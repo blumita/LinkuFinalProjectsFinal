@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="uuid-ae882944-4a40-4771-90c6-efb54dfc760b"
+   viewBox="0 0 219.73 219.72999"
+   version="1.1"
+   width="219.73"
+   height="219.73"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs9" />
+  <rect
+     x="0"
+     y="0"
+     width="219.73"
+     height="219.73"
+     rx="63.578999"
+     ry="63.578999"
+     fill="#4273b9"
+     id="rect2" />
+  <path
+     d="m 135.749,58.070999 h 12.681 v -26.711 h -22.51 c -22.97,0 -37.983,13.921 -37.983,39.124 v 22.155 H 65.411 V 121.707 h 22.526 v 69.733 h 31.425 v -69.733 h 23.431 l 4.458,-29.068001 h -27.89 v -18.864 c 0,-7.952 3.896,-15.704 16.388,-15.704 z"
+     fill="#ffffff"
+     id="path4" />
+</svg>

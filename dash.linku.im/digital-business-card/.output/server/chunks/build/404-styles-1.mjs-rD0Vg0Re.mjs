@@ -1,0 +1,4 @@
+const _404_vue_vue_type_style_index_0_scoped_c4d7976e_lang = "@keyframes bounce-slow-c4d7976e{0%,to{transform:translateY(0)}50%{transform:translateY(-20px)}}@keyframes spin-slow-c4d7976e{0%{transform:rotate(0)}to{transform:rotate(1turn)}}.animate-bounce-slow[data-v-c4d7976e]{animation:bounce-slow-c4d7976e 2s ease-in-out infinite}.animation-delay-200[data-v-c4d7976e]{animation-delay:.2s}.animate-spin-slow[data-v-c4d7976e]{animation:spin-slow-c4d7976e 3s linear infinite}@keyframes ping-c4d7976e{0%{opacity:1;transform:scale(1)}75%,to{opacity:0;transform:scale(2)}}.animate-ping[data-v-c4d7976e]{animation:ping-c4d7976e 1.5s cubic-bezier(0,0,.2,1) infinite}";
+
+export { _404_vue_vue_type_style_index_0_scoped_c4d7976e_lang as _ };
+//# sourceMappingURL=404-styles-1.mjs-rD0Vg0Re.mjs.map
