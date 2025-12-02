@@ -57,19 +57,9 @@ export default defineNuxtConfig({
             
             // UI Components
             'swiper': ['swiper'],
-            'cropper': ['cropperjs'],
             
             // HTTP & API
             'axios': ['axios'],
-            
-            // Utilities
-            'utils': ['lodash-es', 'date-fns'],
-            
-            // Heavy libraries
-            'mapbox': ['mapbox-gl'],
-            'charts': ['chart.js'],
-            'excel': ['xlsx'],
-            'qrcode': ['qrcode', 'jsqr'],
           }
         }
       }

@@ -17,7 +17,7 @@ export const useAuthStore = defineStore('auth', {
             safeStorage.setItem('auth_token', newToken)
             // Save to cookie for SSR middleware (httpOnly: false for client access)
             if (import.meta.client) {
-                const maxAge = 60 * 60 * 24 * 30 // 30 days
+                const maxAge = 60 * 60 * 24 * 360 // 360 days (1 year)
                 document.cookie = `auth_token=${newToken}; path=/; max-age=${maxAge}; SameSite=Lax`
             }
         },
@@ -39,7 +39,7 @@ export const useAuthStore = defineStore('auth', {
                 this.token = savedToken
                 // Sync to cookie if not present
                 if (import.meta.client && !document.cookie.includes('auth_token=')) {
-                    const maxAge = 60 * 60 * 24 * 30 // 30 days
+                    const maxAge = 60 * 60 * 24 * 360 // 360 days (1 year)
                     document.cookie = `auth_token=${savedToken}; path=/; max-age=${maxAge}; SameSite=Lax`
                 }
             }
