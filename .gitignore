@@ -1,0 +1,48 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+vendor/
+
+# Build cache only (not the final build outputs)
+.nuxt/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Cache
+.cache/
+.temp/
+.tmp/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Laravel specific
+storage/
+bootstrap/cache/
+public/storage
+public/hot
+
+# Composer
+composer.lock
+composer.phar

@@ -1,0 +1,80 @@
+/* ===========================
+   RED THEME (Bold Red)
+   =========================== */
+
+.theme-red {
+  /* Background & Foreground Colors - Base */
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(0 0% 3.9%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(0 0% 3.9%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(0 0% 3.9%);
+  
+  /* Primary Brand Colors - Red */
+  --color-primary: hsl(0 72.2% 50.6%);
+  --color-primary-foreground: hsl(0 85.7% 97.3%);
+  --color-primary-alpha: hsl(0 72.2% 50.6% / 0.2);
+  
+  /* Secondary & Muted Colors */
+  --color-secondary: hsl(0 0% 96.1%);
+  --color-secondary-foreground: hsl(0 0% 9%);
+  --color-muted: hsl(0 0% 96.1%);
+  --color-muted-foreground: hsl(0 0% 45.1%);
+  --color-accent: hsl(0 0% 96.1%);
+  --color-accent-foreground: hsl(0 0% 9%);
+  
+  /* Destructive Colors - Red matches primary */
+  --color-destructive: hsl(0 72.2% 50.6%);
+  --color-destructive-foreground: hsl(0 85.7% 97.3%);
+  
+  /* Border & Input Colors */
+  --color-border: hsl(0 0% 89.8%);
+  --color-input: hsl(0 0% 89.8%);
+  --color-ring: hsl(0 72.2% 50.6%);
+  
+  /* Red Color Palette */
+  --color-red-50: hsl(0 85.7% 97.3%);
+  --color-red-100: hsl(0 93.3% 94.1%);
+  --color-red-200: hsl(0 96.3% 89.4%);
+  --color-red-300: hsl(0 93.5% 81.8%);
+  --color-red-400: hsl(0 90.6% 70.8%);
+  --color-red-500: hsl(0 84.2% 60.2%);
+  --color-red-600: hsl(0 72.2% 50.6%);
+  --color-red-700: hsl(0 73.7% 41.8%);
+  --color-red-800: hsl(0 70% 35.3%);
+  --color-red-900: hsl(0 62.8% 30.6%);
+  --color-red-950: hsl(0 60% 19.6%);
+
+  /* Tonal Background Overrides for Red */
+  --color-tonal-primary-bg: hsl(0 85.7% 97.3%);
+  --color-tonal-primary-bg-hover: hsl(0 93.3% 94.1%);
+  --color-tonal-primary-fg: hsl(0 72.2% 50.6%);
+}
+
+/* Dark Mode Red */
+.theme-red.dark {
+  --color-background: hsl(0 0% 3.9%);
+  --color-foreground: hsl(0 0% 98%);
+  --color-card: hsl(0 0% 3.9%);
+  --color-card-foreground: hsl(0 0% 98%);
+  --color-popover: hsl(0 0% 3.9%);
+  --color-popover-foreground: hsl(0 0% 98%);
+  --color-primary: hsl(0 72.2% 50.6%);
+  --color-primary-foreground: hsl(0 85.7% 97.3%);
+  --color-primary-alpha: hsl(0 72.2% 50.6% / 0.2);
+  --color-secondary: hsl(0 0% 14.9%);
+  --color-secondary-foreground: hsl(0 0% 98%);
+  --color-muted: hsl(0 0% 14.9%);
+  --color-muted-foreground: hsl(0 0% 63.9%);
+  --color-accent: hsl(0 0% 14.9%);
+  --color-accent-foreground: hsl(0 0% 98%);
+  --color-border: hsl(0 0% 14.9%);
+  --color-input: hsl(0 0% 14.9%);
+  --color-ring: hsl(0 72.2% 50.6%);
+
+  /* Dark Mode Tonal Overrides */
+  --color-tonal-primary-bg: hsl(0 60% 19.6%);
+  --color-tonal-primary-bg-hover: hsl(0 70% 35.3%);
+  --color-tonal-primary-fg: hsl(0 85.7% 97.3%);
+}

@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Contracts;
+
+interface OtpSenderInterface
+{
+
+    public function send(string $phone, string $code): bool;
+
+}

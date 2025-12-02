@@ -1,0 +1,27 @@
+/* ===========================
+   THEME SYSTEM - INDEX FILE
+   Import all theme files
+   =========================== */
+
+/* Base Theme - Default definitions */
+@import './base.css';
+
+/* Individual Theme Variants */
+@import './zinc.css';
+@import './slate.css';
+@import './stone.css';
+@import './gray.css';
+@import './orange.css';
+@import './green.css';
+@import './blue.css';
+@import './yellow.css';
+@import './violet.css';
+@import './red.css';
+@import './black.css';
+@import './custom.css';
+
+/* ===========================
+   ROOT DEFINITIONS
+   Global CSS custom properties
+   =========================== */
+

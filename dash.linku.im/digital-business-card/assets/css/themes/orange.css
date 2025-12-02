@@ -1,0 +1,80 @@
+/* ===========================
+   ORANGE THEME (Vibrant Orange)
+   =========================== */
+
+.theme-orange {
+  /* Background & Foreground Colors - Base */
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(20 14.3% 4.1%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(20 14.3% 4.1%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(20 14.3% 4.1%);
+  
+  /* Primary Brand Colors - Orange */
+  --color-primary: hsl(24.6 95% 53.1%);
+  --color-primary-foreground: hsl(60 9.1% 97.8%);
+  --color-primary-alpha: hsl(24.6 95% 53.1% / 0.2);
+  
+  /* Secondary & Muted Colors */
+  --color-secondary: hsl(60 4.8% 95.9%);
+  --color-secondary-foreground: hsl(24 9.8% 10%);
+  --color-muted: hsl(60 4.8% 95.9%);
+  --color-muted-foreground: hsl(25 5.3% 44.7%);
+  --color-accent: hsl(60 4.8% 95.9%);
+  --color-accent-foreground: hsl(24 9.8% 10%);
+  
+  /* Destructive Colors */
+  --color-destructive: hsl(0 72.2% 50.6%);
+  --color-destructive-foreground: hsl(0 0% 98%);
+  
+  /* Border & Input Colors */
+  --color-border: hsl(20 5.9% 90%);
+  --color-input: hsl(20 5.9% 90%);
+  --color-ring: hsl(24.6 95% 53.1%);
+  
+  /* Orange Color Palette */
+  --color-orange-50: hsl(33.3 100% 96.5%);
+  --color-orange-100: hsl(34.3 100% 91.8%);
+  --color-orange-200: hsl(32.1 97.7% 83.1%);
+  --color-orange-300: hsl(30.7 97.2% 72.4%);
+  --color-orange-400: hsl(27 96% 61%);
+  --color-orange-500: hsl(24.6 95% 53.1%);
+  --color-orange-600: hsl(20.5 90.2% 48.2%);
+  --color-orange-700: hsl(17.5 88.3% 40.4%);
+  --color-orange-800: hsl(15 79.1% 33.7%);
+  --color-orange-900: hsl(15 75% 28%);
+  --color-orange-950: hsl(13.8 81.5% 14.5%);
+
+  /* Tonal Background Overrides for Orange */
+  --color-tonal-primary-bg: hsl(33.3 100% 96.5%);
+  --color-tonal-primary-bg-hover: hsl(34.3 100% 91.8%);
+  --color-tonal-primary-fg: hsl(17.5 88.3% 40.4%);
+}
+
+/* Dark Mode Orange */
+.theme-orange.dark {
+  --color-background: hsl(20 14.3% 4.1%);
+  --color-foreground: hsl(60 9.1% 97.8%);
+  --color-card: hsl(20 14.3% 4.1%);
+  --color-card-foreground: hsl(60 9.1% 97.8%);
+  --color-popover: hsl(20 14.3% 4.1%);
+  --color-popover-foreground: hsl(60 9.1% 97.8%);
+  --color-primary: hsl(20.5 90.2% 48.2%);
+  --color-primary-foreground: hsl(60 9.1% 97.8%);
+  --color-primary-alpha: hsl(20.5 90.2% 48.2% / 0.2);
+  --color-secondary: hsl(12 6.5% 15.1%);
+  --color-secondary-foreground: hsl(60 9.1% 97.8%);
+  --color-muted: hsl(12 6.5% 15.1%);
+  --color-muted-foreground: hsl(24 5.4% 63.9%);
+  --color-accent: hsl(12 6.5% 15.1%);
+  --color-accent-foreground: hsl(60 9.1% 97.8%);
+  --color-border: hsl(12 6.5% 15.1%);
+  --color-input: hsl(12 6.5% 15.1%);
+  --color-ring: hsl(20.5 90.2% 48.2%);
+
+  /* Dark Mode Tonal Overrides */
+  --color-tonal-primary-bg: hsl(12 6.5% 15.1%);
+  --color-tonal-primary-bg-hover: hsl(15 79.1% 33.7%);
+  --color-tonal-primary-fg: hsl(24.6 95% 53.1%);
+}

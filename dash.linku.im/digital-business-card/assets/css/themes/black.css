@@ -1,0 +1,111 @@
+/* ===========================
+   BLACK THEME (Pure Black/White/Gray)
+   =========================== */
+
+.theme-black {
+  /* Background & Foreground Colors - Base (Light Mode - Soft) */
+  --color-background: hsl(0 0% 99%);
+  --color-foreground: hsl(0 0% 15%);
+  --color-card: hsl(0 0% 98%);
+  --color-card-foreground: hsl(0 0% 20%);
+  --color-popover: hsl(0 0% 98%);
+  --color-popover-foreground: hsl(0 0% 20%);
+  
+  /* Primary Brand Colors - Soft Black */
+  --color-primary: hsl(0 0% 20%);
+  --color-primary-foreground: hsl(0 0% 98%);
+  --color-primary-alpha: hsl(0 0% 20% / 0.15);
+  
+  /* Secondary & Muted Colors - Gentle Grays */
+  --color-secondary: hsl(0 0% 94%);
+  --color-secondary-foreground: hsl(0 0% 25%);
+  --color-muted: hsl(0 0% 95%);
+  --color-muted-foreground: hsl(0 0% 50%);
+  --color-accent: hsl(0 0% 94%);
+  --color-accent-foreground: hsl(0 0% 25%);
+  
+  /* Destructive Colors */
+  --color-destructive: hsl(0 72.2% 50.6%);
+  --color-destructive-foreground: hsl(0 0% 98%);
+  
+  /* Border & Input Colors - Softer Borders */
+  --color-border: hsl(0 0% 88%);
+  --color-input: hsl(0 0% 88%);
+  --color-ring: hsl(0 0% 30%);
+  
+  /* Black Color Palette - Refined */
+  --color-black-50: hsl(0 0% 98%);
+  --color-black-100: hsl(0 0% 95%);
+  --color-black-200: hsl(0 0% 88%);
+  --color-black-300: hsl(0 0% 75%);
+  --color-black-400: hsl(0 0% 60%);
+  --color-black-500: hsl(0 0% 45%);
+  --color-black-600: hsl(0 0% 35%);
+  --color-black-700: hsl(0 0% 25%);
+  --color-black-800: hsl(0 0% 18%);
+  --color-black-900: hsl(0 0% 12%);
+  --color-black-950: hsl(0 0% 6%);
+
+  /* Tonal Background Overrides for Black */
+  --color-tonal-primary-bg: hsl(0 0% 94%);
+  --color-tonal-primary-bg-hover: hsl(0 0% 88%);
+  --color-tonal-primary-fg: hsl(0 0% 25%);
+  
+  /* Success Colors */
+  --color-success: hsl(142.1 76.2% 36.3%);
+  --color-success-foreground: hsl(355.7 100% 97.3%);
+  
+  /* Warning Colors */
+  --color-warning: hsl(32.9 82.3% 57.6%);
+  --color-warning-foreground: hsl(210 40% 98%);
+  
+  /* Info Colors */
+  --color-info: hsl(221.2 83.2% 53.3%);
+  --color-info-foreground: hsl(210 40% 98%);
+}
+
+/* Dark Mode Black - True Black Theme */
+.theme-black.dark {
+  /* Complete Black Background for Dark Mode */
+  --color-background: hsl(0 0% 0%);
+  --color-foreground: hsl(0 0% 95%);
+  --color-card: hsl(0 0% 3%);
+  --color-card-foreground: hsl(0 0% 92%);
+  --color-popover: hsl(0 0% 3%);
+  --color-popover-foreground: hsl(0 0% 92%);
+  
+  /* Pure White Primary for Contrast */
+  --color-primary: hsl(0 0% 100%);
+  --color-primary-foreground: hsl(0 0% 0%);
+  --color-primary-alpha: hsl(0 0% 100% / 0.15);
+  
+  /* Soft Grays for Dark Mode */
+  --color-secondary: hsl(0 0% 8%);
+  --color-secondary-foreground: hsl(0 0% 90%);
+  --color-muted: hsl(0 0% 8%);
+  --color-muted-foreground: hsl(0 0% 65%);
+  --color-accent: hsl(0 0% 8%);
+  --color-accent-foreground: hsl(0 0% 90%);
+  
+  /* Subtle Borders in Dark Mode */
+  --color-border: hsl(0 0% 12%);
+  --color-input: hsl(0 0% 12%);
+  --color-ring: hsl(0 0% 80%);
+
+  /* Dark Mode Tonal Overrides */
+  --color-tonal-primary-bg: hsl(0 0% 8%);
+  --color-tonal-primary-bg-hover: hsl(0 0% 15%);
+  --color-tonal-primary-fg: hsl(0 0% 95%);
+  
+  /* Success Colors - Dark Mode - Softer */
+  --color-success: hsl(142.1 60% 45%);
+  --color-success-foreground: hsl(144.9 80.4% 10%);
+  
+  /* Warning Colors - Dark Mode - Softer */
+  --color-warning: hsl(32.9 65% 55%);
+  --color-warning-foreground: hsl(20 14.3% 4.1%);
+  
+  /* Info Colors - Dark Mode - Softer */
+  --color-info: hsl(217.2 85% 65%);
+  --color-info-foreground: hsl(222.2 84% 4.9%);
+}

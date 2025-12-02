@@ -1,0 +1,6 @@
+export { default as cashapp } from './cashapp.vue'
+export { default as paypal } from './paypal.vue'
+export { default as remit } from './remit.vue'
+export { default as trustwallet } from './trustwallet.vue'
+export { default as zarinpal } from './zarinpal.vue'
+export { default as zelle } from './zelle.vue'

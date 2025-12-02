@@ -1,0 +1,143 @@
+/* ===========================
+   CUSTOM THEME (My Personal Colors)
+   =========================== */
+
+.theme-custom {
+  /* Background & Foreground Colors - Base */
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(240 10% 3.9%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(240 10% 3.9%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(240 10% 3.9%);
+  
+  /* Primary Brand Colors - Deep Purple/Violet */
+  --color-primary: hsl(258 92% 47%);
+  --color-primary-foreground: hsl(0 0% 98%);
+  --color-primary-alpha: hsl(258 92% 47% / 0.15);
+  
+  /* Category Colors - Vibrant Gradient System */
+  --color-category-tech: hsl(258 92% 47%);      /* Deep Purple - Technology */
+  --color-category-food: hsl(25 95% 53%);       /* Orange - Food & Restaurant */
+  --color-category-health: hsl(142 76% 36%);    /* Green - Health & Medical */
+  --color-category-shopping: hsl(341 75% 51%);  /* Pink - Shopping & Retail */
+  --color-category-service: hsl(217 91% 60%);   /* Blue - Services */
+  --color-category-education: hsl(43 96% 56%);  /* Yellow - Education */
+  --color-category-entertainment: hsl(295 76% 51%); /* Magenta - Entertainment */
+  --color-category-travel: hsl(195 100% 50%);   /* Cyan - Travel */
+  --color-category-finance: hsl(120 61% 34%);   /* Dark Green - Finance */
+  --color-category-real-estate: hsl(39 70% 45%); /* Brown - Real Estate */
+  
+  /* Button Colors - Enhanced with gradients */
+  --color-btn-primary: linear-gradient(135deg, hsl(258 92% 47%), hsl(268 83% 57%));
+  --color-btn-secondary: linear-gradient(135deg, hsl(220 14% 96%), hsl(210 20% 90%));
+  --color-btn-accent: linear-gradient(135deg, hsl(25 95% 53%), hsl(35 90% 60%));
+  --color-btn-destructive: linear-gradient(135deg, hsl(0 84% 60%), hsl(10 90% 65%));
+  
+  /* Zoom Button Colors - Bright and distinctive */
+  --color-zoom-in: hsl(142 76% 36%);           /* Vibrant Green */
+  --color-zoom-out: hsl(0 84% 60%);            /* Vibrant Red */
+  --color-zoom-reset: hsl(258 92% 47%);        /* Primary Purple */
+  --color-zoom-fullscreen: hsl(217 91% 60%);   /* Blue */
+  
+  /* Secondary & Muted Colors */
+  --color-secondary: hsl(240 4.8% 95.9%);
+  --color-secondary-foreground: hsl(240 5.9% 10%);
+  --color-muted: hsl(240 4.8% 95.9%);
+  --color-muted-foreground: hsl(240 3.8% 46.1%);
+  --color-accent: hsl(240 4.8% 95.9%);
+  --color-accent-foreground: hsl(240 5.9% 10%);
+  
+  /* Destructive Colors */
+  --color-destructive: hsl(0 72.2% 50.6%);
+  --color-destructive-foreground: hsl(0 0% 98%);
+  
+  /* Border & Input Colors */
+  --color-border: hsl(240 5.9% 90%);
+  --color-input: hsl(240 5.9% 90%);
+  --color-ring: hsl(258 92% 47%);
+  
+  /* Extended Color Palette */
+  --color-violet-50: hsl(250 100% 97.6%);
+  --color-violet-100: hsl(251 91% 95.5%);
+  --color-violet-200: hsl(253 95% 91.8%);
+  --color-violet-300: hsl(255 93% 84.1%);
+  --color-violet-400: hsl(258 90% 74.3%);
+  --color-violet-500: hsl(258 92% 47%);
+  --color-violet-600: hsl(262 83% 58%);
+  --color-violet-700: hsl(263 70% 50.4%);
+  --color-violet-800: hsl(263 69% 42.2%);
+  --color-violet-900: hsl(264 67% 35.3%);
+  --color-violet-950: hsl(265 86% 20%);
+
+  /* Gradient Definitions */
+  --gradient-primary: linear-gradient(135deg, var(--color-primary), var(--color-violet-600));
+  --gradient-secondary: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
+  --gradient-rainbow: linear-gradient(135deg, 
+    hsl(258 92% 47%), 
+    hsl(295 76% 51%), 
+    hsl(341 75% 51%), 
+    hsl(25 95% 53%), 
+    hsl(43 96% 56%));
+
+  /* Tonal Background Overrides */
+  --color-tonal-primary-bg: hsl(250 100% 97.6%);
+  --color-tonal-primary-bg-hover: hsl(251 91% 95.5%);
+  --color-tonal-primary-fg: hsl(258 92% 47%);
+}
+
+/* Dark Mode Custom */
+.theme-custom.dark {
+  --color-background: hsl(240 10% 3.9%);
+  --color-foreground: hsl(0 0% 98%);
+  --color-card: hsl(240 10% 3.9%);
+  --color-card-foreground: hsl(0 0% 98%);
+  --color-popover: hsl(240 10% 3.9%);
+  --color-popover-foreground: hsl(0 0% 98%);
+  
+  --color-primary: hsl(258 92% 67%);
+  --color-primary-foreground: hsl(265 86% 20%);
+  --color-primary-alpha: hsl(258 92% 67% / 0.2);
+  
+  /* Dark mode category colors - more vibrant */
+  --color-category-tech: hsl(258 92% 67%);
+  --color-category-food: hsl(25 95% 63%);
+  --color-category-health: hsl(142 76% 46%);
+  --color-category-shopping: hsl(341 75% 61%);
+  --color-category-service: hsl(217 91% 70%);
+  --color-category-education: hsl(43 96% 66%);
+  --color-category-entertainment: hsl(295 76% 61%);
+  --color-category-travel: hsl(195 100% 60%);
+  --color-category-finance: hsl(120 61% 44%);
+  --color-category-real-estate: hsl(39 70% 55%);
+  
+  /* Dark mode zoom buttons */
+  --color-zoom-in: hsl(142 76% 46%);
+  --color-zoom-out: hsl(0 84% 70%);
+  --color-zoom-reset: hsl(258 92% 67%);
+  --color-zoom-fullscreen: hsl(217 91% 70%);
+  
+  --color-secondary: hsl(240 3.7% 15.9%);
+  --color-secondary-foreground: hsl(0 0% 98%);
+  --color-muted: hsl(240 3.7% 15.9%);
+  --color-muted-foreground: hsl(240 5% 64.9%);
+  --color-accent: hsl(240 3.7% 15.9%);
+  --color-accent-foreground: hsl(0 0% 98%);
+  --color-border: hsl(240 3.7% 15.9%);
+  --color-input: hsl(240 3.7% 15.9%);
+  --color-ring: hsl(258 92% 67%);
+
+  /* Dark Mode Tonal Overrides */
+  --color-tonal-primary-bg: hsl(265 86% 20%);
+  --color-tonal-primary-bg-hover: hsl(263 69% 42.2%);
+  --color-tonal-primary-fg: hsl(250 100% 97.6%);
+  
+  /* Dark mode gradients */
+  --gradient-primary: linear-gradient(135deg, var(--color-primary), var(--color-violet-500));
+  --gradient-rainbow: linear-gradient(135deg, 
+    hsl(258 92% 67%), 
+    hsl(295 76% 61%), 
+    hsl(341 75% 61%), 
+    hsl(25 95% 63%), 
+    hsl(43 96% 66%));
+}

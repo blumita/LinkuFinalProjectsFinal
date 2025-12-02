@@ -1,0 +1,1397 @@
+<template>
+  <div class="min-h-screen flex items-center justify-center bg-background px-4 transition-colors duration-300 relative">
+    <!-- Language Button - Top Corner -->
+    <button
+      @click="isLanguageSheetOpen = true"
+      class="fixed top-4 rtl:left-4 ltr:right-4 z-50 w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center hover:bg-accent transition-colors"
+    >
+      <i class="ti ti-language text-foreground text-xl"></i>
+    </button>
+
+    <div class="w-full max-w-md rtl:text-right ltr:text-left">
+      <template v-if="step === 'phone'">
+        <!-- Header -->
+        <div class="w-full text-center mb-8">
+          <h1 class="text-xl font-bold mb-2 text-foreground">شماره تلفن</h1>
+          <p class="text-muted-foreground text-sm">لطفاً کشور را انتخاب و سپس شماره رو وارد کنید</p>
+        </div>
+
+        <!-- Country Selector -->
+        <div class="w-full mb-4 relative">
+          <label class="absolute rtl:right-4 ltr:left-4 top-[-10px] bg-background text-sm px-1 text-foreground transition-all duration-300">کشور</label>
+          <button 
+            @click="showCountryPicker = true"
+            class="w-full flex items-center border border-border rounded-lg px-4 py-4 bg-card transition-all duration-300 hover:border-primary"
+          >
+            <img :src="`/flag/${selectedCountry.flag}.svg`" :alt="selectedCountry.nameEn" class="w-7 h-5 object-cover rounded rtl:ml-3 ltr:mr-3" />
+            <span class="flex-1 rtl:text-right ltr:text-left text-foreground">{{ selectedCountry.name }}</span>
+            <span class="text-muted-foreground text-sm mx-2" dir="ltr">{{ selectedCountry.dialCode }}</span>
+            <i class="ti ti-chevron-down text-muted-foreground"></i>
+          </button>
+        </div>
+
+
+        <!-- Phone Number Input -->
+        <div class="w-full mb-6 relative overflow-hidden">
+          <input
+              v-model="phone"
+              @input="handlePhoneInput"
+              id="phoneInput"
+              type="text"
+              inputmode="numeric"
+              placeholder=" "
+              dir="ltr"
+              class="peer block w-full px-4 py-4 text-sm border border-border rounded-lg focus:outline-none focus:ring-0 focus:border-primary text-foreground bg-card transition-all duration-300"
+          />
+          <label
+              for="phoneInput"
+              class="absolute rtl:right-4 ltr:left-4 text-sm text-muted-foreground bg-background px-1 z-10 transition-all duration-200 cursor-text
+              top-1/2 -translate-y-1/2
+              peer-focus:top-1 peer-focus:text-xs peer-focus:-translate-y-1/2 peer-focus:text-primary
+              peer-[:not(:placeholder-shown)]:top-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-1/2"
+          >
+            شماره موبایل
+          </label>
+
+          <p v-if="errors.phone" class="text-red-500 text-xs mt-1 block">{{ errors.phone }}</p>
+        </div>
+
+        <!-- Continue Button -->
+        <button
+            class="w-full bg-primary text-primary-foreground text-center py-4 rounded-lg text-lg font-medium relative flex items-center justify-center overflow-hidden transition-all duration-300 hover:opacity-90 hover:-translate-y-0.5"
+            @click="handlePhone"
+        >
+          <i class="ti ti-chevron-left w-4 rtl:mr-auto ltr:ml-auto absolute rtl:left-4 ltr:right-4 pt-1 text-2xl rtl:border-r ltr:border-l px-4 border-primary-foreground/30 ltr:hidden"></i>
+          <i class="ti ti-chevron-right w-4 ltr:ml-auto absolute ltr:right-4 pt-1 text-2xl ltr:border-l px-4 border-primary-foreground/30 rtl:hidden"></i>
+          <span>ادامه</span>
+        </button>
+
+        <!-- Divider -->
+        <div class="flex items-center gap-3 my-6">
+          <div class="flex-1 h-px bg-border"></div>
+          <span class="text-muted-foreground text-sm">یا</span>
+          <div class="flex-1 h-px bg-border"></div>
+        </div>
+
+        <!-- Face ID / Touch ID Button -->
+        <button
+            v-if="isPlatformAuthenticatorAvailable && isPasskeyEnabled()"
+            class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white text-center py-4 rounded-lg text-lg font-medium relative flex items-center justify-center overflow-hidden transition-all duration-300 hover:opacity-90 hover:-translate-y-0.5 mb-3"
+            @click="handlePasskeyLogin"
+            :disabled="isWebAuthnLoading"
+        >
+          <template v-if="isWebAuthnLoading">
+            <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin ml-2"></div>
+            <span>در حال احراز هویت...</span>
+          </template>
+          <template v-else>
+            <i class="ti ti-face-id text-xl ml-2"></i>
+            <span>ورود با Face ID / Touch ID</span>
+          </template>
+        </button>
+
+        <!-- Login with Email Button -->
+        <button
+            class="w-full bg-card border border-border text-foreground text-center py-4 rounded-lg text-lg font-medium relative flex items-center justify-center overflow-hidden transition-all duration-300 hover:bg-muted hover:-translate-y-0.5"
+            @click="step = 'email'"
+        >
+          <i class="ti ti-mail text-xl ml-2"></i>
+          <span>ورود با ایمیل</span>
+        </button>
+      </template>
+
+      <!-- Email Step -->
+      <template v-else-if="step === 'email'">
+        <!-- Header with Back Button -->
+        <div class="w-full mb-8">
+          <div class="flex items-center gap-3 mb-4">
+            <button
+              @click="step = 'phone'"
+              class="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center hover:bg-accent transition-colors"
+            >
+              <i class="ti ti-arrow-right rtl:block ltr:hidden text-foreground text-xl"></i>
+              <i class="ti ti-arrow-left ltr:block rtl:hidden text-foreground text-xl"></i>
+            </button>
+            <h1 class="text-xl font-bold text-foreground flex-1 rtl:text-right ltr:text-left">ایمیل</h1>
+          </div>
+          <p class="text-muted-foreground text-sm rtl:text-right ltr:text-left">آدرس ایمیل خود را وارد کنید</p>
+        </div>
+
+        <!-- Email Input -->
+        <div class="w-full mb-6 relative">
+          <input
+              v-model="email"
+              id="emailInput"
+              type="email"
+              inputmode="email"
+              placeholder=" "
+              dir="ltr"
+              class="peer block w-full px-4 py-4 text-sm border border-border rounded-lg focus:outline-none focus:ring-0 focus:border-primary text-foreground bg-card transition-all duration-300"
+          />
+          <label
+              for="emailInput"
+              class="absolute rtl:right-4 ltr:left-4 text-sm text-muted-foreground bg-background px-1 z-10 transition-all duration-200 cursor-text
+              top-1/2 -translate-y-1/2
+              peer-focus:top-1 peer-focus:text-xs peer-focus:-translate-y-1/2 peer-focus:text-primary
+              peer-[:not(:placeholder-shown)]:top-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-1/2"
+          >
+            ایمیل
+          </label>
+
+          <p v-if="errors.email" class="text-red-500 text-xs mt-1 block">{{ errors.email }}</p>
+        </div>
+
+        <!-- Continue Button -->
+        <button
+            class="w-full bg-primary text-primary-foreground text-center py-4 rounded-lg text-lg font-medium relative flex items-center justify-center overflow-hidden transition-all duration-300 hover:opacity-90 hover:-translate-y-0.5"
+            @click="handleEmail"
+        >
+          <i class="ti ti-chevron-left w-4 rtl:mr-auto ltr:ml-auto absolute rtl:left-4 ltr:right-4 pt-1 text-2xl rtl:border-r ltr:border-l px-4 border-primary-foreground/30 ltr:hidden"></i>
+          <i class="ti ti-chevron-right w-4 ltr:ml-auto absolute ltr:right-4 pt-1 text-2xl ltr:border-l px-4 border-primary-foreground/30 rtl:hidden"></i>
+          <span>ادامه</span>
+        </button>
+      </template>
+
+      <!-- OTP Step -->
+      <template v-else-if="step === 'otp'">
+        <!-- Loading Overlay -->
+        <div v-if="isVerifying" class="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div class="flex flex-col items-center gap-4">
+            <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-foreground font-medium">در حال ورود...</p>
+          </div>
+        </div>
+        <!-- Header with Back Button -->
+        <div class="w-full mb-4">
+          <div class="flex items-center justify-between mb-4">
+            <button
+              @click="goBackFromOtp"
+              class="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center hover:bg-accent transition-colors"
+            >
+              <i class="ti ti-arrow-right rtl:block ltr:hidden text-foreground text-xl"></i>
+              <i class="ti ti-arrow-left ltr:block rtl:hidden text-foreground text-xl"></i>
+            </button>
+            <h2 class="text-xl font-bold text-foreground flex-1 text-center">کد تایید</h2>
+            <div class="w-10"></div>
+          </div>
+        </div>
+        <p v-if="authMethod === 'phone'" class="text-sm text-muted-foreground text-center mb-4">لطفا کد ارسال شده به شماره موبایل
+          {{ toPersianDigits(displayPhone) }} را وارد
+          کنید</p>
+        <p v-else class="text-sm text-muted-foreground text-center mb-4">لطفا کد ارسال شده به ایمیل
+          {{ displayEmail }} را وارد
+          کنید</p>
+
+        <div ref="otpCont" class="flex justify-center gap-2 mt-6 ltr">
+          <input
+              v-for="(_, ind) in otpLength"
+              :key="ind"
+              :id="`otp-input-${ind}`"
+              type="text"
+              class="p-4 w-14 h-14 border border-border rounded-lg bg-card text-center text-xl text-foreground flex items-center justify-center font-semibold ltr focus:outline-none focus:border-primary focus:bg-background transition-all duration-300"
+              :value="otp[ind]"
+              maxlength="1"
+              placeholder="-"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              :autofocus="ind === 0"
+              @input="otp[ind] = ($event.target as HTMLInputElement)?.value || null"
+              @keydown="handleOtpKey(ind, $event)"
+              :class="{ bounce: otp[ind] !== null }"
+          />
+        </div>
+
+        <div class="timer center flex justify-center py-4 text-sm">
+          <template v-if="!isResendEnabled">
+            <div class="text-right">
+              <span class="font-bold inline-block text-foreground" dir="ltr">{{ formatTime(timer) }}</span>
+              <strong class="mr-2 text-muted-foreground">ثانیه مانده تا ارسال مجدد کد</strong>
+            </div>
+          </template>
+          <template v-else>
+            <button
+                class="text-primary underline hover:opacity-80 transition-opacity"
+                @click="resendCode"
+            >
+              ارسال مجدد کد
+            </button>
+          </template>
+        </div>
+
+      </template>
+
+      <!-- Register Step -->
+      <template v-else-if="step === 'register'">
+        <h2 class="text-xl font-bold mb-2 flex items-center gap-2 text-foreground">ثبت</h2>
+
+        <div class="relative w-full mt-4">
+          <input
+              v-model="name"
+              id="nameInput"
+              type="text"
+              placeholder=" "
+              class="peer block w-full px-3 pt-4 pb-4 text-sm text-foreground rtl:text-right ltr:text-left border border-border rounded-lg focus:outline-none focus:ring-0 focus:border-primary bg-card transition-all duration-300"
+          />
+          <label
+              for="nameInput"
+              class="absolute rtl:right-4 ltr:left-4 text-sm text-muted-foreground bg-background px-1 z-10 transition-all duration-200 cursor-text
+              top-1/2 -translate-y-1/2
+              peer-focus:top-1 peer-focus:text-xs peer-focus:-translate-y-1/2 peer-focus:text-primary
+              peer-[:not(:placeholder-shown)]:top-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-1/2"
+          >
+            نام
+          </label>
+        </div>
+
+        <div class="relative w-full my-4">
+          <input
+              type="text"
+              id="referralInput"
+              v-model="referralCode"
+              placeholder=" "
+              class="peer block w-full px-3 pt-4 pb-4 text-sm text-foreground rtl:text-right ltr:text-left border border-border rounded-lg focus:outline-none focus:ring-0 focus:border-primary bg-card transition-all duration-300"
+          />
+          <label
+              for="referralInput"
+              class="absolute rtl:right-4 ltr:left-4 text-sm text-muted-foreground bg-background px-1 z-10 transition-all duration-200 cursor-text
+              top-1/2 -translate-y-1/2
+              peer-focus:top-1 peer-focus:text-xs peer-focus:-translate-y-1/2 peer-focus:text-primary
+              peer-[:not(:placeholder-shown)]:top-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-1/2"
+          >
+            کد معرف (اختیاری)
+          </label>
+        </div>
+
+        <button
+            class="w-full bg-primary text-primary-foreground text-center py-4 rounded-lg text-lg font-medium relative flex items-center justify-center overflow-hidden transition-all duration-300 hover:opacity-90 hover:-translate-y-0.5"
+            @click="handleRegister"
+        >
+          <i class="ti ti-chevron-left w-4 rtl:mr-auto ltr:ml-auto absolute rtl:left-4 ltr:right-4 pt-1 text-2xl rtl:border-r ltr:border-l px-4 border-primary-foreground/30 ltr:hidden"></i>
+          <i class="ti ti-chevron-right w-4 ltr:ml-auto absolute ltr:right-4 pt-1 text-2xl ltr:border-l px-4 border-primary-foreground/30 rtl:hidden"></i>
+          <span>ثبت</span>
+        </button>
+      </template>
+
+      <!-- Email Profile Step (for new email users) -->
+      <template v-else-if="step === 'email_profile'">
+        <h2 class="text-xl font-bold mb-2 flex items-center gap-2 text-foreground">تکمیل اطلاعات</h2>
+        <p class="text-sm text-muted-foreground mb-6">لطفاً اطلاعات زیر را تکمیل کنید</p>
+
+        <!-- Full Name Input -->
+        <div class="relative w-full mt-4">
+          <input
+              v-model="fullName"
+              id="profileFullNameInput"
+              type="text"
+              placeholder=" "
+              class="peer block w-full px-3 py-4 text-sm text-foreground rtl:text-right ltr:text-left border border-border rounded-lg focus:outline-none focus:ring-0 focus:border-primary bg-card transition-all duration-300"
+          />
+          <label
+              for="profileFullNameInput"
+              class="absolute rtl:right-4 ltr:left-4 text-sm text-muted-foreground bg-background px-1 z-10 transition-all duration-200 cursor-text
+              top-1/2 -translate-y-1/2
+              peer-focus:top-1 peer-focus:text-xs peer-focus:-translate-y-1/2 peer-focus:text-primary
+              peer-[:not(:placeholder-shown)]:top-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-1/2"
+          >
+            نام و نام خانوادگی *
+          </label>
+          <p v-if="errors.profileName" class="text-red-500 text-xs mt-1 block">{{ errors.profileName }}</p>
+        </div>
+
+        <!-- Phone Input with Country Code -->
+        <div class="relative w-full mt-4">
+          <div class="flex gap-2 flex-row-reverse">
+            <!-- Country Code Selector (Right in RTL) -->
+            <button 
+              @click="showProfileCountryPicker = true"
+              class="flex items-center gap-2 px-3 py-4 border border-border rounded-lg bg-card hover:border-primary transition-all duration-300"
+            >
+              <img :src="`/flag/${selectedProfileCountry.flag}.svg`" :alt="selectedProfileCountry.nameEn" class="w-6 h-4 object-cover rounded" />
+              <span class="text-sm text-foreground" dir="ltr">{{ selectedProfileCountry.dialCode }}</span>
+              <i class="ti ti-chevron-down text-muted-foreground text-sm"></i>
+            </button>
+            <!-- Phone Number -->
+            <div class="flex-1 relative">
+              <input
+                  v-model="profilePhone"
+                  id="profilePhoneInput"
+                  type="text"
+                  inputmode="numeric"
+                  placeholder=" "
+                  dir="ltr"
+                  class="peer block w-full px-3 py-4 text-sm text-foreground text-left border border-border rounded-lg focus:outline-none focus:ring-0 focus:border-primary bg-card transition-all duration-300"
+              />
+              <label
+                  for="profilePhoneInput"
+                  class="absolute right-4 text-sm text-muted-foreground bg-background px-1 z-10 transition-all duration-200 cursor-text
+                  top-1/2 -translate-y-1/2
+                  peer-focus:top-1 peer-focus:text-xs peer-focus:-translate-y-1/2 peer-focus:text-primary
+                  peer-[:not(:placeholder-shown)]:top-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-1/2"
+              >
+                شماره موبایل (اختیاری)
+              </label>
+            </div>
+          </div>
+          <p v-if="errors.profilePhone" class="text-red-500 text-xs mt-1 block">{{ errors.profilePhone }}</p>
+        </div>
+
+        <!-- Referral Code Input -->
+        <div class="relative w-full mt-4">
+          <input
+              v-model="referralCode"
+              id="profileReferralInput"
+              type="text"
+              placeholder=" "
+              class="peer block w-full px-3 py-4 text-sm text-foreground rtl:text-right ltr:text-left border border-border rounded-lg focus:outline-none focus:ring-0 focus:border-primary bg-card transition-all duration-300"
+          />
+          <label
+              for="profileReferralInput"
+              class="absolute rtl:right-4 ltr:left-4 text-sm text-muted-foreground bg-background px-1 z-10 transition-all duration-200 cursor-text
+              top-1/2 -translate-y-1/2
+              peer-focus:top-1 peer-focus:text-xs peer-focus:-translate-y-1/2 peer-focus:text-primary
+              peer-[:not(:placeholder-shown)]:top-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-1/2"
+          >
+            کد دعوت (اختیاری)
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+            class="w-full bg-primary text-primary-foreground text-center py-4 rounded-lg text-lg font-medium relative flex items-center justify-center overflow-hidden transition-all duration-300 hover:opacity-90 hover:-translate-y-0.5 mt-6"
+            @click="handleEmailProfileSubmit"
+            :disabled="isVerifying"
+        >
+          <template v-if="isVerifying">
+            <div class="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin ml-2"></div>
+            <span>در حال ثبت...</span>
+          </template>
+          <template v-else>
+            <i class="ti ti-chevron-left w-4 rtl:mr-auto ltr:ml-auto absolute rtl:left-4 ltr:right-4 pt-1 text-2xl rtl:border-r ltr:border-l px-4 border-primary-foreground/30 ltr:hidden"></i>
+            <i class="ti ti-chevron-right w-4 ltr:ml-auto absolute ltr:right-4 pt-1 text-2xl ltr:border-l px-4 border-primary-foreground/30 rtl:hidden"></i>
+            <span>ثبت و ورود</span>
+          </template>
+        </button>
+      </template>
+
+      <!-- Success Step -->
+      <template v-else-if="step === 'done'">
+        <h2 class="text-xl font-bold text-center text-green-600 flex items-center justify-center gap-2">
+          <i class="ti ti-check"></i> ورود موفق
+        </h2>
+      </template>
+    </div>
+
+    <!-- Country Picker Bottom Sheet -->
+    <UiBottomSheet
+      v-model="showCountryPicker"
+      title="انتخاب کشور"
+      size="lg"
+      desktop-width="2xl"
+      :closable="true"
+      :close-on-backdrop="true"
+    >
+      <div class="px-4 pb-4">
+        <!-- Search -->
+        <div class="relative mb-4">
+          <i class="ti ti-search absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"></i>
+          <input
+            v-model="countrySearchQuery"
+            type="text"
+            placeholder="جستجو کشور..."
+            class="w-full pr-10 pl-4 py-3 border border-border rounded-lg bg-card text-foreground focus:outline-none focus:border-primary"
+          />
+        </div>
+        
+        <!-- Country List -->
+        <div class="max-h-[50vh] overflow-y-auto space-y-1">
+          <button
+            v-for="country in filteredCountries"
+            :key="country.code"
+            @click="country.code === 'IR' ? selectCountry(country) : null"
+            :disabled="country.code !== 'IR'"
+            :class="[
+              'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all',
+              selectedCountry.code === country.code 
+                ? 'bg-primary/10 border border-primary' 
+                : country.code === 'IR' 
+                  ? 'hover:bg-accent cursor-pointer' 
+                  : 'opacity-50 cursor-not-allowed'
+            ]"
+          >
+            <img :src="`/flag/${country.flag}.svg`" :alt="country.nameEn" class="w-7 h-5 object-cover rounded" />
+            <div class="flex-1 text-right">
+              <div class="text-foreground font-medium">{{ country.name }}</div>
+              <div class="text-xs text-muted-foreground">{{ country.nameEn }}</div>
+            </div>
+            <span class="text-muted-foreground text-sm" dir="ltr">{{ country.dialCode }}</span>
+            <template v-if="country.code === 'IR'">
+              <i v-if="selectedCountry.code === country.code" class="ti ti-check text-primary"></i>
+            </template>
+            <template v-else>
+              <span class="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">به‌زودی</span>
+            </template>
+          </button>
+        </div>
+      </div>
+    </UiBottomSheet>
+
+    <!-- Profile Country Picker Bottom Sheet -->
+    <UiBottomSheet
+      v-model="showProfileCountryPicker"
+      title="انتخاب کشور"
+      size="lg"
+      desktop-width="2xl"
+      :closable="true"
+      :close-on-backdrop="true"
+    >
+      <div class="px-4 pb-4">
+        <!-- Search -->
+        <div class="relative mb-4">
+          <i class="ti ti-search absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"></i>
+          <input
+            v-model="countrySearchQuery"
+            type="text"
+            placeholder="جستجو کشور..."
+            class="w-full pr-10 pl-4 py-3 border border-border rounded-lg bg-card text-foreground focus:outline-none focus:border-primary"
+          />
+        </div>
+        
+        <!-- Country List -->
+        <div class="max-h-[50vh] overflow-y-auto space-y-1">
+          <button
+            v-for="country in filteredCountries"
+            :key="country.code"
+            @click="selectProfileCountry(country)"
+            :class="[
+              'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all',
+              selectedProfileCountry.code === country.code 
+                ? 'bg-primary/10 border border-primary' 
+                : 'hover:bg-accent'
+            ]"
+          >
+            <img :src="`/flag/${country.flag}.svg`" :alt="country.nameEn" class="w-7 h-5 object-cover rounded" />
+            <div class="flex-1 text-right">
+              <div class="text-foreground font-medium">{{ country.name }}</div>
+              <div class="text-xs text-muted-foreground">{{ country.nameEn }}</div>
+            </div>
+            <span class="text-muted-foreground text-sm" dir="ltr">{{ country.dialCode }}</span>
+            <i v-if="selectedProfileCountry.code === country.code" class="ti ti-check text-primary"></i>
+          </button>
+        </div>
+      </div>
+    </UiBottomSheet>
+
+    <!-- Language Settings Bottom Sheet -->
+    <UiBottomSheet
+      v-model="isLanguageSheetOpen"
+      title="تنظیمات زبان"
+      size="auto"
+      desktop-width="lg"
+      :closable="true"
+      :close-on-backdrop="true"
+    >
+      <div class="px-6 py-4 pb-6">
+        <div class="space-y-2">
+          <!-- Persian -->
+          <button
+            @click="handleLanguageChange('fa')"
+            :class="[
+              'w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200',
+              currentLanguage === 'fa' 
+                ? 'border-primary bg-primary/5 shadow-sm' 
+                : 'border-border bg-card hover:border-primary/50 hover:bg-accent'
+            ]"
+          >
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center overflow-hidden">
+                <img src="~/assets/flag/IR.png" alt="Iran" class="w-7 h-5 object-cover" />
+              </div>
+              <div class="text-right">
+                <div class="font-semibold text-foreground">فارسی</div>
+                <div class="text-xs text-muted-foreground">Persian</div>
+              </div>
+            </div>
+            <i v-if="currentLanguage === 'fa'" class="ti ti-check text-primary text-2xl"></i>
+          </button>
+
+          <!-- English -->
+          <button
+            disabled
+            class="w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all opacity-50 cursor-not-allowed border-border bg-muted/30"
+          >
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center overflow-hidden">
+                <img src="~/assets/flag/US.png" alt="USA" class="w-7 h-5 object-cover" />
+              </div>
+              <div class="text-right">
+                <div class="font-semibold text-foreground">English</div>
+                <div class="text-xs text-muted-foreground">به‌زودی</div>
+              </div>
+            </div>
+            <div class="px-2 py-1 bg-muted rounded text-xs text-muted-foreground">قفل</div>
+          </button>
+
+          <!-- Arabic -->
+          <button
+            disabled
+            class="w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all opacity-50 cursor-not-allowed border-border bg-muted/30"
+          >
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center overflow-hidden">
+                <img src="~/assets/flag/SA.png" alt="Saudi Arabia" class="w-7 h-5 object-cover" />
+              </div>
+              <div class="text-right">
+                <div class="font-semibold text-foreground">العربية</div>
+                <div class="text-xs text-muted-foreground">به‌زودی</div>
+              </div>
+            </div>
+          </button>
+
+          <!-- Turkish -->
+          <button
+            disabled
+            class="w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all opacity-50 cursor-not-allowed border-border bg-muted/30"
+          >
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center overflow-hidden">
+                <img src="~/assets/flag/TR.png" alt="Turkey" class="w-7 h-5 object-cover" />
+              </div>
+              <div class="text-right">
+                <div class="font-semibold text-foreground">Türkçe</div>
+                <div class="text-xs text-muted-foreground">به‌زودی</div>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </UiBottomSheet>
+
+  </div>
+  <InfoToast :visible="showToast" :message="toastMessage" :icon="toastIcon"/>
+
+</template>
+
+<script setup lang="ts">
+import {ref, reactive, onMounted, computed, nextTick} from 'vue'
+import {useNuxtApp, useRouter} from 'nuxt/app'
+import {useAuthStore} from '~/stores/auth'
+import type {AxiosInstance} from 'axios'
+import InfoToast from "~/components/UserDashboard/modals/InfoToast.vue";
+import {useUserStore} from "~/stores/user";
+import {useWebAuthn} from "~/composables/useWebAuthn";
+
+// ========== Country List ==========
+import { countries, type Country, defaultCountry } from '~/data/countries'
+
+// ========== WebAuthn ==========
+const { 
+  isSupported: isWebAuthnSupported, 
+  isPlatformAuthenticatorAvailable,
+  isLoading: isWebAuthnLoading,
+  registerPasskey,
+  authenticateWithPasskey,
+  isPasskeyEnabled
+} = useWebAuthn()
+
+// ========== Refs & Reactive State ==========
+const step = ref<'phone' | 'email' | 'otp' | 'register' | 'email_profile' | 'done'>('phone')
+const authMethod = ref<'phone' | 'email'>('phone')
+const phone = ref('')
+const email = ref('')
+const name = ref('')
+const family = ref('')
+const fullName = ref('') // نام و نام‌خانوادگی یکجا
+const profilePhone = ref('')
+const profileCountryCode = ref('+98')
+const selectedCountry = ref<Country>(defaultCountry) // ایران پیش‌فرض
+const selectedProfileCountry = ref<Country>(defaultCountry) // برای فرم پروفایل
+const showCountryPicker = ref(false)
+const showProfileCountryPicker = ref(false)
+const countrySearchQuery = ref('')
+const pendingEmailOtpCode = ref('') // ذخیره کد OTP برای ارسال با پروفایل (email)
+const pendingPhoneOtpCode = ref('') // ذخیره کد OTP برای ارسال با پروفایل (phone)
+const referralCode = ref('')
+const displayPhone = ref('')
+const displayEmail = ref('')
+const isLanguageSheetOpen = ref(false)
+const currentLanguage = ref<'fa' | 'en'>('fa')
+const isDark = computed(() => {
+  if (process.client) {
+    return document.documentElement.classList.contains('dark')
+  }
+  return false
+})
+
+// Filtered countries for search
+const filteredCountries = computed(() => {
+  if (!countrySearchQuery.value) return countries
+  const query = countrySearchQuery.value.toLowerCase()
+  return countries.filter(c => 
+    c.name.includes(query) || 
+    c.nameEn.toLowerCase().includes(query) ||
+    c.dialCode.includes(query)
+  )
+})
+
+// Initialize language from localStorage
+if (process.client) {
+  const savedLang = localStorage.getItem('language') as 'fa' | 'en'
+  if (savedLang) currentLanguage.value = savedLang
+}
+
+const errors = reactive({phone: '', email: '', profilePhone: '', profileName: ''})
+const otpLength = 4
+const otp = reactive(Array(otpLength).fill(null))
+const otpCont = ref<HTMLElement | null>(null)
+const timer = ref(120)
+const isResendEnabled = ref(false)
+const isVerifying = ref(false) // Loading state برای تایید OTP
+const userStore = useUserStore()
+const formStore = useFormStore()
+////Setting Toast
+const showToast = ref(false)
+const toastMessage = ref('')
+const toastIcon = ref('ti-alert-triangle') // یا 'ti-lock', 'ti-check', هر چی خواستی
+const showInfoToast = (message: string, icon = 'ti-lock') => {
+  toastMessage.value = message
+  toastIcon.value = icon
+  showToast.value = true
+  setTimeout(() => showToast.value = false, 3000) // بعد از ۳ ثانیه بسته می‌شه
+}
+
+// ========== Dependencies ==========
+const nuxtApp = useNuxtApp()
+const router = useRouter()
+const $axios = nuxtApp.$axios as AxiosInstance
+const authStore = useAuthStore()
+
+// ========== Helper: Convert Persian/Arabic to English Digits ==========
+function toEnglishDigits(str: string): string {
+  // تبدیل اعداد فارسی به انگلیسی
+  const persianDigits = '۰۱۲۳۴۵۶۷۸۹'
+  // تبدیل اعداد عربی به انگلیسی
+  const arabicDigits = '٠١٢٣٤٥٦٧٨٩'
+  
+  return str
+    .replace(/[۰-۹]/g, d => String(persianDigits.indexOf(d)))
+    .replace(/[٠-٩]/g, d => String(arabicDigits.indexOf(d)))
+}
+
+function toPersianDigits(str: string): string {
+  return str.replace(/[0-9]/g, (d: string) => '۰۱۲۳۴۵۶۷۸۹'[Number(d)]);
+}
+
+// ========== Helper: Format Phone with Spaces ==========
+function formatPhoneWithSpaces(value: string): string {
+  // حذف تمام فاصله‌ها و کاراکترهای غیر عددی
+  const cleaned = value.replace(/\D/g, '')
+  
+  // محدود کردن به 11 رقم
+  const limited = cleaned.slice(0, 11)
+  
+  // اضافه کردن فاصله بعد از هر 3 رقم
+  const formatted = limited.replace(/(\d{3})(?=\d)/g, '$1 ')
+  
+  return toPersianDigits(formatted)
+}
+
+// ========== Go Back From OTP Step ==========
+function goBackFromOtp() {
+  // ریست کردن OTP
+  otp.fill(null)
+  timer.value = 120
+  isResendEnabled.value = false
+  
+  // برگشت به مرحله قبل بر اساس روش احراز هویت
+  if (authMethod.value === 'email') {
+    step.value = 'email'
+  } else {
+    step.value = 'phone'
+  }
+}
+
+// ========== Handle Phone Input with Formatting ==========
+function handlePhoneInput(event: Event) {
+  const input = event.target as HTMLInputElement
+  const cursorPos = input.selectionStart || 0
+  
+  // حذف همه چیز غیر از اعداد فارسی، عربی و انگلیسی
+  let value = input.value
+  // تبدیل به انگلیسی و سپس حذف غیر اعداد
+  const englishValue = toEnglishDigits(value)
+  const cleaned = englishValue.replace(/\D/g, '')
+  
+  // محدود به 11 رقم
+  const limited = cleaned.slice(0, 11)
+  
+  // اضافه کردن فاصله بعد از هر 3 رقم
+  const formatted = limited.replace(/(\d{3})(?=\d)/g, '$1 ')
+  
+  // تبدیل به فارسی
+  const persian = toPersianDigits(formatted)
+  
+  // به‌روزرسانی
+  phone.value = persian
+  input.value = persian
+  
+  // محاسبه موقعیت جدید کرسر - با پشتیبانی از اعداد فارسی، عربی و انگلیسی
+  const oldDigitCount = toEnglishDigits(value.slice(0, cursorPos)).replace(/\D/g, '').length
+  let newPos = 0
+  let digitCount = 0
+  for (let i = 0; i < persian.length; i++) {
+    if (persian[i].match(/[۰-۹]/)) {
+      digitCount++
+      if (digitCount > oldDigitCount) {
+        newPos = i
+        break
+      }
+    }
+    if (digitCount === oldDigitCount) {
+      newPos = i + 1
+      break
+    }
+  }
+  
+  nextTick(() => {
+    input.setSelectionRange(newPos, newPos)
+  })
+}
+
+// ========== Helper: Timer Format ==========
+function formatTime(seconds: number): string {
+  return toPersianDigits(seconds.toString());
+}
+
+// ========== Countdown Timer ==========
+function startTimer() {
+  timer.value = 120
+  isResendEnabled.value = false
+  const interval = setInterval(() => {
+    if (timer.value > 0) {
+      timer.value--
+    } else {
+      isResendEnabled.value = true
+      clearInterval(interval)
+      step.value = 'otp'
+    }
+  }, 1000)
+}
+
+///======
+async function resendCode() {
+  try {
+    let success = false
+    
+    if (authMethod.value === 'phone') {
+      const cleaned = toEnglishDigits(phone.value.trim()).replace(/\D/g, '').replace(/^0/, '')
+      success = await sendOtpCode(cleaned)
+    } else {
+      success = await sendEmailOtpCode(email.value.trim())
+    }
+    
+    if (success) {
+      otp.fill(null)
+      startTimer()
+    } else {
+      showInfoToast('ارسال مجدد ناموفق بود. لطفاً دوباره تلاش کنید.', 'ti-alert-triangle')
+    }
+  } catch (error) {
+    showInfoToast('خطایی رخ داد. لطفاً بعداً دوباره تلاش کنید.', 'ti-alert-triangle')
+  }
+}
+
+// ========== Handle Passkey (Face ID / Touch ID) Login ==========
+async function handlePasskeyLogin() {
+  try {
+    const result = await authenticateWithPasskey()
+    
+    if (result.success && result.userId) {
+      // بازیابی توکن ذخیره شده
+      const savedToken = localStorage.getItem('passkey_auth_token')
+      
+      if (savedToken) {
+        authStore.setToken(savedToken)
+        localStorage.setItem('auth_token', savedToken)
+        
+        showInfoToast('ورود موفق با Face ID', 'ti-check')
+        
+        await userStore.fetchUser()
+        const defaultCard = formStore.defaultCard
+        
+        // همیشه به داشبورد ریدایرکت کن
+        router.push('/dashboard')
+      } else {
+        showInfoToast('لطفاً ابتدا با شماره یا ایمیل وارد شوید', 'ti-alert-triangle')
+      }
+    } else {
+      showInfoToast(result.error || 'احراز هویت ناموفق بود', 'ti-alert-triangle')
+    }
+  } catch (error) {
+    showInfoToast('خطا در احراز هویت', 'ti-alert-triangle')
+  }
+}
+
+// ========== Step 1: Handle Phone Submission ==========
+async function handlePhone() {
+  const cleaned = toEnglishDigits(phone.value.trim()).replace(/\D/g, '')
+  
+  errors.phone = ''
+  authMethod.value = 'phone'
+
+  // validation for phone IR
+  const phoneRegex = /^0?9\d{9}$/;
+
+  if (!phoneRegex.test(cleaned)) {
+    errors.phone = 'شماره موبایل ایران باید با ۰۹ شروع شود یا ۹ و ۱۱ رقم باشد';
+    return;
+  }
+
+  const normalized = cleaned.startsWith('0') ? cleaned.slice(1) : cleaned
+  displayPhone.value = toPersianDigits('98') + normalized + '+'
+
+  try {
+    const success = await sendOtpCode(normalized)
+    
+    if (success) {
+      step.value = 'otp'
+      startTimer()
+    } else {
+      errors.phone = 'ارسال کد تأیید ناموفق بود. لطفاً دوباره تلاش کنید.'
+    }
+  } catch (error) {
+    errors.phone = 'خطایی رخ داد. لطفاً بعداً دوباره تلاش کنید.'
+  }
+}
+
+// ========== Handle Email Submission ==========
+async function handleEmail() {
+  const emailValue = email.value.trim()
+  
+  errors.email = ''
+  authMethod.value = 'email'
+
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+  if (!emailRegex.test(emailValue)) {
+    errors.email = 'لطفاً یک ایمیل معتبر وارد کنید'
+    return
+  }
+
+  displayEmail.value = emailValue
+
+  try {
+    const success = await sendEmailOtpCode(emailValue)
+    
+    if (success) {
+      step.value = 'otp'
+      startTimer()
+    } else {
+      errors.email = 'ارسال کد تأیید ناموفق بود. لطفاً دوباره تلاش کنید.'
+    }
+  } catch (error) {
+    errors.email = 'خطایی رخ داد. لطفاً بعداً دوباره تلاش کنید.'
+  }
+}
+
+// ========== Send Verification Code API ==========
+async function sendOtpCode(normalized: string): Promise<boolean> {
+  try {
+    const phoneData = {
+      phone: toEnglishDigits(normalized),
+      countryCode: '+98',
+    }
+    console.log('📱 Sending OTP to:', phoneData)
+    const response = await $axios.post('auth/sendOtpCode', phoneData)
+    
+    if (response.data && response.data.success === true) {
+      return true;
+    }
+    
+    showInfoToast(response.data.message);
+    return false;
+
+  } catch (error: any) {
+    if (error.response && error.response.data && error.response.data.message) {
+      showInfoToast(error.response.data.message);
+    } else {
+      showInfoToast('مشکلی در ارتباط با سرور وجود دارد.', 'ti-alert-triangle');
+    }
+
+    return false;
+  }
+}
+
+// ========== Send Email Verification Code API ==========
+async function sendEmailOtpCode(emailAddress: string): Promise<boolean> {
+  try {
+    const emailData = {
+      email: emailAddress,
+    }
+    console.log('📧 Sending OTP to email:', emailData)
+    const response = await $axios.post('auth/sendEmailOtp', emailData)
+    
+    if (response.data && response.data.success === true) {
+      return true;
+    }
+    
+    showInfoToast(response.data.message);
+    return false;
+
+  } catch (error: any) {
+    if (error.response && error.response.data && error.response.data.message) {
+      showInfoToast(error.response.data.message);
+    } else {
+      showInfoToast('مشکلی در ارتباط با سرور وجود دارد.', 'ti-alert-triangle');
+    }
+
+    return false;
+  }
+}
+
+// ========== OTP Step Helpers ==========
+const isOtpFull = () => otp.every(d => d !== null && d !== '')
+
+async function handleOtpKey(index: number, event: KeyboardEvent) {
+  const key = event.key
+
+  if (!['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight'].includes(key) && !/^[0-9]$/.test(key)) {
+    event.preventDefault()
+    return
+  }
+
+  // Backspace logic
+  if (key === 'Backspace') {
+    otp[index] = null
+    if (index > 0) {
+      (otpCont.value?.children[index - 1] as HTMLInputElement)?.focus()
+    }
+    event.preventDefault()
+    return
+  }
+
+  // Numeric input
+  if (/^[0-9]$/.test(key)) {
+    otp[index] = key
+    event.preventDefault()
+
+    if (index < otpLength - 1) {
+      (otpCont.value?.children[index + 1] as HTMLInputElement)?.focus()
+    }
+
+    if (isOtpFull()) {
+      // جلوگیری از ارسال مجدد در حین پردازش
+      if (isVerifying.value) return
+      isVerifying.value = true
+      
+      try {
+        const fullCode = toEnglishDigits(otp.join(''))
+        const {success, userExists} = await verifyOtpCode(fullCode)
+        if (success) {
+          if (userExists) {
+            // اجرای موازی fetchUser - بدون await برای سرعت بیشتر
+            // redirect سریع و بارگذاری داده در پس‌زمینه
+            const fetchPromise = userStore.fetchUser()
+            
+            // همزمان بررسی کارت پیش‌فرض
+            await fetchPromise
+            const defaultCard = formStore.defaultCard
+            
+            // ایجاد کارت پیش‌فرض اگر وجود ندارد
+            if (!defaultCard) {
+              await $axios.post('v1/cards/createDefaultCard', {
+                defaultContactType: authMethod.value === 'email' ? 'email' : 'phone'
+              })
+            }
+            // همیشه به داشبورد ریدایرکت کن
+            router.push('/dashboard')
+          } else {
+            // اگر step قبلاً به email_profile تغییر کرده، دست نزن
+            if (step.value !== 'email_profile') {
+              step.value = 'register'
+            }
+            isVerifying.value = false
+          }
+        } else {
+          isVerifying.value = false
+          showInfoToast('کد وارد شده نامعتبر یا منقضی است. لطفاً دوباره تلاش کنید.', 'ti-alert-triangle')
+        }
+      } catch (error: any) {
+        isVerifying.value = false
+        if (error.response && error.response.data.message) {
+          showInfoToast(error.response.data.message);
+        } else {
+          showInfoToast('مشکلی در برقراری ارتباط با سرور وجود دارد.', 'ti-alert-triangle');
+        }
+      }
+    }
+  }
+}
+
+// ========== Verify OTP with Server ==========
+async function verifyOtpCode(fullCode: string): Promise<{ success: boolean; userExists: boolean }> {
+  try {
+    // Build request based on auth method
+    let response
+    
+    if (authMethod.value === 'phone') {
+      const requestData = {
+        code: fullCode,
+        phone: toEnglishDigits(phone.value.trim()).replace(/\D/g, '').replace(/^0/, ''),
+        countryCode: '+98'
+      }
+      response = await $axios.post('/auth/verifyOtpCode', requestData)
+    } else {
+      const requestData = {
+        code: fullCode,
+        email: email.value.trim()
+      }
+      response = await $axios.post('/auth/verifyEmailOtp', requestData)
+    }
+    
+    const token = response.data.token
+    if (typeof token === 'string' && token.length > 0) {
+      authStore.setToken(token)
+      localStorage.setItem('auth_token', token)
+    }
+
+    if (response.status === 200) {
+      return {success: true, userExists: true}
+    }
+    if (response.status === 201) {
+      return {success: true, userExists: false}
+    }
+
+    return {success: false, userExists: false}
+  } catch (error: any) {
+    // Handle profile_required for new users (both phone and email)
+    // Check both response.data.code and response.data.data.code for Nuxt server errors
+    const errorCode = error.response?.data?.code || error.response?.data?.data?.code
+    const errorMessage = error.response?.data?.message || error.response?.data?.data?.message
+    
+    if (errorCode === 'profile_required') {
+      // ذخیره کد OTP برای ارسال مجدد همراه با اطلاعات پروفایل
+      // این یک رفتار عادی است، نه خطا - پس پیام error نشون نده
+      if (authMethod.value === 'email') {
+        pendingEmailOtpCode.value = fullCode
+        step.value = 'email_profile'
+      } else {
+        // برای phone-based login به صفحه register هدایت کن
+        pendingPhoneOtpCode.value = fullCode
+        step.value = 'register'
+      }
+      return { success: true, userExists: false }
+    }
+    
+    // فقط برای خطاهای واقعی پیام نشون بده (نه profile_required)
+    if (errorMessage) {
+      showInfoToast(errorMessage, 'ti-alert-triangle');
+    } else {
+      showInfoToast('مشکلی در برقراری ارتباط با سرور وجود دارد.', 'ti-alert-triangle');
+    }
+    return {success: false, userExists: false}
+  }
+}
+
+// ========== Handle Email Profile Submit ==========
+async function handleEmailProfileSubmit() {
+  // Reset errors
+  errors.profilePhone = ''
+  errors.profileName = ''
+  
+  // Validate inputs
+  if (!fullName.value.trim()) {
+    errors.profileName = 'نام و نام خانوادگی الزامی است'
+    showInfoToast('لطفاً نام و نام خانوادگی خود را وارد کنید')
+    return
+  }
+  
+  // Split fullName into name and family
+  const nameParts = fullName.value.trim().split(' ')
+  const firstName = nameParts[0] || ''
+  const lastName = nameParts.slice(1).join(' ') || ''
+  
+  // Build full phone with country code from selected country (optional)
+  let fullPhone = null
+  const cleanPhone = toEnglishDigits(profilePhone.value.trim()).replace(/\D/g, '')
+  
+  if (cleanPhone) {
+    const countryCode = selectedProfileCountry.value.dialCode.replace('+', '')
+    fullPhone = countryCode + cleanPhone
+    
+    // Check for Israel country code (+972)
+    if (countryCode === '972' || fullPhone.startsWith('972')) {
+      errors.profilePhone = 'این کد کشور پشتیبانی نمی‌شود'
+      showInfoToast('این کد کشور پشتیبانی نمی‌شود', 'ti-alert-triangle')
+      return
+    }
+  }
+  
+  isVerifying.value = true
+  
+  try {
+    const requestData = {
+      code: pendingEmailOtpCode.value,
+      email: email.value.trim(),
+      name: firstName,
+      family: lastName,
+      phone: fullPhone,
+      referred_code: referralCode.value || null
+    }
+    
+    const response = await $axios.post('/auth/verifyEmailOtp', requestData)
+    
+    const token = response.data.token
+    if (typeof token === 'string' && token.length > 0) {
+      authStore.setToken(token)
+      localStorage.setItem('auth_token', token)
+    }
+    
+    showInfoToast(`ثبت‌نام موفق! خوش آمدید ${firstName}`, 'ti-check')
+    
+    // Fetch user and redirect
+    await userStore.fetchUser()
+    const defaultCard = formStore.defaultCard
+    
+    // ایجاد کارت پیش‌فرض اگر وجود ندارد
+    if (!defaultCard) {
+      await $axios.post('v1/cards/createDefaultCard', {
+        defaultContactType: 'email'
+      })
+    }
+    // همیشه به داشبورد ریدایرکت کن
+    router.push('/dashboard')
+  } catch (error: any) {
+    isVerifying.value = false
+    
+    if (error.response?.data?.code === 'phone_taken') {
+      errors.profilePhone = 'این شماره قبلاً ثبت شده است'
+      showInfoToast('این شماره قبلاً ثبت شده است', 'ti-alert-triangle')
+    } else if (error.response?.data?.code === 'invalid_phone_country') {
+      errors.profilePhone = 'این کد کشور پشتیبانی نمی‌شود'
+      showInfoToast('این کد کشور پشتیبانی نمی‌شود', 'ti-alert-triangle')
+    } else if (error.response?.data?.message) {
+      showInfoToast(error.response.data.message, 'ti-alert-triangle')
+    } else {
+      showInfoToast('مشکلی در برقراری ارتباط با سرور وجود دارد.', 'ti-alert-triangle')
+    }
+  }
+}
+
+// ========== Final Step: Register Name ==========
+async function handleRegister() {
+  if (!name.value.trim()) {
+    showInfoToast('لطفاً نام خود را وارد کنید')
+    return
+  }
+
+  try {
+    // اگر کاربر از phone-based login آمده و کد OTP دارد، یک‌بار دیگر verify کن همراه با اطلاعات
+    if (pendingPhoneOtpCode.value) {
+      const requestData = {
+        code: pendingPhoneOtpCode.value,
+        phone: toEnglishDigits(phone.value.trim()).replace(/\D/g, '').replace(/^0/, ''),
+        countryCode: '+98',
+        name: name.value.trim(),
+        referralCode: referralCode.value?.trim() || null
+      }
+      
+      const response = await $axios.post('/auth/verifyOtpCode', requestData)
+      
+      const token = response.data.token
+      if (typeof token === 'string' && token.length > 0) {
+        authStore.setToken(token)
+        localStorage.setItem('auth_token', token)
+      }
+      
+      showInfoToast(`ثبت‌نام موفق! خوش آمدی ${name.value}`, 'ti-check')
+      
+      await userStore.fetchUser()
+      const defaultCard = computed(() => formStore.defaultCard)
+
+      // ایجاد کارت پیش‌فرض اگر وجود ندارد
+      if (!defaultCard?.value) {
+        await $axios.post('v1/cards/createDefaultCard', {
+          defaultContactType: 'phone'
+        })
+      }
+      
+      pendingPhoneOtpCode.value = '' // پاک کردن کد
+      await router.push('/dashboard')
+      return
+    }
+    
+    // اگر قبلاً login شده (کاربر قدیمی)، فقط referralCode رو بروز کن
+    const response = await $axios.post('/user/setReferralCode', {
+      name: name.value,
+      referred_code: referralCode.value || null,
+    })
+
+    showInfoToast(`ثبت‌نام موفق! خوش آمدی ${name.value}`, 'ti-check')
+    await userStore.fetchUser()
+    const defaultCard = computed(() => formStore.defaultCard)
+
+    // ایجاد کارت پیش‌فرض اگر وجود ندارد
+    if (!defaultCard?.value) {
+      await $axios.post('v1/cards/createDefaultCard', {
+        defaultContactType: authMethod.value === 'email' ? 'email' : 'phone'
+      })
+    }
+    // همیشه به داشبورد ریدایرکت کن
+    await router.push('/dashboard')
+
+  } catch (error: any) {
+    console.error('Register error:', error)
+    const errorMessage = error.response?.data?.message || error.response?.data?.data?.message
+    
+    // اگر OTP منقضی شده، کاربر رو به صفحه اول برگردون
+    if (error.response?.status === 429 || errorMessage?.includes('منقضی')) {
+      showInfoToast('کد تایید منقضی شده است. لطفاً مجدداً درخواست کنید.', 'ti-alert-triangle')
+      step.value = 'phone'
+      pendingPhoneOtpCode.value = ''
+      name.value = ''
+      referralCode.value = ''
+      return
+    }
+    
+    showInfoToast(errorMessage || 'مشکلی در ثبت نام پیش آمد. لطفاً دوباره تلاش کنید.', 'ti-alert-triangle')
+  }
+}
+
+// ========== Country Selection Handlers ==========
+const selectCountry = (country: Country) => {
+  selectedCountry.value = country
+  showCountryPicker.value = false
+  countrySearchQuery.value = ''
+}
+
+const selectProfileCountry = (country: Country) => {
+  // Check for Israel (blocked)
+  if (country.dialCode === '+972') {
+    showInfoToast('این کشور پشتیبانی نمی‌شود', 'ti-alert-triangle')
+    return
+  }
+  selectedProfileCountry.value = country
+  profileCountryCode.value = country.dialCode
+  showProfileCountryPicker.value = false
+  countrySearchQuery.value = ''
+}
+
+// ========== Language Change Handler ==========
+const handleLanguageChange = async (lang: 'fa' | 'en') => {
+  currentLanguage.value = lang
+  
+  if (process.client) {
+    localStorage.setItem('language', lang)
+    document.documentElement.lang = lang
+    document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr'
+  }
+  
+  setTimeout(() => {
+    isLanguageSheetOpen.value = false
+  }, 300)
+}
+
+interface OTPCredential extends Credential {
+  code: string;
+}
+
+onMounted(async () => {
+  // بررسی آیا باید Face ID اتوماتیک فعال بشه (از PWA)
+  if (process.client) {
+    const autoBiometric = sessionStorage.getItem('auto_biometric_auth')
+    if (autoBiometric === 'true') {
+      sessionStorage.removeItem('auto_biometric_auth')
+      
+      // صبر کن تا WebAuthn بارگذاری بشه
+      await nextTick()
+      
+      // اگه Face ID فعال بود، اتوماتیک لاگین کن
+      if (isPlatformAuthenticatorAvailable.value && isPasskeyEnabled()) {
+        setTimeout(() => {
+          handlePasskeyLogin()
+        }, 500)
+      }
+    }
+  }
+
+  if ('OTPCredential' in window && navigator.credentials) {
+    const controller = new AbortController();
+
+    navigator.credentials.get({
+      otp: {transport: ['sms']},
+      signal: controller.signal
+    } as any)
+        .then(async (credential) => {
+          if (credential && 'code' in credential) {
+            const code = (credential as any).code as string;
+            const digits = code.split('');
+            digits.forEach((digit, i) => {
+              otp[i] = digit;
+              const input = document.querySelector<HTMLInputElement>(`#otp-input-${i}`);
+              if (input) {
+                input.value = digit;
+                input.dispatchEvent(new Event('input'));
+              }
+            });
+            const lastInput = document.querySelector<HTMLInputElement>(`#otp-input-${digits.length - 1}`);
+            if (lastInput) lastInput.focus();
+            if (isOtpFull()) {
+              // جلوگیری از ارسال مجدد
+              if (isVerifying.value) return
+              isVerifying.value = true
+              
+              try {
+                const fullCode = toEnglishDigits(otp.join(''));
+                const {success, userExists} = await verifyOtpCode(fullCode);
+                if (success) {
+                  if (userExists) {
+                    // بهینه‌سازی: fetch سریع‌تر
+                    await userStore.fetchUser()
+                    const defaultCard = formStore.defaultCard
+                    // ایجاد کارت پیش‌فرض اگر وجود ندارد
+                    if (!defaultCard) {
+                      await $axios.post('v1/cards/createDefaultCard', {
+                        defaultContactType: authMethod.value === 'email' ? 'email' : 'phone'
+                      })
+                    }
+                    // همیشه به داشبورد ریدایرکت کن
+                    router.push('/dashboard')
+                  } else {
+                    step.value = 'register'
+                    isVerifying.value = false
+                  }
+                } else {
+                  isVerifying.value = false
+                  showInfoToast('کد وارد شده نامعتبر یا منقضی است. لطفاً دوباره تلاش کنید.', 'ti-alert-triangle');
+                }
+              } catch (error) {
+                isVerifying.value = false
+                showInfoToast('خطایی رخ داد. لطفاً دوباره تلاش کنید.', 'ti-alert-triangle');
+              }
+            }
+          }
+        })
+        .catch(err => {
+          // Error receiving OTP
+        });
+  }
+});
+
+
+</script>
+
+<style scoped>
+.bounce {
+  animation: pulse 0.25s ease-in-out alternate;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.1);
+  }
+}
+</style>

@@ -1,0 +1,7 @@
+/* ===========================
+   THEME SYSTEM
+   Organized Theme Structure
+   =========================== */
+
+/* Import all theme definitions from separate files */
+@import './themes/index.css';

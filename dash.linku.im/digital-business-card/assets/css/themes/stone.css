@@ -1,0 +1,80 @@
+/* ===========================
+   STONE THEME (Warm Gray Tones)
+   =========================== */
+
+.theme-stone {
+  /* Background & Foreground Colors */
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(28 25% 3.9%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(28 25% 3.9%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(28 25% 3.9%);
+  
+  /* Primary Brand Colors */
+  --color-primary: hsl(28 25% 8.9%);
+  --color-primary-foreground: hsl(60 9.1% 97.8%);
+  --color-primary-alpha: hsl(28 25% 8.9% / 0.2);
+  
+  /* Secondary & Muted Colors */
+  --color-secondary: hsl(60 4.8% 95.9%);
+  --color-secondary-foreground: hsl(28 25% 8.9%);
+  --color-muted: hsl(60 4.8% 95.9%);
+  --color-muted-foreground: hsl(25 5.3% 44.7%);
+  --color-accent: hsl(60 4.8% 95.9%);
+  --color-accent-foreground: hsl(28 25% 8.9%);
+  
+  /* Destructive Colors */
+  --color-destructive: hsl(0 72.2% 50.6%);
+  --color-destructive-foreground: hsl(0 0% 98%);
+  
+  /* Border & Input Colors */
+  --color-border: hsl(20 5.9% 90%);
+  --color-input: hsl(20 5.9% 90%);
+  --color-ring: hsl(28 25% 8.9%);
+  
+  /* Stone Color Palette */
+  --color-stone-50: hsl(60 9.1% 97.8%);
+  --color-stone-100: hsl(60 4.8% 95.9%);
+  --color-stone-200: hsl(20 5.9% 90%);
+  --color-stone-300: hsl(24 5.7% 82.9%);
+  --color-stone-400: hsl(24 5.4% 63.9%);
+  --color-stone-500: hsl(25 5.3% 44.7%);
+  --color-stone-600: hsl(24 9.8% 10%);
+  --color-stone-700: hsl(25 9.2% 24.9%);
+  --color-stone-800: hsl(24 9.8% 10%);
+  --color-stone-900: hsl(28 25% 8.9%);
+  --color-stone-950: hsl(28 25% 3.9%);
+
+  /* Tonal Background Overrides for Stone */
+  --color-tonal-primary-bg: hsl(60 4.8% 95.9%);
+  --color-tonal-primary-bg-hover: hsl(20 5.9% 90%);
+  --color-tonal-primary-fg: hsl(28 25% 8.9%);
+}
+
+/* Dark Mode Stone */
+.theme-stone.dark {
+  --color-background: hsl(28 25% 3.9%);
+  --color-foreground: hsl(60 9.1% 97.8%);
+  --color-card: hsl(28 25% 3.9%);
+  --color-card-foreground: hsl(60 9.1% 97.8%);
+  --color-popover: hsl(28 25% 3.9%);
+  --color-popover-foreground: hsl(60 9.1% 97.8%);
+  --color-primary: hsl(60 9.1% 97.8%);
+  --color-primary-foreground: hsl(28 25% 8.9%);
+  --color-primary-alpha: hsl(60 9.1% 97.8% / 0.2);
+  --color-secondary: hsl(24 9.8% 10%);
+  --color-secondary-foreground: hsl(60 9.1% 97.8%);
+  --color-muted: hsl(24 9.8% 10%);
+  --color-muted-foreground: hsl(24 5.4% 63.9%);
+  --color-accent: hsl(24 9.8% 10%);
+  --color-accent-foreground: hsl(60 9.1% 97.8%);
+  --color-border: hsl(24 9.8% 10%);
+  --color-input: hsl(24 9.8% 10%);
+  --color-ring: hsl(24 5.7% 82.9%);
+
+  /* Dark Mode Tonal Overrides */
+  --color-tonal-primary-bg: hsl(24 9.8% 10%);
+  --color-tonal-primary-bg-hover: hsl(25 9.2% 24.9%);
+  --color-tonal-primary-fg: hsl(60 9.1% 97.8%);
+}

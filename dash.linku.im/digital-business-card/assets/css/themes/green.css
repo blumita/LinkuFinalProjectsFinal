@@ -1,0 +1,80 @@
+/* ===========================
+   GREEN THEME (Nature Green)
+   =========================== */
+
+.theme-green {
+  /* Background & Foreground Colors - Base */
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(240 10% 3.9%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(240 10% 3.9%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(240 10% 3.9%);
+  
+  /* Primary Brand Colors - Green */
+  --color-primary: hsl(142.1 76.2% 36.3%);
+  --color-primary-foreground: hsl(355.7 100% 97.3%);
+  --color-primary-alpha: hsl(142.1 76.2% 36.3% / 0.2);
+  
+  /* Secondary & Muted Colors */
+  --color-secondary: hsl(210 40% 96.1%);
+  --color-secondary-foreground: hsl(222.2 47.4% 11.2%);
+  --color-muted: hsl(210 40% 96.1%);
+  --color-muted-foreground: hsl(215.4 16.3% 46.9%);
+  --color-accent: hsl(210 40% 96.1%);
+  --color-accent-foreground: hsl(222.2 47.4% 11.2%);
+  
+  /* Destructive Colors */
+  --color-destructive: hsl(0 72.2% 50.6%);
+  --color-destructive-foreground: hsl(0 0% 98%);
+  
+  /* Border & Input Colors */
+  --color-border: hsl(214.3 31.8% 91.4%);
+  --color-input: hsl(214.3 31.8% 91.4%);
+  --color-ring: hsl(142.1 76.2% 36.3%);
+  
+  /* Green Color Palette */
+  --color-green-50: hsl(138.5 76.5% 96.7%);
+  --color-green-100: hsl(140.6 84.2% 92.5%);
+  --color-green-200: hsl(141 78.9% 85.1%);
+  --color-green-300: hsl(141.7 76.6% 73.1%);
+  --color-green-400: hsl(141.9 69.2% 58%);
+  --color-green-500: hsl(142.1 70.6% 45.3%);
+  --color-green-600: hsl(142.1 76.2% 36.3%);
+  --color-green-700: hsl(142.4 71.8% 29.2%);
+  --color-green-800: hsl(142.8 64.2% 24.1%);
+  --color-green-900: hsl(143.8 61.2% 20.2%);
+  --color-green-950: hsl(144.6 60.7% 12%);
+
+  /* Tonal Background Overrides for Green */
+  --color-tonal-primary-bg: hsl(138.5 76.5% 96.7%);
+  --color-tonal-primary-bg-hover: hsl(140.6 84.2% 92.5%);
+  --color-tonal-primary-fg: hsl(142.1 76.2% 36.3%);
+}
+
+/* Dark Mode Green */
+.theme-green.dark {
+  --color-background: hsl(240 10% 3.9%);
+  --color-foreground: hsl(0 0% 98%);
+  --color-card: hsl(240 10% 3.9%);
+  --color-card-foreground: hsl(0 0% 98%);
+  --color-popover: hsl(240 10% 3.9%);
+  --color-popover-foreground: hsl(0 0% 98%);
+  --color-primary: hsl(142.1 70.6% 45.3%);
+  --color-primary-foreground: hsl(144.6 60.7% 12%);
+  --color-primary-alpha: hsl(142.1 70.6% 45.3% / 0.2);
+  --color-secondary: hsl(240 3.7% 15.9%);
+  --color-secondary-foreground: hsl(0 0% 98%);
+  --color-muted: hsl(240 3.7% 15.9%);
+  --color-muted-foreground: hsl(240 5% 64.9%);
+  --color-accent: hsl(240 3.7% 15.9%);
+  --color-accent-foreground: hsl(0 0% 98%);
+  --color-border: hsl(240 3.7% 15.9%);
+  --color-input: hsl(240 3.7% 15.9%);
+  --color-ring: hsl(142.4 71.8% 29.2%);
+
+  /* Dark Mode Tonal Overrides */
+  --color-tonal-primary-bg: hsl(143.8 61.2% 20.2%);
+  --color-tonal-primary-bg-hover: hsl(142.4 71.8% 29.2%);
+  --color-tonal-primary-fg: hsl(138.5 76.5% 96.7%);
+}

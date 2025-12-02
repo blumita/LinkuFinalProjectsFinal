@@ -1,0 +1,10 @@
+{
+  "extends": "../.nuxt/tsconfig.server.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "typeRoots": ["../node_modules/@types"],
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "noImplicitAny": false
+  }
+}

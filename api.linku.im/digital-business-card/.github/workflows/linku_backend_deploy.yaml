@@ -1,0 +1,58 @@
+name: LinkUBackend Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Stop laravel services
+        run: |
+          sudo systemctl stop linku-queue
+          sudo systemctl stop linku-schedule
+
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+      - name: Deploy to local server
+        run: |
+          sudo rsync -av --exclude='.git' --exclude='node_modules' --exclude='storage/logs' ./ /var/www/api.linku.im/digital-business-card
+          sudo chmod -R 750 /var/www/api.linku.im/digital-business-card
+          sudo chmod -R 770 /var/www/api.linku.im/digital-business-card/storage /var/www/api.linku.im/digital-business-card/bootstrap/cache
+          sudo chown -R www-data:www-data /var/www/api.linku.im/digital-business-card
+      - name: Cache configuration
+        run: |
+          cd /var/www/api.linku.im/digital-business-card
+          php artisan cache:clear
+          php artisan config:clear
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+      - name: Run migrations
+        run: |
+          cd /var/www/api.linku.im/digital-business-card
+          #php artisan migrate --force
+          #php artisan migrate:fresh --force
+          #php artisan db:seed --class=PlanSeeder --force
+          #php artisan db:seed --class=AdminUserSeeder --force
+          #php artisan db:seed --class=SettingSeeder --force
+          #php artisan db:seed --class=FaqSeeder --force
+          #php artisan db:seed --force
+
+      - name: Start laravel services
+        run: |
+          sudo systemctl start linku-queue
+          sudo systemctl start linku-schedule
+
+      - name: Reload Nginx
+        run: sudo systemctl reload nginx
+
+      - name: Check application health
+        run: curl -f https://api.linku.im/health-check

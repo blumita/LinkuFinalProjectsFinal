@@ -1,0 +1,77 @@
+<template>
+  <svg
+   id="uuid-9ce26155-3537-4e01-9692-895cb89edd07"
+   viewBox="0 0 219.10001 219.1"
+   version="1.1"
+   :width="size"
+   :height="size"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs17" />
+  <rect
+     x="0"
+     y="0"
+     width="219.10001"
+     height="219.10001"
+     rx="63.400002"
+     ry="63.400002"
+     :fill="props.color ? props.color : '#ffffff'"
+     id="rect2" />
+  <g
+     id="g12"
+     transform="translate(-25.299999,-22.299999)">
+    <path
+       d="m 104.1,189.7 c -9.1,0 -18.2,-0.2 -27.3,0 -3.6,0 -4.9,-1.2 -4.4,-4.6 1.4,-9.2 2.8,-18.4 4.2,-27.7 1.9,-12.5 3.8,-24.9 5.7,-37.4 1.3,-7.9 2.7,-15.8 4,-23.8 1.7,-10.5 3.4,-21 5,-31.5 0.7,-4.7 3,-6.7 8,-6.6 16.9,0.2 33.8,-0.1 50.7,0.2 9.1,0.2 18,2.3 25.3,8 9.3,7.3 11.2,17.6 9.7,28.8 0,0 -0.4,-0.1 -0.4,-0.1 -4.4,-1.8 -8.9,-3.7 -13.7,-3.8 -15.2,-0.2 -30.4,0 -45.7,0 -3.3,0 -5,1.6 -6.2,4.6 -1.3,3.4 -0.6,6.9 -1.3,10.3 -2.6,12.5 -4.7,25.2 -5.5,38 v 0 c -0.3,0.3 -0.7,0.6 -1,1 -0.7,9.8 -3.4,19.2 -4.2,29 -0.4,5.3 -1.9,10.5 -2.9,15.8 z"
+       :fill="props.color ? textColor : '#273d82'"
+       :style="props.color ? 'opacity: 0.8' : ''"
+       id="path4" />
+    <path
+       d="m 104.1,189.7 c 1,-5.3 2.5,-10.5 2.9,-15.8 0.8,-9.8 3.4,-19.2 4.2,-29 0.3,-0.4 0.7,-0.7 1,-1.1 0,0 0,0 0,0 2,-1.5 4.4,-1 6.7,-1.1 12,-0.1 23.8,0 35.6,-3.8 18.6,-6.1 29.8,-26.1 30.1,-44 0,0 0.4,0.1 0.4,0.1 11.2,7.4 14.2,15.6 12,29.2 -1.8,10.8 -4.9,20.7 -12.9,28.7 -8.3,8.2 -18.7,10.9 -29.6,11.6 -12.3,0.7 -12.4,0.3 -14.6,12.3 -1.4,7.8 -2.7,15.5 -3.9,23.3 -0.6,3.5 -2.7,5.2 -6.1,5.3 -7.6,0 -15.2,0 -22.9,0 -4.1,0 -5.5,-1.9 -4.4,-6.1 0.8,-3.1 1.8,-6.3 1.4,-9.7 z"
+       :fill="props.color ? textColor : '#279ad4'"
+       id="path6" />
+    <path
+       d="m 184.5,95 c -0.3,17.9 -11.5,37.9 -30.1,44 -11.7,3.9 -23.6,3.7 -35.6,3.8 -2.3,0 -4.6,-0.4 -6.7,1.1 0.8,-12.8 2.9,-25.4 5.5,-38 0.7,-3.4 0,-6.9 1.3,-10.3 1.2,-3.1 2.9,-4.6 6.2,-4.6 15.2,0 30.4,-0.1 45.7,0 4.8,0 9.3,2 13.7,3.8 z"
+       :fill="props.color ? textColor : '#262f66'"
+       :style="props.color ? 'opacity: 0.8' : ''"
+       id="path8" />
+    <path
+       d="m 112.2,143.8 c -0.3,0.4 -0.7,0.7 -1,1.1 0.3,-0.4 0.7,-0.7 1,-1.1 z"
+       :fill="props.color ? textColor : '#262f66'"
+       id="path10" />
+  </g>
+</svg>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+
+interface Props {
+  size?: number | string
+  filled?: boolean
+  color?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  size: 24,
+  filled: false,
+  color: ''
+})
+
+// تابع برای تشخیص رنگ سفید
+const isWhiteColor = (color: string): boolean => {
+  if (!color || color === "transparent") return false
+  
+  // حذف # از ابتدای رنگ hex
+  const hex = color.replace("#", "").toLowerCase()
+  
+  // بررسی اینکه رنگ سفید باشد
+  return hex === "ffffff" || hex === "fff" || color.toLowerCase() === "white"
+}
+
+// تعیین رنگ متن بر اساس رنگ پس‌زمینه
+const textColor = computed(() => {
+  if (!props.color) return '#ffffff' // رنگ پیش‌فرض سفید
+  return isWhiteColor(props.color) ? '#000000' : '#ffffff'
+})
+</script>

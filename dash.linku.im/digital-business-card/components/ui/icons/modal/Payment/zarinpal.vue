@@ -1,0 +1,67 @@
+<template>
+  <svg
+   id="uuid-40ad00e5-617f-4776-b033-1fbdbe9dc962"
+   viewBox="0 0 219.13001 219.13"
+   version="1.1"
+   :width="size"
+   :height="size"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs11" />
+  <rect
+     x="0"
+     y="0"
+     width="219.13"
+     height="219.13"
+     rx="63.405998"
+     ry="63.405998"
+     :fill="props.color ? props.color : '#ffffff'"
+     id="rect2" />
+  <path
+     d="m 172.729,47.64 c -17.72,-0.05 -35.44,-0.04 -53.15,0 -5.618,0.009 -9.265,7.054 -10.043,9.113 -0.124,-0.174 -0.304,-0.307 -0.547,-0.393 0.13,0.32 0.26,0.64 0.39,0.95 v 0.01 h 0.01 l -27.306,65.033 c -0.125,-10e-4 -0.25,-0.002 -0.374,-0.003 -1.7,4.61 -3.41,9.22 -5.11,13.83 -1.62,3.98 -3.25,7.96 -4.88,11.94 -1.44,3.49 -2.98,6.95 -4.32,10.48 -3.06,8.1 0.55,13.39 9.16,13.41 17.64,0.04 35.29,0.01 52.94,0.01 1.98,0 3.98,0.08 5.66,-1.24 4.77,-1.95 4.35,-7.01 6.38,-10.6 2.26,-4.77 4.36,-9.6 5.83,-14.69 4.04,-8.82 7.78,-17.76 10.85,-26.98 2.57,-4.79 4.54,-9.83 6.12,-15.03 2.39,-4.72 4.44,-9.58 5.88,-14.68 1.89,-3.19 3.13,-6.63 4.15,-10.16 2.5,-5.92 5.09,-11.81 7.46,-17.78 3,-7.57 -0.89,-13.19 -9.1,-13.22 z"
+     :fill="props.color ? textColor : '#fbd10e'"
+     id="path4" />
+  <circle
+     cx="85.209999"
+     cy="85.125"
+     r="38.542999"
+     :fill="props.color ? textColor : '#283a8f'"
+     opacity="0.97"
+     :style="props.color ? 'opacity: 0.4' : ''"
+     id="circle6" />
+</svg>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+
+interface Props {
+  size?: number | string
+  filled?: boolean
+  color?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  size: 24,
+  filled: false,
+  color: ''
+})
+
+// تابع برای تشخیص رنگ سفید
+const isWhiteColor = (color: string): boolean => {
+  if (!color || color === "transparent") return false
+  
+  // حذف # از ابتدای رنگ hex
+  const hex = color.replace("#", "").toLowerCase()
+  
+  // بررسی اینکه رنگ سفید باشد
+  return hex === "ffffff" || hex === "fff" || color.toLowerCase() === "white"
+}
+
+// تعیین رنگ متن بر اساس رنگ پس‌زمینه
+const textColor = computed(() => {
+  if (!props.color) return '#ffffff' // رنگ پیش‌فرض سفید
+  return isWhiteColor(props.color) ? '#000000' : '#ffffff'
+})
+</script>

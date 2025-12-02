@@ -1,0 +1,410 @@
+[
+  {
+    "code": "stores",
+    "name": "فروشگاه‌ها",
+    "subcategories": [
+      {
+        "code": "clothing",
+        "name": "پوشاک"
+      },
+      {
+        "code": "bags_shoes",
+        "name": "کیف و کفش"
+      },
+      {
+        "code": "mobile_accessories",
+        "name": "موبایل و لوازم جانبی"
+      },
+      {
+        "code": "electronics",
+        "name": "لوازم الکترونیکی و کامپیوتر"
+      },
+      {
+        "code": "grocery",
+        "name": "سوپرمارکت و مواد غذایی"
+      },
+      {
+        "code": "home_appliances",
+        "name": "لوازم خانگی"
+      },
+      {
+        "code": "tools",
+        "name": "ابزارآلات و یراق‌آلات"
+      },
+      {
+        "code": "stationery",
+        "name": "فروشگاه لوازم تحریر"
+      },
+      {
+        "code": "pet_store",
+        "name": "فروشگاه‌های حیوانات خانگی"
+      }
+    ]
+  },
+  {
+    "code": "food_services",
+    "name": "خدمات خوراکی",
+    "subcategories": [
+      {
+        "code": "restaurant",
+        "name": "رستوران و فست‌فود"
+      },
+      {
+        "code": "cafe",
+        "name": "کافه و قهوه‌سرا"
+      },
+      {
+        "code": "juice_icecream",
+        "name": "آبمیوه و بستنی‌فروشی"
+      },
+      {
+        "code": "catering",
+        "name": "خدمات تهیه غذا (کترینگ)"
+      }
+    ]
+  },
+  {
+    "code": "sports_centers",
+    "name": "مراکز ورزشی",
+    "subcategories": [
+      {
+        "code": "gym",
+        "name": "باشگاه بدنسازی"
+      },
+      {
+        "code": "martial",
+        "name": "باشگاه رزمی"
+      },
+      {
+        "code": "yoga_pilates",
+        "name": "سالن‌های یوگا و پیلاتس"
+      },
+      {
+        "code": "pool_sauna",
+        "name": "استخر و سونا"
+      }
+    ]
+  },
+  {
+    "code": "health_centers",
+    "name": "مراکز درمانی و بهداشتی",
+    "subcategories": [
+      {
+        "code": "pharmacy",
+        "name": "داروخانه"
+      },
+      {
+        "code": "clinic",
+        "name": "کلینیک پزشکی"
+      },
+      {
+        "code": "dentist",
+        "name": "دندانپزشکی"
+      },
+      {
+        "code": "physiotherapy",
+        "name": "فیزیوتراپی"
+      },
+      {
+        "code": "psychology",
+        "name": "روان‌شناسی و مشاوره"
+      }
+    ]
+  },
+  {
+    "code": "beauty_services",
+    "name": "خدمات زیبایی",
+    "subcategories": [
+      {
+        "code": "beauty_salon_women",
+        "name": "آرایشگاه زنانه"
+      },
+      {
+        "code": "beauty_salon_men",
+        "name": "آرایشگاه مردانه"
+      },
+      {
+        "code": "salons",
+        "name": "سالن‌های زیبایی"
+      },
+      {
+        "code": "skin_hair_laser",
+        "name": "خدمات پوست، مو و لیزر"
+      }
+    ]
+  },
+  {
+    "code": "entertainment",
+    "name": "تفریح و خرید",
+    "subcategories": [
+      {
+        "code": "shopping_centers",
+        "name": "مراکز خرید و پاساژ"
+      },
+      {
+        "code": "amusement_park",
+        "name": "شهربازی"
+      },
+      {
+        "code": "cinema",
+        "name": "سینما"
+      },
+      {
+        "code": "gaming_center",
+        "name": "گیم‌نت"
+      }
+    ]
+  },
+  {
+    "code": "freelancers",
+    "name": "افراد و خدمات شخصی",
+    "subcategories": [
+      {
+        "code": "developer",
+        "name": "برنامه‌نویس"
+      },
+      {
+        "code": "graphic_designer",
+        "name": "طراح گرافیک"
+      },
+      {
+        "code": "photographer",
+        "name": "عکاس"
+      },
+      {
+        "code": "tutor",
+        "name": "مدرس خصوصی"
+      },
+      {
+        "code": "sports_coach",
+        "name": "مربی ورزشی"
+      },
+      {
+        "code": "consultant",
+        "name": "مشاور مالی و حقوقی"
+      },
+      {
+        "code": "repair",
+        "name": "تعمیرکار موبایل و لپ‌تاپ"
+      },
+      {
+        "code": "electrician_plumber",
+        "name": "برق‌کار و لوله‌کش"
+      },
+      {
+        "code": "driver",
+        "name": "راننده"
+      },
+      {
+        "code": "babysitter",
+        "name": "نگهداری کودک یا سالمند"
+      },
+      {
+        "code": "pet_trainer",
+        "name": "مربی سگ"
+      },
+      {
+        "code": "translator",
+        "name": "مترجم"
+      }
+    ]
+  },
+  {
+    "code": "general_services",
+    "name": "خدمات عمومی و فنی",
+    "subcategories": [
+      {
+        "code": "carpet_cleaning",
+        "name": "قالیشویی"
+      },
+      {
+        "code": "key_maker",
+        "name": "کلیدسازی"
+      },
+      {
+        "code": "cleaning",
+        "name": "نظافت منزل و محل کار"
+      },
+      {
+        "code": "construction",
+        "name": "خدمات ساختمانی"
+      },
+      {
+        "code": "installation",
+        "name": "تأسیسات"
+      },
+      {
+        "code": "carpentry",
+        "name": "نجاری و کابینت‌سازی"
+      },
+      {
+        "code": "welding",
+        "name": "جوشکاری و درب‌سازی"
+      },
+      {
+        "code": "gardening",
+        "name": "باغبانی"
+      }
+    ]
+  },
+  {
+    "code": "transport",
+    "name": "حمل‌ونقل و خودرو",
+    "subcategories": [
+      {
+        "code": "car_showroom",
+        "name": "نمایشگاه خودرو"
+      },
+      {
+        "code": "mechanic",
+        "name": "مکانیکی"
+      },
+      {
+        "code": "oil_tire",
+        "name": "تعویض روغن و آپاراتی"
+      },
+      {
+        "code": "car_services",
+        "name": "خدمات خودرو"
+      },
+      {
+        "code": "freight",
+        "name": "باربری"
+      },
+      {
+        "code": "car_rental",
+        "name": "کرایه ماشین و وانت"
+      }
+    ]
+  },
+  {
+    "code": "education",
+    "name": "آموزشی",
+    "subcategories": [
+      {
+        "code": "language_school",
+        "name": "آموزشگاه زبان"
+      },
+      {
+        "code": "music_school",
+        "name": "آموزشگاه موسیقی"
+      },
+      {
+        "code": "exam_school",
+        "name": "آموزشگاه کنکور"
+      },
+      {
+        "code": "technical_school",
+        "name": "آموزش فنی‌وحرفه‌ای"
+      },
+      {
+        "code": "online_education",
+        "name": "آموزش آنلاین"
+      },
+      {
+        "code": "driving_school",
+        "name": "آموزشگاه رانندگی"
+      }
+    ]
+  },
+  {
+    "code": "culture",
+    "name": "مذهبی و فرهنگی",
+    "subcategories": [
+      {
+        "code": "service_offices",
+        "name": "دفاتر خدماتی"
+      },
+      {
+        "code": "insurance",
+        "name": "دفاتر بیمه"
+      },
+      {
+        "code": "mosque",
+        "name": "مساجد و حسینیه‌ها"
+      },
+      {
+        "code": "bookstore",
+        "name": "کتابفروشی"
+      },
+      {
+        "code": "culture_center",
+        "name": "مراکز فرهنگی"
+      },
+      {
+        "code": "print_services",
+        "name": "چاپخانه"
+      }
+    ]
+  },
+  {
+    "code": "pets",
+    "name": "حیوانات خانگی",
+    "subcategories": [
+      {
+        "code": "vet",
+        "name": "دامپزشکی"
+      },
+      {
+        "code": "petshop",
+        "name": "پت‌شاپ"
+      },
+      {
+        "code": "pet_care",
+        "name": "شست‌وشو و نگهداری"
+      },
+      {
+        "code": "pet_training",
+        "name": "آموزش سگ"
+      }
+    ]
+  },
+  {
+    "code": "tourism",
+    "name": "گردشگری",
+    "subcategories": [
+      {
+        "code": "travel_agency",
+        "name": "آژانس مسافرتی"
+      },
+      {
+        "code": "villa_rent",
+        "name": "اجاره ویلا"
+      },
+      {
+        "code": "tour_guide",
+        "name": "تور لیدر"
+      },
+      {
+        "code": "bike_rental",
+        "name": "دوچرخه و موتور کرایه‌ای"
+      }
+    ]
+  },
+  {
+    "code": "digital",
+    "name": "حوزه‌های نو",
+    "subcategories": [
+      {
+        "code": "marketing",
+        "name": "دیجیتال مارکتینگ"
+      },
+      {
+        "code": "web_design",
+        "name": "طراحی سایت"
+      },
+      {
+        "code": "content",
+        "name": "تولید محتوا"
+      },
+      {
+        "code": "influencer",
+        "name": "بلاگر و اینفلوئنسر"
+      },
+      {
+        "code": "online_shop",
+        "name": "فروش آنلاین"
+      }
+    ]
+  }
+]

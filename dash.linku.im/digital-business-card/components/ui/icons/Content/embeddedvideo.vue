@@ -1,0 +1,70 @@
+<template>
+  <svg
+   id="uuid-f93ac425-e375-48d5-b9fc-cb8d8437fc8e"
+   viewBox="0 0 219.10001 219.1"
+   version="1.1"
+   :width="size"
+   :height="size"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs11" />
+  <rect
+     x="0"
+     y="0"
+     width="219.10001"
+     height="219.10001"
+     rx="63.400002"
+     ry="63.400002"
+     :fill="filled ? iconColor : 'none'"
+     :stroke="filled ? 'none' : iconColor"
+     :stroke-width="filled ? '0' : '8'"
+     id="rect2" />
+  <path
+     d="m 107.1,177.3 c -32.8,2 -63.8,-27.5 -63.8,-63.3 0,-34.599999 29.4,-64.099999 64.1,-63.699999 34.1,0.3 64.9,28.7 63.3,67.299999 -1.3,30.8 -29.4,61.8 -63.6,59.8 z m 0.3,-115.499999 c -28.1,0 -52.1,23.4 -52.5,50.899999 -0.4,30.5 23.2,53.6 51.5,53.7 30.2,0.2 53.1,-22.3 53,-52.2 0,-29.299999 -21.9,-51.199999 -52.1,-52.399999 z"
+     :fill="filled ? contrastColor : iconColor"
+     id="path4" />
+  <path
+     d="m 96.3,114.3 c 0,-5.6 -0.2,-11.3 0,-16.899999 0.2,-5.8 2.9,-7.2 7.6,-3.9 7.8,5.6 15.4,11.399999 23.1,16.999999 3.7,2.7 3.2,5.1 0,7.5 -7.7,5.7 -15.4,11.4 -23.3,16.8 -4.5,3.2 -7.1,1.8 -7.4,-3.7 -0.2,-5.6 0,-11.3 0,-16.9 z"
+     :fill="filled ? contrastColor : iconColor"
+     id="path6" />
+</svg>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+
+interface Props {
+  size?: number | string
+  filled?: boolean
+  color?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  size: 24,
+  filled: false,
+  color: ''
+})
+
+// تابع برای تشخیص رنگ سفید
+const isWhiteColor = (color: string): boolean => {
+  if (!color || color === "transparent") return false
+  
+  // حذف # از ابتدای رنگ hex
+  const hex = color.replace("#", "").toLowerCase()
+  
+  // بررسی اینکه رنگ سفید باشد
+  return hex === "ffffff" || hex === "fff" || color.toLowerCase() === "white"
+}
+
+// رنگ اصلی آیکون
+const iconColor = computed(() => {
+  return props.color || 'currentColor'
+})
+
+// رنگ متضاد برای filled mode
+const contrastColor = computed(() => {
+  if (!props.color) return '#ffffff'
+  return isWhiteColor(props.color) ? '#000000' : '#ffffff'
+})
+</script>
