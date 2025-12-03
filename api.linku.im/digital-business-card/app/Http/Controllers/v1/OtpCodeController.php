@@ -214,7 +214,7 @@ class OtpCodeController
             
             $user = User::create([
                 'name' => $userName,
-                'username' => $username,
+                'user_name' => $username,
                 'email' => null, // ایمیل بعداً توسط کاربر تکمیل میشه
                 'phone' => $phone,
                 'country_code' => $countryCode['code'] ?? null,
