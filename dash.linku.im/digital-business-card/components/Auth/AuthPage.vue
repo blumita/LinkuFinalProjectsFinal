@@ -3,8 +3,15 @@
       <template v-if="step === 'phone'">
         <!-- Fixed Header -->
         <div class="flex-shrink-0 bg-background border-b border-border">
-          <div class="flex items-center h-14 px-4">
-            <h1 class="text-lg font-semibold text-foreground mr-2">شماره موبایل</h1>
+          <div class="flex items-center h-16 px-4">
+            <!-- Logo -->
+            <div class="flex items-center gap-2">
+              <img 
+                src="/logoLinku.svg" 
+                alt="Linku Logo" 
+                class="h-8 w-auto dark:brightness-0 dark:invert"
+              />
+            </div>
             <div class="flex-1"></div>
             <button
               @click="isLanguageSheetOpen = true"
@@ -187,15 +194,15 @@
       <template v-else-if="step === 'otp'">
         <!-- Fixed Header -->
         <div class="flex-shrink-0 bg-background border-b border-border">
-          <div class="flex items-center h-14 px-4">
-            <button
-              @click="goBackFromOtp"
-              class="w-10 h-10 flex items-center justify-center hover:bg-accent transition-colors rounded-full"
-            >
-              <i class="ti ti-arrow-right rtl:block ltr:hidden text-foreground text-xl"></i>
-              <i class="ti ti-arrow-left ltr:block rtl:hidden text-foreground text-xl"></i>
-            </button>
-            <h2 class="text-lg font-semibold text-foreground mr-2">کد تایید</h2>
+          <div class="flex items-center h-16 px-4">
+            <!-- Logo -->
+            <div class="flex items-center gap-2">
+              <img 
+                src="/logoLinku.svg" 
+                alt="Linku Logo" 
+                class="h-8 w-auto dark:brightness-0 dark:invert"
+              />
+            </div>
             <div class="flex-1"></div>
             <button
               @click="isLanguageSheetOpen = true"
@@ -267,15 +274,16 @@
       <template v-else-if="step === 'register'">
         <!-- Fixed Header -->
         <div class="flex-shrink-0 bg-background border-b border-border">
-          <div class="flex items-center h-14 px-4">
-            <button
-              @click="step = 'otp'"
-              class="w-10 h-10 flex items-center justify-center hover:bg-accent transition-colors rounded-full"
-            >
-              <i class="ti ti-arrow-right rtl:block ltr:hidden text-foreground text-xl"></i>
-              <i class="ti ti-arrow-left ltr:block rtl:hidden text-foreground text-xl"></i>
-            </button>
-            <h1 class="text-lg font-semibold text-foreground mr-2">ثبت نام</h1>
+          <div class="flex items-center h-16 px-4">
+            <!-- Logo -->
+            <div class="flex items-center gap-2">
+              <img 
+                src="/logoLinku.svg" 
+                alt="Linku Logo" 
+                class="h-8 w-auto dark:brightness-0 dark:invert"
+              />
+            </div>
+            <div class="flex-1"></div>
           </div>
         </div>
 
@@ -345,15 +353,16 @@
       <template v-else-if="step === 'email_profile'">
         <!-- Fixed Header -->
         <div class="flex-shrink-0 bg-background border-b border-border">
-          <div class="flex items-center h-14 px-4">
-            <button
-              @click="step = 'otp'"
-              class="w-10 h-10 flex items-center justify-center hover:bg-accent transition-colors rounded-full"
-            >
-              <i class="ti ti-arrow-right rtl:block ltr:hidden text-foreground text-xl"></i>
-              <i class="ti ti-arrow-left ltr:block rtl:hidden text-foreground text-xl"></i>
-            </button>
-            <h1 class="text-lg font-semibold text-foreground mr-2">تکمیل اطلاعات</h1>
+          <div class="flex items-center h-16 px-4">
+            <!-- Logo -->
+            <div class="flex items-center gap-2">
+              <img 
+                src="/logoLinku.svg" 
+                alt="Linku Logo" 
+                class="h-8 w-auto dark:brightness-0 dark:invert"
+              />
+            </div>
+            <div class="flex-1"></div>
           </div>
         </div>
 

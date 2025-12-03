@@ -16,27 +16,40 @@ export default defineNuxtRouteMiddleware(async (to) => {
     // فقط در کلاینت
     if (import.meta.client) {
         const authStore = useAuthStore()
-        const token = localStorage.getItem('auth_token') || document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1]
         
+        // اول از store بخون، بعد از localStorage و cookie
+        let token = authStore.token
         if (!token) {
-            return abortNavigation()
+            token = localStorage.getItem('auth_token') || document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1] || null
         }
         
-        // Validate با API (فقط اگه store خالیه)
+        if (!token) {
+            console.log('❌ No token found - redirecting to login')
+            return navigateTo('/auth/login')
+        }
+        
+        // اگه token توی store نیست، set کن
         if (!authStore.token) {
+            console.log('✅ Hydrating token to store')
+            authStore.setToken(token)
+        }
+        
+        // Validate با API (فقط یکبار)
+        if (!authStore.isValidated) {
             try {
                 const { $axios } = useNuxtApp()
-                authStore.setToken(token)
                 await $axios.get('/v1/profile/info')
+                authStore.isValidated = true
+                console.log('✅ Token validated successfully')
             } catch (error) {
-                // Token invalid
+                // Token invalid - پاک کن و redirect
+                console.error('❌ Token validation failed:', error)
                 authStore.clearToken()
                 localStorage.clear()
                 document.cookie.split(";").forEach(c => {
                     document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/")
                 })
-                window.location.replace('/auth/login')
-                return abortNavigation()
+                return navigateTo('/auth/login')
             }
         }
     }

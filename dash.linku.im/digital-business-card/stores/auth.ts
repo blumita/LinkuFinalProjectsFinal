@@ -6,6 +6,7 @@ export const useAuthStore = defineStore('auth', {
     // State holds the token
     state: () => ({
         token: null as string | null, // Auth token, initially null
+        isValidated: false, // Track if token has been validated with API
     }),
 
     // Actions to manipulate the token
@@ -25,6 +26,7 @@ export const useAuthStore = defineStore('auth', {
         // Clear the token
         clearToken() {
             this.token = null
+            this.isValidated = false
             safeStorage.removeItem('auth_token')
             // Remove cookie
             if (import.meta.client) {
