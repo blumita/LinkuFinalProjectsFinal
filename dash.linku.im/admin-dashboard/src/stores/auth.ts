@@ -1,28 +1,61 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
-// Pure memory storage - NO localStorage at all
-let memoryToken = ''
-let memoryUser: any = null
-
-// Helper functions - completely avoid storage
+// Safe storage helpers with fallback
 const getStoredToken = (): string => {
-    return memoryToken
+    try {
+        return sessionStorage.getItem('adminToken') || ''
+    } catch {
+        return ''
+    }
 }
 
 const setStoredToken = (token: string): void => {
-    memoryToken = token
+    try {
+        if (token) {
+            sessionStorage.setItem('adminToken', token)
+        } else {
+            sessionStorage.removeItem('adminToken')
+        }
+    } catch (e) {
+        console.warn('Could not save token:', e)
+    }
 }
 
 const clearStoredToken = (): void => {
-    memoryToken = ''
-    memoryUser = null
+    try {
+        sessionStorage.removeItem('adminToken')
+        sessionStorage.removeItem('adminUser')
+    } catch (e) {
+        console.warn('Could not clear token:', e)
+    }
+}
+
+const getStoredUser = (): any => {
+    try {
+        const user = sessionStorage.getItem('adminUser')
+        return user ? JSON.parse(user) : null
+    } catch {
+        return null
+    }
+}
+
+const setStoredUser = (user: any): void => {
+    try {
+        if (user) {
+            sessionStorage.setItem('adminUser', JSON.stringify(user))
+        } else {
+            sessionStorage.removeItem('adminUser')
+        }
+    } catch (e) {
+        console.warn('Could not save user:', e)
+    }
 }
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         token: getStoredToken(),
-        user: memoryUser,
+        user: getStoredUser(),
         isVerified: false,
         isVerifying: false
     }),
@@ -34,6 +67,10 @@ export const useAuthStore = defineStore('auth', {
             this.token = token
             setStoredToken(token)
             this.isVerified = false
+        },
+        setUser(user: any) {
+            this.user = user
+            setStoredUser(user)
         },
         logout() {
             this.token = ''
@@ -71,7 +108,7 @@ export const useAuthStore = defineStore('auth', {
                 
                 if (userData && userData.role === 'admin') {
                     this.user = userData
-                    memoryUser = userData
+                    setStoredUser(userData)
                     this.isVerified = true
                     this.isVerifying = false
                     return true
