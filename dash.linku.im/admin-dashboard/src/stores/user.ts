@@ -71,7 +71,7 @@ export const useUserStore = defineStore('userStore', () => {
 
     const fetchUser = async () => {
         try {
-            const {data} = await axios.get('/user')
+            const {data} = await axios.get('/admin/me')
             user.value = data.data
             fetched.value = true
         } catch (error) {
@@ -177,7 +177,7 @@ export const useUserStore = defineStore('userStore', () => {
     }
     const fetchAllUsers = async () => {
         try {
-            const {data} = await axios.get('user/admin/userList')
+            const {data} = await axios.get('/user/admin/userList')
             users.value = data.data
         } catch (error) {
             console.error('❌ خطا در دریافت لیست کاربران:', error)
