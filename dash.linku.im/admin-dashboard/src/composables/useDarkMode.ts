@@ -3,30 +3,18 @@ import { ref } from 'vue'
 const isDarkMode = ref(false)
 let memoryDarkMode: boolean | null = null
 
-// Safe storage access
-const safeGetStorage = (key: string): string | null => {
-  try {
-    return localStorage.getItem(key)
-  } catch (e) {
-    return null
-  }
+// No storage access at all - pure memory
+const safeGetStorage = (): boolean | null => {
+  return memoryDarkMode
 }
 
-const safeSetStorage = (key: string, value: string): void => {
-  try {
-    localStorage.setItem(key, value)
-  } catch (e) {
-    // Silently fail
-  }
+const safeSetStorage = (value: boolean): void => {
+  memoryDarkMode = value
 }
 
 // Initialize immediately when module loads
 const initDarkModeImmediately = () => {
-  const savedDarkMode = safeGetStorage('darkMode')
-  if (savedDarkMode !== null) {
-    isDarkMode.value = savedDarkMode === 'true'
-    memoryDarkMode = isDarkMode.value
-  } else if (memoryDarkMode !== null) {
+  if (memoryDarkMode !== null) {
     isDarkMode.value = memoryDarkMode
   } else {
     isDarkMode.value = window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -51,19 +39,15 @@ export function useDarkMode() {
     memoryDarkMode = isDarkMode.value
     if (isDarkMode.value) {
       document.documentElement.classList.add('dark')
-      safeSetStorage('darkMode', 'true')
+      safeSetStorage(true)
     } else {
       document.documentElement.classList.remove('dark')
-      safeSetStorage('darkMode', 'false')
+      safeSetStorage(false)
     }
   }
 
   const initDarkMode = () => {
-    const savedDarkMode = safeGetStorage('darkMode')
-    if (savedDarkMode !== null) {
-      isDarkMode.value = savedDarkMode === 'true'
-      memoryDarkMode = isDarkMode.value
-    } else if (memoryDarkMode !== null) {
+    if (memoryDarkMode !== null) {
       isDarkMode.value = memoryDarkMode
     } else {
       isDarkMode.value = window.matchMedia('(prefers-color-scheme: dark)').matches

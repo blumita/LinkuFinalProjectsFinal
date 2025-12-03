@@ -1,44 +1,22 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
-// Memory store - primary storage method (no storage errors)
+// Pure memory storage - NO localStorage at all
 let memoryToken = ''
 let memoryUser: any = null
 
+// Helper functions - completely avoid storage
 const getStoredToken = (): string => {
-    // Try localStorage silently
-    try {
-        const token = localStorage.getItem('admin_token')
-        if (token) {
-            memoryToken = token
-        }
-    } catch (e) {
-        // Silently fail - use memory
-    }
-    
     return memoryToken
 }
 
 const setStoredToken = (token: string): void => {
     memoryToken = token
-    // Try to persist but don't fail if not possible
-    try {
-        localStorage.setItem('admin_token', token)
-    } catch (e) {
-        // Silently fail - memory is enough
-    }
 }
 
 const clearStoredToken = (): void => {
     memoryToken = ''
     memoryUser = null
-    try {
-        localStorage.removeItem('admin_token')
-        localStorage.removeItem('token')
-        localStorage.removeItem('auth_token')
-    } catch (e) {
-        // Silently fail
-    }
 }
 
 export const useAuthStore = defineStore('auth', {
