@@ -49,13 +49,15 @@ class UserController
      */
     public function adminMe(Request $request): JsonResponse
     {
-        $admin = $request->user('admin');
-
-        if (!$admin) {
-            return $this->fail('ادمین یافت نشد.', 401);
+        // Try to get user from sanctum (works with tokens)
+        $user = $request->user();
+        
+        // Check if user is an Admin model
+        if (!$user || !($user instanceof \App\Models\Admin)) {
+            return $this->fail('ادمین یافت نشد.', null, 401);
         }
 
-        return $this->ok('', new AdminResource($admin->load('role')));
+        return $this->ok('', new AdminResource($user->load('role')));
     }
 
     public function profiles(Request $request): JsonResponse

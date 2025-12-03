@@ -25,7 +25,8 @@ class AdminResource extends JsonResource
             'countryCode' => $this->country_code,
             'status' => $this->status,
             'roleId' => $this->role_id,
-            'role' => $this->role ? [
+            'role' => 'admin', // برای frontend که چک می‌کند role === 'admin'
+            'roleDetails' => $this->role ? [
                 'id' => $this->role->id,
                 'name' => $this->role->name,
                 'displayName' => $this->role->display_name,

@@ -836,10 +836,17 @@ Route::middleware(['auth:sanctum','log.activity'])
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth:sanctum'])
+    ->prefix('admin')
+    ->group(function () {
+        Route::get('/me', [UserController::class, 'adminMe'])
+            ->name('admin.me');
+    });
+
+Route::middleware(['auth:sanctum'])
     ->prefix('user')
     ->group(function () {
         Route::get('/admin/me', [UserController::class, 'adminMe'])
-            ->name('user.admin.me');
+            ->name('user.admin.me'); // Keep for backward compatibility
         
         // Admin Management Routes
         Route::get('/admin', [UserController::class, 'admins'])
