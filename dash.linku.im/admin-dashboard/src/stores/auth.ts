@@ -75,20 +75,25 @@ export const useAuthStore = defineStore('auth', {
                     timeout: 10000 // 10 ثانیه timeout
                 })
                 
-                if (response.data && response.data.role === 'admin') {
-                    this.user = response.data
+                console.log('Admin me response:', response.data)
+                
+                // Backend returns: { success, message, data: { ...user } }
+                const userData = response.data.data || response.data
+                
+                if (userData && userData.role === 'admin') {
+                    this.user = userData
                     this.isVerified = true
                     this.isVerifying = false
                     return true
                 } else {
                     // کاربر ادمین نیست
-                    console.error('کاربر ادمین نیست')
+                    console.error('کاربر ادمین نیست', userData)
                     this.logout()
                     this.isVerifying = false
                     return false
                 }
             } catch (error: any) {
-                console.error('Token verification failed:', error.response?.status, error.message)
+                console.error('Token verification failed:', error.response?.status, error.response?.data, error.message)
                 // توکن نامعتبر است یا خطای سرور
                 this.logout()
                 this.isVerifying = false
