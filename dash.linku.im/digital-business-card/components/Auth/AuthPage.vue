@@ -280,7 +280,7 @@
           <div class="w-full max-w-md px-4">
             <p class="text-muted-foreground text-sm text-center mb-8">لطفاً اطلاعات خود را تکمیل کنید</p>
 
-        <!-- Name Input -->
+        <!-- Full Name Input -->
         <div class="relative w-full mb-4">
           <input
               v-model="name"
@@ -298,29 +298,7 @@
 								right-2 origin-top-right"
           >
             <i class="ti ti-user w-4 h-4 ml-1.5"></i>
-            <span>نام</span>
-          </label>
-        </div>
-
-        <!-- Family Name Input -->
-        <div class="relative w-full mb-4">
-          <input
-              v-model="family"
-              id="familyInput"
-              type="text"
-              placeholder=" "
-              class="peer block w-full px-3 pb-2.5 pt-4 text-sm text-foreground bg-transparent rounded-xl border-2 border-border focus:outline-none focus:ring-0 focus:border-primary transition-all duration-300"
-          />
-          <label
-              for="familyInput"
-              class="inline-flex items-center absolute text-sm text-muted-foreground duration-300 transform -translate-y-4 scale-[0.85] top-2 z-10 bg-background px-2 
-								peer-focus:px-2 peer-focus:text-primary 
-								peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 
-								peer-focus:top-2 peer-focus:scale-[0.85] peer-focus:-translate-y-4 
-								right-2 origin-top-right"
-          >
-            <i class="ti ti-user w-4 h-4 ml-1.5"></i>
-            <span>نام خانوادگی</span>
+            <span>نام کامل</span>
           </label>
         </div>
 
@@ -1232,11 +1210,12 @@ async function verifyOtpCode(fullCode: string): Promise<{ success: boolean; user
         pendingPhoneOtpCode.value = fullCode
         step.value = 'register'
       }
+      // هیچ toast نشون نده برای profile_required
       return { success: true, userExists: false }
     }
     
     // فقط برای خطاهای واقعی پیام نشون بده (نه profile_required)
-    if (errorMessage) {
+    if (errorMessage && errorCode !== 'profile_required') {
       showInfoToast(errorMessage, 'ti-alert-triangle');
     } else {
       showInfoToast('مشکلی در برقراری ارتباط با سرور وجود دارد.', 'ti-alert-triangle');
@@ -1302,14 +1281,18 @@ async function handleEmailProfileSubmit() {
     showInfoToast(`ثبت‌نام موفق! خوش آمدید ${firstName}`, 'ti-check')
     
     // Fetch user and redirect
-    await userStore.fetchUser()
-    const defaultCard = formStore.defaultCard
-    
-    // ایجاد کارت پیش‌فرض اگر وجود ندارد
-    if (!defaultCard) {
-      await $axios.post('v1/cards/createDefaultCard', {
-        defaultContactType: 'email'
-      })
+    try {
+      await userStore.fetchUser()
+      const defaultCard = formStore.defaultCard
+      
+      // ایجاد کارت پیش‌فرض اگر وجود ندارد
+      if (!defaultCard) {
+        await $axios.post('v1/cards/createDefaultCard', {
+          defaultContactType: 'email'
+        })
+      }
+    } catch (fetchError) {
+      console.error('❌ Error fetching user after profile submission:', fetchError)
     }
     // همیشه به داشبورد ریدایرکت کن
     router.push('/dashboard')
@@ -1333,9 +1316,14 @@ async function handleEmailProfileSubmit() {
 // ========== Final Step: Register Name ==========
 async function handleRegister() {
   if (!name.value.trim()) {
-    showInfoToast('لطفاً نام خود را وارد کنید')
+    showInfoToast('لطفاً نام کامل خود را وارد کنید')
     return
   }
+
+  // Split نام کامل به نام و نام خانوادگی
+  const nameParts = name.value.trim().split(/\s+/)
+  const firstName = nameParts[0]
+  const lastName = nameParts.slice(1).join(' ') || firstName
 
   try {
     // اگر کاربر از phone-based login آمده و کد OTP دارد، یک‌بار دیگر verify کن همراه با اطلاعات
@@ -1344,8 +1332,8 @@ async function handleRegister() {
         code: pendingPhoneOtpCode.value,
         phone: toEnglishDigits(phone.value.trim()).replace(/\D/g, '').replace(/^0/, ''),
         countryCode: '+98',
-        name: name.value.trim(),
-        family: family.value.trim() || null,
+        name: firstName,
+        family: lastName,
         referralCode: referralCode.value?.trim() || null
       }
       
@@ -1357,16 +1345,20 @@ async function handleRegister() {
         safeStorage.setItem('auth_token', token)
       }
       
-      showInfoToast(`ثبت‌نام موفق! خوش آمدید ${name.value}`, 'ti-check')
+      showInfoToast(`ثبت‌نام موفق! خوش آمدید ${firstName}`, 'ti-check')
       
-      await userStore.fetchUser()
-      const defaultCard = computed(() => formStore.defaultCard)
+      try {
+        await userStore.fetchUser()
+        const defaultCard = computed(() => formStore.defaultCard)
 
-      // ایجاد کارت پیش‌فرض اگر وجود ندارد
-      if (!defaultCard?.value) {
-        await $axios.post('v1/cards/createDefaultCard', {
-          defaultContactType: 'phone'
-        })
+        // ایجاد کارت پیش‌فرض اگر وجود ندارد
+        if (!defaultCard?.value) {
+          await $axios.post('v1/cards/createDefaultCard', {
+            defaultContactType: 'phone'
+          })
+        }
+      } catch (fetchError) {
+        console.error('❌ Error fetching user after phone profile:', fetchError)
       }
       
       pendingPhoneOtpCode.value = '' // پاک کردن کد
@@ -1376,12 +1368,12 @@ async function handleRegister() {
     
     // اگر قبلاً login شده (کاربر قدیمی)، فقط referralCode رو بروز کن
     const response = await $axios.post('/user/setReferralCode', {
-      name: name.value,
-      family: family.value.trim() || null,
+      name: firstName,
+      family: lastName,
       referred_code: referralCode.value || null,
     })
 
-    showInfoToast(`ثبت‌نام موفق! خوش آمدید ${name.value}`, 'ti-check')
+    showInfoToast(`ثبت‌نام موفق! خوش آمدید ${firstName}`, 'ti-check')
     await userStore.fetchUser()
     const defaultCard = computed(() => formStore.defaultCard)
 
@@ -1501,13 +1493,17 @@ onMounted(async () => {
                 if (success) {
                   if (userExists) {
                     // بهینه‌سازی: fetch سریع‌تر
-                    await userStore.fetchUser()
-                    const defaultCard = formStore.defaultCard
-                    // ایجاد کارت پیش‌فرض اگر وجود ندارد
-                    if (!defaultCard) {
-                      await $axios.post('v1/cards/createDefaultCard', {
-                        defaultContactType: authMethod.value === 'email' ? 'email' : 'phone'
-                      })
+                    try {
+                      await userStore.fetchUser()
+                      const defaultCard = formStore.defaultCard
+                      // ایجاد کارت پیش‌فرض اگر وجود ندارد
+                      if (!defaultCard) {
+                        await $axios.post('v1/cards/createDefaultCard', {
+                          defaultContactType: authMethod.value === 'email' ? 'email' : 'phone'
+                        })
+                      }
+                    } catch (fetchError) {
+                      console.error('❌ Error fetching user after OTP verification:', fetchError)
                     }
                     // همیشه به داشبورد ریدایرکت کن
                     router.push('/dashboard')
