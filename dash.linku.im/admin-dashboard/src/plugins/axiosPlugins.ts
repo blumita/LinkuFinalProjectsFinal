@@ -12,7 +12,7 @@ declare module '@vue/runtime-core' {
 export default {
     install: (app: App) => {
         const instance = axios.create({
-            baseURL: import.meta.env.VITE_API_BASE_URL || 'https://api.linkuapp.com/api',
+            baseURL: import.meta.env.VITE_API_BASE_URL || 'https://api.linku.im/api',
             withCredentials: false,
             headers: {
                 'Content-Type': 'application/json',
