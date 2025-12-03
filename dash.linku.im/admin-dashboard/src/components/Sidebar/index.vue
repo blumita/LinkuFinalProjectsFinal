@@ -2,7 +2,7 @@
 import { inject, computed, ref, defineOptions, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import SidebarItem from './SidebarItem.vue'
-import LinkuLogo from '@/assets/images/linku.svg'
+import LinkuLogo from '@/assets/images/logoApp.svg'
 
 defineOptions({
   name: 'SidebarMenu'
