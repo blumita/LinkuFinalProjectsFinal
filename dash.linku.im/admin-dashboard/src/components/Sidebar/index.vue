@@ -108,6 +108,7 @@ watch(() => route.path, (newPath) => {
       <SidebarItem icon="ti ti-settings" text="مدیریت محصولات" :collapsed="itemCollapsed" to="/cards/management" @itemClicked="handleItemClick" />
       <SidebarItem icon="ti ti-users" text="مدیریت مدیران" :collapsed="itemCollapsed" to="/admins" @itemClicked="handleItemClick" />
       <SidebarItem icon="ti ti-shield-lock" text="مدیریت نقش‌ها" :collapsed="itemCollapsed" to="/roles" @itemClicked="handleItemClick" />
+      <SidebarItem icon="ti ti-shield-check" text="داشبورد امنیتی" :collapsed="itemCollapsed" to="/security" @itemClicked="handleItemClick" />
 
       <!-- جداکننده -->
       <div class="py-2">

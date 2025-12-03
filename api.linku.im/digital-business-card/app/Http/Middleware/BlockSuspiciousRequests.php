@@ -60,6 +60,15 @@ class BlockSuspiciousRequests
     ];
 
     /**
+     * IP های معتبر که از بررسی معاف هستند
+     */
+    protected array $whitelistedIPs = [
+        '127.0.0.1',
+        '::1',
+        // می‌توانید IP های معتبر (مثل دفتر، خانه) را اینجا اضافه کنید
+    ];
+
+    /**
      * تعداد مجاز درخواست در دقیقه برای هر IP
      */
     protected int $maxRequestsPerMinute = 60;
@@ -70,6 +79,11 @@ class BlockSuspiciousRequests
     public function handle(Request $request, Closure $next): Response
     {
         $ip = $request->ip();
+        
+        // Skip checks for whitelisted IPs
+        if (in_array($ip, $this->whitelistedIPs)) {
+            return $next($request);
+        }
         
         // بررسی IP مشکوک
         if ($this->isBlockedIP($ip)) {

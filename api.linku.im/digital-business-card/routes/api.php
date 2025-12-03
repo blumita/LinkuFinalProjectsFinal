@@ -33,6 +33,7 @@ use App\Http\Controllers\v1\SubscriptionController;
 use App\Http\Controllers\Admin\SupportController;
 use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\TutorialController;
+use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\v1\TransactionController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
@@ -840,6 +841,16 @@ Route::middleware(['auth:sanctum'])
     ->group(function () {
         Route::get('/me', [UserController::class, 'adminMe'])
             ->name('admin.me');
+        
+        // Security Dashboard Routes
+        Route::prefix('security')->group(function () {
+            Route::get('/stats', [SecurityController::class, 'getSecurityStats'])
+                ->name('admin.security.stats');
+            Route::post('/unblock-ip', [SecurityController::class, 'unblockIP'])
+                ->name('admin.security.unblock');
+            Route::post('/clear-blocked', [SecurityController::class, 'clearAllBlocked'])
+                ->name('admin.security.clear');
+        });
     });
 
 Route::middleware(['auth:sanctum'])

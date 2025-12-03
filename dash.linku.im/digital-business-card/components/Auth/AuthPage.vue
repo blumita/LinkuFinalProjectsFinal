@@ -71,9 +71,11 @@
           <div class="absolute top-1/2 -translate-y-1/2 left-3 text-muted-foreground text-sm font-medium pointer-events-none border-r border-border pr-2 mr-2 min-w-[40px] text-left flex items-center h-8" dir="ltr">
             {{ selectedCountry.dialCode }}
           </div>
-
-          <p v-if="errors.phone" class="text-red-500 text-xs mt-1 block">{{ errors.phone }}</p>
         </div>
+
+        <!-- Error Message - Outside to prevent layout shift -->
+        <p v-if="errors.phone" class="text-red-500 text-xs mb-4 block min-h-[20px]">{{ errors.phone }}</p>
+        <div v-else class="mb-4 min-h-[20px]"></div>
 
         <!-- Continue Button -->
         <button
@@ -162,9 +164,11 @@
           >
             ایمیل
           </label>
-
-          <p v-if="errors.email" class="text-red-500 text-xs mt-1 block">{{ errors.email }}</p>
         </div>
+
+        <!-- Error Message - Outside to prevent layout shift -->
+        <p v-if="errors.email" class="text-red-500 text-xs mb-4 block min-h-[20px]">{{ errors.email }}</p>
+        <div v-else class="mb-4 min-h-[20px]"></div>
 
         <!-- Continue Button -->
         <button
