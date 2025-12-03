@@ -34,6 +34,11 @@ class OtpService
         try {
             $phone = $this->normalizePhone($requestData['phone']);
 
+            // پاک کردن کدهای منقضی شده قبلی
+            OtpCode::where('phone', $phone)
+                ->where('expires_at', '<=', now())
+                ->delete();
+
             // اجازه ارسال مجدد اگر کمتر از 10 ثانیه به انقضا مانده
             if ($this->otpCodeExist($phone, 10)) {
                 // دریافت زمان باقیمانده برای اطلاع فرونت

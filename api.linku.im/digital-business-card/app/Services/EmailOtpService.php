@@ -29,6 +29,11 @@ class EmailOtpService
     {
         $email = $this->normalizeEmail($email);
 
+        // پاک کردن کدهای منقضی شده قبلی
+        EmailOtpCode::where('email', $email)
+            ->where('expires_at', '<=', now())
+            ->delete();
+
         if ($this->otpCodeExist($email)) {
             // دریافت زمان باقیمانده برای اطلاع فرونت
             $remainingSeconds = $this->getRemainingSeconds($email);
