@@ -71,8 +71,8 @@ class AntiBruteForce
                     $response->setContent(json_encode($content));
                 }
             }
-        } elseif ($response->status() === 200) {
-            // در صورت موفقیت، تلاش‌ها را پاک کن
+        } elseif ($response->status() >= 200 && $response->status() < 300) {
+            // در صورت موفقیت (200, 201, 204, etc)، تلاش‌ها را پاک کن
             $this->clearAttempts($identifier);
         }
 

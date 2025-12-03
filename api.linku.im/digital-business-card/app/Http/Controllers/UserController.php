@@ -75,10 +75,19 @@ class UserController
 
     public function profiles(Request $request): JsonResponse
     {
+        // Pagination for large datasets (prevent memory overflow)
+        $perPage = $request->input('per_page', 50); // Default 50 items per page
+        $profiles = User::paginate($perPage);
 
-        $profiles = User::all();
-
-        return $this->ok('', ProfileResource::collection($profiles));
+        return $this->ok('', [
+            'data' => ProfileResource::collection($profiles->items()),
+            'pagination' => [
+                'current_page' => $profiles->currentPage(),
+                'last_page' => $profiles->lastPage(),
+                'per_page' => $profiles->perPage(),
+                'total' => $profiles->total(),
+            ]
+        ]);
 
     }
     public function toggleStatus(Request $request,$id): JsonResponse
