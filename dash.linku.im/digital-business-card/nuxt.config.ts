@@ -16,7 +16,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-12',
   devServer: {
     port: 3000,
-    host: '192.168.1.139', // IP شبکه شما
+    host: 'localhost',
     // SSL فقط در development (اگر certificate موجود باشد)
     https: httpsConfig
   },
@@ -25,8 +25,8 @@ export default defineNuxtConfig({
       // SSL فقط در development (اگر certificate موجود باشد)
       https: httpsConfig,
       hmr: {
-        port: 24678,
-        host: '192.168.1.139', // IP شبکه شما
+        protocol: 'ws',
+        host: 'localhost',
         overlay: false,
       }
     },

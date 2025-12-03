@@ -4,7 +4,8 @@
         <!-- Fixed Header -->
         <div class="flex-shrink-0 bg-background border-b border-border">
           <div class="flex items-center h-14 px-4">
-            <h1 class="flex-1 text-lg font-semibold text-foreground text-center">شماره موبایل</h1>
+            <h1 class="text-lg font-semibold text-foreground mr-2">شماره موبایل</h1>
+            <div class="flex-1"></div>
             <button
               @click="isLanguageSheetOpen = true"
               class="w-10 h-10 flex items-center justify-center hover:bg-accent transition-colors rounded-full"
@@ -51,21 +52,23 @@
               inputmode="numeric"
               placeholder=" "
               dir="ltr"
-              class="block px-3 pb-2.5 pt-4 w-full text-sm text-foreground bg-transparent rounded-xl border-2 border-border appearance-none focus:outline-none focus:ring-0 focus:border-primary peer transition-colors duration-200 pl-12"
+              :class="[
+                'block px-3 pb-2.5 pt-4 w-full text-sm text-foreground bg-transparent rounded-xl border-2 appearance-none focus:outline-none focus:ring-0 peer transition-colors duration-200 pl-16',
+                errors.phone ? 'border-red-500' : 'border-border focus:border-primary'
+              ]"
           />
           <label
               for="phoneInput"
-              class="inline-flex items-center absolute text-sm text-muted-foreground duration-300 transform -translate-y-4 scale-[0.85] top-2 z-10 bg-background px-2 
-								peer-focus:px-2 peer-focus:text-primary 
-								peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 
-								peer-focus:top-2 peer-focus:scale-[0.85] peer-focus:-translate-y-4 
-								right-2 origin-top-right"
+              :class="[
+                'inline-flex items-center absolute text-sm duration-300 transform -translate-y-4 scale-[0.85] top-2 z-10 bg-background px-2 right-2 origin-top-right pointer-events-none',
+                errors.phone ? 'text-red-500' : 'text-muted-foreground peer-focus:text-primary'
+              ]"
           >
             <i class="ti ti-phone w-4 h-4 ml-1.5"></i>
             <span>شماره موبایل</span>
           </label>
-          <!-- Country Code Display Inside Input with Border -->
-          <div class="absolute top-1/2 -translate-y-1/2 left-3 text-muted-foreground text-sm font-medium pointer-events-none border-r border-border pr-2 mr-2" dir="ltr">
+          <!-- Country Code Display Inside Input with Border - Fixed Position -->
+          <div class="absolute top-1/2 -translate-y-1/2 left-3 text-muted-foreground text-sm font-medium pointer-events-none border-r border-border pr-2 mr-2 min-w-[40px] text-left flex items-center h-8" dir="ltr">
             {{ selectedCountry.dialCode }}
           </div>
 
@@ -130,7 +133,7 @@
               <i class="ti ti-arrow-right rtl:block ltr:hidden text-foreground text-xl"></i>
               <i class="ti ti-arrow-left ltr:block rtl:hidden text-foreground text-xl"></i>
             </button>
-            <h1 class="flex-1 text-lg font-semibold text-foreground mr-2">ایمیل</h1>
+            <h1 class="text-lg font-semibold text-foreground mr-2">ایمیل</h1>
           </div>
         </div>
 
@@ -188,7 +191,8 @@
               <i class="ti ti-arrow-right rtl:block ltr:hidden text-foreground text-xl"></i>
               <i class="ti ti-arrow-left ltr:block rtl:hidden text-foreground text-xl"></i>
             </button>
-            <h2 class="flex-1 text-lg font-semibold text-foreground text-center">کد تایید</h2>
+            <h2 class="text-lg font-semibold text-foreground mr-2">کد تایید</h2>
+            <div class="flex-1"></div>
             <button
               @click="isLanguageSheetOpen = true"
               class="w-10 h-10 flex items-center justify-center hover:bg-accent transition-colors rounded-full"
@@ -257,54 +261,102 @@
 
       <!-- Register Step -->
       <template v-else-if="step === 'register'">
-        <h2 class="text-xl font-bold mb-2 flex items-center gap-2 text-foreground">ثبت</h2>
+        <!-- Fixed Header -->
+        <div class="flex-shrink-0 bg-background border-b border-border">
+          <div class="flex items-center h-14 px-4">
+            <button
+              @click="step = 'otp'"
+              class="w-10 h-10 flex items-center justify-center hover:bg-accent transition-colors rounded-full"
+            >
+              <i class="ti ti-arrow-right rtl:block ltr:hidden text-foreground text-xl"></i>
+              <i class="ti ti-arrow-left ltr:block rtl:hidden text-foreground text-xl"></i>
+            </button>
+            <h1 class="text-lg font-semibold text-foreground mr-2">ثبت نام</h1>
+          </div>
+        </div>
 
-        <div class="relative w-full mt-4">
+        <!-- Centered Content -->
+        <div class="flex-1 flex items-center justify-center overflow-hidden">
+          <div class="w-full max-w-md px-4">
+            <p class="text-muted-foreground text-sm text-center mb-8">لطفاً اطلاعات خود را تکمیل کنید</p>
+
+        <!-- Name Input -->
+        <div class="relative w-full mb-4">
           <input
               v-model="name"
               id="nameInput"
               type="text"
               placeholder=" "
-              class="peer block w-full px-3 pt-4 pb-4 text-sm text-foreground rtl:text-right ltr:text-left border border-border rounded-lg focus:outline-none focus:ring-0 focus:border-primary bg-card transition-all duration-300"
+              class="peer block w-full px-3 pb-2.5 pt-4 text-sm text-foreground bg-transparent rounded-xl border-2 border-border focus:outline-none focus:ring-0 focus:border-primary transition-all duration-300"
           />
           <label
               for="nameInput"
-              class="absolute rtl:right-4 ltr:left-4 text-sm text-muted-foreground bg-background px-1 z-10 transition-all duration-200 cursor-text
-              top-1/2 -translate-y-1/2
-              peer-focus:top-1 peer-focus:text-xs peer-focus:-translate-y-1/2 peer-focus:text-primary
-              peer-[:not(:placeholder-shown)]:top-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-1/2"
+              class="inline-flex items-center absolute text-sm text-muted-foreground duration-300 transform -translate-y-4 scale-[0.85] top-2 z-10 bg-background px-2 
+								peer-focus:px-2 peer-focus:text-primary 
+								peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 
+								peer-focus:top-2 peer-focus:scale-[0.85] peer-focus:-translate-y-4 
+								right-2 origin-top-right"
           >
-            نام
+            <i class="ti ti-user w-4 h-4 ml-1.5"></i>
+            <span>نام</span>
           </label>
         </div>
 
-        <div class="relative w-full my-4">
+        <!-- Family Name Input -->
+        <div class="relative w-full mb-4">
+          <input
+              v-model="family"
+              id="familyInput"
+              type="text"
+              placeholder=" "
+              class="peer block w-full px-3 pb-2.5 pt-4 text-sm text-foreground bg-transparent rounded-xl border-2 border-border focus:outline-none focus:ring-0 focus:border-primary transition-all duration-300"
+          />
+          <label
+              for="familyInput"
+              class="inline-flex items-center absolute text-sm text-muted-foreground duration-300 transform -translate-y-4 scale-[0.85] top-2 z-10 bg-background px-2 
+								peer-focus:px-2 peer-focus:text-primary 
+								peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 
+								peer-focus:top-2 peer-focus:scale-[0.85] peer-focus:-translate-y-4 
+								right-2 origin-top-right"
+          >
+            <i class="ti ti-user w-4 h-4 ml-1.5"></i>
+            <span>نام خانوادگی</span>
+          </label>
+        </div>
+
+        <!-- Referral Code Input -->
+        <div class="relative w-full mb-6">
           <input
               type="text"
               id="referralInput"
               v-model="referralCode"
               placeholder=" "
-              class="peer block w-full px-3 pt-4 pb-4 text-sm text-foreground rtl:text-right ltr:text-left border border-border rounded-lg focus:outline-none focus:ring-0 focus:border-primary bg-card transition-all duration-300"
+              class="peer block w-full px-3 pb-2.5 pt-4 text-sm text-foreground bg-transparent rounded-xl border-2 border-border focus:outline-none focus:ring-0 focus:border-primary transition-all duration-300"
           />
           <label
               for="referralInput"
-              class="absolute rtl:right-4 ltr:left-4 text-sm text-muted-foreground bg-background px-1 z-10 transition-all duration-200 cursor-text
-              top-1/2 -translate-y-1/2
-              peer-focus:top-1 peer-focus:text-xs peer-focus:-translate-y-1/2 peer-focus:text-primary
-              peer-[:not(:placeholder-shown)]:top-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-1/2"
+              class="inline-flex items-center absolute text-sm text-muted-foreground duration-300 transform -translate-y-4 scale-[0.85] top-2 z-10 bg-background px-2 
+								peer-focus:px-2 peer-focus:text-primary 
+								peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 
+								peer-focus:top-2 peer-focus:scale-[0.85] peer-focus:-translate-y-4 
+								right-2 origin-top-right"
           >
-            کد معرف (اختیاری)
+            <i class="ti ti-gift w-4 h-4 ml-1.5"></i>
+            <span>کد معرف (اختیاری)</span>
           </label>
         </div>
 
+        <!-- Submit Button -->
         <button
             class="w-full bg-primary text-primary-foreground text-center py-4 rounded-lg text-lg font-medium relative flex items-center justify-center overflow-hidden transition-all duration-300 hover:opacity-90 hover:-translate-y-0.5"
             @click="handleRegister"
         >
           <i class="ti ti-chevron-left w-4 rtl:mr-auto ltr:ml-auto absolute rtl:left-4 ltr:right-4 pt-1 text-2xl rtl:border-r ltr:border-l px-4 border-primary-foreground/30 ltr:hidden"></i>
           <i class="ti ti-chevron-right w-4 ltr:ml-auto absolute ltr:right-4 pt-1 text-2xl ltr:border-l px-4 border-primary-foreground/30 rtl:hidden"></i>
-          <span>ثبت</span>
+          <span>ثبت و ورود</span>
         </button>
+          </div>
+        </div>
       </template>
 
       <!-- Email Profile Step (for new email users) -->
@@ -612,6 +664,7 @@ import type {AxiosInstance} from 'axios'
 import InfoToast from "~/components/UserDashboard/modals/InfoToast.vue";
 import {useUserStore} from "~/stores/user";
 import {useWebAuthn} from "~/composables/useWebAuthn";
+import {safeStorage} from "~/utils/safeStorage";
 
 // ========== Country List ==========
 import { countries, type Country, defaultCountry } from '~/data/countries'
@@ -666,9 +719,9 @@ const filteredCountries = computed(() => {
   )
 })
 
-// Initialize language from localStorage
+// Initialize language from safeStorage
 if (process.client) {
-  const savedLang = localStorage.getItem('language') as 'fa' | 'en'
+  const savedLang = safeStorage.getItem('language') as 'fa' | 'en'
   if (savedLang) currentLanguage.value = savedLang
 }
 
@@ -677,6 +730,7 @@ const otpLength = 4
 const otp = reactive(Array(otpLength).fill(null))
 const otpCont = ref<HTMLElement | null>(null)
 const timer = ref(120)
+const timerInterval = ref<number | null>(null)
 const isResendEnabled = ref(false)
 const isVerifying = ref(false) // Loading state برای تایید OTP
 const userStore = useUserStore()
@@ -819,18 +873,26 @@ function formatTime(seconds: number): string {
 }
 
 // ========== Countdown Timer ==========
-function startTimer() {
-  timer.value = 120
+function startTimer(initialSeconds: number = 120) {
+  // پاک کردن تایمر قبلی اگر وجود دارد
+  if (timerInterval.value) {
+    clearInterval(timerInterval.value)
+  }
+  
+  timer.value = initialSeconds
   isResendEnabled.value = false
-  const interval = setInterval(() => {
+  
+  timerInterval.value = setInterval(() => {
     if (timer.value > 0) {
       timer.value--
     } else {
       isResendEnabled.value = true
-      clearInterval(interval)
-      step.value = 'otp'
+      if (timerInterval.value) {
+        clearInterval(timerInterval.value)
+        timerInterval.value = null
+      }
     }
-  }, 1000)
+  }, 1000) as unknown as number
 }
 
 ///======
@@ -863,11 +925,11 @@ async function handlePasskeyLogin() {
     
     if (result.success && result.userId) {
       // بازیابی توکن ذخیره شده
-      const savedToken = localStorage.getItem('passkey_auth_token')
+      const savedToken = safeStorage.getItem('passkey_auth_token')
       
       if (savedToken) {
         authStore.setToken(savedToken)
-        localStorage.setItem('auth_token', savedToken)
+        safeStorage.setItem('auth_token', savedToken)
         
         showInfoToast('ورود موفق با Face ID', 'ti-check')
         
@@ -968,8 +1030,20 @@ async function sendOtpCode(normalized: string): Promise<boolean> {
     return false;
 
   } catch (error: any) {
-    if (error.response && error.response.data && error.response.data.message) {
-      showInfoToast(error.response.data.message);
+    const errorData = error.response?.data
+    
+    // اگر کد قبلی هنوز معتبره، تایمر رو با زمان باقیمانده sync کن
+    if (errorData?.code === 'code_already_valid' && errorData?.remaining_seconds) {
+      const remaining = parseInt(errorData.remaining_seconds)
+      showInfoToast(`کد قبلی هنوز معتبر است (${toPersianDigits(remaining.toString())} ثانیه مانده)`, 'ti-info-circle')
+      // تایمر رو با زمان باقیمانده reset کن
+      startTimer(remaining)
+      otp.fill(null) // OTP قبلی رو پاک کن
+      return true; // به عنوان موفق برگردون چون تایمر sync شد
+    }
+    
+    if (errorData?.message) {
+      showInfoToast(errorData.message);
     } else {
       showInfoToast('مشکلی در ارتباط با سرور وجود دارد.', 'ti-alert-triangle');
     }
@@ -995,8 +1069,20 @@ async function sendEmailOtpCode(emailAddress: string): Promise<boolean> {
     return false;
 
   } catch (error: any) {
-    if (error.response && error.response.data && error.response.data.message) {
-      showInfoToast(error.response.data.message);
+    const errorData = error.response?.data
+    
+    // اگر کد قبلی هنوز معتبره، تایمر رو با زمان باقیمانده sync کن
+    if (errorData?.code === 'code_already_valid' && errorData?.remaining_seconds) {
+      const remaining = parseInt(errorData.remaining_seconds)
+      showInfoToast(`کد قبلی هنوز معتبر است (${toPersianDigits(remaining.toString())} ثانیه مانده)`, 'ti-info-circle')
+      // تایمر رو با زمان باقیمانده reset کن
+      startTimer(remaining)
+      otp.fill(null) // OTP قبلی رو پاک کن
+      return true; // به عنوان موفق برگردون چون تایمر sync شد
+    }
+    
+    if (errorData?.message) {
+      showInfoToast(errorData.message);
     } else {
       showInfoToast('مشکلی در ارتباط با سرور وجود دارد.', 'ti-alert-triangle');
     }
@@ -1047,20 +1133,26 @@ async function handleOtpKey(index: number, event: KeyboardEvent) {
           if (userExists) {
             // اجرای موازی fetchUser - بدون await برای سرعت بیشتر
             // redirect سریع و بارگذاری داده در پس‌زمینه
-            const fetchPromise = userStore.fetchUser()
-            
-            // همزمان بررسی کارت پیش‌فرض
-            await fetchPromise
-            const defaultCard = formStore.defaultCard
-            
-            // ایجاد کارت پیش‌فرض اگر وجود ندارد
-            if (!defaultCard) {
-              await $axios.post('v1/cards/createDefaultCard', {
-                defaultContactType: authMethod.value === 'email' ? 'email' : 'phone'
-              })
+            try {
+              const fetchPromise = userStore.fetchUser()
+              
+              // همزمان بررسی کارت پیش‌فرض
+              await fetchPromise
+              const defaultCard = formStore.defaultCard
+              
+              // ایجاد کارت پیش‌فرض اگر وجود ندارد
+              if (!defaultCard) {
+                await $axios.post('v1/cards/createDefaultCard', {
+                  defaultContactType: authMethod.value === 'email' ? 'email' : 'phone'
+                })
+              }
+              // همیشه به داشبورد ریدایرکت کن
+              router.push('/dashboard')
+            } catch (fetchError: any) {
+              console.error('❌ Error fetching user after login:', fetchError)
+              // حتی اگر fetch user خطا داد، بازم به داشبورد برو (token ذخیره شده)
+              router.push('/dashboard')
             }
-            // همیشه به داشبورد ریدایرکت کن
-            router.push('/dashboard')
           } else {
             // اگر step قبلاً به email_profile تغییر کرده، دست نزن
             if (step.value !== 'email_profile') {
@@ -1107,8 +1199,12 @@ async function verifyOtpCode(fullCode: string): Promise<{ success: boolean; user
     
     const token = response.data.token
     if (typeof token === 'string' && token.length > 0) {
+      console.log('✅ Token received from server:', token.substring(0, 20) + '...')
       authStore.setToken(token)
-      localStorage.setItem('auth_token', token)
+      safeStorage.setItem('auth_token', token)
+      console.log('✅ Token saved to safeStorage and store')
+    } else {
+      console.error('❌ No token in response:', response.data)
     }
 
     if (response.status === 200) {
@@ -1200,7 +1296,7 @@ async function handleEmailProfileSubmit() {
     const token = response.data.token
     if (typeof token === 'string' && token.length > 0) {
       authStore.setToken(token)
-      localStorage.setItem('auth_token', token)
+      safeStorage.setItem('auth_token', token)
     }
     
     showInfoToast(`ثبت‌نام موفق! خوش آمدید ${firstName}`, 'ti-check')
@@ -1249,6 +1345,7 @@ async function handleRegister() {
         phone: toEnglishDigits(phone.value.trim()).replace(/\D/g, '').replace(/^0/, ''),
         countryCode: '+98',
         name: name.value.trim(),
+        family: family.value.trim() || null,
         referralCode: referralCode.value?.trim() || null
       }
       
@@ -1257,10 +1354,10 @@ async function handleRegister() {
       const token = response.data.token
       if (typeof token === 'string' && token.length > 0) {
         authStore.setToken(token)
-        localStorage.setItem('auth_token', token)
+        safeStorage.setItem('auth_token', token)
       }
       
-      showInfoToast(`ثبت‌نام موفق! خوش آمدی ${name.value}`, 'ti-check')
+      showInfoToast(`ثبت‌نام موفق! خوش آمدید ${name.value}`, 'ti-check')
       
       await userStore.fetchUser()
       const defaultCard = computed(() => formStore.defaultCard)
@@ -1280,10 +1377,11 @@ async function handleRegister() {
     // اگر قبلاً login شده (کاربر قدیمی)، فقط referralCode رو بروز کن
     const response = await $axios.post('/user/setReferralCode', {
       name: name.value,
+      family: family.value.trim() || null,
       referred_code: referralCode.value || null,
     })
 
-    showInfoToast(`ثبت‌نام موفق! خوش آمدی ${name.value}`, 'ti-check')
+    showInfoToast(`ثبت‌نام موفق! خوش آمدید ${name.value}`, 'ti-check')
     await userStore.fetchUser()
     const defaultCard = computed(() => formStore.defaultCard)
 
@@ -1338,7 +1436,7 @@ const handleLanguageChange = async (lang: 'fa' | 'en') => {
   currentLanguage.value = lang
   
   if (process.client) {
-    localStorage.setItem('language', lang)
+    safeStorage.setItem('language', lang)
     document.documentElement.lang = lang
     document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr'
   }

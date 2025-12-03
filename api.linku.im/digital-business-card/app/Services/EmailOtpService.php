@@ -30,7 +30,17 @@ class EmailOtpService
         $email = $this->normalizeEmail($email);
 
         if ($this->otpCodeExist($email)) {
-            throw new CustomException(__('sms.sms_recent_code'), 429);
+            // دریافت زمان باقیمانده برای اطلاع فرونت
+            $remainingSeconds = $this->getRemainingSeconds($email);
+            
+            throw new CustomException(
+                __('sms.sms_recent_code'),
+                429,
+                [
+                    'code' => 'code_already_valid',
+                    'remaining_seconds' => $remainingSeconds
+                ]
+            );
         }
 
         $otpCode = $this->generateOtpCode();
@@ -117,6 +127,23 @@ class EmailOtpService
         return EmailOtpCode::where('email', $email)
             ->where('expires_at', '>', now())
             ->exists();
+    }
+
+    /**
+     * دریافت زمان باقیمانده تا انقضای OTP (به ثانیه)
+     */
+    public function getRemainingSeconds(string $email): ?int
+    {
+        $otp = EmailOtpCode::where('email', $email)
+            ->where('expires_at', '>', now())
+            ->latest()
+            ->first();
+
+        if (!$otp) {
+            return null;
+        }
+
+        return max(0, now()->diffInSeconds($otp->expires_at, false));
     }
 
     /**

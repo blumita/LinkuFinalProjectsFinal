@@ -36,7 +36,17 @@ class OtpService
 
             // اجازه ارسال مجدد اگر کمتر از 10 ثانیه به انقضا مانده
             if ($this->otpCodeExist($phone, 10)) {
-                throw new CustomException(__('sms.sms_recent_code'), 429);
+                // دریافت زمان باقیمانده برای اطلاع فرونت
+                $remainingSeconds = $this->getRemainingSeconds($phone);
+                
+                throw new CustomException(
+                    __('sms.sms_recent_code'),
+                    429,
+                    [
+                        'code' => 'code_already_valid',
+                        'remaining_seconds' => $remainingSeconds
+                    ]
+                );
             }
 
             $otpCode = $this->generateOtpCode();
@@ -214,6 +224,23 @@ class OtpService
         }
         
         return $query->exists();
+    }
+
+    /**
+     * دریافت زمان باقیمانده تا انقضای OTP (به ثانیه)
+     */
+    public function getRemainingSeconds(string $phone): ?int
+    {
+        $otp = OtpCode::where('phone', $phone)
+            ->where('expires_at', '>', now())
+            ->latest()
+            ->first();
+
+        if (!$otp) {
+            return null;
+        }
+
+        return max(0, now()->diffInSeconds($otp->expires_at, false));
     }
 
     public function otpCodeFind(string $phone, string $code, bool $deleteAfterVerify = true): bool

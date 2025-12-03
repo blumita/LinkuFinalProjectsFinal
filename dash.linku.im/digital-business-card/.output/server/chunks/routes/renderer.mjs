@@ -1,10 +1,9 @@
 import { createRenderer, getRequestDependencies, getPreloadLinks, getPrefetchLinks } from 'vue-bundle-renderer/runtime';
-import { D as joinRelativeURL, E as useRuntimeConfig, F as defineRenderHandler, G as getQuery, c as createError, H as getRouteRules, h as hasProtocol, I as relative, j as joinURL, J as useNitroApp, K as getResponseStatusText, L as getResponseStatus } from '../_/nitro.mjs';
+import { j as joinRelativeURL, u as useRuntimeConfig, b as defineRenderHandler, e as getQuery, c as createError, f as getRouteRules, h as hasProtocol, i as relative, k as joinURL, l as useNitroApp, m as getResponseStatusText, n as getResponseStatus } from '../_/nitro.mjs';
 import { renderToString } from 'vue/server-renderer';
 import { createHead as createHead$1, propsToString, renderSSRHead } from 'unhead/server';
-import { FlatMetaPlugin, DeprecationsPlugin, PromisesPlugin, TemplateParamsPlugin, AliasSortingPlugin } from 'unhead/plugins';
-import { walkResolver } from 'unhead/utils';
-import { toValue, isRef, hasInjectionContext, inject, ref, watchEffect, getCurrentInstance, onBeforeUnmount, onDeactivated, onActivated } from 'vue';
+import { toValue, isRef } from 'vue';
+import { DeprecationsPlugin, PromisesPlugin, TemplateParamsPlugin, AliasSortingPlugin } from 'unhead/plugins';
 
 const VueResolver = (_, value) => {
   return isRef(value) ? toValue(value) : value;
@@ -20,56 +19,6 @@ function vueInstall(head) {
     }
   };
   return plugin.install;
-}
-
-function injectHead() {
-  if (hasInjectionContext()) {
-    const instance = inject(headSymbol);
-    if (!instance) {
-      throw new Error("useHead() was called without provide context, ensure you call it through the setup() function.");
-    }
-    return instance;
-  }
-  throw new Error("useHead() was called without provide context, ensure you call it through the setup() function.");
-}
-function useHead(input, options = {}) {
-  const head = options.head || injectHead();
-  return head.ssr ? head.push(input || {}, options) : clientUseHead(head, input, options);
-}
-function clientUseHead(head, input, options = {}) {
-  const deactivated = ref(false);
-  let entry;
-  watchEffect(() => {
-    const i = deactivated.value ? {} : walkResolver(input, VueResolver);
-    if (entry) {
-      entry.patch(i);
-    } else {
-      entry = head.push(i, options);
-    }
-  });
-  const vm = getCurrentInstance();
-  if (vm) {
-    onBeforeUnmount(() => {
-      entry.dispose();
-    });
-    onDeactivated(() => {
-      deactivated.value = true;
-    });
-    onActivated(() => {
-      deactivated.value = false;
-    });
-  }
-  return entry;
-}
-function useSeoMeta(input = {}, options = {}) {
-  const head = options.head || injectHead();
-  head.use(FlatMetaPlugin);
-  const { title, titleTemplate, ...meta } = input;
-  return useHead({
-    title,
-    titleTemplate,
-    _flatMeta: meta
-  }, options);
 }
 
 function createHead(options = {}) {
@@ -93,9 +42,6 @@ const appTeleportAttrs = {"id":"teleports"};
 
 const appId = "nuxt-app";
 
-function baseURL() {
-  return useRuntimeConfig().app.baseURL;
-}
 function buildAssetsDir() {
   return useRuntimeConfig().app.buildAssetsDir;
 }
@@ -110,8 +56,8 @@ function publicAssetsURL(...path) {
 
 const APP_ROOT_OPEN_TAG = `<${appRootTag}${propsToString(appRootAttrs)}>`;
 const APP_ROOT_CLOSE_TAG = `</${appRootTag}>`;
-const getServerEntry = () => import('../build/server.mjs').then((r) => r.default || r);
-const getClientManifest = () => import('../build/client.manifest.mjs').then((r) => r.default || r).then((r) => typeof r === "function" ? r() : r);
+const getServerEntry = () => import('../build/client.manifest.mjs').then(function (n) { return n.s; }).then((r) => r.default || r);
+const getClientManifest = () => import('../build/client.manifest.mjs').then(function (n) { return n.c; }).then((r) => r.default || r).then((r) => typeof r === "function" ? r() : r);
 const getSSRRenderer = lazyCachedFunction(async () => {
   const manifest = await getClientManifest();
   if (!manifest) {
@@ -477,7 +423,7 @@ async function renderInlineStyles(usedModules) {
 
 const renderSSRHeadOptions = {"omitLineBreaks":false};
 
-const entryFileName = "BJ5m1LBI.js";
+const entryFileName = "CCqXuS2f.js";
 
 globalThis.__buildAssetsURL = buildAssetsURL;
 globalThis.__publicAssetsURL = publicAssetsURL;
@@ -649,5 +595,5 @@ const renderer$1 = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty
   default: renderer
 }, Symbol.toStringTag, { value: 'Module' }));
 
-export { useSeoMeta as a, baseURL as b, buildAssetsURL as c, headSymbol as h, publicAssetsURL as p, renderer$1 as r, useHead as u };
+export { buildAssetsURL as b, renderer$1 as r };
 //# sourceMappingURL=renderer.mjs.map
