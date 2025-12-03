@@ -24,7 +24,9 @@ class VerifyOtpCodeRequest extends OtpCodeRequest
     {
         return array_merge(parent::rules(), [
             'code' => 'required|string',
-            'type'=>'nullable|string',
+            'type' => 'nullable|string',
+            'name' => 'nullable|string|max:255',
+            'referralCode' => 'nullable|string|max:50',
         ]);
     }
 }

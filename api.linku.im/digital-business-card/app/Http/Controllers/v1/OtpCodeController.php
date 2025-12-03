@@ -75,7 +75,8 @@ class OtpCodeController
         $existingUser = User::where('phone', $phone)->first();
         
         // تصمیم‌گیری قبل از verify: آیا کاربر جدید بدون پروفایل است؟
-        $isNewUserWithoutProfile = !$existingUser && empty($validatedData['name']);
+        // فقط name کافی است (family اختیاری است)
+        $isNewUserWithoutProfile = !$existingUser && (empty($validatedData['name']) || trim($validatedData['name']) === '');
         
         // اگر کاربر جدید است و نام ارسال نشده، فرم ثبت‌نام نمایش داده شود
         // این چک را قبل از verify انجام می‌دهیم تا OTP حذف نشود
@@ -322,7 +323,7 @@ class OtpCodeController
         // بررسی کنیم کاربر جدید است و اطلاعات پروفایل ندارد
         $existingUser = User::where('email', $email)->first();
         // فقط نام الزامی است، شماره تلفن اختیاری است
-        $isNewUserWithoutProfile = !$existingUser && empty($validatedData['name']);
+        $isNewUserWithoutProfile = !$existingUser && (empty($validatedData['name']) || trim($validatedData['name']) === '');
 
         // اگر کاربر جدید است و نام ارسال نشده، فرم ثبت‌نام نمایش داده شود
         // این چک را قبل از verify انجام می‌دهیم تا OTP حذف نشود

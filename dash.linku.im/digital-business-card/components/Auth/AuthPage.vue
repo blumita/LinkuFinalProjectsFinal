@@ -1415,13 +1415,15 @@ async function handleRegister() {
   try {
     // اگر کاربر از phone-based login آمده و کد OTP دارد، یک‌بار دیگر verify کن همراه با اطلاعات
     if (pendingPhoneOtpCode.value) {
+      // ترکیب نام و نام خانوادگی برای ارسال به سرور
+      const fullName = lastName ? `${firstName} ${lastName}` : firstName
+      
       const requestData = {
         code: pendingPhoneOtpCode.value,
         phone: toEnglishDigits(phone.value.trim()).replace(/\D/g, '').replace(/^0/, ''),
         countryCode: '+98',
-        name: firstName,
-        family: lastName,
-        referred_code: referralCode.value?.trim() || null
+        name: fullName,  // نام کامل
+        referralCode: referralCode.value?.trim() || null
       }
       
       console.log('📤 Sending registration data:', requestData)
