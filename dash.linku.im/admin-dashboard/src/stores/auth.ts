@@ -1,6 +1,15 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
+// Create axios instance with baseURL
+const apiClient = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'https://api.linku.im/api',
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+})
+
 // Safe storage helpers with fallback
 const getStoredToken = (): string => {
     try {
@@ -94,7 +103,7 @@ export const useAuthStore = defineStore('auth', {
             this.isVerifying = true
             
             try {
-                const response = await axios.get('/admin/me', {
+                const response = await apiClient.get('/admin/me', {
                     headers: {
                         Authorization: `Bearer ${this.token}`
                     },
