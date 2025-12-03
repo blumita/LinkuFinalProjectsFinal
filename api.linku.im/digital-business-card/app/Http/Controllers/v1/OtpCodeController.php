@@ -293,6 +293,17 @@ class OtpCodeController
         $validatedData = $request->validated();
         $email = strtolower(trim($validatedData['email']));
 
+        // Debug: Log incoming data
+        \Log::info('verifyEmailOtp called', [
+            'email' => $email,
+            'has_name' => isset($validatedData['name']),
+            'name_value' => $validatedData['name'] ?? 'NOT_SET',
+            'has_family' => isset($validatedData['family']),
+            'family_value' => $validatedData['family'] ?? 'NOT_SET',
+            'has_phone' => isset($validatedData['phone']),
+            'phone_value' => $validatedData['phone'] ?? 'NOT_SET',
+        ]);
+
         // بررسی کنیم کاربر جدید است و اطلاعات پروفایل ندارد
         $existingUser = User::where('email', $email)->first();
         // فقط نام الزامی است، شماره تلفن اختیاری است

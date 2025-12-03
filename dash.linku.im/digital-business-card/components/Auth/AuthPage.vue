@@ -1278,6 +1278,21 @@ async function handleEmailProfileSubmit() {
   const firstName = nameParts[0] || ''
   const lastName = nameParts.slice(1).join(' ') || ''
   
+  // Double-check that firstName is not empty (防御性编程)
+  if (!firstName || firstName.trim() === '') {
+    errors.profileName = 'نام الزامی است'
+    showInfoToast('لطفاً نام خود را وارد کنید')
+    return
+  }
+  
+  console.log('📝 Name split:', {
+    fullName: fullName.value,
+    firstName,
+    lastName,
+    firstNameLength: firstName.length,
+    lastNameLength: lastName.length
+  })
+  
   // Build full phone with country code from selected country (optional)
   let fullPhone = null
   const cleanPhone = toEnglishDigits(profilePhone.value.trim()).replace(/\D/g, '')
@@ -1297,6 +1312,14 @@ async function handleEmailProfileSubmit() {
   isVerifying.value = true
   
   try {
+    // Verify OTP code is available
+    if (!pendingEmailOtpCode.value || pendingEmailOtpCode.value.trim() === '') {
+      console.error('🐛 BUG: pendingEmailOtpCode is empty!')
+      showInfoToast('کد تأیید منقضی شده است. لطفاً دوباره کد دریافت کنید.', 'ti-alert-triangle')
+      step.value = 'email' // Go back to email step
+      return
+    }
+    
     const requestData = {
       code: pendingEmailOtpCode.value,
       email: email.value.trim(),
@@ -1306,7 +1329,22 @@ async function handleEmailProfileSubmit() {
       referred_code: referralCode.value || null
     }
     
+    console.log('🔍 Sending registration data:', {
+      email: requestData.email,
+      code: requestData.code ? '****' : 'MISSING',
+      name: requestData.name || 'EMPTY',
+      family: requestData.family || 'EMPTY',
+      phone: requestData.phone || 'null',
+      referred_code: requestData.referred_code || 'null'
+    })
+    
     const response = await $axios.post('/auth/verifyEmailOtp', requestData)
+    
+    console.log('✅ Registration successful:', {
+      status: response.status,
+      hasToken: !!response.data.token,
+      hasUser: !!response.data.user
+    })
     
     const token = response.data.token
     if (typeof token === 'string' && token.length > 0) {
@@ -1335,10 +1373,23 @@ async function handleEmailProfileSubmit() {
   } catch (error: any) {
     isVerifying.value = false
     
-    if (error.response?.data?.code === 'phone_taken') {
+    console.error('❌ Registration failed:', {
+      status: error.response?.status,
+      code: error.response?.data?.code,
+      message: error.response?.data?.message,
+      fullError: error.response?.data
+    })
+    
+    const errorCode = error.response?.data?.code
+    
+    if (errorCode === 'profile_required') {
+      // این نباید اتفاق بیفتد چون اطلاعات رو فرستادیم
+      console.error('🐛 BUG: Received profile_required AGAIN after sending profile data!')
+      showInfoToast('خطا در ثبت اطلاعات. لطفاً دوباره تلاش کنید.', 'ti-alert-triangle')
+    } else if (errorCode === 'phone_taken') {
       errors.profilePhone = 'این شماره قبلاً ثبت شده است'
       showInfoToast('این شماره قبلاً ثبت شده است', 'ti-alert-triangle')
-    } else if (error.response?.data?.code === 'invalid_phone_country') {
+    } else if (errorCode === 'invalid_phone_country') {
       errors.profilePhone = 'این کد کشور پشتیبانی نمی‌شود'
       showInfoToast('این کد کشور پشتیبانی نمی‌شود', 'ti-alert-triangle')
     } else if (error.response?.data?.message) {
