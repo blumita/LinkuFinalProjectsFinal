@@ -92,12 +92,14 @@ export const useUserStore = defineStore('userStore', () => {
         userCards.value=cards.slice(0,max)
     }
 
-    const fetchProfiles = async () => {
+    const fetchProfiles = async (page: number = 1, perPage: number = 100) => {
         try {
-            const { data } = await axios.get('/user/admin/profiles')
+            const { data } = await axios.get('/user/admin/profiles', {
+                params: { page, per_page: perPage }
+            })
 
             // اضافه کردن cardCount به هر پروفایل
-            profiles.value = data.data.map((profile: any) => ({
+            profiles.value = data.data.data.map((profile: any) => ({
                 ...profile,
                 cardCount: profile.cards ? profile.cards.length : 0,
             }))
