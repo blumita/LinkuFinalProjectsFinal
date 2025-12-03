@@ -555,6 +555,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import QRCode from 'qrcode'
+import { copyToClipboard as copyText } from '@/utils/clipboard'
 
 // Types
 interface Card {
@@ -938,7 +939,7 @@ const downloadQRCode = () => {
 
 const copyToClipboard = async (text: string) => {
   try {
-    await navigator.clipboard.writeText(text)
+    await copyText(text)
     successMessage.value = 'لینک با موفقیت کپی شد'
     showSuccessMessage.value = true
     setTimeout(() => {
@@ -946,6 +947,11 @@ const copyToClipboard = async (text: string) => {
     }, 3000)
   } catch (err) {
     console.error('Failed to copy: ', err)
+    successMessage.value = 'خطا در کپی کردن'
+    showSuccessMessage.value = true
+    setTimeout(() => {
+      showSuccessMessage.value = false
+    }, 3000)
   }
 }
 
