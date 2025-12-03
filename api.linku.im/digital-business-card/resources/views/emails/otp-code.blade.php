@@ -4,97 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>کد تایید لینکو</title>
-    <style>
-        body {
-            font-family: 'Tahoma', 'Vazir', sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 20px;
-            direction: rtl;
-        }
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-        .content {
-            padding: 30px;
-            text-align: center;
-        }
-        .otp-code {
-            background-color: #f0f0f0;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-            font-size: 32px;
-            font-weight: bold;
-            letter-spacing: 8px;
-            color: #333;
-            font-family: monospace;
-        }
-        .message {
-            color: #666;
-            font-size: 14px;
-            line-height: 1.8;
-        }
-        .warning {
-            background-color: #fff3cd;
-            border: 1px solid #ffc107;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
-            font-size: 13px;
-            color: #856404;
-        }
-        .footer {
-            background-color: #f8f9fa;
-            padding: 20px;
-            text-align: center;
-            font-size: 12px;
-            color: #999;
-        }
-    </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🔐 کد تایید لینکو</h1>
-        </div>
-        <div class="content">
-            <p class="message">
-                سلام! 👋<br>
-                برای ورود به حساب کاربری خود از کد زیر استفاده کنید:
-            </p>
-            
-            <div class="otp-code">
-                {{ $otpCode }}
-            </div>
-            
-            <p class="message">
-                این کد تا <strong>۲ دقیقه</strong> معتبر است.
-            </p>
-            
-            <div class="warning">
-                ⚠️ اگر شما این درخواست را ارسال نکرده‌اید، لطفاً این ایمیل را نادیده بگیرید.
-            </div>
-        </div>
-        <div class="footer">
-            <p>با تشکر از انتخاب شما</p>
-            <p>تیم لینکو - Linku</p>
-        </div>
-    </div>
+<body style="margin: 0; padding: 0; font-family: Tahoma, Arial, sans-serif; background-color: #fafafa; direction: rtl;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #fafafa; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden;">
+                    
+                    <!-- Logo -->
+                    <tr>
+                        <td style="padding: 40px 40px 20px; text-align: center;">
+                            <img src="https://i.ibb.co/JFb4JD2s/logoApp.png" alt="Linku" style="width: 120px; height: auto; display: block; margin: 0 auto;">
+                        </td>
+                    </tr>
+
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 20px 40px 30px; text-align: center;">
+                            <p style="margin: 0 0 30px; color: #333333; font-size: 16px; line-height: 1.6;">
+                                کد تایید شما:
+                            </p>
+                            
+                            <!-- OTP Code -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center">
+                                        <div style="background-color: #f5f5f5; border-radius: 8px; padding: 20px; display: inline-block;">
+                                            <span style="font-size: 32px; font-weight: bold; letter-spacing: 16px; color: #000000; font-family: 'Courier New', monospace;">{{ $otpCode }}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <p style="margin: 30px 0 0; color: #666666; font-size: 14px; line-height: 1.6;">
+                                این کد تا <strong style="color: #333333;">2 دقیقه</strong> معتبر است.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 20px 40px 40px; text-align: center; border-top: 1px solid #eeeeee;">
+                            <p style="margin: 0; color: #999999; font-size: 12px; line-height: 1.5;">
+                                تیم لینکو
+                            </p>
+                        </td>
+                    </tr>
+                    
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

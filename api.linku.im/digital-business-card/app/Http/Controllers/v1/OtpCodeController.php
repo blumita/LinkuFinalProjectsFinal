@@ -8,6 +8,7 @@ use App\Http\Requests\v1\OtpCodeRequest;
 use App\Http\Requests\v1\VerifyOtpCodeRequest;
 use App\Http\Requests\v1\EmailOtpCodeRequest;
 use App\Http\Requests\v1\VerifyEmailOtpCodeRequest;
+use App\Mail\LoginSecurityNotification;
 use App\Models\Order;
 use App\Models\Admin;
 use App\Models\OtpCode;
@@ -22,6 +23,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class OtpCodeController
 {
@@ -71,10 +73,28 @@ class OtpCodeController
         // بررسی اینکه کاربر جدید است و اطلاعات پروفایل ندارد
         $phone = $this->otpService->normalizePhone($validatedData['phone']);
         $existingUser = User::where('phone', $phone)->first();
+        
+        // تصمیم‌گیری قبل از verify: آیا کاربر جدید بدون پروفایل است؟
         $isNewUserWithoutProfile = !$existingUser && empty($validatedData['name']);
+        
+        // اگر کاربر جدید است و نام ارسال نشده، فرم ثبت‌نام نمایش داده شود
+        // این چک را قبل از verify انجام می‌دهیم تا OTP حذف نشود
+        if ($isNewUserWithoutProfile) {
+            // فقط OTP را verify کن بدون حذف
+            if (!$this->otpService->verifyOtp($validatedData, false)) {
+                throw new CustomException(__('sms.sms_expired'), 429);
+            }
+            
+            return $this->fail(
+                'لطفاً نام و نام خانوادگی خود را وارد کنید.',
+                null,
+                422,
+                'profile_required'
+            );
+        }
 
-        // OTP را verify کن، ولی اگر کاربر جدید است و پروفایل ندارد، حذف نکن
-        if (!$this->otpService->verifyOtp($validatedData, !$isNewUserWithoutProfile)) {
+        // حالا می‌توانیم OTP را verify و حذف کنیم (کاربر موجود یا کاربر جدید با name)
+        if (!$this->otpService->verifyOtp($validatedData, true)) {
             throw new CustomException(__('sms.sms_expired'), 429);
         }
 
@@ -84,16 +104,6 @@ class OtpCodeController
 
         if (($validatedData['type'] ?? null) === 'admin_authenticate') {
             return $this->adminLogin($validatedData);
-        }
-
-        // اگر کاربر جدید است و نام ارسال نشده، فرم ثبت‌نام نمایش داده شود
-        if (!$existingUser && empty($validatedData['name'])) {
-            return $this->fail(
-                'کاربر جدید است؛ لطفاً نام و کد معرف را ارسال کنید.',
-                null,
-                422,
-                'profile_required'
-            );
         }
 
         return $this->login($validatedData);
@@ -179,6 +189,11 @@ class OtpCodeController
         Auth::login($user);
 
         $user->notify(new UserActivityNotification(UserActivityNotificationType::REGISTER));
+
+        // Send security notification email if user has email
+        if (!empty($user->email)) {
+            $this->sendLoginSecurityEmail($user, $request);
+        }
 
         return response()->json([
             'token' => $user->createToken('otp-login')->plainTextToken,
@@ -309,8 +324,24 @@ class OtpCodeController
         // فقط نام الزامی است، شماره تلفن اختیاری است
         $isNewUserWithoutProfile = !$existingUser && empty($validatedData['name']);
 
-        // OTP را verify کن، ولی اگر کاربر جدید است و پروفایل ندارد، حذف نکن
-        if (!$this->emailOtpService->verifyOtp($email, $validatedData['code'], !$isNewUserWithoutProfile)) {
+        // اگر کاربر جدید است و نام ارسال نشده، فرم ثبت‌نام نمایش داده شود
+        // این چک را قبل از verify انجام می‌دهیم تا OTP حذف نشود
+        if ($isNewUserWithoutProfile) {
+            // فقط OTP را verify کن بدون حذف
+            if (!$this->emailOtpService->verifyOtp($email, $validatedData['code'], false)) {
+                throw new CustomException(__('sms.sms_expired'), 429);
+            }
+            
+            return $this->fail(
+                'لطفاً نام و نام خانوادگی خود را وارد کنید.',
+                null,
+                422,
+                'profile_required'
+            );
+        }
+
+        // حالا می‌توانیم OTP را verify و حذف کنیم (کاربر موجود یا کاربر جدید با name)
+        if (!$this->emailOtpService->verifyOtp($email, $validatedData['code'], true)) {
             throw new CustomException(__('sms.sms_expired'), 429);
         }
 
@@ -324,19 +355,8 @@ class OtpCodeController
             return $this->emailAdminLogin($email);
         }
 
-        // لاگین یا ثبت‌نام معمولی
-        // اگر کاربر وجود ندارد و اطلاعات پروفایل ارسال نشده، به کلاینت اطلاع بده تا فرم تکمیل شود
+        // لاگین یا ثبت‌نام معمولی - کاربر جدید با اطلاعات
         if (!$existingUser) {
-            // نام الزامی است، شماره تلفن اختیاری
-            if (empty($validatedData['name'])) {
-                return $this->fail(
-                    'کاربر جدید است؛ لطفاً نام و نام خانوادگی را ارسال کنید.',
-                    null,
-                    422,
-                    'profile_required'
-                );
-            }
-
             // بررسی شماره (ممنوعیت اسرائیل) - فقط اگر شماره ارسال شده باشد
             $phoneRaw = $validatedData['phone'] ?? null;
             $digits = $phoneRaw ? preg_replace('/\D/', '', $phoneRaw) : null;
@@ -382,6 +402,11 @@ class OtpCodeController
 
             Auth::login($user);
 
+            // Send security notification email
+            if (!empty($user->email)) {
+                $this->sendLoginSecurityEmail($user, []);
+            }
+
             return response()->json([
                 'token' => $user->createToken('email-otp-login')->plainTextToken,
                 'user' => $user,
@@ -407,6 +432,11 @@ class OtpCodeController
         Auth::login($user);
 
         $user->notify(new UserActivityNotification(UserActivityNotificationType::REGISTER));
+
+        // Send security notification email
+        if (!empty($user->email)) {
+            $this->sendLoginSecurityEmail($user, []);
+        }
 
         return response()->json([
             'token' => $user->createToken('email-otp-login')->plainTextToken,
@@ -784,5 +814,40 @@ class OtpCodeController
             'user' => new \App\Http\Resources\AdminResource($admin->load('role')),
             'message' => 'ورود موفقیت‌آمیز بود.',
         ]);
+    }
+
+    /**
+     * Send login security notification email
+     */
+    private function sendLoginSecurityEmail(User $user, array $request): void
+    {
+        try {
+            $loginTime = now()->setTimezone('Asia/Tehran')->format('Y-m-d H:i:s');
+            $ipAddress = request()->ip() ?? 'Unknown';
+            
+            // Get user agent and parse it for better display
+            $userAgent = request()->userAgent() ?? 'Unknown';
+            
+            // Send email
+            Mail::to($user->email)->send(
+                new LoginSecurityNotification(
+                    $user->name,
+                    $loginTime,
+                    $ipAddress,
+                    $userAgent
+                )
+            );
+
+            Log::info('Login security email sent', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'ip' => $ipAddress,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send login security email', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
