@@ -12,12 +12,12 @@ declare module '@vue/runtime-core' {
 export default {
     install: (app: App) => {
         const instance = axios.create({
-            baseURL: import.meta.env.DEV 
-                ? 'http://127.0.0.1:8000/api'  // Development (local)
-                : 'https://api.linku.im/api',   // Production
-            /*headers: {
-                'Content-Type': 'application/json'
-            }*/
+            baseURL: import.meta.env.VITE_API_BASE_URL || 'https://api.linkuapp.com/api',
+            withCredentials: false,
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
         })
 
         // ✅ افزودن توکن از store به هدر

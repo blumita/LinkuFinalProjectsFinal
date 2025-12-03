@@ -1,13 +1,42 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
-// استفاده از sessionStorage به جای localStorage (امن‌تر و با بستن مرورگر پاک می‌شود)
+// Memory store as fallback when storage is not available
+let memoryToken = ''
+
 const getStoredToken = (): string => {
     try {
-        return sessionStorage.getItem('admin_token') || ''
+        // Try localStorage first (more persistent)
+        const token = localStorage.getItem('admin_token')
+        if (token) {
+            memoryToken = token
+            return token
+        }
     } catch (e) {
-        console.warn('sessionStorage not available:', e)
-        return ''
+        console.warn('localStorage not available:', e)
+    }
+    
+    // Fallback to memory
+    return memoryToken
+}
+
+const setStoredToken = (token: string): void => {
+    memoryToken = token
+    try {
+        localStorage.setItem('admin_token', token)
+    } catch (e) {
+        console.warn('Could not save token to localStorage:', e)
+    }
+}
+
+const clearStoredToken = (): void => {
+    memoryToken = ''
+    try {
+        localStorage.removeItem('admin_token')
+        localStorage.removeItem('token')
+        localStorage.removeItem('auth_token')
+    } catch (e) {
+        console.warn('Could not clear storage:', e)
     }
 }
 
@@ -24,15 +53,7 @@ export const useAuthStore = defineStore('auth', {
     actions: {
         setToken(token: string) {
             this.token = token
-            try {
-                // ذخیره در sessionStorage (با بستن مرورگر پاک می‌شود)
-                sessionStorage.setItem('admin_token', token)
-                // حذف localStorage قدیمی اگر وجود داشته باشد
-                localStorage.removeItem('token')
-                localStorage.removeItem('auth_token')
-            } catch (e) {
-                console.warn('Could not save token to sessionStorage:', e)
-            }
+            setStoredToken(token)
             this.isVerified = false
         },
         logout() {
@@ -40,18 +61,7 @@ export const useAuthStore = defineStore('auth', {
             this.user = null
             this.isVerified = false
             this.isVerifying = false
-            try {
-                // پاک کردن همه storage ها
-                sessionStorage.removeItem('admin_token')
-                localStorage.removeItem('token')
-                localStorage.removeItem('auth_token')
-                // پاک کردن همه کوکی‌ها
-                document.cookie.split(';').forEach(c => {
-                    document.cookie = c.trim().split('=')[0] + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;'
-                })
-            } catch (e) {
-                console.warn('Could not clear storage:', e)
-            }
+            clearStoredToken()
         },
         async verifyToken(): Promise<boolean> {
             if (!this.token) {
