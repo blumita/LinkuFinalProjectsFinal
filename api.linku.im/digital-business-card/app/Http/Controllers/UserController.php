@@ -49,10 +49,23 @@ class UserController
      */
     public function adminMe(Request $request): JsonResponse
     {
-        // Try to get user from sanctum (works with tokens)
-        $user = $request->user();
+        // Try to get the authenticated user via token
+        $token = $request->bearerToken();
         
-        // Check if user is an Admin model
+        if (!$token) {
+            return $this->fail('توکن یافت نشد.', null, 401);
+        }
+
+        // Find the token and get its owner (tokenable)
+        $personalAccessToken = \Laravel\Sanctum\PersonalAccessToken::findToken($token);
+        
+        if (!$personalAccessToken) {
+            return $this->fail('توکن نامعتبر است.', null, 401);
+        }
+
+        $user = $personalAccessToken->tokenable;
+        
+        // Check if the tokenable is an Admin model
         if (!$user || !($user instanceof \App\Models\Admin)) {
             return $this->fail('ادمین یافت نشد.', null, 401);
         }
