@@ -452,24 +452,18 @@ class OtpCodeController
      */
     protected function emailAdminLogin(string $email): JsonResponse
     {
-        $user = User::where('email', $email)->first();
+        $admin = Admin::where('email', $email)->first();
 
-        if (!$user) {
-            throw new CustomException(__('auth.user_not_found'), 404);
+        if (!$admin) {
+            throw new CustomException('ادمین با این ایمیل یافت نشد.', 404);
         }
 
-        if ($user->role !== 'admin') {
-            throw new CustomException(__('auth.not_admin_user'), 403);
-        }
-
-        Auth::login($user);
-
-        $user->notify(new UserActivityNotification(UserActivityNotificationType::ADMIN_LOGIN));
+        Auth::guard('admin')->login($admin);
 
         return response()->json([
-            'token' => $user->createToken('admin-email-otp-login', ['admin'])->plainTextToken,
-            'user' => $user,
-            'message' => __('auth.admin_login_success'),
+            'token' => $admin->createToken('admin-email-otp-login', ['admin'])->plainTextToken,
+            'user' => new \App\Http\Resources\AdminResource($admin->load('role')),
+            'message' => 'ورود موفقیت‌آمیز بود.',
         ]);
     }
 
@@ -486,15 +480,11 @@ class OtpCodeController
 
         $email = strtolower(trim($request->email));
 
-        // بررسی اینکه کاربر ادمین باشد
-        $user = User::where('email', $email)->first();
+        // بررسی اینکه ادمین وجود داشته باشد
+        $admin = Admin::where('email', $email)->first();
         
-        if (!$user) {
-            return $this->fail('کاربری با این ایمیل یافت نشد.');
-        }
-
-        if ($user->role !== 'admin') {
-            return $this->fail('شما دسترسی ادمین ندارید.');
+        if (!$admin) {
+            return $this->fail('ادمین با این ایمیل یافت نشد.');
         }
 
         $result = $this->emailOtpService->sendOtp($email, 'admin');
