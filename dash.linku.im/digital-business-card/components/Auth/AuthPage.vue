@@ -1334,7 +1334,7 @@ async function handleRegister() {
         countryCode: '+98',
         name: firstName,
         family: lastName,
-        referralCode: referralCode.value?.trim() || null
+        referred_code: referralCode.value?.trim() || null
       }
       
       const response = await $axios.post('/auth/verifyOtpCode', requestData)
