@@ -374,7 +374,7 @@ onMounted(async () => {
   
   // فقط وقتی لاگین هستیم اطلاعات یوزر و نوتیفیکیشن رو بگیر
   const authStore = useAuthStore()
-  if (authStore.isAuthenticated()) {
+  if (authStore.isAuthenticated) {
     await userStore.fetchUser()
     await notifyStore.fetchNotifications()
     updateTabCounts()
