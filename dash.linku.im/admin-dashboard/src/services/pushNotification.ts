@@ -140,8 +140,12 @@ export async function sendSubscriptionToServer(subscription: PushSubscription): 
   try {
     const subscriptionJson = subscription.toJSON();
     
-    // ذخیره در localStorage هم برای backup
-    localStorage.setItem('push_subscription', JSON.stringify(subscriptionJson));
+    // ذخیره در localStorage هم برای backup (با try-catch)
+    try {
+      localStorage.setItem('push_subscription', JSON.stringify(subscriptionJson));
+    } catch (e) {
+      // Silently fail if storage not available
+    }
     
     console.log('Subscription to send:', subscriptionJson);
     

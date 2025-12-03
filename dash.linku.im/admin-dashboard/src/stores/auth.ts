@@ -1,51 +1,52 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
-// Memory store as fallback when storage is not available
+// Memory store - primary storage method (no storage errors)
 let memoryToken = ''
+let memoryUser: any = null
 
 const getStoredToken = (): string => {
+    // Try localStorage silently
     try {
-        // Try localStorage first (more persistent)
         const token = localStorage.getItem('admin_token')
         if (token) {
             memoryToken = token
-            return token
         }
     } catch (e) {
-        console.warn('localStorage not available:', e)
+        // Silently fail - use memory
     }
     
-    // Fallback to memory
     return memoryToken
 }
 
 const setStoredToken = (token: string): void => {
     memoryToken = token
+    // Try to persist but don't fail if not possible
     try {
         localStorage.setItem('admin_token', token)
     } catch (e) {
-        console.warn('Could not save token to localStorage:', e)
+        // Silently fail - memory is enough
     }
 }
 
 const clearStoredToken = (): void => {
     memoryToken = ''
+    memoryUser = null
     try {
         localStorage.removeItem('admin_token')
         localStorage.removeItem('token')
         localStorage.removeItem('auth_token')
     } catch (e) {
-        console.warn('Could not clear storage:', e)
+        // Silently fail
     }
 }
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         token: getStoredToken(),
-        user: null as any,
+        user: memoryUser,
         isVerified: false,
-        isVerifying: false // برای جلوگیری از چند بار verify همزمان
+        isVerifying: false
     }),
     getters: {
         isAuthenticated: (state) => !!state.token && state.token.length > 0 && state.isVerified
@@ -92,6 +93,7 @@ export const useAuthStore = defineStore('auth', {
                 
                 if (userData && userData.role === 'admin') {
                     this.user = userData
+                    memoryUser = userData
                     this.isVerified = true
                     this.isVerifying = false
                     return true
