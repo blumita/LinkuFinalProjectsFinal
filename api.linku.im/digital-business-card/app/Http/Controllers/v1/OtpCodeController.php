@@ -606,4 +606,172 @@ class OtpCodeController
             'message' => 'ورود موفقیت‌آمیز بود.',
         ]);
     }
+
+    /**
+     * Admin direct login with username/password (NO OTP)
+     * این متد برای ورود مستقیم ادمین با نام کاربری یا ایمیل و رمز عبور است
+     * بدون نیاز به کد OTP
+     */
+    public function adminDirectLogin(Request $request): JsonResponse
+    {
+        $request->validate([
+            'username' => 'required|string', // می‌تواند email یا user_name باشد
+            'password' => 'required|string',
+        ]);
+
+        $username = strtolower(trim($request->username));
+
+        // جستجو با ایمیل یا user_name
+        $admin = Admin::where('email', $username)
+            ->orWhere('user_name', $username)
+            ->first();
+
+        // تاخیر تصادفی برای جلوگیری از timing attacks (100-300ms)
+        $delay = rand(100000, 300000);
+        usleep($delay);
+
+        if (!$admin) {
+            // ثبت log تلاش ناموفق
+            Log::warning('Failed admin login - user not found', [
+                'username' => $username,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'نام کاربری یا رمز عبور اشتباه است.'
+            ], 401);
+        }
+
+        // بررسی رمز عبور
+        if (!Hash::check($request->password, $admin->password)) {
+            // ثبت log تلاش ناموفق
+            Log::warning('Failed admin login - wrong password', [
+                'admin_id' => $admin->id,
+                'username' => $username,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'نام کاربری یا رمز عبور اشتباه است.'
+            ], 401);
+        }
+
+        // بررسی وضعیت اکانت
+        if ($admin->status !== 'active') {
+            Log::warning('Blocked admin login - account inactive', [
+                'admin_id' => $admin->id,
+                'status' => $admin->status,
+                'ip' => $request->ip(),
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'حساب کاربری شما غیرفعال شده است.'
+            ], 403);
+        }
+
+        // لاگین مستقیم بدون OTP
+        Auth::guard('admin')->login($admin);
+        
+        // ثبت log ورود موفق
+        Log::info('Successful admin login', [
+            'admin_id' => $admin->id,
+            'username' => $username,
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'token' => $admin->createToken('admin-direct-login', ['admin'])->plainTextToken,
+            'user' => new \App\Http\Resources\AdminResource($admin->load('role')),
+            'message' => 'ورود موفقیت‌آمیز بود.',
+        ]);
+    }
+
+    /**
+     * Send OTP SMS to admin phone number
+     */
+    public function sendAdminPhoneOtp(Request $request): JsonResponse
+    {
+        $request->validate([
+            'phone' => 'required|string',
+            'countryCode' => 'required|string',
+        ]);
+
+        $phone = $this->otpService->normalizePhone($request->phone);
+
+        // بررسی اینکه کاربر ادمین باشد
+        $admin = Admin::where('phone', $phone)->first();
+        
+        if (!$admin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ادمینی با این شماره موبایل یافت نشد.'
+            ], 404);
+        }
+
+        // ارسال کد OTP به شماره موبایل
+        $result = $this->otpService->sendOtp([
+            'phone' => $phone,
+            'countryCode' => $request->countryCode,
+        ]);
+
+        if (!$result) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ارسال پیامک با مشکل مواجه شد.'
+            ], 500);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'کد تایید به شماره موبایل شما ارسال شد.'
+        ]);
+    }
+
+    /**
+     * Verify admin phone OTP code
+     *
+     * @throws CustomException
+     */
+    public function verifyAdminPhoneOtp(Request $request): JsonResponse
+    {
+        $request->validate([
+            'phone' => 'required|string',
+            'countryCode' => 'required|string',
+            'code' => 'required|string|size:4',
+        ]);
+
+        $phone = $this->otpService->normalizePhone($request->phone);
+
+        // بررسی کد OTP
+        if (!$this->otpService->verifyOtp([
+            'phone' => $phone,
+            'countryCode' => $request->countryCode,
+            'code' => $request->code,
+        ])) {
+            throw new CustomException('کد وارد شده صحیح نیست یا منقضی شده است.', 429);
+        }
+
+        // پیدا کردن ادمین
+        $admin = Admin::where('phone', $phone)->first();
+
+        if (!$admin) {
+            throw new CustomException('ادمین معتبر نیست.', 403);
+        }
+
+        Auth::guard('admin')->login($admin);
+
+        return response()->json([
+            'success' => true,
+            'token' => $admin->createToken('admin-phone-otp-login', ['admin'])->plainTextToken,
+            'user' => new \App\Http\Resources\AdminResource($admin->load('role')),
+            'message' => 'ورود موفقیت‌آمیز بود.',
+        ]);
+    }
 }

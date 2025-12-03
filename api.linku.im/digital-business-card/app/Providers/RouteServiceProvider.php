@@ -50,9 +50,41 @@ class RouteServiceProvider extends ServiceProvider
         });
 
 
-        // Rate limiter برای OTP - افزایش به 50 درخواست در ساعت
+        // Rate limiter برای OTP - 10 درخواست در 5 دقیقه
         RateLimiter::for('otp', function ($request) {
-            return Limit::perHour(50)->by($request->ip());
+            return Limit::perMinutes(5, 10)->by($request->ip())
+                ->response(function () {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'تعداد درخواست‌های شما بیش از حد مجاز است. لطفاً 5 دقیقه صبر کنید.',
+                        'code' => 'rate_limit_exceeded'
+                    ], 429);
+                });
+        });
+        
+        // Rate limiter برای admin login - 5 تلاش در 15 دقیقه
+        RateLimiter::for('admin.login', function ($request) {
+            $key = 'admin-login:' . $request->ip();
+            return Limit::perMinutes(15, 5)->by($key)
+                ->response(function () {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'تعداد تلاش‌های ورود بیش از حد مجاز است. لطفاً 15 دقیقه صبر کنید.',
+                        'code' => 'login_attempts_exceeded'
+                    ], 429);
+                });
+        });
+        
+        // Rate limiter عمومی API - 100 درخواست در دقیقه
+        RateLimiter::for('api', function ($request) {
+            return Limit::perMinute(100)->by($request->ip())
+                ->response(function () {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'تعداد درخواست‌های شما بیش از حد مجاز است.',
+                        'code' => 'rate_limit_exceeded'
+                    ], 429);
+                });
         });
 
     }

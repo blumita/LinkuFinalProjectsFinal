@@ -62,7 +62,7 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
     event.notification.close()
 
-    const urlToOpen = event.notification.data ? .url || '/dashboard/notifications'
+    const urlToOpen = (event.notification.data && event.notification.data.url) || '/dashboard/notifications'
 
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true })

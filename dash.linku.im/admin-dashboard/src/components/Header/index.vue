@@ -394,20 +394,23 @@ const logout = async () => {
   try {
     const authStore = useAuthStore()
 
-    const {data} = await axios.get('user/logout');
+    try {
+      // تلاش برای اطلاع‌رسانی به سرور (اما اگر خطا داد، مهم نیست)
+      await axios.get('user/logout', { timeout: 3000 })
+    } catch (error) {
+      console.warn('Logout API call failed, continuing with local logout:', error)
+    }
 
-    // Clear authentication token
-    localStorage.removeItem('auth_token');
-    authStore.setToken('')
+    // پاک کردن همه‌چیز (شامل localStorage و sessionStorage قدیمی)
+    authStore.logout()
 
     // Redirect user to login
     await router.push('/auth/login')
-  } catch (error:any) {
-    if (error.response && error.response.data.message) {
-      alert(error.response.data.message);
-    } else {
-      alert('مشکلی در برقراری ارتباط با سرور وجود دارد.');
-    }
+  } catch (error: any) {
+    // حتی اگر خطا داشت، کاربر را logout کن
+    const authStore = useAuthStore()
+    authStore.logout()
+    await router.push('/auth/login')
   }
 }
 </script>

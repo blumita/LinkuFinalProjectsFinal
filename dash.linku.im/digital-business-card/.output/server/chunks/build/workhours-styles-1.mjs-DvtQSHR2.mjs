@@ -1,4 +1,0 @@
-const workhours_vue_vue_type_style_index_0_scoped_8cdfdb3f_lang = '.form-switch-primary[data-v-8cdfdb3f]{-webkit-appearance:none;-moz-appearance:none;appearance:none;background-color:hsl(var(--muted));border-radius:9999px;cursor:pointer;height:20px;position:relative;transition:background-color .2s;width:36px}.form-switch-primary[data-v-8cdfdb3f]:checked{background-color:hsl(var(--primary))}.form-switch-primary[data-v-8cdfdb3f]:before{background:hsl(var(--background));border-radius:9999px;content:"";height:16px;left:2px;position:absolute;top:2px;transition:transform .2s ease;width:16px}.form-switch-primary[data-v-8cdfdb3f]:checked:before{transform:translate(16px)}';
-
-export { workhours_vue_vue_type_style_index_0_scoped_8cdfdb3f_lang as w };
-//# sourceMappingURL=workhours-styles-1.mjs-DvtQSHR2.mjs.map

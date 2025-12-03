@@ -10,19 +10,12 @@ const userStore = useUserStore()
 const authStore = useAuthStore()
 
 onMounted(async () => {
-  // راه‌اندازی Push Notifications بعد از 2 ثانیه (تا UI بارگذاری شود)
+  // راه‌اندازی Push Notifications بعد از 3 ثانیه (تا UI و authentication بارگذاری شود)
   setTimeout(async () => {
     try {
-      // بررسی کن آیا کاربر لاگین است و توکن معتبر است
-      if (!authStore.isAuthenticated) {
-        console.log('ℹ️ کاربر لاگین نیست، Push Notification فعال نمی‌شود')
-        return
-      }
-
-      // تایید اعتبار توکن قبل از ادامه
-      const isValid = await authStore.verifyToken()
-      if (!isValid) {
-        console.log('ℹ️ توکن نامعتبر است، Push Notification فعال نمی‌شود')
+      // بررسی دقیق authentication
+      if (!authStore.token || !authStore.isVerified) {
+        console.log('ℹ️ کاربر احراز هویت نشده، Push Notification فعال نمی‌شود')
         return
       }
 
@@ -45,7 +38,7 @@ onMounted(async () => {
     } catch (error) {
       console.error('❌ خطا در راه‌اندازی Push Notification:', error)
     }
-  }, 2000)
+  }, 3000)
 })
 </script>
 

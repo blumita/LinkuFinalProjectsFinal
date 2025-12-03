@@ -6,7 +6,8 @@ use App\Http\Middleware\CardMiddleware;
 use App\Http\Middleware\CorsMiddleware;
 use App\Http\Middleware\FileManagerMiddleware;
 use App\Http\Middleware\LogUserActivity;
-use App\Providers\ConfigOverrideServiceProvider;
+use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\BlockSuspiciousRequests;use App\Http\Middleware\AntiBruteForce;use App\Providers\ConfigOverrideServiceProvider;
 use App\Providers\EventServiceProvider;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Application;
@@ -15,7 +16,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
-use Illuminate\Http\Middleware\HandleCors;
+use Illuminate\Http\Http\Middleware\HandleCors;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -35,7 +36,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'card.owner' => CardMiddleware::class,
             'model.owner' => FileManagerMiddleware::class,
-            'log.activity'=> LogUserActivity::class
+            'log.activity'=> LogUserActivity::class,
+            'security.headers' => SecurityHeaders::class,
+            'block.suspicious' => BlockSuspiciousRequests::class,
+            'anti.bruteforce' => AntiBruteForce::class,
+        ]);
+        
+        // اضافه کردن middleware های امنیتی به تمام API routes
+        $middleware->api(prepend: [
+            SecurityHeaders::class,
+            BlockSuspiciousRequests::class,
         ]);
         
         // CORS is handled in public/index.php for local development

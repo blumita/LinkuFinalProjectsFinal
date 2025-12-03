@@ -90,15 +90,28 @@ Route::prefix('auth')
         Route::post('/admin/verifyOtpEmail', [OtpCodeController::class, 'verifyAdminEmailOtp'])
             ->name('admin.otp.email.verify');
 
+        // Admin Phone OTP
+        Route::post('/admin/sendOtpSms', [OtpCodeController::class, 'sendAdminPhoneOtp'])
+            ->name('admin.otp.sms.send');
+
+        Route::post('/admin/verifyOtpSms', [OtpCodeController::class, 'verifyAdminPhoneOtp'])
+            ->name('admin.otp.sms.verify');
+
         // Admin Password Login with 2FA
         Route::post('/admin/loginWithPassword', [OtpCodeController::class, 'adminLoginWithPassword'])
             ->name('admin.login.password');
 
         Route::post('/admin/verify2FA', [OtpCodeController::class, 'verifyAdmin2FA'])
             ->name('admin.verify.2fa');
+
+        // Admin Direct Login (NO OTP) - برای ورود با نام کاربری
+        Route::post('/admin/directLogin', [OtpCodeController::class, 'adminDirectLogin'])
+            ->middleware(['throttle:admin.login', 'anti.bruteforce'])
+            ->name('admin.direct.login');
     });
 
     Route::post('/login', [OtpCodeController::class, 'LoginWithPass'])
+        ->middleware(['throttle:admin.login', 'anti.bruteforce'])
         ->name('admin.login');
 
 

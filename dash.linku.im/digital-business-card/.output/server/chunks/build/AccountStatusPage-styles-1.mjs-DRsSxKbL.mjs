@@ -1,4 +1,0 @@
-const AccountStatusPage_vue_vue_type_style_index_0_scoped_4c4a1222_lang = "@keyframes pulse-4c4a1222{0%,to{opacity:1}50%{opacity:.5}}@keyframes shimmer-4c4a1222{0%{background-position:-468px 0}to{background-position:468px 0}}.animate-pulse[data-v-4c4a1222]{animation:pulse-4c4a1222 2s cubic-bezier(.4,0,.6,1) infinite}.bg-muted\\/40[data-v-4c4a1222],.bg-muted\\/50[data-v-4c4a1222],.bg-muted\\/60[data-v-4c4a1222],.bg-muted\\/80[data-v-4c4a1222]{animation:shimmer-4c4a1222 1.5s infinite;background:linear-gradient(90deg,var(--muted) 25%,var(--muted-foreground)/10 50%,var(--muted) 75%);background-size:200% 100%}";
-
-export { AccountStatusPage_vue_vue_type_style_index_0_scoped_4c4a1222_lang as A };
-//# sourceMappingURL=AccountStatusPage-styles-1.mjs-DRsSxKbL.mjs.map

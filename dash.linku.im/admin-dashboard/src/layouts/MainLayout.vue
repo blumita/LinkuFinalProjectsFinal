@@ -1,5 +1,14 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-slate-900 flex flex-col">
+  <!-- Loading state در حین بررسی authentication -->
+  <div v-if="isCheckingAuth && !isAuthRoute" class="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center">
+    <div class="text-center">
+      <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <p class="text-gray-600 dark:text-gray-400">در حال بررسی احراز هویت...</p>
+    </div>
+  </div>
+
+  <!-- Main layout - فقط بعد از احراز هویت نمایش داده می‌شود -->
+  <div v-else class="min-h-screen bg-gray-50 dark:bg-slate-900 flex flex-col">
     <!-- Header -->
     <Header v-if="!isAuthRoute" @toggle-sidebar="toggleSidebar" />
 
@@ -40,18 +49,21 @@
 </template>
 
 <script setup lang="ts">
-import {ref, provide, onMounted, onUnmounted, computed} from 'vue'
+import {ref, provide, onMounted, onUnmounted, computed, watch} from 'vue'
 import Header from '@/components/Header/index.vue'
 import Sidebar from '@/components/Sidebar/index.vue'
-import {useRoute} from "vue-router";
+import {useRoute} from "vue-router"
+import {useAuthStore} from "@/stores/auth"
 
 defineOptions({
   name: 'MainLayout'
 })
 
+const authStore = useAuthStore()
 const isDesktopSidebarCollapsed = ref(false)
 const isMobileMenuOpen = ref(false)
 const isMobile = ref(false)
+const isCheckingAuth = ref(false)
 
 // Check if device is mobile
 const checkMobile = () => {
@@ -60,8 +72,20 @@ const checkMobile = () => {
     isMobileMenuOpen.value = false // Auto close mobile menu on resize
   }
 }
+
 const route = useRoute()
 const isAuthRoute = computed(() => route.name === 'login')
+
+// وقتی route تغییر می‌کند، بررسی کن که آیا در حال بررسی authentication هستیم
+watch(() => route.name, (newRoute) => {
+  if (newRoute !== 'login' && !authStore.isVerified) {
+    isCheckingAuth.value = true
+    // بررسی می‌شود که router guard این کار را انجام می‌دهد
+  } else {
+    isCheckingAuth.value = false
+  }
+}, { immediate: true })
+
 const toggleSidebar = () => {
   if (isMobile.value) {
     isMobileMenuOpen.value = !isMobileMenuOpen.value

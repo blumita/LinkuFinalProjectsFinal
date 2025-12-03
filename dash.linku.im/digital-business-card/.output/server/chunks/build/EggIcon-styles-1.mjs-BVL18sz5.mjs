@@ -1,4 +1,0 @@
-const EggIcon_vue_vue_type_style_index_0_scoped_69db0179_lang = ".egg-container[data-v-69db0179]{position:relative;transition:all .3s cubic-bezier(.25,.46,.45,.94)}.egg-container[data-v-69db0179],.egg-svg[data-v-69db0179]{display:block;height:auto;width:100%}.egg-svg[data-v-69db0179]{cursor:pointer;transition:transform .2s ease}.egg-svg[data-v-69db0179]:hover{transform:scale(1.02)}.egg-svg[data-v-69db0179]:active{transform:scale(.98)}.animate-shake[data-v-69db0179]{animation:shake-69db0179 .4s ease-in-out}.egg-variant[data-v-69db0179]{transition:opacity .2s ease}@keyframes shake-69db0179{0%,to{transform:translate(0)}10%,30%,50%,70%,90%{transform:translate(-2px)}20%,40%,60%,80%{transform:translate(2px)}}";
-
-export { EggIcon_vue_vue_type_style_index_0_scoped_69db0179_lang as E };
-//# sourceMappingURL=EggIcon-styles-1.mjs-BVL18sz5.mjs.map

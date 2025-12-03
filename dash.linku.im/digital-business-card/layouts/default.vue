@@ -20,6 +20,12 @@ const route = useRoute()
 // چک امنیتی - اگه token نیست رندر نکن
 const hasValidAuth = computed(() => {
   if (import.meta.client) {
+    // اگه در صفحات auth هستیم، اصلاً نباید این layout رندر بشه
+    const currentPath = window.location.pathname.toLowerCase()
+    if (currentPath.startsWith('/auth') || currentPath === '/login') {
+      return false
+    }
+    
     const token = localStorage.getItem('auth_token')
     const cookieToken = document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1]
     if (!token && !cookieToken) {

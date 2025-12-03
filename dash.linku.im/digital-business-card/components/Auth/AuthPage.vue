@@ -339,37 +339,55 @@
 
       <!-- Email Profile Step (for new email users) -->
       <template v-else-if="step === 'email_profile'">
-        <h2 class="text-xl font-bold mb-2 flex items-center gap-2 text-foreground">تکمیل اطلاعات</h2>
-        <p class="text-sm text-muted-foreground mb-6">لطفاً اطلاعات زیر را تکمیل کنید</p>
+        <!-- Fixed Header -->
+        <div class="flex-shrink-0 bg-background border-b border-border">
+          <div class="flex items-center h-14 px-4">
+            <button
+              @click="step = 'otp'"
+              class="w-10 h-10 flex items-center justify-center hover:bg-accent transition-colors rounded-full"
+            >
+              <i class="ti ti-arrow-right rtl:block ltr:hidden text-foreground text-xl"></i>
+              <i class="ti ti-arrow-left ltr:block rtl:hidden text-foreground text-xl"></i>
+            </button>
+            <h1 class="text-lg font-semibold text-foreground mr-2">تکمیل اطلاعات</h1>
+          </div>
+        </div>
+
+        <!-- Centered Content -->
+        <div class="flex-1 flex items-center justify-center overflow-hidden">
+          <div class="w-full max-w-md px-4">
+            <p class="text-muted-foreground text-sm text-center mb-8">لطفاً اطلاعات خود را تکمیل کنید</p>
 
         <!-- Full Name Input -->
-        <div class="relative w-full mt-4">
+        <div class="relative w-full mb-4">
           <input
               v-model="fullName"
               id="profileFullNameInput"
               type="text"
               placeholder=" "
-              class="peer block w-full px-3 py-4 text-sm text-foreground rtl:text-right ltr:text-left border border-border rounded-lg focus:outline-none focus:ring-0 focus:border-primary bg-card transition-all duration-300"
+              class="peer block w-full px-3 pb-2.5 pt-4 text-sm text-foreground bg-transparent rounded-xl border-2 border-border focus:outline-none focus:ring-0 focus:border-primary transition-all duration-300"
           />
           <label
               for="profileFullNameInput"
-              class="absolute rtl:right-4 ltr:left-4 text-sm text-muted-foreground bg-background px-1 z-10 transition-all duration-200 cursor-text
-              top-1/2 -translate-y-1/2
-              peer-focus:top-1 peer-focus:text-xs peer-focus:-translate-y-1/2 peer-focus:text-primary
-              peer-[:not(:placeholder-shown)]:top-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-1/2"
+              class="inline-flex items-center absolute text-sm text-muted-foreground duration-300 transform -translate-y-4 scale-[0.85] top-2 z-10 bg-background px-2 
+								peer-focus:px-2 peer-focus:text-primary 
+								peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 
+								peer-focus:top-2 peer-focus:scale-[0.85] peer-focus:-translate-y-4 
+								right-2 origin-top-right"
           >
-            نام و نام خانوادگی *
+            <i class="ti ti-user w-4 h-4 ml-1.5"></i>
+            <span>نام کامل</span>
           </label>
           <p v-if="errors.profileName" class="text-red-500 text-xs mt-1 block">{{ errors.profileName }}</p>
         </div>
 
         <!-- Phone Input with Country Code -->
-        <div class="relative w-full mt-4">
+        <div class="relative w-full mb-4">
           <div class="flex gap-2 flex-row-reverse">
             <!-- Country Code Selector (Right in RTL) -->
             <button 
               @click="showProfileCountryPicker = true"
-              class="flex items-center gap-2 px-3 py-4 border border-border rounded-lg bg-card hover:border-primary transition-all duration-300"
+              class="flex items-center gap-2 px-3 py-4 border-2 border-border rounded-xl bg-transparent hover:border-primary transition-all duration-300"
             >
               <img :src="`/flag/${selectedProfileCountry.flag}.svg`" :alt="selectedProfileCountry.nameEn" class="w-6 h-4 object-cover rounded" />
               <span class="text-sm text-foreground" dir="ltr">{{ selectedProfileCountry.dialCode }}</span>
@@ -384,16 +402,18 @@
                   inputmode="numeric"
                   placeholder=" "
                   dir="ltr"
-                  class="peer block w-full px-3 py-4 text-sm text-foreground text-left border border-border rounded-lg focus:outline-none focus:ring-0 focus:border-primary bg-card transition-all duration-300"
+                  class="peer block w-full px-3 pb-2.5 pt-4 text-sm text-foreground bg-transparent rounded-xl border-2 border-border focus:outline-none focus:ring-0 focus:border-primary transition-all duration-300 text-left"
               />
               <label
                   for="profilePhoneInput"
-                  class="absolute right-4 text-sm text-muted-foreground bg-background px-1 z-10 transition-all duration-200 cursor-text
-                  top-1/2 -translate-y-1/2
-                  peer-focus:top-1 peer-focus:text-xs peer-focus:-translate-y-1/2 peer-focus:text-primary
-                  peer-[:not(:placeholder-shown)]:top-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-1/2"
+                  class="inline-flex items-center absolute text-sm text-muted-foreground duration-300 transform -translate-y-4 scale-[0.85] top-2 z-10 bg-background px-2 
+										peer-focus:px-2 peer-focus:text-primary 
+										peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 
+										peer-focus:top-2 peer-focus:scale-[0.85] peer-focus:-translate-y-4 
+										right-2 origin-top-right"
               >
-                شماره موبایل (اختیاری)
+                <i class="ti ti-phone w-4 h-4 ml-1.5"></i>
+                <span>شماره موبایل (اختیاری)</span>
               </label>
             </div>
           </div>
@@ -401,28 +421,30 @@
         </div>
 
         <!-- Referral Code Input -->
-        <div class="relative w-full mt-4">
+        <div class="relative w-full mb-6">
           <input
               v-model="referralCode"
               id="profileReferralInput"
               type="text"
               placeholder=" "
-              class="peer block w-full px-3 py-4 text-sm text-foreground rtl:text-right ltr:text-left border border-border rounded-lg focus:outline-none focus:ring-0 focus:border-primary bg-card transition-all duration-300"
+              class="peer block w-full px-3 pb-2.5 pt-4 text-sm text-foreground bg-transparent rounded-xl border-2 border-border focus:outline-none focus:ring-0 focus:border-primary transition-all duration-300"
           />
           <label
               for="profileReferralInput"
-              class="absolute rtl:right-4 ltr:left-4 text-sm text-muted-foreground bg-background px-1 z-10 transition-all duration-200 cursor-text
-              top-1/2 -translate-y-1/2
-              peer-focus:top-1 peer-focus:text-xs peer-focus:-translate-y-1/2 peer-focus:text-primary
-              peer-[:not(:placeholder-shown)]:top-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-1/2"
+              class="inline-flex items-center absolute text-sm text-muted-foreground duration-300 transform -translate-y-4 scale-[0.85] top-2 z-10 bg-background px-2 
+								peer-focus:px-2 peer-focus:text-primary 
+								peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 
+								peer-focus:top-2 peer-focus:scale-[0.85] peer-focus:-translate-y-4 
+								right-2 origin-top-right"
           >
-            کد دعوت (اختیاری)
+            <i class="ti ti-gift w-4 h-4 ml-1.5"></i>
+            <span>کد معرف (اختیاری)</span>
           </label>
         </div>
 
         <!-- Submit Button -->
         <button
-            class="w-full bg-primary text-primary-foreground text-center py-4 rounded-lg text-lg font-medium relative flex items-center justify-center overflow-hidden transition-all duration-300 hover:opacity-90 hover:-translate-y-0.5 mt-6"
+            class="w-full bg-primary text-primary-foreground text-center py-4 rounded-lg text-lg font-medium relative flex items-center justify-center overflow-hidden transition-all duration-300 hover:opacity-90 hover:-translate-y-0.5"
             @click="handleEmailProfileSubmit"
             :disabled="isVerifying"
         >
@@ -436,6 +458,8 @@
             <span>ثبت و ورود</span>
           </template>
         </button>
+          </div>
+        </div>
       </template>
 
       <!-- Success Step -->
@@ -1010,14 +1034,20 @@ async function sendOtpCode(normalized: string): Promise<boolean> {
   } catch (error: any) {
     const errorData = error.response?.data
     
-    // اگر کد قبلی هنوز معتبره، تایمر رو با زمان باقیمانده sync کن
-    if (errorData?.code === 'code_already_valid' && errorData?.remaining_seconds) {
-      const remaining = parseInt(errorData.remaining_seconds)
-      showInfoToast(`کد قبلی هنوز معتبر است (${toPersianDigits(remaining.toString())} ثانیه مانده)`, 'ti-info-circle')
-      // تایمر رو با زمان باقیمانده reset کن
+    // اگر کد قبلی هنوز معتبره، به صفحه OTP برو و تایمر رو sync کن
+    // Format 1: {code: 'code_already_valid', remaining_seconds: 120}
+    // Format 2: {success: false, message: 'کد قبلی هنوز معتبر است...'}
+    if (
+      (errorData?.code === 'code_already_valid' && errorData?.remaining_seconds) ||
+      (errorData?.message && errorData.message.includes('کد قبلی هنوز معتبر است'))
+    ) {
+      // بدون نمایش toast، مستقیم به صفحه OTP برو
+      step.value = 'otp'
+      // اگر remaining_seconds موجود باشه استفاده کن، وگرنه 120 ثانیه
+      const remaining = errorData?.remaining_seconds ? parseInt(errorData.remaining_seconds) : 120
       startTimer(remaining)
-      otp.fill(null) // OTP قبلی رو پاک کن
-      return true; // به عنوان موفق برگردون چون تایمر sync شد
+      otp.fill(null)
+      return true;
     }
     
     if (errorData?.message) {
@@ -1049,14 +1079,20 @@ async function sendEmailOtpCode(emailAddress: string): Promise<boolean> {
   } catch (error: any) {
     const errorData = error.response?.data
     
-    // اگر کد قبلی هنوز معتبره، تایمر رو با زمان باقیمانده sync کن
-    if (errorData?.code === 'code_already_valid' && errorData?.remaining_seconds) {
-      const remaining = parseInt(errorData.remaining_seconds)
-      showInfoToast(`کد قبلی هنوز معتبر است (${toPersianDigits(remaining.toString())} ثانیه مانده)`, 'ti-info-circle')
-      // تایمر رو با زمان باقیمانده reset کن
+    // اگر کد قبلی هنوز معتبره، به صفحه OTP برو و تایمر رو sync کن
+    // Format 1: {code: 'code_already_valid', remaining_seconds: 120}
+    // Format 2: {success: false, message: 'کد قبلی هنوز معتبر است...'}
+    if (
+      (errorData?.code === 'code_already_valid' && errorData?.remaining_seconds) ||
+      (errorData?.message && errorData.message.includes('کد قبلی هنوز معتبر است'))
+    ) {
+      // بدون نمایش toast، مستقیم به صفحه OTP برو
+      step.value = 'otp'
+      // اگر remaining_seconds موجود باشه استفاده کن، وگرنه 120 ثانیه
+      const remaining = errorData?.remaining_seconds ? parseInt(errorData.remaining_seconds) : 120
       startTimer(remaining)
-      otp.fill(null) // OTP قبلی رو پاک کن
-      return true; // به عنوان موفق برگردون چون تایمر sync شد
+      otp.fill(null)
+      return true;
     }
     
     if (errorData?.message) {
@@ -1337,6 +1373,7 @@ async function handleRegister() {
         referred_code: referralCode.value?.trim() || null
       }
       
+      console.log('📤 Sending registration data:', requestData)
       const response = await $axios.post('/auth/verifyOtpCode', requestData)
       
       const token = response.data.token
@@ -1388,6 +1425,7 @@ async function handleRegister() {
 
   } catch (error: any) {
     console.error('Register error:', error)
+    console.error('Error response:', error.response?.data)
     const errorMessage = error.response?.data?.message || error.response?.data?.data?.message
     
     // اگر OTP منقضی شده، کاربر رو به صفحه اول برگردون

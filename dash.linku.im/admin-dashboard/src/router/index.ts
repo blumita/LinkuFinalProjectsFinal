@@ -222,25 +222,35 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
-  // اگر مسیر نیاز به auth دارد
+  // اگر مسیر نیاز به auth دارد (همه جا به جز login)
   if (to.meta.requiresAuth) {
     // اول چک کنیم توکن وجود داره یا نه
-    if (!authStore.isAuthenticated()) {
-      return next({ name: 'login' })
+    if (!authStore.token || authStore.token.length === 0) {
+      console.warn('🚫 No token - redirecting to login')
+      authStore.logout()
+      return next({ name: 'login', replace: true })
     }
     
-    // اگر هنوز verify نشده، با سرور چک کنیم
-    if (!authStore.isVerified) {
+    // همیشه با سرور چک کنیم (حتی اگر قبلا verify شده باشد)
+    try {
       const isValid = await authStore.verifyToken()
       if (!isValid) {
-        return next({ name: 'login' })
+        console.warn('🚫 Invalid token - redirecting to login')
+        return next({ name: 'login', replace: true })
       }
+    } catch (error) {
+      console.error('🚫 Token verification error:', error)
+      authStore.logout()
+      return next({ name: 'login', replace: true })
     }
   }
 
   // اگر مسیر login است و کاربر لاگین است، به home هدایت شود
-  if (to.name === 'login' && authStore.isAuthenticated()) {
-    return next({ name: 'home' })
+  if (to.name === 'login') {
+    if (authStore.token && authStore.isVerified) {
+      console.log('✅ Already authenticated - redirecting to home')
+      return next({ name: 'home', replace: true })
+    }
   }
 
   next()
