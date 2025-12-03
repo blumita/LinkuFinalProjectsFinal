@@ -1,9 +1,17 @@
 // Service Worker Registration for Push Notifications
 export default defineNuxtPlugin(async () => {
+  // تابع خالی برای برگرداندن وقتی service worker پشتیبانی نمیشه
+  const emptyProvide = () => ({
+    provide: {
+      swRegistration: null,
+      subscribeToPush: async () => false,
+      requestNotificationPermission: async () => false
+    }
+  })
+
   // فقط در مرورگرهایی که Service Worker دارن
   if (!('serviceWorker' in navigator)) {
-    console.warn('Service Worker not supported')
-    return
+    return emptyProvide()
   }
 
   // چک کردن که آیا sw.js در دسترس هست یا نه
@@ -11,12 +19,10 @@ export default defineNuxtPlugin(async () => {
     const swUrl = '/sw.js'
     const checkResponse = await fetch(swUrl, { method: 'HEAD' })
     if (!checkResponse.ok) {
-      console.warn('Service Worker file not accessible, skipping registration')
-      return
+      return emptyProvide()
     }
   } catch (error) {
-    console.warn('Service Worker file check failed, skipping registration:', error)
-    return
+    return emptyProvide()
   }
 
   try {
@@ -25,17 +31,13 @@ export default defineNuxtPlugin(async () => {
       scope: '/'
     })
 
-    console.log('Service Worker registered successfully:', registration)
-
     // چک کردن آپدیت
     registration.addEventListener('updatefound', () => {
       const newWorker = registration.installing
-      console.log('New Service Worker found')
       
       newWorker?.addEventListener('statechange', () => {
         if (newWorker.state === 'activated') {
-          console.log('New Service Worker activated')
-          // می‌تونی اینجا به کاربر بگی که رفرش کنه
+          // Service Worker activated
         }
       })
     })
@@ -45,49 +47,88 @@ export default defineNuxtPlugin(async () => {
       registration.update()
     }, 60 * 60 * 1000)
 
-    // درخواست Permission برای نوتیفیکیشن (بعد از نصب PWA)
-    if ('Notification' in window && Notification.permission === 'default') {
-      // صبر کن تا کاربر اپ رو نصب کنه (یا یه بار باز کنه)
-      setTimeout(async () => {
+    // تابع برای ثبت Push Subscription
+    const subscribeToPush = async () => {
+      try {
+        const VAPID_PUBLIC_KEY = 'BFzttfamBJ5XHjuy55yNQTCdkR2rbgE3J0oYQHmEgoiRJPPrLWPt5lkTBZn7jS30UBdMLCeBplkznfAoZSjXkUY'
+        
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+        })
+        
+        // ارسال subscription به سرور برای ذخیره
         try {
-          const permission = await Notification.requestPermission()
-          console.log('Notification permission:', permission)
+          const { $axios } = useNuxtApp()
+          const subscriptionData = subscription.toJSON()
           
-          if (permission === 'granted') {
-            // دریافت Push Subscription از Service Worker
-            const subscription = await registration.pushManager.subscribe({
-              userVisibleOnly: true,
-              applicationServerKey: urlBase64ToUint8Array(
-                'BFzttfamBJ5XHjuy55yNQTCdkR2rbgE3J0oYQHmEgoiRJPPrLWPt5lkTBZn7jS30UBdMLCeBplkznfAoZSjXkUY'
-              )
-            })
-            
-            console.log('Push subscription:', subscription)
-            
-            // ارسال subscription به سرور برای ذخیره
-            try {
-              const { $axios } = useNuxtApp()
-              await $axios.post('/user/push-subscription', {
-                subscription: subscription.toJSON()
-              })
-              console.log('✓ Subscription saved to server')
-            } catch (error) {
-              console.error('Failed to save subscription:', error)
-            }
+          // Attach Authorization if available (SPA may store token in localStorage)
+          const token = (typeof window !== 'undefined') ? localStorage.getItem('auth_token') : null
+          const config: any = {}
+          if (token) {
+            config.headers = { Authorization: `Bearer ${token}` }
+          }
+
+          await $axios.post('/user/push-subscription', {
+            subscription: subscriptionData
+          }, config)
+          
+          return true
+        } catch (error: any) {
+          return false
+        }
+      } catch (error: any) {
+        return false
+      }
+    }
+
+    // درخواست Permission فوری (نه بعد از 3 ثانیه)
+    if ('Notification' in window) {
+      // اگه permission داده شده، چک کن که subscription داره یا نه
+      if (Notification.permission === 'granted') {
+        try {
+          const existingSubscription = await registration.pushManager.getSubscription()
+          if (!existingSubscription) {
+            await subscribeToPush()
           }
         } catch (error) {
-          console.error('Error requesting notification permission:', error)
+          await subscribeToPush()
         }
-      }, 3000) // 3 ثانیه بعد از باز شدن اپ
+      }
+      // اگه هنوز نداده، فوراً درخواست کن (خودکار)
+      else if (Notification.permission === 'default') {
+        try {
+          const permission = await Notification.requestPermission()
+          
+          if (permission === 'granted') {
+            await subscribeToPush()
+          }
+        } catch (error) {
+          // Permission error
+        }
+      }
+    }
+
+    // توابع برای دسترسی از بیرون
+    const requestNotificationPermission = async () => {
+      if ('Notification' in window && Notification.permission === 'default') {
+        const permission = await Notification.requestPermission()
+        if (permission === 'granted') {
+          return await subscribeToPush()
+        }
+      }
+      return false
     }
 
     return {
       provide: {
-        swRegistration: registration
+        swRegistration: registration,
+        subscribeToPush,
+        requestNotificationPermission
       }
     }
   } catch (error) {
-    console.error('Service Worker registration failed:', error)
+    return emptyProvide()
   }
 })
 

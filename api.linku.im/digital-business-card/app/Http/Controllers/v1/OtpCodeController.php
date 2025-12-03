@@ -9,6 +9,7 @@ use App\Http\Requests\v1\VerifyOtpCodeRequest;
 use App\Http\Requests\v1\EmailOtpCodeRequest;
 use App\Http\Requests\v1\VerifyEmailOtpCodeRequest;
 use App\Models\Order;
+use App\Models\Admin;
 use App\Models\OtpCode;
 use App\Models\User;
 use App\Notifications\UserActivityNotification;
@@ -41,16 +42,21 @@ class OtpCodeController
      */
     public function sendOtpCode(OtpCodeRequest $request): JsonResponse
     {
+        try {
+            $result = $this->otpService->sendOtp($request->validated());
 
-        $result = $this->otpService->sendOtp($request->validated());
+            if (!$result) {
+                return $this->fail(__('sms.sms_not_sent'));
+            }
 
-        if (!$result) {
+            return $this->ok(__('sms.sms_sent'));
 
-            return $this->fail(__('sms.sms_not_sent'));
+        } catch (CustomException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getCode() ?: 422);
         }
-
-        return $this->ok(__('sms.sms_sent'));
-
     }
 
     /**
@@ -532,26 +538,18 @@ class OtpCodeController
 
         $email = strtolower(trim($request->email));
 
-        // پیدا کردن کاربر
-        $user = User::where('email', $email)->first();
+        // پیدا کردن ادمین از جدول admins
+        $admin = Admin::where('email', $email)->first();
 
-        if (!$user) {
+        if (!$admin) {
             return response()->json([
                 'success' => false,
-                'message' => 'کاربری با این ایمیل یافت نشد.'
+                'message' => 'ادمینی با این ایمیل یافت نشد.'
             ], 404);
         }
 
-        // بررسی نقش ادمین
-        if ($user->role !== 'admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'شما دسترسی ادمین ندارید.'
-            ], 403);
-        }
-
         // بررسی رمز عبور
-        if (!Hash::check($request->password, $user->password)) {
+        if (!Hash::check($request->password, $admin->password)) {
             return response()->json([
                 'success' => false,
                 'message' => 'ایمیل یا رمز عبور اشتباه است.'
@@ -593,20 +591,18 @@ class OtpCodeController
             throw new CustomException('کد وارد شده صحیح نیست یا منقضی شده است.', 429);
         }
 
-        // پیدا کردن کاربر و لاگین
-        $user = User::where('email', $email)->first();
+        // پیدا کردن ادمین از جدول admins و لاگین
+        $admin = Admin::where('email', $email)->first();
 
-        if (!$user || $user->role !== 'admin') {
-            throw new CustomException('کاربر معتبر نیست.', 403);
+        if (!$admin) {
+            throw new CustomException('ادمین معتبر نیست.', 403);
         }
 
-        Auth::login($user);
-
-        $user->notify(new UserActivityNotification(UserActivityNotificationType::ADMIN_LOGIN));
+        Auth::guard('admin')->login($admin);
 
         return response()->json([
-            'token' => $user->createToken('admin-password-2fa-login', ['admin'])->plainTextToken,
-            'user' => $user,
+            'token' => $admin->createToken('admin-password-2fa-login', ['admin'])->plainTextToken,
+            'user' => new \App\Http\Resources\AdminResource($admin->load('role')),
             'message' => 'ورود موفقیت‌آمیز بود.',
         ]);
     }

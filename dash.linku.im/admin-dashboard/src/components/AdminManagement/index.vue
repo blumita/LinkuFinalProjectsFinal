@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
     <!-- Header -->
     <div class="p-6 border-b border-gray-200 dark:border-gray-700">
       <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -46,10 +46,29 @@
     </div>
 
     <!-- Admins Grid -->
-    <div v-if="paginatedAdmins.length>0" class="p-6">
+    <div v-if="!userStore.fetched" class="p-6">
+      <div class="flex items-center justify-center py-12">
+        <div class="text-center">
+          <i class="ti ti-loader-2 text-4xl text-blue-500 animate-spin mb-2"></i>
+          <p class="text-gray-600 dark:text-gray-400">در حال بارگذاری...</p>
+        </div>
+      </div>
+    </div>
+    
+    <div v-else-if="paginatedAdmins.length === 0" class="p-6">
+      <div class="flex items-center justify-center py-12">
+        <div class="text-center">
+          <i class="ti ti-users-off text-6xl text-gray-400 mb-4"></i>
+          <p class="text-gray-600 dark:text-gray-400 mb-2">مدیری یافت نشد</p>
+          <p class="text-sm text-gray-500 dark:text-gray-500">{{ searchQuery ? 'نتیجه‌ای برای جستجوی شما یافت نشد' : 'هیچ مدیری ثبت نشده است' }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div v-else class="p-6">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div v-for="admin in paginatedAdmins" :key="admin.id"
-             class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700 group relative">
+             class="bg-white dark:bg-gray-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-colors group relative">
 
           <div class="flex items-start justify-between mb-4">
             <div class="flex items-center gap-3">
@@ -72,32 +91,34 @@
               <i class="ti ti-mail text-gray-400 text-sm"></i>
               <span class="text-sm text-gray-600 dark:text-gray-400 truncate">{{ admin.email }}</span>
             </div>
-            <div class="flex items-center gap-2">
+            <div v-if="admin.createdAt" class="flex items-center gap-2">
               <i class="ti ti-calendar text-gray-400 text-sm"></i>
               <span class="text-xs text-gray-500 dark:text-gray-400">{{ formatDate(admin.createdAt) }}</span>
             </div>
           </div>
 
           <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <span class="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-xs font-medium">
-              {{ admin.status === 'active' ? 'فعال' : 'غیرفعال' }}
-            </span>
-            <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs font-medium">
-              مدیر
-            </span>
-          </div>
-
-          <div class="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-all duration-200 flex gap-2">
-            <button @click="editAdmin(admin)"
-                    class="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    title="ویرایش">
-              <i class="ti ti-edit text-sm"></i>
-            </button>
-            <button @click="deleteAdmin(admin)"
-                    class="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                    title="حذف">
-              <i class="ti ti-trash text-sm"></i>
-            </button>
+            <div class="flex gap-2">
+              <span class="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-xs font-medium">
+                {{ admin.status === 'active' ? 'فعال' : 'غیرفعال' }}
+              </span>
+              <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs font-medium">
+                مدیر
+              </span>
+            </div>
+            
+            <div class="flex gap-2">
+              <button @click="editAdmin(admin)"
+                      class="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                      title="ویرایش">
+                <i class="ti ti-edit text-base"></i>
+              </button>
+              <button @click="deleteAdmin(admin)"
+                      class="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                      title="حذف">
+                <i class="ti ti-trash text-base"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -289,7 +310,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed, onMounted} from 'vue'
+import {ref, computed, onMounted, getCurrentInstance} from 'vue'
 import { useAlert } from '@/composables/useAlert'
 import {useUserStore} from "@/stores/user.ts";
 import jalaali from "jalaali-js";
@@ -298,7 +319,9 @@ defineOptions({
   name: 'AdminManagement'
 })
 
-const { showSuccess, showDeleteConfirm } = useAlert()
+const { showSuccess, showDeleteConfirm, showAlert, showError } = useAlert()
+const instance = getCurrentInstance()
+const axios = instance?.appContext.config.globalProperties.$axios
 
 interface Admin {
   id: number
@@ -342,16 +365,27 @@ const formData = ref({
   status: 'active' as 'active' | 'inactive'
 })
 const toJalaali = (gregorianDate: string | Date): string => {
-  const dateStr = typeof gregorianDate === 'string'
-      ? gregorianDate
-      : gregorianDate.toISOString().split('T')[0] // "YYYY-MM-DD"
+  try {
+    const dateStr = typeof gregorianDate === 'string'
+        ? gregorianDate
+        : gregorianDate.toISOString().split('T')[0] // "YYYY-MM-DD"
 
-  const [gy, gm, gd] = dateStr.split('-').map(Number)
-  const { jy, jm, jd } = jalaali.toJalaali(gy, gm, gd)
-  return `${jy}/${String(jm).padStart(2, '0')}/${String(jd).padStart(2, '0')}`
+    const [gy, gm, gd] = dateStr.split('-').map(Number)
+    
+    // Validate year range
+    if (!gy || gy < 1900 || gy > 2100) {
+      return ''
+    }
+    
+    const { jy, jm, jd } = jalaali.toJalaali(gy, gm, gd)
+    return `${jy}/${String(jm).padStart(2, '0')}/${String(jd).padStart(2, '0')}`
+  } catch (error) {
+    console.warn('Error converting date:', error)
+    return ''
+  }
 }
 const formatDate = (date: string | null | undefined): string => {
-  if (!date || typeof date !== 'string' || date.trim() === '') return ''
+  if (!date || typeof date !== 'string' || date.trim() === '') return '-'
 
   const normalized = normalizePersianDigits(date)
 
@@ -359,28 +393,34 @@ const formatDate = (date: string | null | undefined): string => {
     return date
   }
 
-  return toJalaali(date)
+  const result = toJalaali(date)
+  return result || '-'
 }
 const normalizePersianDigits = (str: string): string => {
   return str.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))
 }
 
 // Sample admins data
-const admins =computed(()=>userStore.admins)
+const admins = computed(() => userStore.admins || [])
 
 // Computed properties
 const filteredAdmins = computed(() => {
   let filtered = [...admins.value]
-  console.log('ad',filtered)
+  console.log('ad', filtered)
+  
+  // اگر آرایه خالی یا undefined است، خالی برگردان
+  if (!filtered || filtered.length === 0) {
+    return []
+  }
 
   // Search filter
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter(admin =>
-      admin.fullName.toLowerCase().includes(query) ||
-      admin.username.toLowerCase().includes(query) ||
-      admin.phone.includes(query) ||
-      admin.email.toLowerCase().includes(query)
+      admin.fullName?.toLowerCase().includes(query) ||
+      admin.username?.toLowerCase().includes(query) ||
+      admin.phone?.includes(query) ||
+      admin.email?.toLowerCase().includes(query)
     )
   }
 
@@ -439,17 +479,18 @@ const addAdmin = () => {
 }
 
 const editAdmin = (admin: Admin) => {
-  editingAdmin.value = admin
+  // Clone the admin object to prevent direct mutation
+  editingAdmin.value = { ...admin }
   const [firstName, ...lastNameParts] = admin.fullName.split(' ')
   formData.value = {
     firstName: firstName,
     lastName: lastNameParts.join(' '),
     username: admin.username,
     phone: admin.phone,
-    countryCode:'98+',
+    countryCode: admin.countryCode || '+98',
     email: admin.email,
     password: '',
-    roleId: (admin as any).roleId || null,
+    roleId: (admin as any).role_id || (admin as any).roleId || null,
     status: admin.status
   }
   showEditModal.value = true
@@ -458,45 +499,48 @@ const editAdmin = (admin: Admin) => {
 const saveAdmin = async () => {
   const fullName = `${formData.value.firstName} ${formData.value.lastName}`.trim()
 
-  if (editingAdmin.value) {
-    // Update existing admin
-    editingAdmin.value.firstName = formData.value.firstName
-    editingAdmin.value.lastName = formData.value.lastName
-    editingAdmin.value.fullName = fullName
-    editingAdmin.value.username = formData.value.username
-    editingAdmin.value.phone = formData.value.phone
-    editingAdmin.value.countryCode = formData.value.countryCode
-    editingAdmin.value.email = formData.value.email
-    editingAdmin.value.status = formData.value.status
-
-    // Update password only if provided
-    if (formData.value.password && formData.value.password.trim() !== '') {
-      editingAdmin.value.password = formData.value.password
-    }
-    console.log('editingAdmin',editingAdmin)
-    await userStore.updateAdminUser(editingAdmin.value.id,editingAdmin.value)
-
-    await showSuccess('ویرایش موفق', 'مدیر با موفقیت ویرایش شد')
-  } else {
-    // Add new admin
-    const newAdmin: Admin = {
-      id: Date.now(),
-      fullName,
-      firstName:formData.value.firstName,
-      lastName:formData.value.lastName,
-      username: formData.value.username,
-      password:formData.value.password,
-      phone: formData.value.phone,
-      countryCode: formData.value.countryCode,
-      email: formData.value.email,
-      status: formData.value.status,
-      createdAt: new Date().toLocaleDateString('fa-IR')
-    }
-    await userStore.createAdminUser(newAdmin)
-    admins.value.unshift(newAdmin)
-    await showSuccess('افزودن موفق', `مدیر با موفقیت اضافه شد. پسورد موقت: ${formData.value.password}`)
+  const payload: any = {
+    firstName: formData.value.firstName,
+    lastName: formData.value.lastName,
+    fullName,
+    username: formData.value.username,
+    email: formData.value.email,
+    phone: formData.value.phone,
+    countryCode: formData.value.countryCode,
+    status: formData.value.status,
   }
-  closeModals()
+
+  if (formData.value.password && formData.value.password.trim() !== '') {
+    payload.password = formData.value.password
+  }
+
+  if (formData.value.roleId) {
+    payload.role_id = formData.value.roleId
+  }
+
+  console.log('💾 Saving admin with payload:', payload)
+  console.log('✏️ Is editing?', !!editingAdmin.value, editingAdmin.value?.id)
+
+  try {
+    if (editingAdmin.value) {
+      console.log('🔄 Updating admin ID:', editingAdmin.value.id)
+      const updated = await userStore.updateAdminUser(editingAdmin.value.id, payload)
+      console.log('✅ Update response:', updated)
+      
+      // Refresh the whole list to ensure we have the latest data
+      await userStore.fetchAdminUser()
+    } else {
+      await userStore.createAdminUser(payload)
+      // refresh list from server to keep consistency
+      await userStore.fetchAdminUser()
+    }
+    // Close modal immediately after successful save
+    closeModals()
+  } catch (error: any) {
+    console.error('Error saving admin:', error)
+    const msg = error?.response?.data?.message || error?.response?.data?.error || 'خطا در ذخیره مدیر'
+    await showError('خطا', msg)
+  }
 }
 
 const deleteAdmin = async (admin: Admin) => {
@@ -512,11 +556,11 @@ const deleteAdmin = async (admin: Admin) => {
       const index = admins.value.findIndex(a => a.id === admin.id)
       if (index > -1) {
         admins.value.splice(index, 1)
-        await showSuccess('حذف موفق', 'مدیر با موفقیت حذف شد')
       }
     }
   } catch (error) {
     console.error('Error deleting admin:', error)
+    await showError('خطا', 'خطا در حذف مدیر')
   }
 }
 
@@ -570,8 +614,9 @@ onMounted(async () => {
 // Fetch roles from API
 async function fetchRoles() {
   try {
-    const response = await (window as any).$nuxt.$axios.get('/api/admin/roles')
+    const response = await axios!.get('user/admin/roles')
     roles.value = response.data.data || []
+    console.log('Roles loaded:', roles.value)
   } catch (error) {
     console.error('Error fetching roles:', error)
     roles.value = []

@@ -15,20 +15,28 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'v1/*', 'sanctum/csrf-cookie', 'login', 'logout', 'user/*'],
+    'paths' => env('APP_ENV') === 'local' 
+        ? []  // در محیط local از index.php استفاده میشه
+        : ['api/*', 'v1/*', 'sanctum/csrf-cookie', 'login', 'logout', 'user/*'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [
-        env('FRONTEND_URL', 'https://dash.linku.im'),
-        'https://linku.im',
-        'https://www.linku.im',
-        'https://dash.linkuapp.com',
-        'https://linkuapp.com',
-        'https://www.linkuapp.com',
-        'http://localhost:3000',
-        'http://localhost:3001',
-    ],
+    'allowed_origins' => env('APP_ENV') === 'local' 
+        ? ['*']  // در محیط local همه origin ها مجاز هستند
+        : [
+            env('FRONTEND_URL', 'https://dash.linku.im'),
+            'https://linku.im',
+            'https://www.linku.im',
+            'https://dash.linkuapp.com',
+            'https://linkuapp.com',
+            'https://www.linkuapp.com',
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'http://localhost:5779',
+            'http://127.0.0.1:3000',
+            'http://127.0.0.1:3001',
+            'http://127.0.0.1:5779',
+        ],
 
     'allowed_origins_patterns' => [
         '#^https?://.*\.linku\.im$#',

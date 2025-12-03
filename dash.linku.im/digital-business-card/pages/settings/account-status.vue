@@ -1,6 +1,20 @@
 <template>
-  <div class="min-h-screen bg-background pb-24">
-    <div class="px-4 lg:px-6 py-6 space-y-4">
+  <div class="min-h-screen bg-background">
+    <!-- Header -->
+    <div class="fixed top-0 left-0 right-0 z-40 bg-card border-b border-border">
+      <div class="flex items-center h-14 px-4 max-w-5xl mx-auto">
+        <button
+          @click="goBack"
+          class="flex items-center justify-center w-10 h-10 rounded-lg text-foreground hover:bg-accent transition-colors"
+        >
+          <i class="ti ti-arrow-right text-xl"></i>
+        </button>
+        <h1 class="flex-1 text-lg font-semibold text-foreground">وضعیت حساب</h1>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="pt-[76px] pb-20 px-4 lg:px-6 space-y-4">
       <!-- کارت پیشرفت -->
       <div class="bg-card rounded-2xl p-4 lg:p-6 border border-border shadow-sm">
         <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-4">
@@ -151,6 +165,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useFormStore } from '~/stores/form'
 import { useUserStore } from '~/stores/user'
 
@@ -159,8 +174,26 @@ definePageMeta({
   layout: 'default'
 })
 
+const router = useRouter()
 const formStore = useFormStore()
 const userStore = useUserStore()
+
+// PWA safe navigation
+const { $pwa } = useNuxtApp()
+
+const goBack = () => {
+  if ($pwa?.safeNavigateBack) {
+    $pwa.safeNavigateBack('/settings')
+  } else {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                         (window.navigator as any).standalone === true
+    if (isStandalone || window.history.length <= 2) {
+      window.location.href = '/settings'
+    } else {
+      window.history.back()
+    }
+  }
+}
 
 const defaultCard = computed(() => formStore.defaultCard)
 const user = computed(() => userStore.user || {})

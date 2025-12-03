@@ -3,9 +3,7 @@
     <div class="text-center space-y-6 px-6">
       <div class="relative inline-block">
         <i class="ti ti-search text-8xl text-primary opacity-20"></i>
-        <div class="absolute inset-0 flex items-center justify-center">
-          <i class="ti ti-clock text-3xl text-primary opacity-40"></i>
-        </div>
+
       </div>
       
       <div class="space-y-2">

@@ -144,15 +144,19 @@ export const useUserStore = defineStore('userStore', () => {
     const createAdminUser = async (adminForm: Admin) => {
         try {
             const {data} = await axios.post('/user/admin/addAdmin', adminForm)
-            user.value = data.data
-
+            // اضافه کردن مدیر جدید به لیست
+            await fetchAdminUser() // یا می‌تونیم admins.value.push(data.data) کنیم
+            return data.data
         } catch (error: any) {
             console.error('❌ خطا در ایجاد ادمین:', error)
+            throw error
         }
     }
     const updateAdminUser = async (id: number, payload: Partial<Admin>) => {
         try {
+            console.log('📡 API Call - PUT /user/admin/' + id, payload)
             const {data} = await axios.put(`/user/admin/${id}`, payload)
+            console.log('📥 API Response:', data)
             const index = admins.value.findIndex(a => a.id === id)
             if (index !== -1) admins.value[index] = data.data
             return data.data
@@ -190,6 +194,23 @@ export const useUserStore = defineStore('userStore', () => {
         user.value = {} as User
     }
 
+    /**
+     * ذخیره Push Subscription در بک‌اند
+     */
+    const savePushSubscription = async (subscription: PushSubscription) => {
+        try {
+            const subscriptionJson = subscription.toJSON()
+            const {data} = await axios.post('/user/admin/push-subscription', {
+                subscription: subscriptionJson
+            })
+            console.log('✅ Subscription ذخیره شد:', data)
+            return data
+        } catch (error) {
+            console.error('❌ خطا در ذخیره subscription:', error)
+            throw error
+        }
+    }
+
     return {
         user,
         admins,
@@ -215,6 +236,7 @@ export const useUserStore = defineStore('userStore', () => {
         updateAdminUser,
         deleteAdminUser,
         selectProfile,
-        clearProfile
+        clearProfile,
+        savePushSubscription
     }
 })

@@ -38,13 +38,21 @@ class CardController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        //
-        if ($request->user()->role === 'admin') {
+        $user = $request->user();
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'کاربر احراز هویت نشده است'
+            ], 401);
+        }
+        
+        if ($user->role === 'admin') {
             // Admin can see all business cards
             $cards = Card::all();
         } else {
             // Regular users can only see their own cards
-            $cards = $request->user()->cards;
+            $cards = $user->cards;
         }
 
         $cards->load([

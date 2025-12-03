@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\UserActivityNotificationType;
+use App\Models\Admin;
 use App\Models\Card;
 use App\Models\User;
 use App\Notifications\UserActivityNotification;
@@ -128,10 +129,9 @@ class UserService
 
     }
 
-    public function addAdmin($data): void
+    public function addAdmin($data): Admin
     {
-
-        $user = User::create([
+        return Admin::create([
             'first_name'=>$data['firstName'],
             'last_name'=>$data['lastName'],
             'name'=>$data['fullName'],
@@ -139,11 +139,10 @@ class UserService
             'password' => Hash::make($data['password']),
             'email' => $data['email'],
             'phone' => $data['phone'],
-            'role'=>'admin',
+            'role_id' => $data['role_id'] ?? null,
             'country_code' => $data['countryCode'],
             'status'=>$data['status']
         ]);
-
     }
 
 }

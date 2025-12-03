@@ -9,7 +9,7 @@
         >
           <i class="ti ti-arrow-right text-xl"></i>
         </button>
-        <h1 class="flex-1 text-lg font-semibold text-foreground text-center">سفارشی‌سازی کیوآر کد</h1>
+        <h1 class="flex-1 text-lg font-semibold text-foreground">سفارشی‌سازی کیوآر کد</h1>
         <button
           @click="shareQRCode"
           class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center hover:bg-primary/30 transition-colors"
@@ -111,10 +111,10 @@
               <i class="ti ti-palette text-primary"></i>
               <span>انتخاب رنگ کیوآر کد</span>
             </h3>
-            <div class="flex gap-3 flex-wrap">
+            <div class="flex gap-1 flex-wrap">
               <button 
                 @click="openColorPicker"
-                class="w-12 h-12 rounded-xl border-2 border-border flex items-center justify-center hover:opacity-80 transition-all shadow-sm"
+                class="w-8 h-8 rounded-xl border-2 border-border flex items-center justify-center hover:opacity-80 transition-all shadow-sm"
                 :style="{ backgroundColor: selectedOptions.foregroundColor }"
               >
                 <i class="ti ti-color-picker text-white text-lg"></i>
@@ -123,10 +123,10 @@
                 v-for="color in themeColors"
                 :key="color.value"
                 @click="selectedOptions.foregroundColor = color.value"
-                class="w-12 h-12 rounded-xl border-2 transition-all hover:scale-105 shadow-sm"
+                class="w-8 h-8 rounded-xl border-2 transition-all  shadow-sm"
                 :style="{ backgroundColor: color.value }"
                 :class="selectedOptions.foregroundColor === color.value 
-                  ? 'border-foreground scale-105 ring-2 ring-foreground ring-offset-2' 
+                  ? 'border-foreground  ring-2 ring-foreground ring-offset-2' 
                   : 'border-border'"
               >
               </button>

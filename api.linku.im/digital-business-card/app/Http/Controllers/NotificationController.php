@@ -16,13 +16,29 @@ class NotificationController
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'کاربر احراز هویت نشده است',
+                'notifications' => []
+            ], 401);
+        }
 
+        // اضافه کردن pagination برای بهبود عملکرد
+        $perPage = $request->input('per_page', 50); // پیش‌فرض 50 نوتیفیکیشن
+        $page = $request->input('page', 1);
+        
+        // استفاده از paginate به جای get
+        $notificationsPaginated = $user->notifications()
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
 
-        $notifications = $user->notifications->map(function ($n) {
+        $notifications = $notificationsPaginated->map(function ($n) {
             $type = $n->data['type'] ?? 'general';
             $title = $n->data['title'] ?? '';
             $message = $n->data['message'] ?? '';
-            $time=$n->data['time']??'';
+            $time = $n->data['time'] ?? '';
 
             // بررسی نوع Enum
             if (in_array($type, SubscriptionNotificationType::casesEnumValues())) {
@@ -40,13 +56,20 @@ class NotificationController
                 'title' => $title,
                 'message' => $message,
                 'read_at' => $n->read_at,
-                'time'=>$time,
+                'time' => $time,
                 'created_at' => $n->created_at,
             ];
         });
 
         return response()->json([
-            'notifications' => $notifications
+            'notifications' => $notifications,
+            'pagination' => [
+                'total' => $notificationsPaginated->total(),
+                'per_page' => $notificationsPaginated->perPage(),
+                'current_page' => $notificationsPaginated->currentPage(),
+                'last_page' => $notificationsPaginated->lastPage(),
+                'has_more' => $notificationsPaginated->hasMorePages(),
+            ]
         ]);
     }
 
@@ -108,7 +131,7 @@ class NotificationController
     }
 
     //Send Push Notification from Admin
-    public function sendNotification(Request $request, WebPushService $webPushService): JsonResponse
+    public function sendNotification(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'recipients' => 'required|string|in:all,premium,free,specific',
@@ -174,7 +197,7 @@ class NotificationController
             ]);
         }
 
-        // جمع‌آوری Push Subscriptions
+        // جمع‌آوری Push Subscriptions از جدول push_subscriptions
         $pushSubscriptions = [];
         
         // ارسال فوری
@@ -188,21 +211,31 @@ class NotificationController
             ));
             $sentCount++;
 
-            // اضافه کردن Push Subscription اگه داره
-            if ($user->push_subscription) {
-                $pushSubscriptions[] = $user->push_subscription;
+            // اضافه کردن Push Subscriptions از جدول push_subscriptions (کاربران عادی)
+            $userPushSubscriptions = \App\Models\PushSubscription::where('user_id', $user->id)->get();
+            foreach ($userPushSubscriptions as $sub) {
+                $pushSubscriptions[] = $sub->toWebPushFormat();
             }
         }
 
         // ارسال Push واقعی به گوشی‌ها
         if (!empty($pushSubscriptions)) {
-            $pushResult = $webPushService->sendBulkNotifications(
-                $pushSubscriptions,
-                $validated['title'],
-                $validated['message'],
-                $validated['actionLink'] ?? null
-            );
-            $pushSentCount = $pushResult['sent'];
+            try {
+                if (class_exists(\Minishlink\WebPush\WebPush::class)) {
+                    $webPushService = app(\App\Services\WebPushService::class);
+                    $pushResult = $webPushService->sendBulkNotifications(
+                        $pushSubscriptions,
+                        $validated['title'],
+                        $validated['message'],
+                        $validated['actionLink'] ?? null
+                    );
+                    $pushSentCount = $pushResult['sent'];
+                } else {
+                    \Log::info('WebPush package not installed. Skipping push notifications.');
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Failed to send push notifications: ' . $e->getMessage());
+            }
         }
 
         // ثبت در لاگ

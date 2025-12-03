@@ -17,6 +17,23 @@ const formStore = useFormStore()
 const {$axios} = useNuxtApp()
 const route = useRoute()
 
+// چک امنیتی - اگه token نیست رندر نکن
+const hasValidAuth = computed(() => {
+  if (import.meta.client) {
+    const token = localStorage.getItem('auth_token')
+    const cookieToken = document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1]
+    if (!token && !cookieToken) {
+      // اگه token نیست فوری redirect (این خط نباید اجرا بشه چون plugin انجام داده)
+      if (typeof window !== 'undefined') {
+        window.location.replace('/auth/login')
+      }
+      return false
+    }
+    return true
+  }
+  return false // در SSR رندر نکن
+})
+
 // صفحاتی که هدر خودشان را دارند
 const pagesWithOwnHeader = computed(() => {
   return route.path.includes('/notifications') || 
@@ -34,24 +51,16 @@ const pagesWithOwnHeader = computed(() => {
          route.path.includes('/rewards')
 })
 
-// صفحاتی که bottom navigation ندارند
-const hideBottomNav = computed(() => {
-  return route.path.includes('/checkout/order') ||
-         route.path.includes('/QR') ||
-         route.path.includes('/profile/CustomizeQRPage') ||
-         route.path.includes('/dashboard/edit-card') ||
-         route.path.includes('/dashboard/activate')
+// فقط صفحه اصلی داشبورد باتم ناویگیشن داره
+const showBottomNav = computed(() => {
+  return route.path === '/dashboard' || route.path === '/dashboard/'
 })
 
-// بارگذاری اطلاعات کاربر فقط اگر لاگین کرده
+// بارگذاری اطلاعات کاربر
 onMounted(async () => {
   authStore.hydrateToken()
-  if (authStore.isAuthenticated) {
-    await userStore.fetchUser()
-    formStore.cards = userStore.cards
-  } else {
-    navigateTo('/auth/login')
-  }
+  await userStore.fetchUser()
+  formStore.cards = userStore.cards
 })
 // وضعیت مدال اشتراک‌گذاری
 const showModal = ref(false)
@@ -314,7 +323,7 @@ provide('topbarConfig', topbarConfig)
 </script>
 
 <template>
-  <div class="flex bg-background min-h-screen overflow-hidden transition-colors duration-300">
+  <div v-if="hasValidAuth" class="flex bg-background min-h-screen overflow-hidden transition-colors duration-300">
 
     <!-- ✅ Main Content -->
     <div class="flex-1 flex flex-col relative">
@@ -345,15 +354,15 @@ provide('topbarConfig', topbarConfig)
       <div class="flex-1 overflow-y-auto lg:pb-4"
            :class="[
              pagesWithOwnHeader ? 'pt-0' : 'pt-20',
-             hideBottomNav ? 'pb-0' : 'pb-20',
-             route.path.includes('/checkout') || hideBottomNav ? '' : 'lg:px-4 px-2'
+             showBottomNav ? 'pb-20' : 'pb-0',
+             route.path.includes('/checkout') || !showBottomNav ? '' : 'lg:px-4 px-2'
            ]">
         <NuxtPage :search="searchQuery" @open-share="openShareModal"/>
       </div>
 
-      <!-- ✅ Bottom Navigation - فقط موبایل و تبلت -->
+      <!-- ✅ Bottom Navigation - فقط صفحه اصلی داشبورد -->
       <BottomNavigation 
-        v-if="!hideBottomNav"
+        v-if="showBottomNav"
         @open-share="openShareModal(formStore.defaultCard)"
       />
     </div>

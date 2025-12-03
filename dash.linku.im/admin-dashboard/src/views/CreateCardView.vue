@@ -1,188 +1,113 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors duration-300 p-4 sm:p-6">
-    <div class="max-w-7xl mx-auto space-y-8">
+    <div class="space-y-6">
       <!-- Header -->
-      <div
-          class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-6 transition-colors duration-300">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4 sm:p-5 transition-colors duration-300">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">ایجاد کارت ویزیت جدید</h1>
-            <p class="text-gray-600 dark:text-gray-400">کارت ویزیت دیجیتال جدید ایجاد کنید</p>
+            <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-1">ایجاد کارت ویزیت</h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400">کارت‌های ویزیت جدید ایجاد کنید</p>
           </div>
           <router-link
               :to="{ name: 'cards' }"
-              class="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 px-4 py-2 rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
+              class="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 px-4 py-2 rounded-lg transition-all duration-300 font-medium flex items-center gap-2 text-sm"
           >
-            <i class="ti ti-arrow-left text-lg"></i>
+            <i class="ti ti-arrow-left"></i>
             بازگشت
           </router-link>
         </div>
       </div>
 
-      <!-- Creation Mode Selector -->
-      <div
-          class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-6 transition-colors duration-300">
-        <div class="flex flex-col sm:flex-row gap-4">
-          <button
-              @click="activeTab = 'bulk'"
-              :class="[
-              'flex-1 flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 font-medium',
-              activeTab === 'bulk'
-                ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 shadow-lg'
-                : 'border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:border-purple-300 dark:hover:border-purple-600'
-            ]"
-          >
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center"
-                 :class="activeTab === 'bulk' ? 'bg-purple-500 text-white' : 'bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-gray-400'">
-              <i class="ti ti-copy text-lg"></i>
-            </div>
-            <span>ایجاد دسته‌ای</span>
-            <div v-if="activeTab === 'bulk'"
-                 class="w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
-              <i class="ti ti-check text-white text-xs"></i>
-            </div>
-          </button>
-          <button disabled
-              @click="activeTab = 'single'"
-              :class="[
-              'flex-1 flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 font-medium',
-              activeTab === 'single'
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 shadow-lg'
-                : 'border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:border-blue-300 dark:hover:border-blue-600'
-            ]"
-          >
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center"
-                 :class="activeTab === 'single' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-gray-400'">
-              <i class="ti ti-credit-card text-lg"></i>
-            </div>
-            <span>ایجاد تکی</span>
-            <div v-if="activeTab === 'single'"
-                 class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-              <i class="ti ti-check text-white text-xs"></i>
-            </div>
-          </button>
-        </div>
-      </div>
-
       <!-- Form Card -->
-      <div
-          class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-6 sm:p-8 transition-colors duration-300">
+      <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-5 sm:p-6 transition-colors duration-300">
         <!-- Bulk Card Creation -->
         <div v-if="activeTab === 'bulk'">
-          <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
-              <i class="ti ti-copy text-xl text-purple-600 dark:text-purple-400"></i>
-            </div>
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white">ایجاد دسته‌ای کارت ویزیت‌ها</h2>
-          </div>
-
-          <form @submit.prevent="createBulkCards" class="max-w-screen-md mx-auto">
-            <div class="grid grid-cols-1 lg:grid-cols-1 gap-8">
-
-              <!-- Left Column - Bulk Settings -->
-              <div class="space-y-6">
-                <!-- Card Type Selection -->
-                <div>
-                  <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-3">نوع کارت ویزیت
-                    فیزیکی</label>
-                  <div class="grid grid-cols-2 gap-3">
-                    <div
-                        v-for="cardType in products"
-                        :key="cardType.id"
-                        @click="bulkForm.cardType = cardType.id"
-                        :class="[
-                        'relative cursor-pointer rounded-xl border-2 p-4 transition-all duration-300 bg-white',
-                        bulkForm.cardType === cardType.id
-                          ? 'border-purple-500 shadow-lg scale-105'
-                          : 'border-gray-200 dark:border-slate-600 hover:border-purple-300 dark:hover:border-purple-600 hover:shadow-md'
-                      ]"
-                    >
-                      <div class="text-center">
-                        <img
-                            :src="cardType.image"
-                            :alt="cardType.name"
-                            class="w-10 h-10 mx-auto mb-2 object-contain"
-                        >
-                        <h3 class="text-xs font-medium text-gray-900 dark:text-white mb-1">{{ cardType.name }}</h3>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">موجودی: {{ cardType.stock }}</p>
-                      </div>
-                      <div v-if="bulkForm.cardType === cardType.id"
-                           class="absolute top-2 left-2 w-4 h-4 bg-purple-500 rounded-full flex items-center justify-center">
-                        <i class="ti ti-check text-white text-xs"></i>
-                      </div>
+          <form @submit.prevent="createBulkCards" class="space-y-5">
+              <!-- Card Type Selection -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-3">نوع کارت ویزیت فیزیکی</label>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                  <div
+                      v-for="cardType in products"
+                      :key="cardType.id"
+                      @click="bulkForm.cardType = cardType.id"
+                      :class="[
+                      'relative cursor-pointer rounded-lg border-2 p-3 transition-all duration-300',
+                      bulkForm.cardType === cardType.id
+                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 shadow-md'
+                        : 'border-gray-200 dark:border-slate-600 hover:border-purple-300 dark:hover:border-purple-600'
+                    ]"
+                  >
+                    <div class="text-center">
+                      <img
+                          :src="cardType.image"
+                          :alt="cardType.name"
+                          class="w-12 h-12 mx-auto mb-2 object-contain"
+                      >
+                      <h3 class="text-xs font-medium text-gray-900 dark:text-white mb-1">{{ cardType.name }}</h3>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">موجودی: {{ cardType.stock }}</p>
+                    </div>
+                    <div v-if="bulkForm.cardType === cardType.id"
+                         class="absolute -top-1 -left-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
+                      <i class="ti ti-check text-white text-xs"></i>
                     </div>
                   </div>
                 </div>
+              </div>
 
+              <!-- Count and Status -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Count Selection -->
                 <div>
-                  <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-3">تعداد کارت ویزیت</label>
+                  <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">تعداد کارت</label>
                   <input
                       v-model.number="bulkForm.count"
                       type="number"
                       min="1"
                       max="100"
                       required
-                      class="w-full px-4 py-4 bg-gray-50 dark:bg-slate-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 border border-gray-200 dark:border-slate-600"
+                      class="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 border border-gray-200 dark:border-slate-600"
+                      placeholder="مثال: 10"
                   >
-                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">حداکثر 100 کارت ویزیت در هر بار</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5">حداکثر 100 کارت</p>
                 </div>
-
-                <!-- Name Prefix -->
-                <!--                <div>
-                                  <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-3">پیشوند نام</label>
-                                  <input
-                                      v-model="bulkForm.namePrefix"
-                                      type="text"
-                                      required
-                                      placeholder="کاربر"
-                                      class="w-full px-4 py-4 bg-gray-50 dark:bg-slate-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 placeholder-gray-500 dark:placeholder-gray-400 border border-gray-200 dark:border-slate-600"
-                                  >
-                                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">مثال: کاربر1، کاربر2، ...</p>
-                                </div>-->
 
                 <!-- Status Selection -->
                 <div>
-                  <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-3">وضعیت</label>
-                  <div class="grid grid-cols-2 gap-3">
+                  <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">وضعیت</label>
+                  <div class="grid grid-cols-2 gap-2">
                     <button
                         type="button"
                         @click="bulkForm.status = 'active'"
                         :class="[
-                        'relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-md',
+                        'flex items-center justify-center gap-2 p-3 border-2 rounded-lg transition-all duration-300',
                         bulkForm.status === 'active'
-                          ? 'border-green-500 bg-green-50 dark:bg-green-900/30 shadow-lg'
-                          : 'border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 hover:border-green-300 dark:hover:border-green-600'
+                          ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+                          : 'border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:border-green-300'
                       ]"
                     >
-                      <div class="flex items-center gap-3">
-                        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
-                             :class="bulkForm.status === 'active' ? 'border-green-500 bg-green-500' : 'border-gray-300 dark:border-gray-600'">
-                          <div v-if="bulkForm.status === 'active'" class="w-2 h-2 bg-white rounded-full"></div>
-                        </div>
-                        <span class="font-medium"
-                              :class="bulkForm.status === 'active' ? 'text-green-700 dark:text-green-300' : 'text-gray-700 dark:text-gray-300'">فعال</span>
+                      <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center"
+                           :class="bulkForm.status === 'active' ? 'border-green-500 bg-green-500' : 'border-gray-300'">
+                        <div v-if="bulkForm.status === 'active'" class="w-1.5 h-1.5 bg-white rounded-full"></div>
                       </div>
+                      <span class="text-sm font-medium">فعال</span>
                     </button>
 
                     <button
                         type="button"
                         @click="bulkForm.status = 'inactive'"
                         :class="[
-                        'relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-md',
+                        'flex items-center justify-center gap-2 p-3 border-2 rounded-lg transition-all duration-300',
                         bulkForm.status === 'inactive'
-                          ? 'border-red-500 bg-red-50 dark:bg-red-900/30 shadow-lg'
-                          : 'border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 hover:border-red-300 dark:hover:border-red-600'
+                          ? 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
+                          : 'border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:border-red-300'
                       ]"
                     >
-                      <div class="flex items-center gap-3">
-                        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
-                             :class="bulkForm.status === 'inactive' ? 'border-red-500 bg-red-500' : 'border-gray-300 dark:border-gray-600'">
-                          <div v-if="bulkForm.status === 'inactive'" class="w-2 h-2 bg-white rounded-full"></div>
-                        </div>
-                        <span class="font-medium"
-                              :class="bulkForm.status === 'inactive' ? 'text-red-700 dark:text-red-300' : 'text-gray-700 dark:text-gray-300'">غیرفعال</span>
+                      <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center"
+                           :class="bulkForm.status === 'inactive' ? 'border-red-500 bg-red-500' : 'border-gray-300'">
+                        <div v-if="bulkForm.status === 'inactive'" class="w-1.5 h-1.5 bg-white rounded-full"></div>
                       </div>
+                      <span class="text-sm font-medium">غیرفعال</span>
                     </button>
                   </div>
                 </div>
@@ -209,30 +134,29 @@
                                 </div>
                               </div>
                             </div>-->
-            </div>
 
             <!-- Form Actions -->
-            <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 dark:border-slate-700 mt-8">
+            <div class="flex flex-col sm:flex-row gap-3 pt-5 border-t border-gray-200 dark:border-slate-700 mt-6">
               <button
                   type="submit"
                   :disabled="isBulkSaving"
-                  class="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl font-semibold text-lg flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                  class="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg font-semibold flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 <template v-if="!isBulkSaving">
-                  <i class="ti ti-copy text-lg"></i>
-                  ایجاد {{ bulkForm.count }} کارت ویزیت
+                  <i class="ti ti-plus"></i>
+                  ایجاد {{ bulkForm.count }} کارت
                 </template>
 
                 <template v-else>
-                  <i class="ti ti-loader animate-spin text-lg"></i>
+                  <i class="ti ti-loader animate-spin"></i>
                   در حال ایجاد...
                 </template>
               </button>
               <router-link
                   :to="{ name: 'cards' }"
-                  class="px-6 py-4 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-xl transition-all duration-300 font-medium text-center flex items-center justify-center gap-2"
+                  class="sm:w-auto px-6 py-3 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-lg transition-all duration-300 font-medium text-center flex items-center justify-center gap-2"
               >
-                <i class="ti ti-arrow-left text-lg"></i>
+                <i class="ti ti-x"></i>
                 انصراف
               </router-link>
             </div>

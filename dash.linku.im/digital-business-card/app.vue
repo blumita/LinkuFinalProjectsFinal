@@ -1,16 +1,53 @@
 <template>
   <div dir="rtl">
+    <!-- بررسی authentication قبل از نمایش محتوا -->
+    <div v-if="!authChecked" class="h-screen w-screen bg-background flex items-center justify-center">
+      <div class="flex flex-col items-center gap-4">
+        <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    </div>
+    
     <!-- محتوای اصلی -->
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
+    <div v-else>
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const authChecked = ref(false)
 
 onMounted(() => {
+  // چک فوری authentication
+  const currentPath = window.location.pathname.toLowerCase()
+  const publicPaths = ['/auth', '/login', '/register', '/forgot-password', '/reset-password', '/', '/card', '/c/']
+  const isPublicPath = publicPaths.some(p => currentPath === p || currentPath.startsWith(p))
+  
+  if (!isPublicPath) {
+    // صفحه محافظت شده - چک token
+    const token = localStorage.getItem('auth_token')
+    const cookieToken = document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1]
+    
+    if (!token && !cookieToken) {
+      // هیچ token ای نیست - پاک کن و برو لاگین
+      localStorage.clear()
+      document.cookie.split(";").forEach(c => {
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/")
+      })
+      window.location.replace('/auth/login')
+      return
+    }
+  }
+  
+  // Auth OK - نمایش محتوا
+  authChecked.value = true
+  
   // Force RTL
   document.documentElement.dir = 'rtl'
   document.documentElement.lang = 'fa'

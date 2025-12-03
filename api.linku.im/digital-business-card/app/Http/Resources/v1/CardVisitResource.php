@@ -30,10 +30,16 @@ class CardVisitResource extends JsonResource
                     'id' => $creator->id,
                     'name' => $creator->name,
                     'email' => $creator->email,
-                    'mobile' => $creator->mobile ?? null,
+                    'mobile' => $creator->phone ?? null, // فیلد phone در جدول users
                     'cardSlug' => $license->card->slug,
                 ];
             }
+        }
+
+        // اگر qr_link با http شروع نمی‌شه، https://linku.im/ رو اضافه کن
+        $qrLink = $this->qr_link;
+        if ($qrLink && !str_starts_with($qrLink, 'http://') && !str_starts_with($qrLink, 'https://')) {
+            $qrLink = 'https://linku.im/' . ltrim($qrLink, '/');
         }
 
         return [
@@ -41,7 +47,7 @@ class CardVisitResource extends JsonResource
             'identifier' => 'CV-' . str_pad($this->sequence_number, 5, '0', STR_PAD_LEFT), // شماره مرتب به جای ID
             'mobile' => $this->mobile,
             'ownerName' => $this->owner_name,
-            'qrLink' => $this->qr_link,
+            'qrLink' => $qrLink,
             'license' => $this->unit?->license?->license_code ?? null,
             'status' => $this->status,
             'cardType' => $this->card_type,

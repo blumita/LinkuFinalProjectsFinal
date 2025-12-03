@@ -1,7 +1,7 @@
 <template>
   <!-- صفحه کارت غیرفعال -->
   <div v-if="!isCardActivated" class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl p-8 sm:p-12 max-w-md w-full text-center">
+    <div class="w-full text-center">
       <!-- لوگو -->
       <div class="mb-8">
         <img 
@@ -19,9 +19,9 @@
       </div>
       
       <!-- عنوان -->
-      <h1 class="text-2xl font-bold text-gray-900 mb-4">
+      <h3 class="text-2xl font-bold text-gray-900 mb-4">
         این صفحه هنوز فعال نشده است
-      </h1>
+      </h3>
       
       <!-- توضیحات -->
       <p class="text-gray-600 mb-8 leading-relaxed">

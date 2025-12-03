@@ -35,7 +35,16 @@ class LicenseController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $userId = $request->user()->id;
+        $user = $request->user();
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'کاربر احراز هویت نشده است'
+            ], 401);
+        }
+        
+        $userId = $user->id;
 
         $licenses = License::with(['card.creator'])
             ->whereNotNull('card_id')
@@ -51,7 +60,14 @@ class LicenseController extends Controller
 
     public function generateLicense(Request $request, CardProduct $cardProduct): JsonResponse
     {
-
+        $user = $request->user();
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'کاربر احراز هویت نشده است'
+            ], 401);
+        }
 
         try {
             $quantity = $request->input('count');

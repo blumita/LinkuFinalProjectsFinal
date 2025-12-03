@@ -3,20 +3,16 @@ const CACHE_NAME = 'linku-v1'
 
 // Install event
 self.addEventListener('install', (event) => {
-    console.log('Service Worker installing...')
     self.skipWaiting()
 })
 
 // Activate event
 self.addEventListener('activate', (event) => {
-    console.log('Service Worker activating...')
     event.waitUntil(clients.claim())
 })
 
 // Push event - دریافت نوتیفیکیشن واقعی گوشی
 self.addEventListener('push', (event) => {
-    console.log('Push received:', event)
-
     let notificationData = {
         title: 'لینکو',
         body: 'شما یک پیام جدید دارید',
@@ -53,7 +49,7 @@ self.addEventListener('push', (event) => {
                 }
             }
         } catch (e) {
-            console.error('Error parsing push data:', e)
+            // Parse error
         }
     }
 
@@ -64,8 +60,6 @@ self.addEventListener('push', (event) => {
 
 // Notification click event
 self.addEventListener('notificationclick', (event) => {
-    console.log('Notification clicked:', event)
-
     event.notification.close()
 
     const urlToOpen = event.notification.data ? .url || '/dashboard/notifications'
@@ -113,6 +107,6 @@ async function syncNotifications() {
             }
         }
     } catch (error) {
-        console.error('Error syncing notifications:', error)
+        // Sync error
     }
 }

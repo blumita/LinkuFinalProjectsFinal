@@ -35,6 +35,7 @@ use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\TutorialController;
 use App\Http\Controllers\v1\TransactionController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Broadcast;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,6 +46,9 @@ use Illuminate\Support\Facades\Route;
 | Routes are versioned and grouped for scalability and maintainability.
 |
 */
+
+// Broadcasting Authentication (for Laravel Reverb / WebSocket)
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 Route::prefix('auth')
     ->group(function () {
@@ -374,6 +378,14 @@ Route::middleware(['auth:sanctum','log.activity'])
             ->name('notify.readAll');
 
     });
+    
+    // Push Subscription Routes for regular users
+    Route::post('/push-subscription', [PushSubscriptionController::class, 'storeUserSubscription'])
+        ->name('user.push-subscription.store');
+    Route::delete('/push-subscription', [PushSubscriptionController::class, 'destroyUserSubscription'])
+        ->name('user.push-subscription.destroy');
+    Route::post('/push-subscription/test', [PushSubscriptionController::class, 'sendTestNotification'])
+        ->name('user.push-subscription.test');
 
 
     Route::prefix('admin')->group(function () {
@@ -815,6 +827,26 @@ Route::middleware(['auth:sanctum'])
     ->group(function () {
         Route::get('/admin/me', [UserController::class, 'adminMe'])
             ->name('user.admin.me');
+        
+        // Admin Management Routes
+        Route::get('/admin', [UserController::class, 'admins'])
+            ->name('user.admins.list');
+        Route::post('/admin/addAdmin', [UserController::class, 'adminsCreate'])
+            ->name('user.admins.create');
+        Route::put('/admin/{id}', [UserController::class, 'adminsUpdate'])
+            ->name('user.admins.update');
+        Route::delete('/admin/{id}', [UserController::class, 'adminsDelete'])
+            ->name('user.admins.delete');
+        
+        // Push Subscription Routes
+        Route::post('/admin/push-subscription', [PushSubscriptionController::class, 'store'])
+            ->name('user.admin.push-subscription.store');
+        Route::get('/admin/push-subscriptions', [PushSubscriptionController::class, 'index'])
+            ->name('user.admin.push-subscriptions.index');
+        Route::delete('/admin/push-subscription/{id?}', [PushSubscriptionController::class, 'destroy'])
+            ->name('user.admin.push-subscription.destroy');
+        Route::delete('/admin/push-subscription-by-endpoint', [PushSubscriptionController::class, 'destroyByEndpoint'])
+            ->name('user.admin.push-subscription.destroy-by-endpoint');
     });
 
 

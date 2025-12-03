@@ -9,7 +9,7 @@
         >
           <i class="ti ti-arrow-right text-xl"></i>
         </button>
-        <h1 class="flex-1 text-lg font-semibold text-foreground text-center lg:text-right lg:text-2xl mr-2 lg:mr-4">صندوق پیام‌ها</h1>
+        <h1 class="flex-1 text-lg font-semibold text-foreground lg:text-2xl">صندوق پیام‌ها</h1>
       </div>
     </div>
 

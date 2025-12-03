@@ -17,11 +17,13 @@ class Role extends Model
         'description',
         'priority',
         'is_active',
+        'menus',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'priority' => 'integer',
+        'menus' => 'array',
     ];
 
     /**

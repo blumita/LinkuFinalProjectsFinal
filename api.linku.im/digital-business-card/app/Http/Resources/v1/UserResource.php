@@ -14,10 +14,15 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $fullName = trim(($this->first_name ?? '') . ' ' . ($this->last_name ?? ''));
+        if (empty($fullName)) {
+            $fullName = $this->name;
+        }
+        
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'fullName' => $this->name,
+            'fullName' => $fullName,
             'firstName'=>$this->first_name,
             'lastName'=>$this->last_name,
             'status'=>$this->status,
@@ -28,6 +33,7 @@ class UserResource extends JsonResource
             'countryCode'=>$this->country_code,
             'emailVerified' => (bool) $this->email_verified,
             'role' => $this->role,
+            'roleId' => $this->role_id,
             'referralCode' => $this->referral_code,
             'removeBranding' => $this->remove_branding,
             'referredBy' => $this->referred_by,

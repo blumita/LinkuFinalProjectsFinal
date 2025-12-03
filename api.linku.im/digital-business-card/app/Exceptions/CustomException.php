@@ -12,6 +12,6 @@ class CustomException extends Exception
     {
         return response()->json([
             'message' => $this->getMessage(),
-        ], 422);
+        ], $this->getCode() ?: 422);
     }
 }

@@ -34,7 +34,8 @@ class OtpService
         try {
             $phone = $this->normalizePhone($requestData['phone']);
 
-            if ($this->otpCodeExist($phone)) {
+            // اجازه ارسال مجدد اگر کمتر از 10 ثانیه به انقضا مانده
+            if ($this->otpCodeExist($phone, 10)) {
                 throw new CustomException(__('sms.sms_recent_code'), 429);
             }
 
@@ -201,11 +202,18 @@ class OtpService
     /**
      * @throws CustomException
      */
-    public function otpCodeExist(string $phone): bool
+    public function otpCodeExist(string $phone, int $gracePeriodSeconds = 0): bool
     {
-        return OtpCode::where('phone', $phone)
-            ->where('expires_at', '>', now())
-            ->exists();
+        $query = OtpCode::where('phone', $phone);
+        
+        if ($gracePeriodSeconds > 0) {
+            // فقط اگر بیشتر از gracePeriod به انقضا مانده جلوگیری کن
+            $query->where('expires_at', '>', now()->addSeconds($gracePeriodSeconds));
+        } else {
+            $query->where('expires_at', '>', now());
+        }
+        
+        return $query->exists();
     }
 
     public function otpCodeFind(string $phone, string $code, bool $deleteAfterVerify = true): bool

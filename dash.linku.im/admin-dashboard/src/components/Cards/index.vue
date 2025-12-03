@@ -305,7 +305,7 @@
       </div>
 
       <!-- Modern Cards Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
           v-for="(card, index) in paginatedCards"
           :key="card.id"
@@ -349,17 +349,28 @@
 
             <!-- Link with copy button -->
             <div class="mb-3">
-              <div class="flex items-center gap-1 bg-gray-50 dark:bg-slate-700/50 rounded-lg px-2 py-1.5">
-                <span class="flex-1 font-mono text-[10px] text-gray-500 dark:text-gray-400 truncate" :title="card.qrLink">
-                  {{ card.qrLink }}
-                </span>
-                <button
-                  @click="copyToClipboard(card.qrLink)"
-                  class="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex-shrink-0"
-                  title="کپی لینک"
-                >
-                  <i class="ti ti-copy text-xs"></i>
-                </button>
+              <div class="bg-gray-50 dark:bg-slate-700/50 rounded-lg px-3 py-2">
+                <div class="flex items-center gap-2 mb-1">
+                  <i class="ti ti-link text-blue-600 dark:text-blue-400 text-sm"></i>
+                  <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">لینک پروفایل</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <a 
+                    :href="card.qrLink" 
+                    target="_blank"
+                    class="flex-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 truncate block" 
+                    :title="card.qrLink"
+                  >
+                    {{ card.qrLink }}
+                  </a>
+                  <button
+                    @click="copyToClipboard(card.qrLink)"
+                    class="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-colors flex-shrink-0"
+                    title="کپی لینک"
+                  >
+                    <i class="ti ti-copy text-sm"></i>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -390,23 +401,35 @@
             </div>
 
             <!-- Activated By Section -->
-            <div v-if="card.activatedBy" class="mb-3 p-2 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-lg border border-emerald-100 dark:border-emerald-800/30">
-              <div class="flex items-center gap-2">
-                <div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
-                  <i class="ti ti-user-check text-[10px]"></i>
+            <div v-if="card.activatedBy" class="mb-3 p-3 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800/30">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                  <i class="ti ti-user-check text-lg"></i>
                 </div>
                 <div class="min-w-0 flex-1">
-                  <span class="text-[10px] text-emerald-600 dark:text-emerald-400 block">فعال‌شده توسط</span>
-                  <span class="text-xs font-medium text-emerald-800 dark:text-emerald-300 truncate block">{{ card.activatedBy.name }}</span>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">فعال‌شده توسط</span>
+                    <a
+                      :href="`https://linku.im/${card.activatedBy.cardSlug}`"
+                      target="_blank"
+                      class="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+                      title="مشاهده پروفایل"
+                    >
+                      <i class="ti ti-external-link text-xs"></i>
+                    </a>
+                  </div>
+                  <p class="text-sm font-semibold text-emerald-900 dark:text-emerald-200 mb-1">{{ card.activatedBy.name }}</p>
+                  <div class="space-y-1">
+                    <div v-if="card.activatedBy.mobile" class="flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-300">
+                      <i class="ti ti-phone text-xs"></i>
+                      <span class="font-mono">{{ card.activatedBy.mobile }}</span>
+                    </div>
+                    <div v-if="card.activatedBy.email" class="flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-300">
+                      <i class="ti ti-mail text-xs"></i>
+                      <span class="truncate" :title="card.activatedBy.email">{{ card.activatedBy.email }}</span>
+                    </div>
+                  </div>
                 </div>
-                <a
-                  :href="`https://linku.im/${card.activatedBy.cardSlug}`"
-                  target="_blank"
-                  class="p-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors flex-shrink-0"
-                  title="مشاهده پروفایل"
-                >
-                  <i class="ti ti-external-link text-xs"></i>
-                </a>
               </div>
             </div>
 

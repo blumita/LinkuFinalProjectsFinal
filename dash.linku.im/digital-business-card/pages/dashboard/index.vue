@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full">
+  <div class="h-full" v-if="hasValidAuth">
     <!-- Mobile Preview Modal (Full Screen) -->
     <div 
       v-if="showPreviewMobile" 
@@ -174,6 +174,16 @@ const formStore = useFormStore()
 const loading = ref(true)
 const copied = ref(false)
 const showPreviewMobile = ref(false)
+
+// چک امنیتی - اگه token نیست رندر نکن
+const hasValidAuth = computed(() => {
+  if (import.meta.client) {
+    const token = localStorage.getItem('auth_token')
+    const cookieToken = document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1]
+    return !!(token || cookieToken)
+  }
+  return false // در SSR رندر نکن
+})
 
 // User data
 const userName = computed(() => userStore.user?.name || 'کاربر')

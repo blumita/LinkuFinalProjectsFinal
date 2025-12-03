@@ -78,45 +78,80 @@
           </h3>
           
           <!-- Email -->
-          <div>
-            <label class="text-xs font-medium text-foreground mb-1.5 block">ایمیل</label>
+          <div class="relative">
             <input
               type="email"
-              class="w-full border border-border rounded-xl px-3 py-3 focus:outline-none bg-muted/50 text-muted-foreground text-sm cursor-not-allowed"
               v-model="form.email"
-              disabled
-              readonly
-              placeholder="email@example.com"
+              id="emailInput"
+              placeholder=" "
+              dir="ltr"
+              class="peer block w-full px-3 pt-4 pb-2.5 text-sm text-foreground bg-transparent rounded-xl border-2 border-border appearance-none focus:outline-none focus:ring-0 focus:border-primary transition-colors duration-200"
             />
+            <label
+              for="emailInput"
+              class="inline-flex items-center absolute text-sm text-muted-foreground duration-300 transform -translate-y-4 scale-[0.85] top-2 z-10 bg-background px-2 
+                peer-focus:px-2 peer-focus:text-primary 
+                peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 
+                peer-focus:top-2 peer-focus:scale-[0.85] peer-focus:-translate-y-4 
+                right-2 origin-top-right"
+            >
+              <i class="ti ti-mail w-4 h-4 ml-1.5"></i>
+              <span>ایمیل</span>
+            </label>
           </div>
 
           <!-- Phone -->
           <div>
-            <label class="text-xs font-medium text-foreground mb-1.5 block">شماره موبایل</label>
-            
             <!-- Country Selector -->
-            <div class="mb-2">
+            <div class="relative mb-3">
               <button 
                 @click="showCountryPicker = true"
-                class="w-full flex items-center border border-border rounded-xl px-3 py-3 bg-background transition-all duration-300 hover:border-primary"
+                class="block px-3 pb-2.5 pt-4 w-full text-sm text-foreground bg-transparent rounded-xl border-2 border-border appearance-none focus:outline-none focus:ring-0 hover:border-primary peer transition-colors duration-200 text-right"
               >
-                <img :src="`/flag/${selectedCountry.flag}.svg`" :alt="selectedCountry.nameEn" class="w-6 h-4 object-cover rounded ml-2" />
-                <span class="flex-1 text-right text-foreground text-sm">{{ selectedCountry.name }}</span>
-                <span class="text-muted-foreground text-xs mx-2" dir="ltr">{{ selectedCountry.dialCode }}</span>
-                <i class="ti ti-chevron-down text-muted-foreground text-sm"></i>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <img :src="`/flag/${selectedCountry.flag}.svg`" :alt="selectedCountry.nameEn" class="w-6 h-4 object-cover rounded" />
+                    <span class="text-foreground">{{ selectedCountry.name }}</span>
+                  </div>
+                  <i class="ti ti-chevron-down text-muted-foreground"></i>
+                </div>
               </button>
+              <label 
+                class="inline-flex items-center absolute text-sm text-muted-foreground duration-300 transform -translate-y-4 scale-[0.85] top-2 z-10 bg-background px-2 right-2 origin-top-right pointer-events-none"
+              >
+                <i class="ti ti-world w-4 h-4 ml-1.5"></i>
+                <span>کشور</span>
+              </label>
             </div>
             
             <!-- Phone Input -->
-            <input
-              type="tel"
-              class="w-full border border-border rounded-xl px-3 py-3 focus:outline-none bg-muted/50 text-muted-foreground text-sm cursor-not-allowed"
-              v-model="form.phone"
-              disabled
-              readonly
-              placeholder="۹۱۲ ۰۰۰ ۰۰۰۰"
-              dir="ltr"
-            />
+            <div class="relative">
+              <input
+                v-model="form.phone"
+                @input="handlePhoneInput"
+                id="phoneInput"
+                type="text"
+                inputmode="numeric"
+                placeholder=" "
+                dir="ltr"
+                class="block px-3 pb-2.5 pt-4 w-full text-sm text-foreground bg-transparent rounded-xl border-2 border-border appearance-none focus:outline-none focus:ring-0 focus:border-primary peer transition-colors duration-200 pl-12"
+              />
+              <label
+                for="phoneInput"
+                class="inline-flex items-center absolute text-sm text-muted-foreground duration-300 transform -translate-y-4 scale-[0.85] top-2 z-10 bg-background px-2 
+                  peer-focus:px-2 peer-focus:text-primary 
+                  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 
+                  peer-focus:top-2 peer-focus:scale-[0.85] peer-focus:-translate-y-4 
+                  right-2 origin-top-right"
+              >
+                <i class="ti ti-phone w-4 h-4 ml-1.5"></i>
+                <span>شماره موبایل</span>
+              </label>
+              <!-- Country Code Display Inside Input with Border -->
+              <div class="absolute top-1/2 -translate-y-1/2 left-3 text-muted-foreground text-sm font-medium pointer-events-none border-r border-border pr-2 mr-2" dir="ltr">
+                {{ selectedCountry.dialCode }}
+              </div>
+            </div>
           </div>
         </div>
 

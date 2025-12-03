@@ -20,7 +20,7 @@
           </div>
         </div>
         <button
-          @click="showCreateModal = true"
+          @click="openCreateRoleModal"
           class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition flex items-center gap-2"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,12 +39,12 @@
       </div>
     </div>
 
-    <!-- Roles List -->
-    <div v-else class="p-4 space-y-3">
+    <!-- Roles Grid -->
+    <div v-else class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <div
         v-for="role in roles"
         :key="role.id"
-        class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition"
+        class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition flex flex-col"
       >
         <!-- Role Header -->
         <div class="flex items-start justify-between mb-3">
@@ -91,6 +91,15 @@
           </div>
           <div class="flex gap-2">
             <button
+              @click="openEditRoleModal(role)"
+              class="p-2 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-lg transition"
+              title="ویرایش نقش"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+            <button
               @click="editRole(role)"
               class="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition"
               title="ویرایش مجوزها"
@@ -113,7 +122,7 @@
         </div>
 
         <!-- Permissions Preview -->
-        <div v-if="role.permissions && role.permissions.length > 0" class="pt-3 border-t border-gray-100 dark:border-gray-700">
+        <div v-if="role.permissions && role.permissions.length > 0" class="mt-auto pt-3 border-t border-gray-100 dark:border-gray-700">
           <div class="flex flex-wrap gap-2">
             <span
               v-for="perm in role.permissions.slice(0, 5)"
@@ -139,7 +148,7 @@
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
       @click.self="showEditModal = false"
     >
-      <div class="bg-white dark:bg-gray-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div class="bg-white dark:bg-gray-800 rounded-xl max-w-5xl w-full h-[85vh] overflow-hidden flex flex-col">
         <!-- Modal Header -->
         <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
           <h2 class="text-xl font-bold text-gray-900 dark:text-white">
@@ -155,28 +164,193 @@
           </button>
         </div>
 
-        <!-- Modal Body -->
-        <div class="flex-1 overflow-y-auto p-4">
-          <PermissionTree
-            :permissions="permissionsTree"
-            :selected="selectedPermissions"
-            :access-levels="accessLevels"
-            @update="updateSelectedPermissions"
-            @update-access="updateAccessLevels"
-          />
+        <!-- Modal Body with Tabs -->
+        <div class="flex-1 overflow-y-auto min-h-0">
+          <!-- Tabs -->
+          <div class="border-b border-gray-200 dark:border-gray-700 px-4 bg-gray-50 dark:bg-gray-800/50 sticky top-0 z-10">
+            <div class="flex gap-4">
+              <button
+                @click="activePermissionTab = 'permissions'"
+                :class="[
+                  'px-4 py-3 text-sm font-medium border-b-2 transition',
+                  activePermissionTab === 'permissions'
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                ]"
+              >
+                مجوزهای عملیاتی
+              </button>
+              <button
+                @click="activePermissionTab = 'menus'"
+                :class="[
+                  'px-4 py-3 text-sm font-medium border-b-2 transition',
+                  activePermissionTab === 'menus'
+                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                ]"
+              >
+                دسترسی به منوها
+              </button>
+            </div>
+          </div>
+
+          <!-- Tab Content -->
+          <div class="p-4 pb-6">
+            <!-- Permissions Tab -->
+            <div v-if="activePermissionTab === 'permissions'">
+              <PermissionTree
+                :permissions="permissionsTree"
+                :selected="selectedPermissions"
+                :access-levels="accessLevels"
+                @update="updateSelectedPermissions"
+                @update-access="updateAccessLevels"
+              />
+            </div>
+
+            <!-- Menus Tab -->
+            <div v-if="activePermissionTab === 'menus'">
+              <MenuTree
+                :menus="sidebarMenus"
+                :selected="selectedRoleMenus"
+                @update="updateRoleMenus"
+              />
+            </div>
+          </div>
         </div>
 
-        <!-- Modal Footer -->
-        <div class="p-4 border-t border-gray-200 dark:border-gray-700 flex gap-2">
+        <!-- Modal Footer - Sticky Bottom -->
+        <div class="p-4 border-t border-gray-200 dark:border-gray-700 flex gap-2 bg-white dark:bg-gray-800 sticky bottom-0 z-10 shadow-lg">
           <button
             @click="savePermissions"
             :disabled="saving"
             class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50"
           >
-            {{ saving ? 'در حال ذخیره...' : 'ذخیره تغییرات' }}
+            {{ saving ? 'در حال ذخیره...' : 'ذخیره مجوزها و منوها' }}
           </button>
           <button
             @click="showEditModal = false"
+            class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+          >
+            انصراف
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create/Edit Role Modal -->
+    <div
+      v-if="showCreateModal"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+      @click.self="showCreateModal = false"
+    >
+      <div class="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full h-[85vh] overflow-hidden flex flex-col">
+        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+            {{ editingRole ? 'ویرایش نقش' : 'ایجاد نقش جدید' }}
+          </h2>
+        </div>
+
+        <form @submit.prevent="saveRole" class="flex-1 overflow-y-auto min-h-0">
+          <div class="p-4 space-y-4 pb-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              نام سیستمی (انگلیسی) *
+            </label>
+            <input
+              v-model="roleForm.name"
+              type="text"
+              required
+              :disabled="!!editingRole"
+              placeholder="admin, manager, user"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:cursor-not-allowed"
+            />
+            <p class="text-xs text-gray-500 mt-1">فقط حروف انگلیسی کوچک و _ مجاز است</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              نام نمایشی (فارسی) *
+            </label>
+            <input
+              v-model="roleForm.display_name"
+              type="text"
+              required
+              placeholder="مدیر، کاربر عادی"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              توضیحات
+            </label>
+            <textarea
+              v-model="roleForm.description"
+              rows="3"
+              placeholder="توضیحات نقش..."
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              اولویت *
+            </label>
+            <input
+              v-model.number="roleForm.priority"
+              type="number"
+              required
+              min="0"
+              max="100"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            />
+            <p class="text-xs text-gray-500 mt-1">عدد بزرگتر = اولویت بالاتر (0-100)</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input
+              v-model="roleForm.is_active"
+              type="checkbox"
+              id="role-active"
+              class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label for="role-active" class="text-sm text-gray-700 dark:text-gray-300">
+              نقش فعال است
+            </label>
+          </div>
+
+          <!-- Menu Selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              دسترسی به منوها *
+            </label>
+            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 max-h-96 overflow-y-auto">
+              <MenuTree
+                :menus="sidebarMenus"
+                :selected="roleForm.menus"
+                @update="updateSelectedMenus"
+              />
+            </div>
+            <p class="text-xs text-gray-500 mt-2">
+              منوهایی که این نقش می‌تواند در سایدبار ببیند و به آن‌ها دسترسی داشته باشد
+            </p>
+          </div>
+          </div>
+        </form>
+
+        <!-- Sticky Footer with Buttons -->
+        <div class="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex gap-2 sticky bottom-0 z-10 shadow-lg">
+          <button
+            @click="saveRole"
+            :disabled="saving"
+            type="button"
+            class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50"
+          >
+            {{ saving ? 'در حال ذخیره...' : (editingRole ? 'ویرایش' : 'ایجاد') }}
+          </button>
+          <button
+            type="button"
+            @click="closeRoleModal"
             class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
           >
             انصراف
@@ -190,11 +364,21 @@
 <script setup lang="ts">
 import { ref, onMounted, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
+import PermissionTree from '@/components/PermissionTree.vue'
+import MenuTree from '@/components/MenuTree.vue'
 
 interface Permission {
   id: number
   name: string
   display_name: string
+}
+
+interface MenuItem {
+  id: string
+  name: string
+  icon: string
+  route: string
+  children?: MenuItem[]
 }
 
 interface Role {
@@ -205,6 +389,7 @@ interface Role {
   priority: number
   is_active: boolean
   permissions: Permission[]
+  menus?: string[]
   users_count: number
 }
 
@@ -217,10 +402,136 @@ const saving = ref(false)
 const roles = ref<Role[]>([])
 const permissionsTree = ref<any[]>([])
 const selectedRole = ref<Role | null>(null)
+const editingRole = ref<Role | null>(null)
 const selectedPermissions = ref<number[]>([])
+const selectedRoleMenus = ref<string[]>([])
 const accessLevels = ref<Record<number, { read: boolean; write: boolean; delete: boolean }>>({})
 const showEditModal = ref(false)
 const showCreateModal = ref(false)
+const activePermissionTab = ref<'permissions' | 'menus'>('permissions')
+
+const roleForm = ref({
+  name: '',
+  display_name: '',
+  description: '',
+  priority: 50,
+  is_active: true,
+  menus: [] as string[]
+})
+
+// لیست منوهای سایدبار
+const sidebarMenus = ref<MenuItem[]>([
+  {
+    id: 'dashboard',
+    name: 'پیشخوان',
+    icon: 'ti ti-layout-grid',
+    route: '/'
+  },
+  {
+    id: 'users',
+    name: 'مدیریت پروفایل‌ها',
+    icon: 'ti ti-user-circle',
+    route: '/users'
+  },
+  {
+    id: 'cards',
+    name: 'مدیریت کارت‌ها',
+    icon: 'ti ti-credit-card',
+    route: '/cards'
+  },
+  {
+    id: 'products',
+    name: 'مدیریت محصولات',
+    icon: 'ti ti-settings',
+    route: '/cards/management'
+  },
+  {
+    id: 'admins',
+    name: 'مدیریت مدیران',
+    icon: 'ti ti-users',
+    route: '/admins'
+  },
+  {
+    id: 'roles',
+    name: 'مدیریت نقش‌ها',
+    icon: 'ti ti-shield-lock',
+    route: '/roles'
+  },
+  {
+    id: 'premium',
+    name: 'اشتراک ویژه',
+    icon: 'ti ti-crown',
+    route: '/premium',
+    children: [
+      {
+        id: 'subscriptions',
+        name: 'مدیریت اشتراک',
+        icon: 'ti ti-star',
+        route: '/subscriptions'
+      },
+      {
+        id: 'features',
+        name: 'ویژگی‌ها',
+        icon: 'ti ti-sparkles',
+        route: '/features'
+      }
+    ]
+  },
+  {
+    id: 'notifications',
+    name: 'ارسال نوتیفیکیشن',
+    icon: 'ti ti-bell-ringing',
+    route: '/notifications/send'
+  },
+  {
+    id: 'discounts',
+    name: 'کدهای تخفیف',
+    icon: 'ti ti-discount',
+    route: '/discounts'
+  },
+  {
+    id: 'transactions',
+    name: 'تراکنش‌ها',
+    icon: 'ti ti-credit-card',
+    route: '/transactions'
+  },
+  {
+    id: 'reports',
+    name: 'گزارشات',
+    icon: 'ti ti-report',
+    route: '/reports'
+  },
+  {
+    id: 'backup',
+    name: 'پشتیبان‌گیری',
+    icon: 'ti ti-database-export',
+    route: '/backup'
+  },
+  {
+    id: 'tutorials',
+    name: 'ویدیوهای آموزشی',
+    icon: 'ti ti-video',
+    route: '/tutorials'
+  },
+  {
+    id: 'settings',
+    name: 'تنظیمات سیستم',
+    icon: 'ti ti-settings',
+    route: '/settings'
+  },
+  {
+    id: 'faqs',
+    name: 'پرسش‌های متداول',
+    icon: 'ti ti-question-mark',
+    route: '/faqs'
+  },
+  {
+    id: 'guide',
+    name: 'راهنما',
+    icon: 'ti ti-help',
+    route: '/guide'
+  }
+])
 
 // دریافت لیست نقش‌ها
 async function fetchRoles() {
@@ -251,6 +562,7 @@ async function fetchPermissionsTree() {
 async function editRole(role: Role) {
   selectedRole.value = role
   selectedPermissions.value = role.permissions.map((p) => p.id)
+  selectedRoleMenus.value = role.menus || []
   
   // بارگذاری سطوح دسترسی از سرور یا تنظیم پیش‌فرض
   accessLevels.value = {}
@@ -265,6 +577,7 @@ async function editRole(role: Role) {
   })
   
   await fetchPermissionsTree()
+  activePermissionTab.value = 'permissions'
   showEditModal.value = true
 }
 
@@ -281,7 +594,12 @@ function updateAccessLevels(data: { permissionId: number; accessType: 'read' | '
   accessLevels.value[data.permissionId][data.accessType] = data.value
 }
 
-// ذخیره مجوزها
+// آپدیت منوهای نقش
+function updateRoleMenus(menuIds: string[]) {
+  selectedRoleMenus.value = menuIds
+}
+
+// ذخیره مجوزها و منوها
 async function savePermissions() {
   if (!selectedRole.value || !axios) return
   
@@ -296,13 +614,19 @@ async function savePermissions() {
       can_delete: accessLevels.value[permId]?.delete ?? false
     }))
     
+    // ذخیره مجوزها
     await axios.post(`/user/admin/roles/${selectedRole.value.id}/permissions`, {
       permissions: permissionsWithAccess
     })
     
+    // ذخیره منوها
+    await axios.put(`/user/admin/roles/${selectedRole.value.id}`, {
+      menus: selectedRoleMenus.value
+    })
+    
     showEditModal.value = false
     await fetchRoles()
-    alert('مجوزها با موفقیت ذخیره شد')
+    alert('مجوزها و منوها با موفقیت ذخیره شد')
   } catch (error) {
     console.error('Error saving permissions:', error)
     alert('خطا در ذخیره مجوزها')
@@ -323,6 +647,77 @@ async function deleteRole(role: Role) {
     await fetchRoles()
   } catch (error: any) {
     alert(error.response?.data?.message || 'خطا در حذف نقش')
+  }
+}
+
+// باز کردن مودال ایجاد/ویرایش نقش
+function openCreateRoleModal() {
+  editingRole.value = null
+  roleForm.value = {
+    name: '',
+    display_name: '',
+    description: '',
+    priority: 50,
+    is_active: true,
+    menus: []
+  }
+  showCreateModal.value = true
+}
+
+function openEditRoleModal(role: Role) {
+  editingRole.value = role
+  roleForm.value = {
+    name: role.name,
+    display_name: role.display_name,
+    description: role.description || '',
+    priority: role.priority ?? 50,
+    is_active: role.is_active ?? true,
+    menus: role.menus || []
+  }
+  showCreateModal.value = true
+}
+
+// به‌روزرسانی منوهای انتخاب شده
+function updateSelectedMenus(menuIds: string[]) {
+  roleForm.value.menus = menuIds
+}
+
+// ذخیره نقش (ایجاد یا ویرایش)
+async function saveRole() {
+  if (!axios) return
+  
+  try {
+    saving.value = true
+    
+    if (editingRole.value) {
+      // ویرایش نقش موجود
+      await axios.put(`/user/admin/roles/${editingRole.value.id}`, roleForm.value)
+    } else {
+      // ایجاد نقش جدید
+      await axios.post('/user/admin/roles', roleForm.value)
+    }
+    
+    closeRoleModal()
+    await fetchRoles()
+  } catch (error: any) {
+    console.error('Error saving role:', error)
+    alert(error.response?.data?.message || 'خطا در ذخیره نقش')
+  } finally {
+    saving.value = false
+  }
+}
+
+// بستن مودال نقش
+function closeRoleModal() {
+  showCreateModal.value = false
+  editingRole.value = null
+  roleForm.value = {
+    name: '',
+    display_name: '',
+    description: '',
+    priority: 50,
+    is_active: true,
+    menus: []
   }
 }
 

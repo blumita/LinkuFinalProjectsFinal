@@ -10,7 +10,7 @@
         >
           <i class="ti ti-arrow-right text-lg"></i>
         </button>
-        <h1 class="flex-1 text-base font-semibold text-foreground text-center mr-10 lg:text-lg">اطلاعیه‌ها</h1>
+        <h1 class="flex-1 text-base font-semibold text-foreground lg:text-lg">اطلاعیه‌ها</h1>
         <button 
           @click="markAllAsRead"
           class="flex items-center justify-center w-9 h-9 rounded-lg text-foreground hover:bg-accent transition-colors disabled:opacity-50"
@@ -109,6 +109,42 @@
     <!-- Main Content -->
     <div class="pt-[90px] lg:pt-16 pb-20 px-2.5 lg:px-4 mt-4 lg:mt-0">
       <div class="lg:max-w-none lg:mx-0">
+        
+        <!-- Notification Permission Banner -->
+        <div 
+          v-if="showPermissionBanner"
+          class="mb-4 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg"
+        >
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+              <i class="ti ti-bell-ringing text-xl"></i>
+            </div>
+            <div class="flex-1">
+              <h3 class="font-semibold mb-1">فعال‌سازی اعلان‌ها</h3>
+              <p class="text-sm text-white/90 mb-3">برای دریافت اطلاعیه‌های فوری، لطفاً دسترسی نوتیفیکیشن را فعال کنید.</p>
+              <div class="flex gap-2">
+                <button
+                  @click="requestNotificationPermission"
+                  class="px-4 py-2 bg-white text-blue-600 rounded-lg text-sm font-medium hover:bg-white/90 transition-colors"
+                >
+                  فعال‌سازی
+                </button>
+                <button
+                  @click="dismissPermissionBanner"
+                  class="px-4 py-2 bg-white/10 text-white rounded-lg text-sm font-medium hover:bg-white/20 transition-colors"
+                >
+                  بعداً
+                </button>
+              </div>
+            </div>
+            <button
+              @click="dismissPermissionBanner"
+              class="text-white/70 hover:text-white transition-colors"
+            >
+              <i class="ti ti-x text-lg"></i>
+            </button>
+          </div>
+        </div>
         
         <!-- Desktop: Sidebar + Content Layout -->
         <div class="hidden lg:flex lg:gap-6 lg:mt-6 lg:items-start">
@@ -359,8 +395,8 @@
   </ClientOnly>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useNotificationStore } from '~/stores/notification'
 
 definePageMeta({
@@ -371,6 +407,7 @@ const notificationStore = useNotificationStore()
 
 const selectedCategory = ref('all')
 const loading = computed(() => notificationStore.loading)
+const showPermissionBanner = ref(false)
 
 const displayedNotifications = computed(() => {
   return notificationStore.notifications
@@ -393,7 +430,7 @@ const allCount = computed(() => {
 })
 
 const unreadCount = computed(() => {
-  return notificationStore.notifications.filter(n => !n.read).length
+  return notificationStore.unreadCount
 })
 
 const categoryCount = (type) => {
@@ -531,10 +568,98 @@ const markAllAsRead = async () => {
   await notificationStore.markAllAsRead()
 }
 
+// تست نوتیفیکیشن
+const sendTestNotification = async () => {
+  try {
+    const { $axios } = useNuxtApp()
+    const response = await $axios.post('/user/push-subscription/test')
+    
+    if (response.data.success) {
+      console.log('✅ Test notification sent:', response.data)
+      alert('نوتیفیکیشن تست ارسال شد! اگر دیدی یعنی کار میکنه 🎉')
+    } else {
+      console.error('❌ Test notification failed:', response.data)
+      alert(response.data.message || 'خطا در ارسال نوتیفیکیشن')
+    }
+  } catch (error: any) {
+    console.error('❌ Error sending test notification:', error)
+    alert(error.response?.data?.message || 'خطا در ارسال نوتیفیکیشن. ابتدا دسترسی نوتیفیکیشن را بدهید.')
+  }
+}
+
+
+
+// درخواست دسترسی نوتیفیکیشن
+const requestNotificationPermission = async () => {
+  if (!('Notification' in window)) {
+    alert('مرورگر شما از نوتیفیکیشن پشتیبانی نمی‌کند')
+    return
+  }
+
+  try {
+    const permission = await Notification.requestPermission()
+    
+    if (permission === 'granted') {
+      showPermissionBanner.value = false
+      
+      // ثبت subscription
+      const { $subscribeToPush } = useNuxtApp()
+      if ($subscribeToPush) {
+        const success = await $subscribeToPush()
+        if (success) {
+          alert('دسترسی نوتیفیکیشن با موفقیت فعال شد! ✅')
+        }
+      }
+    } else if (permission === 'denied') {
+      alert('دسترسی نوتیفیکیشن رد شد. لطفاً از تنظیمات مرورگر یا گوشی، دسترسی را فعال کنید.')
+    }
+  } catch (error) {
+    console.error('❌ Error requesting permission:', error)
+    alert('خطا در درخواست دسترسی. لطفاً صفحه را رفرش کنید.')
+  }
+}
+
+// بستن بنر
+const dismissPermissionBanner = () => {
+  showPermissionBanner.value = false
+  localStorage.setItem('notification_banner_dismissed', 'true')
+}
+
+// چک کردن وضعیت دسترسی
+const checkNotificationPermission = () => {
+  if (!process.client || !('Notification' in window)) return
+  
+  const dismissed = localStorage.getItem('notification_banner_dismissed')
+  const permission = Notification.permission
+  
+  console.log('📱 Notification permission:', permission)
+  
+  // اگه هنوز درخواست نداده یا رد کرده و banner رو نبسته
+  if (permission === 'default' && !dismissed) {
+    showPermissionBanner.value = true
+  } else if (permission === 'denied') {
+    console.warn('⚠️ Notification permission denied by user')
+  } else if (permission === 'granted') {
+    console.log('✅ Notification permission granted')
+  }
+}
+
 // Fetch on client side only
 if (process.client) {
   onMounted(() => {
     notificationStore.fetchNotifications()
+    // Start polling every 15 seconds for real-time updates
+    notificationStore.startPolling(15000)
+    
+    // چک کردن دسترسی نوتیفیکیشن
+    setTimeout(() => {
+      checkNotificationPermission()
+    }, 1000)
+  })
+
+  onUnmounted(() => {
+    // Stop polling when leaving the page
+    notificationStore.stopPolling()
   })
 }
 </script>

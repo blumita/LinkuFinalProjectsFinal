@@ -25,6 +25,7 @@ import {useAuthStore} from "@/stores/auth.ts"
 import NotificationView from "@/views/notifications/NotificationView.vue";
 import SendNotificationView from "@/views/notifications/SendNotificationView.vue";
 import FAQView from "@/views/faqs/FAQView.vue";
+import RolesView from "@/pages/roles/index.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -93,6 +94,12 @@ const router = createRouter({
       path: '/admins',
       name: 'admins',
       component: AdminsView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/roles',
+      name: 'roles',
+      component: RolesView,
       meta: { requiresAuth: true }
     },
     {

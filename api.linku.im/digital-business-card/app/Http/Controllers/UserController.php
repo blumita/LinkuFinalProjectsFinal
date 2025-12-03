@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\AdminResource;
 use App\Http\Resources\v1\ProfileResource;
 use App\Http\Resources\v1\UserResource;
+use App\Models\Admin;
 use App\Models\User;
 use App\Services\UserService;
 use App\Traits\HasApiResponses;
@@ -37,11 +39,9 @@ class UserController
 
     public function admins(Request $request): JsonResponse
     {
+        $admins = Admin::with('role')->get();
 
-        $admins = User::where('role', 'admin')->get();
-
-        return $this->ok('', UserResource::collection($admins));
-
+        return $this->ok('', AdminResource::collection($admins));
     }
 
     /**
@@ -49,17 +49,13 @@ class UserController
      */
     public function adminMe(Request $request): JsonResponse
     {
-        $user = $request->user();
+        $admin = $request->user('admin');
 
-        if (!$user) {
-            return $this->fail('کاربر یافت نشد.', 401);
+        if (!$admin) {
+            return $this->fail('ادمین یافت نشد.', 401);
         }
 
-        if ($user->role !== 'admin') {
-            return $this->fail('شما دسترسی ادمین ندارید.', 403);
-        }
-
-        return $this->ok('', new UserResource($user));
+        return $this->ok('', new AdminResource($admin->load('role')));
     }
 
     public function profiles(Request $request): JsonResponse
@@ -89,19 +85,20 @@ class UserController
             'firstName' => 'required|string|max:255',
             'lastName' => 'required|string|max:255',
             'fullName' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,user_name,' . $id,
-            'email' => 'required|email|unique:users,email,' . $id,
-            'phone' => 'required|string|unique:users,phone,' . $id,
-            'countryCode' => 'nullable|string|size:3',
+            'username' => 'required|string|max:255|unique:admins,user_name,' . $id . ',id',
+            'email' => 'required|email|unique:admins,email,' . $id . ',id',
+            'phone' => 'required|string|unique:admins,phone,' . $id . ',id',
+            'countryCode' => 'nullable|string|max:10',
             'status' => 'required|in:active,inactive',
             'password' => 'nullable|string|min:8',
+            'role_id' => 'nullable|exists:roles,id',
         ]);
 
-        $admin = User::findOrFail($id);
+        $admin = Admin::findOrFail($id);
         $updateData = [
             'first_name' => $validated['firstName'],
             'last_name' => $validated['lastName'],
-            'full_name' => $validated['fullName'],
+            'name' => $validated['fullName'],
             'user_name' => $validated['username'],
             'email' => $validated['email'],
             'phone' => $validated['phone'],
@@ -113,11 +110,44 @@ class UserController
             $updateData['password'] = bcrypt($validated['password']);
         }
 
+        if (isset($validated['role_id'])) {
+            $updateData['role_id'] = $validated['role_id'];
+        }
+
         $admin->update($updateData);
+        $admin->load('role'); // بارگذاری relation
+
+        return $this->ok('Admin updated successfully', new AdminResource($admin));
+    }
+
+    public function adminsCreate(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'firstName' => 'required|string|max:255',
+            'lastName' => 'required|string|max:255',
+            'fullName' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:admins,user_name',
+            'email' => 'required|email|unique:admins,email',
+            'phone' => 'required|string|unique:admins,phone',
+            'countryCode' => 'nullable|string|max:10',
+            'status' => 'required|in:active,inactive',
+            'password' => 'required|string|min:8',
+            'role_id' => 'nullable|exists:roles,id',
+        ]);
+
+        $admin = $this->service->addAdmin($validated);
+        $admin->load('role'); // Load role relationship
+        
+        return $this->ok('Admin created successfully', new AdminResource($admin));
+    }
+
+    public function adminsDelete($id): JsonResponse
+    {
+        $admin = Admin::findOrFail($id);
+        $admin->delete();
 
         return response()->json([
-            'message' => 'Admin updated successfully',
-            'data' => new UserResource($admin)
+            'message' => 'Admin deleted successfully'
         ]);
     }
 
@@ -157,7 +187,8 @@ class UserController
             'username' => 'required|string|min:3|max:50'
         ]);
 
-        $userId = $request->user()->id ?? null;
+        $user = $request->user();
+        $userId = $user ? $user->id : null;
 
         $exists = User::where('user_name', $request->username)
             ->when($userId, fn($q) => $q->where('id', '!=', $userId))
@@ -242,7 +273,8 @@ class UserController
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
             'countryCode' => 'nullable|string|size:3',
-            'status' => 'required|in:active,inactive'
+            'status' => 'required|in:active,inactive',
+            'role_id' => 'nullable|exists:roles,id'
         ];
 
         $user = User::where('phone', $request->input('phone'))->first();
@@ -261,6 +293,9 @@ class UserController
             ]));
 
             $user->role = 'admin';
+            if (isset($validated['role_id'])) {
+                $user->role_id = $validated['role_id'];
+            }
             $user->save();
         }
     }

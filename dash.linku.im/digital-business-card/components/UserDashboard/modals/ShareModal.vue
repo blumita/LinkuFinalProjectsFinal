@@ -208,7 +208,7 @@ const shareLinks = computed(() => [
   {
     name: 'ایمیل',
     iconComponent: getIconComponent({type: 'component', name: 'email'}),
-    url: `mailto:?subject=کارت دیجیتال من&body=مشاهده کارت من: ${profileLink.value}`
+    url: `mailto:?subject=کارت دیجیتال&body=برای مشاهده پروفایل، روی لینک زیر کلیک کنید 👇🏻%0A%0A${profileLink.value}`
   },
   {
     name: 'لینکدین',
@@ -218,12 +218,12 @@ const shareLinks = computed(() => [
   {
     name: 'تلگرام',
     iconComponent: getIconComponent({type: 'component', name: 'telegram'}),
-    url: `https://t.me/share/url?url=${profileLink.value}`
+    url: `https://t.me/share/url?url=${profileLink.value}&text=${encodeURIComponent('برای مشاهده پروفایل، روی لینک زیر کلیک کنید 👇🏻')}`
   },
   {
     name: 'واتساپ',
     iconComponent: getIconComponent({type: 'component', name: 'whatsapp'}),
-    url: `https://api.whatsapp.com/send?text=${encodeURIComponent('مشاهده کارت من: ' + profileLink.value)}`
+    url: `https://api.whatsapp.com/send?text=${encodeURIComponent('برای مشاهده پروفایل، روی لینک زیر کلیک کنید 👇🏻\n\n' + profileLink.value)}`
   }
 ])
 </script>

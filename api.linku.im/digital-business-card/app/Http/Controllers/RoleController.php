@@ -15,6 +15,7 @@ class RoleController extends Controller
     public function index(): JsonResponse
     {
         $roles = Role::with('permissions')
+            ->withCount('users')
             ->orderBy('priority', 'desc')
             ->get();
 
@@ -52,6 +53,8 @@ class RoleController extends Controller
             'description' => 'nullable|string|max:500',
             'priority' => 'nullable|integer|min:1|max:99',
             'is_active' => 'nullable|boolean',
+            'menus' => 'nullable|array',
+            'menus.*' => 'string',
             'permissions' => 'nullable|array',
             'permissions.*' => 'exists:permissions,id',
         ]);
@@ -90,6 +93,8 @@ class RoleController extends Controller
             'description' => 'nullable|string|max:500',
             'priority' => 'nullable|integer|min:1|max:99',
             'is_active' => 'nullable|boolean',
+            'menus' => 'nullable|array',
+            'menus.*' => 'string',
             'permissions' => 'nullable|array',
             'permissions.*' => 'exists:permissions,id',
         ]);

@@ -52,34 +52,96 @@ export const useNotificationStore = defineStore('notifications', () => {
     const notifications = ref<Notification[]>([])
     const activeFilter = ref('all')
     const loading = ref(false)
+    const pollingInterval = ref<NodeJS.Timeout | null>(null)
+    const lastFetchTime = ref<number>(0)
     const {$axios} = useNuxtApp()
     const axios = $axios as AxiosInstance
 
-    const fetchNotifications = async () => {
-
-        loading.value = true
+    const fetchNotifications = async (silent = false) => {
+        // اگه silent باشه، loading نشون نمیدیم (برای polling)
+        if (!silent) {
+            loading.value = true
+        }
+        
         try {
-            const { data } = await axios.get('user/notifications')
+            // محدود کردن به 100 نوتیفیکیشن اخیر
+            const { data } = await axios.get('user/notifications', {
+                params: {
+                    per_page: 100,
+                    page: 1
+                }
+            })
             
-            if (!data || !data.notifications) {
+            if (!data || !data.notifications || !Array.isArray(data.notifications)) {
                 notifications.value = []
                 return
             }
             
-            notifications.value = data.notifications.map((n: NotificationApiResponse) => ({
+            const newNotifications = data.notifications.map((n: NotificationApiResponse) => ({
                 id: n.id,
-                type: n.type,
-                rawType: n.raw_type,
-                title: n.title,
-                description: n.message,
-                createdAt: new Date(n.created_at),
+                type: n.type || 'general',
+                rawType: n.raw_type || 'unknown',
+                title: n.title || 'اطلاعیه',
+                description: n.message || '',
+                createdAt: n.created_at ? new Date(n.created_at) : new Date(),
                 read: !!n.read_at,
-                actions: getActionsByType(n.type, n.raw_type)
+                actions: getActionsByType(n.type || 'general', n.raw_type || 'unknown')
             }))
+            
+            // بررسی اینکه آیا notification جدید اومده
+            const hasNewNotification = newNotifications.length > notifications.value.length ||
+                newNotifications.some((n: Notification) => 
+                    !notifications.value.find((old: Notification) => old.id === n.id)
+                )
+            
+            notifications.value = newNotifications
+            lastFetchTime.value = Date.now()
+            
+            // اگه notification جدید اومده، صدای notification رو پخش کن
+            if (hasNewNotification && process.client && lastFetchTime.value > 0) {
+                // می‌تونی اینجا یه toast notification نشون بدی
+                playNotificationSound()
+            }
+            
         } catch (e: any) {
+            console.error('Error fetching notifications:', e)
             notifications.value = []
         } finally {
-            loading.value = false
+            if (!silent) {
+                loading.value = false
+            }
+        }
+    }
+    
+    // پخش صدای notification (اختیاری)
+    const playNotificationSound = () => {
+        try {
+            const audio = new Audio('/notification-sound.mp3')
+            audio.volume = 0.3
+            audio.play().catch(() => {
+                // Ignore autoplay errors
+            })
+        } catch (error) {
+            // Ignore sound errors
+        }
+    }
+    
+    // شروع polling
+    const startPolling = (intervalMs = 15000) => {
+        if (pollingInterval.value) {
+            return // قبلا شروع شده
+        }
+        
+        pollingInterval.value = setInterval(() => {
+            fetchNotifications(true) // silent fetch
+        }, intervalMs)
+    }
+    
+    // توقف polling
+    const stopPolling = () => {
+        if (pollingInterval.value) {
+            clearInterval(pollingInterval.value)
+            pollingInterval.value = null
         }
     }
 
@@ -111,14 +173,22 @@ export const useNotificationStore = defineStore('notifications', () => {
         notifications.value.forEach(n => (n.read = true))
         await axios.post(`user/notifications/readAll`)
     }
+    
+    // تعداد notification های خوانده نشده
+    const unreadCount = computed(() => {
+        return notifications.value.filter(n => !n.read).length
+    })
 
     return {
         notifications,
         filteredNotifications,
         activeFilter,
         loading,
+        unreadCount,
         fetchNotifications,
         markAsRead,
-        markAllAsRead
+        markAllAsRead,
+        startPolling,
+        stopPolling
     }
 })

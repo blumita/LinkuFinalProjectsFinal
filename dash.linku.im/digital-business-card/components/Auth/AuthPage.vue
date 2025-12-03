@@ -1,38 +1,48 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-background px-4 transition-colors duration-300 relative">
-    <!-- Language Button - Top Corner -->
-    <button
-      @click="isLanguageSheetOpen = true"
-      class="fixed top-4 rtl:left-4 ltr:right-4 z-50 w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center hover:bg-accent transition-colors"
-    >
-      <i class="ti ti-language text-foreground text-xl"></i>
-    </button>
-
-    <div class="w-full max-w-md rtl:text-right ltr:text-left">
+  <div class="h-screen bg-background transition-colors duration-300 relative overflow-hidden flex flex-col">
       <template v-if="step === 'phone'">
-        <!-- Header -->
-        <div class="w-full text-center mb-8">
-          <h1 class="text-xl font-bold mb-2 text-foreground">شماره تلفن</h1>
-          <p class="text-muted-foreground text-sm">لطفاً کشور را انتخاب و سپس شماره رو وارد کنید</p>
+        <!-- Fixed Header -->
+        <div class="flex-shrink-0 bg-background border-b border-border">
+          <div class="flex items-center h-14 px-4">
+            <h1 class="flex-1 text-lg font-semibold text-foreground text-center">شماره موبایل</h1>
+            <button
+              @click="isLanguageSheetOpen = true"
+              class="w-10 h-10 flex items-center justify-center hover:bg-accent transition-colors rounded-full"
+            >
+              <i class="ti ti-language text-foreground text-xl"></i>
+            </button>
+          </div>
         </div>
 
-        <!-- Country Selector -->
-        <div class="w-full mb-4 relative">
-          <label class="absolute rtl:right-4 ltr:left-4 top-[-10px] bg-background text-sm px-1 text-foreground transition-all duration-300">کشور</label>
+        <!-- Centered Content -->
+        <div class="flex-1 flex items-center justify-center overflow-hidden">
+          <div class="w-full max-w-md px-4">
+            <p class="text-muted-foreground text-sm text-center mb-8">لطفاً کشور را انتخاب و سپس شماره رو وارد کنید</p>
+
+        <!-- Country Selector (استایل جدید مطابق عکس) -->
+        <div class="relative w-full mb-4">
           <button 
             @click="showCountryPicker = true"
-            class="w-full flex items-center border border-border rounded-lg px-4 py-4 bg-card transition-all duration-300 hover:border-primary"
+            class="block px-3 pb-2.5 pt-4 w-full text-sm text-foreground bg-transparent rounded-xl border-2 border-border appearance-none focus:outline-none focus:ring-0 hover:border-primary peer transition-colors duration-200 text-right"
           >
-            <img :src="`/flag/${selectedCountry.flag}.svg`" :alt="selectedCountry.nameEn" class="w-7 h-5 object-cover rounded rtl:ml-3 ltr:mr-3" />
-            <span class="flex-1 rtl:text-right ltr:text-left text-foreground">{{ selectedCountry.name }}</span>
-            <span class="text-muted-foreground text-sm mx-2" dir="ltr">{{ selectedCountry.dialCode }}</span>
-            <i class="ti ti-chevron-down text-muted-foreground"></i>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <img :src="`/flag/${selectedCountry.flag}.svg`" :alt="selectedCountry.nameEn" class="w-6 h-4 object-cover rounded" />
+                <span class="text-foreground">{{ selectedCountry.name }}</span>
+              </div>
+              <i class="ti ti-chevron-down text-muted-foreground"></i>
+            </div>
           </button>
+          <label 
+            class="inline-flex items-center absolute text-sm text-muted-foreground duration-300 transform -translate-y-4 scale-[0.85] top-2 z-10 bg-background px-2 right-2 origin-top-right pointer-events-none"
+          >
+            <i class="ti ti-world w-4 h-4 ml-1.5"></i>
+            <span>کشور</span>
+          </label>
         </div>
 
-
-        <!-- Phone Number Input -->
-        <div class="w-full mb-6 relative overflow-hidden">
+        <!-- Phone Number Input (استایل جدید مطابق عکس) -->
+        <div class="relative w-full mb-6">
           <input
               v-model="phone"
               @input="handlePhoneInput"
@@ -41,17 +51,23 @@
               inputmode="numeric"
               placeholder=" "
               dir="ltr"
-              class="peer block w-full px-4 py-4 text-sm border border-border rounded-lg focus:outline-none focus:ring-0 focus:border-primary text-foreground bg-card transition-all duration-300"
+              class="block px-3 pb-2.5 pt-4 w-full text-sm text-foreground bg-transparent rounded-xl border-2 border-border appearance-none focus:outline-none focus:ring-0 focus:border-primary peer transition-colors duration-200 pl-12"
           />
           <label
               for="phoneInput"
-              class="absolute rtl:right-4 ltr:left-4 text-sm text-muted-foreground bg-background px-1 z-10 transition-all duration-200 cursor-text
-              top-1/2 -translate-y-1/2
-              peer-focus:top-1 peer-focus:text-xs peer-focus:-translate-y-1/2 peer-focus:text-primary
-              peer-[:not(:placeholder-shown)]:top-1 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-translate-y-1/2"
+              class="inline-flex items-center absolute text-sm text-muted-foreground duration-300 transform -translate-y-4 scale-[0.85] top-2 z-10 bg-background px-2 
+								peer-focus:px-2 peer-focus:text-primary 
+								peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 
+								peer-focus:top-2 peer-focus:scale-[0.85] peer-focus:-translate-y-4 
+								right-2 origin-top-right"
           >
-            شماره موبایل
+            <i class="ti ti-phone w-4 h-4 ml-1.5"></i>
+            <span>شماره موبایل</span>
           </label>
+          <!-- Country Code Display Inside Input with Border -->
+          <div class="absolute top-1/2 -translate-y-1/2 left-3 text-muted-foreground text-sm font-medium pointer-events-none border-r border-border pr-2 mr-2" dir="ltr">
+            {{ selectedCountry.dialCode }}
+          </div>
 
           <p v-if="errors.phone" class="text-red-500 text-xs mt-1 block">{{ errors.phone }}</p>
         </div>
@@ -98,24 +114,30 @@
           <i class="ti ti-mail text-xl ml-2"></i>
           <span>ورود با ایمیل</span>
         </button>
+          </div>
+        </div>
       </template>
 
       <!-- Email Step -->
       <template v-else-if="step === 'email'">
-        <!-- Header with Back Button -->
-        <div class="w-full mb-8">
-          <div class="flex items-center gap-3 mb-4">
+        <!-- Fixed Header -->
+        <div class="flex-shrink-0 bg-background border-b border-border">
+          <div class="flex items-center h-14 px-4">
             <button
               @click="step = 'phone'"
-              class="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center hover:bg-accent transition-colors"
+              class="w-10 h-10 flex items-center justify-center hover:bg-accent transition-colors rounded-full"
             >
               <i class="ti ti-arrow-right rtl:block ltr:hidden text-foreground text-xl"></i>
               <i class="ti ti-arrow-left ltr:block rtl:hidden text-foreground text-xl"></i>
             </button>
-            <h1 class="text-xl font-bold text-foreground flex-1 rtl:text-right ltr:text-left">ایمیل</h1>
+            <h1 class="flex-1 text-lg font-semibold text-foreground mr-2">ایمیل</h1>
           </div>
-          <p class="text-muted-foreground text-sm rtl:text-right ltr:text-left">آدرس ایمیل خود را وارد کنید</p>
         </div>
+
+        <!-- Centered Content -->
+        <div class="flex-1 flex items-center justify-center overflow-hidden">
+          <div class="w-full max-w-md px-4">
+            <p class="text-muted-foreground text-sm text-center mb-8">آدرس ایمیل خود را وارد کنید</p>
 
         <!-- Email Input -->
         <div class="w-full mb-6 relative">
@@ -150,10 +172,32 @@
           <i class="ti ti-chevron-right w-4 ltr:ml-auto absolute ltr:right-4 pt-1 text-2xl ltr:border-l px-4 border-primary-foreground/30 rtl:hidden"></i>
           <span>ادامه</span>
         </button>
+          </div>
+        </div>
       </template>
 
       <!-- OTP Step -->
       <template v-else-if="step === 'otp'">
+        <!-- Fixed Header -->
+        <div class="flex-shrink-0 bg-background border-b border-border">
+          <div class="flex items-center h-14 px-4">
+            <button
+              @click="goBackFromOtp"
+              class="w-10 h-10 flex items-center justify-center hover:bg-accent transition-colors rounded-full"
+            >
+              <i class="ti ti-arrow-right rtl:block ltr:hidden text-foreground text-xl"></i>
+              <i class="ti ti-arrow-left ltr:block rtl:hidden text-foreground text-xl"></i>
+            </button>
+            <h2 class="flex-1 text-lg font-semibold text-foreground text-center">کد تایید</h2>
+            <button
+              @click="isLanguageSheetOpen = true"
+              class="w-10 h-10 flex items-center justify-center hover:bg-accent transition-colors rounded-full"
+            >
+              <i class="ti ti-language text-foreground text-xl"></i>
+            </button>
+          </div>
+        </div>
+
         <!-- Loading Overlay -->
         <div v-if="isVerifying" class="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
           <div class="flex flex-col items-center gap-4">
@@ -161,26 +205,16 @@
             <p class="text-foreground font-medium">در حال ورود...</p>
           </div>
         </div>
-        <!-- Header with Back Button -->
-        <div class="w-full mb-4">
-          <div class="flex items-center justify-between mb-4">
-            <button
-              @click="goBackFromOtp"
-              class="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center hover:bg-accent transition-colors"
-            >
-              <i class="ti ti-arrow-right rtl:block ltr:hidden text-foreground text-xl"></i>
-              <i class="ti ti-arrow-left ltr:block rtl:hidden text-foreground text-xl"></i>
-            </button>
-            <h2 class="text-xl font-bold text-foreground flex-1 text-center">کد تایید</h2>
-            <div class="w-10"></div>
-          </div>
-        </div>
-        <p v-if="authMethod === 'phone'" class="text-sm text-muted-foreground text-center mb-4">لطفا کد ارسال شده به شماره موبایل
-          {{ toPersianDigits(displayPhone) }} را وارد
-          کنید</p>
-        <p v-else class="text-sm text-muted-foreground text-center mb-4">لطفا کد ارسال شده به ایمیل
-          {{ displayEmail }} را وارد
-          کنید</p>
+
+        <!-- Centered Content -->
+        <div class="flex-1 flex items-center justify-center overflow-hidden">
+          <div class="w-full max-w-md px-4">
+            <p v-if="authMethod === 'phone'" class="text-sm text-muted-foreground text-center mb-4">لطفا کد ارسال شده به شماره موبایل
+              {{ toPersianDigits(displayPhone) }} را وارد
+              کنید</p>
+            <p v-else class="text-sm text-muted-foreground text-center mb-4">لطفا کد ارسال شده به ایمیل
+              {{ displayEmail }} را وارد
+              کنید</p>
 
         <div ref="otpCont" class="flex justify-center gap-2 mt-6 ltr">
           <input
@@ -217,7 +251,8 @@
             </button>
           </template>
         </div>
-
+          </div>
+        </div>
       </template>
 
       <!-- Register Step -->
@@ -565,8 +600,6 @@
         </div>
       </div>
     </UiBottomSheet>
-
-  </div>
   <InfoToast :visible="showToast" :message="toastMessage" :icon="toastIcon"/>
 
 </template>
@@ -724,8 +757,31 @@ function handlePhoneInput(event: Event) {
   // محدود به 11 رقم
   const limited = cleaned.slice(0, 11)
   
-  // اضافه کردن فاصله بعد از هر 3 رقم
-  const formatted = limited.replace(/(\d{3})(?=\d)/g, '$1 ')
+  // فرمت جدید: آخرین رقم بدون فاصله
+  // اگه شماره با 0 شروع شه: 0914 276 6601
+  // اگه بدون 0 باشه: 914 276 6601
+  let formatted = ''
+  if (limited.length > 0) {
+    if (limited.startsWith('0')) {
+      // فرمت: 0XXX XXX XXXX (آخرین 4 رقم بدون فاصله)
+      if (limited.length <= 4) {
+        formatted = limited
+      } else if (limited.length <= 7) {
+        formatted = limited.slice(0, 4) + ' ' + limited.slice(4)
+      } else {
+        formatted = limited.slice(0, 4) + ' ' + limited.slice(4, 7) + ' ' + limited.slice(7)
+      }
+    } else {
+      // فرمت: XXX XXX XXXX (آخرین 4 رقم بدون فاصله)
+      if (limited.length <= 3) {
+        formatted = limited
+      } else if (limited.length <= 6) {
+        formatted = limited.slice(0, 3) + ' ' + limited.slice(3)
+      } else {
+        formatted = limited.slice(0, 3) + ' ' + limited.slice(3, 6) + ' ' + limited.slice(6)
+      }
+    }
+  }
   
   // تبدیل به فارسی
   const persian = toPersianDigits(formatted)

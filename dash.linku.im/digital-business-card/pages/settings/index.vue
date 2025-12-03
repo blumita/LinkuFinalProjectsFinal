@@ -9,7 +9,7 @@
         >
           <i class="ti ti-arrow-right text-xl"></i>
         </button>
-        <h1 class="flex-1 text-lg font-semibold text-foreground text-center mr-10">تنظیمات</h1>
+        <h1 class="flex-1 text-lg font-semibold text-foreground">تنظیمات</h1>
       </div>
     </div>
 
@@ -20,7 +20,7 @@
         <!-- Mobile List -->
         <div class="lg:hidden space-y-0">
           <!-- Edit Profile -->
-          <button
+          <!-- <button
             @click="handleSettingClick('edit-profile')"
             class="w-full flex items-center justify-between py-4 border-b border-border/20"
           >
@@ -29,9 +29,9 @@
               <span class="font-medium text-foreground text-base">ویرایش پروفایل</span>
             </div>
             <i class="ti ti-chevron-left text-muted-foreground text-sm"></i>
-          </button>
+          </button> -->
 
-          <button
+          <!-- <button
             @click="handleSettingClick('customize-link')"
             class="w-full flex items-center justify-between py-4 border-b border-border/20"
           >
@@ -40,9 +40,9 @@
               <span class="font-medium text-foreground text-base">سفارشی‌سازی لینک</span>
             </div>
             <i class="ti ti-chevron-left text-muted-foreground text-sm"></i>
-          </button>
+          </button> -->
 
-          <button
+          <!-- <button
             @click="handleSettingClick('customize-qr')"
             class="w-full flex items-center justify-between py-4 border-b border-border/20"
           >
@@ -51,7 +51,7 @@
               <span class="font-medium text-foreground text-base">سفارشی‌سازی کد QR</span>
             </div>
             <i class="ti ti-chevron-left text-muted-foreground text-sm"></i>
-          </button>
+          </button>  -->
 
           <button
             @click="handleSettingClick('theme')"
@@ -135,7 +135,7 @@
 
         <!-- Desktop Grid -->
         <div class="hidden lg:grid lg:grid-cols-3 lg:gap-6 lg:auto-rows-fr">
-          <button
+          <!-- <button
             @click="handleSettingClick('edit-profile')"
             class="bg-card border border-border rounded-xl p-5 hover:bg-accent hover:border-primary/30 transition-all text-right group"
           >
@@ -178,7 +178,7 @@
               </div>
               <i class="ti ti-chevron-left text-muted-foreground group-hover:text-foreground transition-colors"></i>
             </div>
-          </button>
+          </button> -->
 
           <button
             @click="handleSettingClick('theme')"
