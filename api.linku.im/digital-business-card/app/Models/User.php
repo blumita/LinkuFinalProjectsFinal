@@ -25,6 +25,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'username',
         'user_name',
         'first_name',
         'last_name',
@@ -93,6 +94,10 @@ class User extends Authenticatable
                 } while (User::where('user_name', $username)->exists());
 
                 $user->user_name = $username;
+            }
+            // keep legacy `username` column (if present) in sync
+            if (empty($user->username)) {
+                $user->username = $user->user_name;
             }
         });
     }
