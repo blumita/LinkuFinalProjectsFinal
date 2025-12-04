@@ -614,11 +614,11 @@ const sendNotification = async () => {
       }
       
       if (bannerFile.value) {
-        formData.append('imageUrl', bannerFile.value)
+        formData.append('banner', bannerFile.value)
       }
       
       if (iconFile.value) {
-        formData.append('iconUrl', iconFile.value)
+        formData.append('icon', iconFile.value)
       }
       
       response = await axios.post('/user/admin/notifications/send', formData, {
