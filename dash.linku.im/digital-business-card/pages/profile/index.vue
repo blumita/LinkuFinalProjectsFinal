@@ -32,7 +32,7 @@
                       class="ti ti-crown text-primary text-2xl"
                     />
                   </div>
-                  <p class="text-sm text-muted-foreground font-mono">{{ userPhone }}</p>
+                  <p class="text-sm text-muted-foreground font-mono" dir="ltr">{{ userPhone }}</p>
                 </div>
 
                 <!-- Edit Profile Button -->
@@ -335,7 +335,7 @@
                   class="ti ti-rosette-discount-check-filled text-primary text-xl"
                 />
               </div>
-              <p class="text-sm text-muted-foreground pt-1">{{ userPhone }}</p>
+              <p class="text-sm text-muted-foreground pt-1" dir="ltr">{{ userPhone }}</p>
             </div>
             <button 
               @click="goToEditProfile"

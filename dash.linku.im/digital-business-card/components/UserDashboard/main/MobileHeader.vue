@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed top-0 left-0 right-0 w-full z-50 bg-card/95 backdrop-blur-lg border-b border-border">
+  <div class="fixed top-0 left-0 right-0 w-full z-50 bg-background backdrop-blur-lg border-b border-border">
     <div class="flex items-center justify-between px-4 py-3">
       <!-- Left Side - Back Button (if has back) or Profile Selector -->
       <div v-if="showBackButton" class="flex items-center gap-3">

@@ -1,8 +1,8 @@
 <template>
-  <div class="h-screen bg-background transition-colors duration-300 relative overflow-hidden flex flex-col">
+  <div class="h-screen bg-background transition-colors duration-300 relative flex flex-col overflow-y-auto">
       <template v-if="step === 'phone'">
         <!-- Fixed Header -->
-        <div class="flex-shrink-0 bg-background border-b border-border">
+        <div class="sticky top-0 z-50 flex-shrink-0 bg-background border-b border-border">
           <div class="flex items-center h-16 px-4">
             <!-- Logo -->
             <div class="flex items-center gap-2">
@@ -23,7 +23,7 @@
         </div>
 
         <!-- Centered Content -->
-        <div class="flex-1 flex items-center justify-center overflow-hidden">
+        <div class="flex-1 flex items-center justify-center py-8">
           <div class="w-full max-w-md px-4">
             <p class="text-muted-foreground text-sm text-center mb-8">لطفاً کشور را انتخاب و سپس شماره رو وارد کنید</p>
 
@@ -193,7 +193,7 @@
       <!-- OTP Step -->
       <template v-else-if="step === 'otp'">
         <!-- Fixed Header -->
-        <div class="flex-shrink-0 bg-background border-b border-border">
+        <div class="sticky top-0 z-50 flex-shrink-0 bg-background border-b border-border">
           <div class="flex items-center h-16 px-4">
             <!-- Logo -->
             <div class="flex items-center gap-2">
@@ -273,7 +273,7 @@
       <!-- Register Step -->
       <template v-else-if="step === 'register'">
         <!-- Fixed Header -->
-        <div class="flex-shrink-0 bg-background border-b border-border">
+        <div class="sticky top-0 z-50 flex-shrink-0 bg-background border-b border-border">
           <div class="flex items-center h-16 px-4">
             <!-- Logo -->
             <div class="flex items-center gap-2">
@@ -352,7 +352,7 @@
       <!-- Email Profile Step (for new email users) -->
       <template v-else-if="step === 'email_profile'">
         <!-- Fixed Header -->
-        <div class="flex-shrink-0 bg-background border-b border-border">
+        <div class="sticky top-0 z-50 flex-shrink-0 bg-background border-b border-border">
           <div class="flex items-center h-16 px-4">
             <!-- Logo -->
             <div class="flex items-center gap-2">

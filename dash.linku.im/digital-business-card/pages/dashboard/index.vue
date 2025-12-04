@@ -31,7 +31,7 @@
     </div>
 
     <!-- Main Content - Mobile: fixed center, no scroll -->
-    <div class="fixed inset-0 top-[60px] bottom-[80px] lg:relative lg:top-auto lg:bottom-auto lg:px-6 lg:py-8 lg:h-auto flex items-center justify-center overflow-hidden">
+    <div class="fixed inset-0 top-[60px] bottom-[80px] lg:relative lg:top-auto lg:bottom-auto lg:px-6 lg:py-8 lg:h-auto flex items-center justify-center overflow-hidden bg-background">
       <!-- Profile Cards Container -->
       <div class="w-full max-w-xs mx-auto px-4 lg:px-0">
           <!-- Loading State -->
