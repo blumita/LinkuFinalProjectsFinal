@@ -61,8 +61,8 @@ if command -v pm2 &> /dev/null; then
     # توقف و حذف پروسه قبلی
     pm2 delete dash-linku 2>/dev/null || true
     
-    # اجرا با ecosystem config
-    pm2 start ecosystem.config.js
+    # اجرا با ecosystem config (.cjs برای سازگاری با ES modules)
+    pm2 start ecosystem.config.cjs
     pm2 save
     
     echo -e "${GREEN}✅ PM2 با ecosystem config شروع شد (dash-linku)${NC}"
