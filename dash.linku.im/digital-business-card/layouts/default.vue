@@ -6,6 +6,7 @@ import MobileHeader from '~/components/UserDashboard/main/MobileHeader.vue'
 import BottomNavigation from '~/components/UserDashboard/main/BottomNavigation.vue'
 import ShareModal from '~/components/UserDashboard/modals/ShareModal.vue'
 import CardSelect from '~/components/UserDashboard/main/header/CardSelect.vue'
+import NotificationPermissionBanner from '~/components/shared/NotificationPermissionBanner.vue'
 import {useUserStore} from "~/stores/user";
 import {useAuthStore} from "~/stores/auth";
 import {useFormStore} from "~/stores/form";
@@ -330,6 +331,11 @@ provide('topbarConfig', topbarConfig)
 
 <template>
   <div v-if="hasValidAuth" class="flex bg-background min-h-screen overflow-hidden transition-colors duration-300">
+
+    <!-- ✅ Notification Permission Banner -->
+    <ClientOnly>
+      <NotificationPermissionBanner />
+    </ClientOnly>
 
     <!-- ✅ Main Content -->
     <div class="flex-1 flex flex-col relative">
