@@ -136,6 +136,9 @@ class NotificationController
     //Send Push Notification from Admin
     public function sendNotification(Request $request): JsonResponse
     {
+        // بررسی اینکه آیا درخواست شامل فایل است
+        $hasFiles = $request->hasFile('banner') || $request->hasFile('icon');
+        
         $validated = $request->validate([
             'recipients' => 'required|string|in:all,premium,free,specific',
             'userIds' => 'array',
@@ -146,10 +149,30 @@ class NotificationController
             'actionLink' => 'nullable|string|max:500',
             'scheduledFor' => 'nullable|date|after:now',
             'isPinned' => 'nullable|boolean',
+            'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:1024',
             'imageUrl' => 'nullable|string|max:500',
             'iconUrl' => 'nullable|string|max:500',
             'backgroundColor' => 'nullable|string|max:20',
         ]);
+
+        // آپلود فایل‌ها اگر وجود داشته باشند
+        $imageUrl = $validated['imageUrl'] ?? null;
+        $iconUrl = $validated['iconUrl'] ?? null;
+
+        if ($request->hasFile('banner')) {
+            $bannerPath = $request->file('banner')->store('notifications/banners', 'public');
+            $imageUrl = asset('storage/' . $bannerPath);
+        }
+
+        if ($request->hasFile('icon')) {
+            $iconPath = $request->file('icon')->store('notifications/icons', 'public');
+            $iconUrl = asset('storage/' . $iconPath);
+        }
+
+        // به‌روزرسانی validated با URL های جدید
+        $validated['imageUrl'] = $imageUrl;
+        $validated['iconUrl'] = $iconUrl;
 
         $users = collect();
 

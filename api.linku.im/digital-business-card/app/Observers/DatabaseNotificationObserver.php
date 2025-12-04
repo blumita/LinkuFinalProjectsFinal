@@ -37,7 +37,7 @@ class DatabaseNotificationObserver
             // ارسال Push Notification
             $webPushService = app(WebPushService::class);
             
-            $title = $data['title'] ?? 'لینکو';
+            $title = $data['title'] ?? 'از طرف لینکو';
             $message = $data['message'] ?? 'شما یک پیام جدید دارید';
             $url = $data['action_link'] ?? '/dashboard/notifications';
 
