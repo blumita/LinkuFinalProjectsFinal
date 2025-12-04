@@ -289,13 +289,27 @@ const payInvoice = () => {
 }
 
 // Lifecycle
-onMounted(() => {
-  // Simulate API call
-  setTimeout(() => {
-    const invoiceId = route.params.id as string
+onMounted(async () => {
+  const invoiceId = route.params.id as string
+  isDataLoaded.value = false
+  
+  try {
+    const { $axios } = useNuxtApp() as any
+    const response = await $axios.get(`invoices/${invoiceId}`)
+    
+    if (response.data && response.data.data) {
+      invoice.value = response.data.data
+    } else {
+      // Fallback to sample data if API fails
+      invoice.value = sampleInvoices.find(inv => inv.id === invoiceId) || sampleInvoices[0]
+    }
+  } catch (error) {
+    console.error('Error loading invoice:', error)
+    // Use sample data as fallback
     invoice.value = sampleInvoices.find(inv => inv.id === invoiceId) || sampleInvoices[0]
+  } finally {
     isDataLoaded.value = true
-  }, 1200)
+  }
 })
 </script>
 

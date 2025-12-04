@@ -67,7 +67,7 @@ class ModirPayamak implements OtpSenderInterface
             $response = Http::timeout(30)
                 ->retry(2, 100)
                 ->withHeaders([
-                    'Authorization' => $this->apiKey,
+                    'Authorization' => 'Bearer ' . $this->apiKey,
                     'Content-Type' => 'application/json',
                 ])
                 ->post($url, $payload);
