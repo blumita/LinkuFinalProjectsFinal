@@ -211,7 +211,13 @@
             <tr v-for="discount in paginatedDiscounts" :key="discount.id"
                 class="hover:bg-gray-50 dark:hover:bg-gray-900">
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
+                <div class="flex items-center gap-3">
+                  <div v-if="(discount as any).icon" class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700">
+                    <img :src="(discount as any).icon" class="w-full h-full object-cover" alt="Icon" />
+                  </div>
+                  <div v-else class="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-100 dark:bg-blue-900 flex-shrink-0">
+                    <i class="ti ti-discount-2 text-blue-600 dark:text-blue-400 text-xl"></i>
+                  </div>
                   <code
                       class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-mono text-sm">
                     {{ discount.code }}
@@ -270,12 +276,20 @@
         <div class="lg:hidden space-y-4">
           <div v-for="discount in paginatedDiscounts" :key="discount.id"
                class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 space-y-3">
-            <!-- Header with Code and Status -->
-            <div class="flex items-center justify-between">
-              <code
-                  class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-mono text-sm">
-                {{ discount.code }}
-              </code>
+            <!-- Header with Icon, Code and Status -->
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div v-if="(discount as any).icon" class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700">
+                  <img :src="(discount as any).icon" class="w-full h-full object-cover" alt="Icon" />
+                </div>
+                <div v-else class="w-12 h-12 rounded-lg flex items-center justify-center bg-blue-100 dark:bg-blue-900 flex-shrink-0">
+                  <i class="ti ti-discount-2 text-blue-600 dark:text-blue-400 text-xl"></i>
+                </div>
+                <code
+                    class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-mono text-sm">
+                  {{ discount.code }}
+                </code>
+              </div>
               <span :class="['inline-flex px-2 py-1 text-xs font-semibold rounded-full', getStatusClasses(discount)]">
                 {{ getStatusText(discount) }}
               </span>
@@ -469,6 +483,52 @@
                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"></textarea>
           </div>
 
+          <!-- Banner Image Upload -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">بنر تبلیغاتی</label>
+            <div class="space-y-2">
+              <input
+                type="file"
+                @change="handleBannerUpload"
+                accept="image/*"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white file:ml-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-500 file:text-white file:cursor-pointer hover:file:bg-blue-600"
+              />
+              <div v-if="bannerPreview || formData.banner" class="relative w-full h-32 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600">
+                <img :src="bannerPreview || formData.banner" class="w-full h-full object-cover" alt="Banner preview" />
+                <button
+                  type="button"
+                  @click="removeBanner"
+                  class="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
+                >
+                  <i class="ti ti-x text-sm"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Icon Image Upload -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">آیکون</label>
+            <div class="space-y-2">
+              <input
+                type="file"
+                @change="handleIconUpload"
+                accept="image/*"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white file:ml-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-500 file:text-white file:cursor-pointer hover:file:bg-blue-600"
+              />
+              <div v-if="iconPreview || formData.icon" class="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600">
+                <img :src="iconPreview || formData.icon" class="w-full h-full object-cover" alt="Icon preview" />
+                <button
+                  type="button"
+                  @click="removeIcon"
+                  class="absolute top-1 right-1 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
+                >
+                  <i class="ti ti-x text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">نوع تخفیف *</label>
             <div class="relative dropdown-container">
@@ -563,6 +623,8 @@ interface DiscountCode {
   expiryDate?: string
   active: boolean
   createdAt: string
+  banner?: string
+  icon?: string
 }
 
 // Reactive data
@@ -589,8 +651,16 @@ const formData = ref({
   type: 'percentage' as 'percentage' | 'fixed',
   value: 0,
   maxUsage: undefined as number | undefined,
-  expiryDate: ''
+  expiryDate: '',
+  banner: null as string | null,
+  icon: null as string | null
 })
+
+// File upload refs
+const bannerFile = ref<File | null>(null)
+const iconFile = ref<File | null>(null)
+const bannerPreview = ref<string | null>(null)
+const iconPreview = ref<string | null>(null)
 
 // Sample data
 const discountCodes = computed(()=>discountStore.discounts)
@@ -736,8 +806,17 @@ const editDiscount = async (discount: DiscountCode) => {
     type: discount.type,
     value: discount.value,
     maxUsage: discount.maxUsage,
-    expiryDate: discount.expiryDate || ''
+    expiryDate: discount.expiryDate || '',
+    banner: (discount as any).banner || null,
+    icon: (discount as any).icon || null
   }
+  
+  // Load existing images for preview
+  bannerPreview.value = null
+  iconPreview.value = null
+  bannerFile.value = null
+  iconFile.value = null
+  
   showEditModal.value = true
 }
 const normalizePersianDigits = (str: string): string => {
@@ -779,24 +858,117 @@ const formatDate = (date: string | null | undefined): string => {
 
   return toJalaali(date)
 }
+
+// Image upload handlers
+const handleBannerUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  
+  if (file) {
+    bannerFile.value = file
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      bannerPreview.value = e.target?.result as string
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+const handleIconUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  
+  if (file) {
+    iconFile.value = file
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      iconPreview.value = e.target?.result as string
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+const removeBanner = () => {
+  bannerFile.value = null
+  bannerPreview.value = null
+  formData.value.banner = null
+}
+
+const removeIcon = () => {
+  iconFile.value = null
+  iconPreview.value = null
+  formData.value.icon = null
+}
+
 // مثال استفاده
 const saveDiscount = async () => {
+  // Build FormData if there are image files
+  const hasImages = bannerFile.value || iconFile.value
+  
   if (editingDiscount.value) {
     // Update existing
-    await discountStore.updateDiscount(editingDiscount.value.id, formData.value)
+    if (hasImages) {
+      const formDataObj = new FormData()
+      formDataObj.append('code', formData.value.code)
+      formDataObj.append('title', formData.value.title)
+      formDataObj.append('description', formData.value.description || '')
+      formDataObj.append('type', formData.value.type)
+      formDataObj.append('value', formData.value.value.toString())
+      if (formData.value.maxUsage) {
+        formDataObj.append('maxUsage', formData.value.maxUsage.toString())
+      }
+      if (formData.value.expiryDate) {
+        formDataObj.append('expiryDate', toGregorian(formData.value.expiryDate))
+      }
+      if (bannerFile.value) {
+        formDataObj.append('banner', bannerFile.value)
+      }
+      if (iconFile.value) {
+        formDataObj.append('icon', iconFile.value)
+      }
+      
+      await discountStore.updateDiscount(editingDiscount.value.id, formDataObj as any)
+    } else {
+      await discountStore.updateDiscount(editingDiscount.value.id, formData.value)
+    }
+    
     Object.assign(editingDiscount.value, formData.value)
     await showSuccess('ویرایش موفق', 'کد تخفیف با موفقیت ویرایش شد')
   } else {
     // Add new
-    const newDiscount: DiscountCode = {
-      id: Date.now(),
-      ...formData.value,
-      usedCount: 0,
-      active: true,
-      createdAt: new Date().toISOString().split('T')[0] ,// "2025-10-25"
-      expiryDate: toGregorian(formData.value.expiryDate)
+    if (hasImages) {
+      const formDataObj = new FormData()
+      formDataObj.append('code', formData.value.code)
+      formDataObj.append('title', formData.value.title)
+      formDataObj.append('description', formData.value.description || '')
+      formDataObj.append('type', formData.value.type)
+      formDataObj.append('value', formData.value.value.toString())
+      if (formData.value.maxUsage) {
+        formDataObj.append('maxUsage', formData.value.maxUsage.toString())
+      }
+      if (formData.value.expiryDate) {
+        formDataObj.append('expiryDate', toGregorian(formData.value.expiryDate))
+      }
+      if (bannerFile.value) {
+        formDataObj.append('banner', bannerFile.value)
+      }
+      if (iconFile.value) {
+        formDataObj.append('icon', iconFile.value)
+      }
+      
+      await discountStore.createDiscount(formDataObj as any)
+    } else {
+      const newDiscount: DiscountCode = {
+        id: Date.now(),
+        ...formData.value,
+        usedCount: 0,
+        active: true,
+        createdAt: new Date().toISOString().split('T')[0] ,// "2025-10-25"
+        expiryDate: toGregorian(formData.value.expiryDate)
+      }
+      await discountStore.createDiscount(newDiscount)
     }
-    await discountStore.createDiscount(newDiscount)
+    
     await showSuccess('افزودن موفق', 'کد تخفیف با موفقیت اضافه شد')
   }
 
@@ -834,6 +1006,13 @@ const closeModals = () => {
   showAddModal.value = false
   showEditModal.value = false
   editingDiscount.value = null
+  
+  // Clear image states
+  bannerFile.value = null
+  iconFile.value = null
+  bannerPreview.value = null
+  iconPreview.value = null
+  
   if (showAddModal.value === false) {
     /*formData.value = {
       code: '',

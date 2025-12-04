@@ -144,8 +144,11 @@ class NotificationController
             'title' => 'required|string|max:255',
             'message' => 'required|string|max:1000',
             'actionLink' => 'nullable|string|max:500',
-            'scheduledFor' => 'nullable|date|after:now', // برای زمان‌بندی
+            'scheduledFor' => 'nullable|date|after:now',
             'isPinned' => 'nullable|boolean',
+            'imageUrl' => 'nullable|string|max:500',
+            'iconUrl' => 'nullable|string|max:500',
+            'backgroundColor' => 'nullable|string|max:20',
         ]);
 
         $users = collect();
@@ -192,6 +195,9 @@ class NotificationController
                 'scheduled_for' => $validated['scheduledFor'],
                 'is_sent' => false,
                 'is_pinned' => $validated['isPinned'] ?? false,
+                'image_url' => $validated['imageUrl'] ?? null,
+                'icon_url' => $validated['iconUrl'] ?? null,
+                'background_color' => $validated['backgroundColor'] ?? null,
             ]);
 
             return response()->json([
@@ -213,7 +219,10 @@ class NotificationController
                 $validated['title'],
                 $validated['message'],
                 $validated['actionLink'] ?? null,
-                $validated['isPinned'] ?? false
+                $validated['isPinned'] ?? false,
+                $validated['imageUrl'] ?? null,
+                $validated['iconUrl'] ?? null,
+                $validated['backgroundColor'] ?? null
             ));
             $sentCount++;
 
@@ -255,6 +264,9 @@ class NotificationController
             'delivered_count' => $pushSentCount,
             'is_sent' => true,
             'is_pinned' => $validated['isPinned'] ?? false,
+            'image_url' => $validated['imageUrl'] ?? null,
+            'icon_url' => $validated['iconUrl'] ?? null,
+            'background_color' => $validated['backgroundColor'] ?? null,
         ]);
 
         return response()->json([
@@ -301,6 +313,57 @@ class NotificationController
         return response()->json([
             'success' => true,
             'data' => $notifications
+        ]);
+    }
+
+    // حذف یک نوتیفیکیشن از تاریخچه
+    public function deleteNotificationHistory(Request $request, $id): JsonResponse
+    {
+        $notification = NotificationLog::find($id);
+
+        if (!$notification) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Notification not found'
+            ], 404);
+        }
+
+        $notification->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notification deleted successfully'
+        ]);
+    }
+
+    // ویرایش یک نوتیفیکیشن از تاریخچه
+    public function updateNotificationHistory(Request $request, $id): JsonResponse
+    {
+        $notification = NotificationLog::find($id);
+
+        if (!$notification) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Notification not found'
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'title' => 'sometimes|string|max:255',
+            'message' => 'sometimes|string|max:1000',
+            'action_link' => 'nullable|string|max:500',
+            'is_pinned' => 'sometimes|boolean',
+            'image_url' => 'nullable|string|max:500',
+            'icon_url' => 'nullable|string|max:500',
+            'background_color' => 'nullable|string|max:20',
+        ]);
+
+        $notification->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notification updated successfully',
+            'data' => $notification
         ]);
     }
 }

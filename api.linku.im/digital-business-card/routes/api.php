@@ -426,6 +426,12 @@ Route::middleware(['auth:sanctum','log.activity'])
         Route::get('/notifications/scheduled', [NotificationController::class, 'scheduledNotifications'])
             ->name('admin.notify.scheduled');
 
+        Route::delete('/notifications/history/{id}', [NotificationController::class, 'deleteNotificationHistory'])
+            ->name('admin.notify.delete');
+
+        Route::put('/notifications/history/{id}', [NotificationController::class, 'updateNotificationHistory'])
+            ->name('admin.notify.update');
+
         // Role & Permission Management
         Route::prefix('roles')->group(function () {
             Route::get('/', [RoleController::class, 'index'])

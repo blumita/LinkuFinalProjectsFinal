@@ -286,14 +286,26 @@
               :class="!notification.read ? 'border-primary/20' : 'border-border'"
             >
               <div class="flex items-center gap-4">
-                <!-- Icon -->
+                <!-- Icon with custom image or default -->
                 <div 
                   :class="[
-                    'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 relative',
-                    getNotificationStyle(notification).bg
+                    'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 relative overflow-hidden',
+                    notification.backgroundColor || getNotificationStyle(notification).bg
                   ]"
+                  :style="notification.backgroundColor ? { backgroundColor: notification.backgroundColor } : {}"
                 >
-                  <i :class="[getNotificationStyle(notification).icon, getNotificationStyle(notification).color, 'text-xl']"></i>
+                  <!-- Custom icon image -->
+                  <img 
+                    v-if="notification.iconUrl" 
+                    :src="notification.iconUrl" 
+                    class="w-full h-full object-cover"
+                    alt="icon"
+                  />
+                  <!-- Default icon -->
+                  <i 
+                    v-else
+                    :class="[getNotificationStyle(notification).icon, getNotificationStyle(notification).color, 'text-xl']"
+                  ></i>
                   <!-- Pinned indicator -->
                   <div 
                     v-if="notification.is_pinned"
@@ -308,6 +320,13 @@
                 <div class="flex-1 min-w-0">
                   <h3 class="font-semibold text-foreground text-sm leading-tight mb-1">{{ notification.title }}</h3>
                   <p class="text-xs text-muted-foreground leading-relaxed truncate">{{ notification.description }}</p>
+                  <!-- Large image if exists -->
+                  <img 
+                    v-if="notification.imageUrl" 
+                    :src="notification.imageUrl" 
+                    class="mt-2 rounded-lg w-full max-w-xs h-32 object-cover"
+                    alt="notification image"
+                  />
                 </div>
 
                 <!-- Time -->
@@ -364,11 +383,23 @@
               <div class="flex items-start gap-2.5">
                 <div 
                   :class="[
-                    'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 relative',
-                    getNotificationStyle(notification).bg
+                    'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 relative overflow-hidden',
+                    notification.backgroundColor || getNotificationStyle(notification).bg
                   ]"
+                  :style="notification.backgroundColor ? { backgroundColor: notification.backgroundColor } : {}"
                 >
-                  <i :class="[getNotificationStyle(notification).icon, getNotificationStyle(notification).color, 'text-lg']"></i>
+                  <!-- Custom icon image -->
+                  <img 
+                    v-if="notification.iconUrl" 
+                    :src="notification.iconUrl" 
+                    class="w-full h-full object-cover"
+                    alt="icon"
+                  />
+                  <!-- Default icon -->
+                  <i 
+                    v-else
+                    :class="[getNotificationStyle(notification).icon, getNotificationStyle(notification).color, 'text-lg']"
+                  ></i>
                   <!-- Pinned indicator -->
                   <div 
                     v-if="notification.is_pinned"
@@ -385,6 +416,13 @@
                     <span class="text-[10px] text-muted-foreground flex-shrink-0 mt-0.5">{{ formatTime(notification.createdAt) }}</span>
                   </div>
                   <p class="text-xs text-muted-foreground leading-relaxed line-clamp-2">{{ notification.description }}</p>
+                  <!-- Large image if exists -->
+                  <img 
+                    v-if="notification.imageUrl" 
+                    :src="notification.imageUrl" 
+                    class="mt-2 rounded-lg w-full h-24 object-cover"
+                    alt="notification image"
+                  />
                 </div>
 
                 <div 
@@ -575,9 +613,8 @@ const formatTime = (date) => {
 }
 
 const handleNotificationClick = async (notification) => {
-  if (!notification.read) {
-    await notificationStore.markAsRead(notification.id)
-  }
+  // Navigate to details page
+  await navigateTo(`/dashboard/notifications/${notification.id}`)
 }
 
 const markAllAsRead = async () => {

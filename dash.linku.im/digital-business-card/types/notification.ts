@@ -8,6 +8,9 @@ export interface NotificationApiResponse {
     created_at: string
     read_at: string | null
     is_pinned?: boolean
+    image_url?: string
+    icon_url?: string
+    background_color?: string
 }
 
 export interface Notification {
@@ -19,6 +22,9 @@ export interface Notification {
     createdAt: Date
     read: boolean
     is_pinned?: boolean
+    imageUrl?: string
+    iconUrl?: string
+    backgroundColor?: string
     actions: {
         label: string
         type: 'primary' | 'secondary'

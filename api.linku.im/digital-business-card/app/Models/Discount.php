@@ -13,6 +13,8 @@ class Discount extends Model
         'code',
         'title',
         'description',
+        'banner',
+        'icon',
         'type',          // percentage | fixed
         'value',
         'max_usage',

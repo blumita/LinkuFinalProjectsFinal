@@ -14,6 +14,9 @@ class AdminPushNotification extends Notification
     protected string $message;
     protected ?string $actionLink;
     protected bool $isPinned;
+    protected ?string $imageUrl;
+    protected ?string $iconUrl;
+    protected ?string $backgroundColor;
 
     /**
      * Create a new notification instance.
@@ -23,13 +26,19 @@ class AdminPushNotification extends Notification
         string $title,
         string $message,
         ?string $actionLink = null,
-        bool $isPinned = false
+        bool $isPinned = false,
+        ?string $imageUrl = null,
+        ?string $iconUrl = null,
+        ?string $backgroundColor = null
     ) {
         $this->notificationType = $notificationType;
         $this->title = $title;
         $this->message = $message;
         $this->actionLink = $actionLink;
         $this->isPinned = $isPinned;
+        $this->imageUrl = $imageUrl;
+        $this->iconUrl = $iconUrl;
+        $this->backgroundColor = $backgroundColor;
     }
 
     /**
@@ -51,6 +60,9 @@ class AdminPushNotification extends Notification
             'message' => $this->message,
             'action_link' => $this->actionLink,
             'is_pinned' => $this->isPinned,
+            'image_url' => $this->imageUrl,
+            'icon_url' => $this->iconUrl,
+            'background_color' => $this->backgroundColor,
             'time' => now()->toDateTimeString(),
         ];
     }

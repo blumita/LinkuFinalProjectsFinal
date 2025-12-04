@@ -13,6 +13,8 @@ class DiscountResource extends JsonResource
             'code' => $this->code,
             'title' => $this->title,
             'description' => $this->description,
+            'banner' => $this->banner ? asset('storage/' . $this->banner) : null,
+            'icon' => $this->icon ? asset('storage/' . $this->icon) : null,
             'type' => $this->type,
             'value' => $this->value,
             'maxUsage' => $this->max_usage,

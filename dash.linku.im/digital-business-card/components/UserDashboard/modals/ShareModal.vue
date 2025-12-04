@@ -101,7 +101,7 @@ const drawQR = async (color, bgColor) => {
     width: 160,
     margin: 1,
     errorCorrectionLevel: 'H',
-    color: {dark: bgColor, light: color}
+    color: {dark: color, light: bgColor}
   })
   const ctx = qrCanvas.value.getContext('2d')
   const logo = new Image()
@@ -149,7 +149,7 @@ const downloadQR = async (color, bgColor) => {
     errorCorrectionLevel: 'H',
     width: size,
     margin: 2,
-    color: {dark: bgColor, light: color}
+    color: {dark: color, light: bgColor}
   })
 
   const logo = new Image()

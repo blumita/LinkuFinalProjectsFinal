@@ -378,10 +378,11 @@ const filteredUsers = computed(() => {
   const query = userSearchQuery.value.toLowerCase()
   return allUsers.value
     .filter(user => 
+      user && // بررسی اینکه user وجود داره
       !selectedUsers.value.find(u => u.id === user.id) &&
-      (user.name.toLowerCase().includes(query) ||
-       user.email?.toLowerCase().includes(query) ||
-       user.phone?.includes(query))
+      ((user.name?.toLowerCase() || '').includes(query) ||
+       (user.email?.toLowerCase() || '').includes(query) ||
+       (user.phone || '').includes(query))
     )
     .slice(0, 10)
 })

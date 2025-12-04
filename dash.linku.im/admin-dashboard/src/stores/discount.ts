@@ -15,6 +15,8 @@ export interface Discount {
     expiryDate?: string
     active: boolean
     createdAt: string
+    banner?: string
+    icon?: string
 }
 
 export const useDiscountStore = defineStore('discount', () => {
@@ -38,9 +40,12 @@ export const useDiscountStore = defineStore('discount', () => {
         }
     }
     // ➕ ایجاد تخفیف جدید
-    const createDiscount = async (payload: Discount) => {
+    const createDiscount = async (payload: Discount | FormData) => {
         try {
-            const res = await axios.post('/user/admin/discount', payload)
+            const config = payload instanceof FormData ? {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            } : {}
+            const res = await axios.post('/user/admin/discount', payload, config)
             const newDiscount = res.data?.data || res.data
             discounts.value.unshift(newDiscount)
             return newDiscount
@@ -50,9 +55,12 @@ export const useDiscountStore = defineStore('discount', () => {
         }
     }
     // ✏️ بروزرسانی تخفیف
-    const updateDiscount = async (id: number, payload: Partial<Discount>) => {
+    const updateDiscount = async (id: number, payload: Partial<Discount> | FormData) => {
         try {
-            const res = await axios.put(`/user/admin/discount/update/${id}`, payload)
+            const config = payload instanceof FormData ? {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            } : {}
+            const res = await axios.put(`/user/admin/discount/update/${id}`, payload, config)
             const updated = res.data?.data || res.data
             const index = discounts.value.findIndex(d => d.id === id)
             if (index !== -1) discounts.value[index] = updated

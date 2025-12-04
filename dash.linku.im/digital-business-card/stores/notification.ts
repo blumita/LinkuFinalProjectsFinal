@@ -86,6 +86,9 @@ export const useNotificationStore = defineStore('notifications', () => {
                 createdAt: n.created_at ? new Date(n.created_at) : new Date(),
                 read: !!n.read_at,
                 is_pinned: n.is_pinned || false,
+                imageUrl: n.image_url,
+                iconUrl: n.icon_url,
+                backgroundColor: n.background_color,
                 actions: getActionsByType(n.type || 'general', n.raw_type || 'unknown')
             }))
             
@@ -147,10 +150,19 @@ export const useNotificationStore = defineStore('notifications', () => {
     }
 
     const filteredNotifications = computed(() => {
-        if (activeFilter.value === 'all') {
-            return notifications.value
-        }
-        return notifications.value.filter((n:any) => n.type === activeFilter.value)
+        let filtered = activeFilter.value === 'all' 
+            ? notifications.value 
+            : notifications.value.filter((n:any) => n.type === activeFilter.value)
+        
+        // مرتب‌سازی: ابتدا پین‌شده‌ها، سپس بقیه
+        return filtered.sort((a: Notification, b: Notification) => {
+            // اول pinned ها
+            if (a.is_pinned && !b.is_pinned) return -1
+            if (!a.is_pinned && b.is_pinned) return 1
+            
+            // بعد براساس تاریخ (جدیدترین اول)
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        })
     })
 
 

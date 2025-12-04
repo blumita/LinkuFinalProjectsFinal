@@ -33,6 +33,8 @@ class DiscountRequest extends BaseFormRequest
             ],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
+            'banner' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+            'icon' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:1024'],
 
             'type' => ['required', Rule::in(['percentage', 'fixed'])],
             'value' => ['required', 'numeric', 'min:0'],

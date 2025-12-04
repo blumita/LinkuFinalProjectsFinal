@@ -1,8 +1,8 @@
 <template>
-  <div class="h-screen bg-background transition-colors duration-300 relative flex flex-col overflow-y-auto">
+  <div class="h-screen bg-background transition-colors duration-300 relative flex flex-col overflow-hidden">
       <template v-if="step === 'phone'">
         <!-- Fixed Header -->
-        <div class="sticky top-0 z-50 flex-shrink-0 bg-background border-b border-border">
+        <div class="flex-shrink-0 bg-background border-b border-border">
           <div class="flex items-center h-16 px-4">
             <!-- Logo -->
             <div class="flex items-center gap-2">
@@ -23,7 +23,7 @@
         </div>
 
         <!-- Centered Content -->
-        <div class="flex-1 flex items-center justify-center py-8">
+        <div class="flex-1 flex items-center justify-center">
           <div class="w-full max-w-md px-4">
             <p class="text-muted-foreground text-sm text-center mb-8">لطفاً کشور را انتخاب و سپس شماره رو وارد کنید</p>
 
@@ -147,7 +147,7 @@
         </div>
 
         <!-- Centered Content -->
-        <div class="flex-1 flex items-center justify-center overflow-hidden">
+        <div class="flex-1 flex items-center justify-center">
           <div class="w-full max-w-md px-4">
             <p class="text-muted-foreground text-sm text-center mb-8">آدرس ایمیل خود را وارد کنید</p>
 
@@ -193,7 +193,7 @@
       <!-- OTP Step -->
       <template v-else-if="step === 'otp'">
         <!-- Fixed Header -->
-        <div class="sticky top-0 z-50 flex-shrink-0 bg-background border-b border-border">
+        <div class="flex-shrink-0 bg-background border-b border-border">
           <div class="flex items-center h-16 px-4">
             <!-- Logo -->
             <div class="flex items-center gap-2">
@@ -222,7 +222,7 @@
         </div>
 
         <!-- Centered Content -->
-        <div class="flex-1 flex items-center justify-center overflow-hidden">
+        <div class="flex-1 flex items-center justify-center">
           <div class="w-full max-w-md px-4">
             <p v-if="authMethod === 'phone'" class="text-sm text-muted-foreground text-center mb-4">لطفا کد ارسال شده به شماره موبایل
               {{ toPersianDigits(displayPhone) }} را وارد
@@ -273,7 +273,7 @@
       <!-- Register Step -->
       <template v-else-if="step === 'register'">
         <!-- Fixed Header -->
-        <div class="sticky top-0 z-50 flex-shrink-0 bg-background border-b border-border">
+        <div class="flex-shrink-0 bg-background border-b border-border">
           <div class="flex items-center h-16 px-4">
             <!-- Logo -->
             <div class="flex items-center gap-2">
@@ -288,8 +288,8 @@
         </div>
 
         <!-- Centered Content -->
-        <div class="flex-1 flex items-center justify-center overflow-hidden">
-          <div class="w-full max-w-md px-4">
+        <div class="flex-1 flex items-center justify-center overflow-y-auto">
+          <div class="w-full max-w-md px-4 py-4">
             <p class="text-muted-foreground text-sm text-center mb-8">لطفاً اطلاعات خود را تکمیل کنید</p>
 
         <!-- Full Name Input -->
@@ -367,8 +367,8 @@
         </div>
 
         <!-- Centered Content -->
-        <div class="flex-1 flex items-center justify-center overflow-hidden">
-          <div class="w-full max-w-md px-4">
+        <div class="flex-1 flex items-center justify-center overflow-y-auto">
+          <div class="w-full max-w-md px-4 py-4">
             <p class="text-muted-foreground text-sm text-center mb-8">لطفاً اطلاعات خود را تکمیل کنید</p>
 
         <!-- Full Name Input -->
@@ -913,6 +913,9 @@ function startTimer(initialSeconds: number = 120) {
 ///======
 async function resendCode() {
   try {
+    // غیرفعال کردن دکمه ارسال مجدد برای جلوگیری از کلیک مکرر
+    isResendEnabled.value = false
+    
     let success = false
     
     if (authMethod.value === 'phone') {
@@ -924,12 +927,20 @@ async function resendCode() {
     
     if (success) {
       otp.fill(null)
-      startTimer()
+      // فقط اگر تایمر فعال نیست، شروع کن
+      if (timerSeconds.value === 0) {
+        startTimer()
+      }
+      showInfoToast('کد تأیید مجدد ارسال شد', 'ti-check')
     } else {
       showInfoToast('ارسال مجدد ناموفق بود. لطفاً دوباره تلاش کنید.', 'ti-alert-triangle')
+      // اگر ارسال ناموفق بود، دکمه رو دوباره فعال کن
+      isResendEnabled.value = true
     }
   } catch (error) {
+    console.error('Error in resendCode:', error)
     showInfoToast('خطایی رخ داد. لطفاً بعداً دوباره تلاش کنید.', 'ti-alert-triangle')
+    isResendEnabled.value = true
   }
 }
 
@@ -1054,10 +1065,15 @@ async function sendOtpCode(normalized: string): Promise<boolean> {
       (errorData?.code === 'code_already_valid' && errorData?.remaining_seconds) ||
       (errorData?.message && errorData.message.includes('کد قبلی هنوز معتبر است'))
     ) {
-      // بدون نمایش toast، مستقیم به صفحه OTP برو
-      step.value = 'otp'
-      // اگر remaining_seconds موجود باشه استفاده کن، وگرنه 120 ثانیه
+      // نمایش پیام به کاربر
       const remaining = errorData?.remaining_seconds ? parseInt(errorData.remaining_seconds) : 120
+      const minutes = Math.floor(remaining / 60)
+      const seconds = remaining % 60
+      showInfoToast(`کد قبلی هنوز معتبر است. ${minutes}:${seconds.toString().padStart(2, '0')} دقیقه باقی‌مانده`, 'ti-clock')
+      
+      // مستقیم به صفحه OTP برو
+      step.value = 'otp'
+      // تایمر رو با زمان باقی‌مانده شروع کن
       startTimer(remaining)
       otp.fill(null)
       return true;
@@ -1099,10 +1115,15 @@ async function sendEmailOtpCode(emailAddress: string): Promise<boolean> {
       (errorData?.code === 'code_already_valid' && errorData?.remaining_seconds) ||
       (errorData?.message && errorData.message.includes('کد قبلی هنوز معتبر است'))
     ) {
-      // بدون نمایش toast، مستقیم به صفحه OTP برو
-      step.value = 'otp'
-      // اگر remaining_seconds موجود باشه استفاده کن، وگرنه 120 ثانیه
+      // نمایش پیام به کاربر
       const remaining = errorData?.remaining_seconds ? parseInt(errorData.remaining_seconds) : 120
+      const minutes = Math.floor(remaining / 60)
+      const seconds = remaining % 60
+      showInfoToast(`کد قبلی هنوز معتبر است. ${minutes}:${seconds.toString().padStart(2, '0')} دقیقه باقی‌مانده`, 'ti-clock')
+      
+      // مستقیم به صفحه OTP برو
+      step.value = 'otp'
+      // تایمر رو با زمان باقی‌مانده شروع کن
       startTimer(remaining)
       otp.fill(null)
       return true;

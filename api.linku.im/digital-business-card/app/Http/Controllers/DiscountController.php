@@ -10,6 +10,7 @@ use App\Traits\HasApiResponses;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 
 class DiscountController extends Controller
 {
@@ -25,10 +26,24 @@ class DiscountController extends Controller
     {
         $validated = $request->validated();
 
+        // Handle banner image upload
+        $bannerPath = null;
+        if ($request->hasFile('banner')) {
+            $bannerPath = $request->file('banner')->store('discounts/banners', 'public');
+        }
+
+        // Handle icon image upload
+        $iconPath = null;
+        if ($request->hasFile('icon')) {
+            $iconPath = $request->file('icon')->store('discounts/icons', 'public');
+        }
+
         $discount = Discount::create([
             'code'        => $validated['code'],
             'title'       => $validated['title'],
             'description' => $validated['description'] ?? null,
+            'banner'      => $bannerPath,
+            'icon'        => $iconPath,
             'type'        => $validated['type'],
             'value'       => $validated['value'],
             'max_usage'    => $validated['maxUsage'] ?? null,
@@ -51,12 +66,34 @@ class DiscountController extends Controller
     {
         $validated = $request->validated();
 
-        $discount=Discount::find($id);
+        $discount = Discount::find($id);
+
+        // Handle banner image upload
+        $bannerPath = $discount->banner;
+        if ($request->hasFile('banner')) {
+            // Delete old banner if exists
+            if ($discount->banner) {
+                Storage::disk('public')->delete($discount->banner);
+            }
+            $bannerPath = $request->file('banner')->store('discounts/banners', 'public');
+        }
+
+        // Handle icon image upload
+        $iconPath = $discount->icon;
+        if ($request->hasFile('icon')) {
+            // Delete old icon if exists
+            if ($discount->icon) {
+                Storage::disk('public')->delete($discount->icon);
+            }
+            $iconPath = $request->file('icon')->store('discounts/icons', 'public');
+        }
 
         $discount->update([
             'code'        => $validated['code'],
             'title'       => $validated['title'],
             'description' => $validated['description'] ?? null,
+            'banner'      => $bannerPath,
+            'icon'        => $iconPath,
             'type'        => $validated['type'],
             'value'       => $validated['value'],
             'max_usage'   => $validated['maxUsage'] ?? null,
