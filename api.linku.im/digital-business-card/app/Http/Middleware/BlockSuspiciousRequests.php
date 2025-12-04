@@ -24,20 +24,19 @@ class BlockSuspiciousRequests
      * پترن‌های مشکوک برای شناسایی حملات
      */
     protected array $suspiciousPatterns = [
-        // SQL Injection
-        '/(\bor\b|\band\b).*?=.*?/i',
-        '/union.*?select/i',
-        '/select.*?from/i',
-        '/drop.*?table/i',
-        '/insert.*?into/i',
-        '/delete.*?from/i',
-        '/update.*?set/i',
-        '/(;|\||&&).*?(cat|wget|curl|exec|system)/i',
+        // SQL Injection - فقط موارد واقعاً مشکوک
+        '/union\s+select/i',
+        '/select\s+.*\s+from\s+/i',
+        '/drop\s+table/i',
+        '/insert\s+into/i',
+        '/delete\s+from/i',
+        '/update\s+.*\s+set/i',
+        '/\'\s*(or|and)\s+[\'"\d]/i', // SQL injection با quote
+        '/(;|\||&&)\s*(cat|wget|curl|exec|system)/i',
         
         // XSS
-        '/<script[^>]*>.*?<\/script>/i',
-        '/javascript:/i',
-        '/on\w+\s*=/i', // onclick, onload, etc.
+        '/<script[^>]*>.*?<\/script>/is',
+        '/javascript\s*:/i',
         '/<iframe/i',
         '/<embed/i',
         '/<object/i',
@@ -48,7 +47,7 @@ class BlockSuspiciousRequests
         '/\.\.%5c/i',
         
         // Command Injection
-        '/[;&|`$\(\)].*?(cat|ls|pwd|chmod|rm|wget|curl)/i',
+        '/[;&|`]\s*(cat|ls|pwd|chmod|rm|wget|curl)/i',
     ];
 
     /**
@@ -66,6 +65,17 @@ class BlockSuspiciousRequests
         '127.0.0.1',
         '::1',
         // می‌توانید IP های معتبر (مثل دفتر، خانه) را اینجا اضافه کنید
+    ];
+    
+    /**
+     * مسیرهایی که از بررسی محتوای مشکوک معاف هستند
+     * (فقط برای rate limiting و IP blocking چک میشن)
+     */
+    protected array $exemptPaths = [
+        'api/v1/card/*',  // ذخیره و ویرایش کارت
+        'api/v1/profile/*', // پروفایل کاربر
+        'api/user/card/*', // کارت کاربر
+        'api/user/profile/*', // پروفایل
     ];
 
     /**
@@ -114,8 +124,8 @@ class BlockSuspiciousRequests
             ], 429);
         }
 
-        // بررسی پارامترها برای پترن‌های مشکوک
-        if ($this->hasSuspiciousContent($request)) {
+        // بررسی پارامترها برای پترن‌های مشکوک (فقط برای مسیرهای غیر معاف)
+        if (!$this->isExemptPath($request->path()) && $this->hasSuspiciousContent($request)) {
             Log::warning('Suspicious request detected', [
                 'ip' => $ip,
                 'url' => $request->fullUrl(),
@@ -160,6 +170,21 @@ class BlockSuspiciousRequests
 
         // بررسی IP های موقتاً مسدود شده
         return Cache::has("blocked_ip:{$ip}");
+    }
+    
+    /**
+     * بررسی اینکه آیا مسیر از بررسی محتوا معاف است
+     */
+    protected function isExemptPath(string $path): bool
+    {
+        foreach ($this->exemptPaths as $pattern) {
+            // تبدیل wildcard به regex
+            $pattern = str_replace(['*', '/'], ['.*', '\/'], $pattern);
+            if (preg_match('/^' . $pattern . '$/i', $path)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
