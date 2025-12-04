@@ -85,6 +85,7 @@ export const useNotificationStore = defineStore('notifications', () => {
                 description: n.message || '',
                 createdAt: n.created_at ? new Date(n.created_at) : new Date(),
                 read: !!n.read_at,
+                is_pinned: n.is_pinned || false,
                 actions: getActionsByType(n.type || 'general', n.raw_type || 'unknown')
             }))
             

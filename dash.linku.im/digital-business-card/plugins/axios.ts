@@ -47,9 +47,15 @@ export default defineNuxtPlugin((nuxtApp) => {
             if (error.response?.status === 401) {
                 const authStore = useAuthStore()
                 
-                // Check if it's a token expiration issue
-                if (error.response?.data?.code === 'unauthenticated') {
+                // فقط اگر واقعاً unauthenticated باشه لاگ‌اوت کن
+                // برای PWA و حالت offline این مهم هست
+                if (error.response?.data?.message === 'Unauthenticated.' || 
+                    error.response?.data?.code === 'unauthenticated' ||
+                    error.response?.data?.message?.includes('Unauthenticated')) {
+                    
                     console.warn('Token expired or invalid, logging out...')
+                    
+                    // پاک کردن token
                     authStore.logout()
                     
                     // Redirect to login only if not already on login/register page

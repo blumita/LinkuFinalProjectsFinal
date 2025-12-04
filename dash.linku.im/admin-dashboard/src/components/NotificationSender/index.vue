@@ -183,6 +183,25 @@
           />
         </div>
 
+        <!-- Pin Notification -->
+        <div class="flex items-center gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800 rounded-xl">
+          <input
+            id="isPinned"
+            v-model="notificationData.isPinned"
+            type="checkbox"
+            class="w-5 h-5 text-amber-600 border-gray-300 rounded focus:ring-amber-500 focus:ring-2"
+          />
+          <label for="isPinned" class="flex-1 cursor-pointer">
+            <div class="flex items-center gap-2">
+              <i class="ti ti-pin text-amber-600 dark:text-amber-400"></i>
+              <span class="font-semibold text-gray-900 dark:text-white">پین کردن اعلان</span>
+            </div>
+            <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+              این اعلان همیشه در بالای لیست نمایش داده شده و قابل حذف نیست
+            </p>
+          </label>
+        </div>
+
         <!-- Preview -->
         <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-600">
           <div class="flex items-center gap-2 mb-4">
@@ -349,7 +368,8 @@ const sentCount = ref(0)
 const notificationData = ref({
   title: '',
   message: '',
-  actionLink: ''
+  actionLink: '',
+  isPinned: false
 })
 
 // Computed
@@ -420,7 +440,8 @@ const resetForm = () => {
   notificationData.value = {
     title: '',
     message: '',
-    actionLink: ''
+    actionLink: '',
+    isPinned: false
   }
   selectedUsers.value = []
   userSearchQuery.value = ''
@@ -439,7 +460,8 @@ const sendNotification = async () => {
       type: selectedType.value,
       title: notificationData.value.title,
       message: notificationData.value.message,
-      actionLink: notificationData.value.actionLink || null
+      actionLink: notificationData.value.actionLink || null,
+      isPinned: notificationData.value.isPinned
     }
 
     const { data } = await axios.post('/user/admin/notifications/send', payload)

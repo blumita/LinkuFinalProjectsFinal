@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full" v-if="hasValidAuth">
+  <div class="h-full overflow-hidden" v-if="hasValidAuth">
     <!-- Mobile Preview Modal (Full Screen) -->
     <div 
       v-if="showPreviewMobile" 

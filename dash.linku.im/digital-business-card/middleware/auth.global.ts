@@ -34,22 +34,32 @@ export default defineNuxtRouteMiddleware(async (to) => {
             authStore.setToken(token)
         }
         
-        // Validate با API (فقط یکبار)
-        if (!authStore.isValidated) {
+        // Validate با API (فقط یکبار یا بعد از 5 دقیقه)
+        const lastValidated = authStore.lastValidated || 0
+        const now = Date.now()
+        const validationInterval = 5 * 60 * 1000 // 5 minutes
+        
+        if (!authStore.isValidated || (now - lastValidated) > validationInterval) {
             try {
                 const { $axios } = useNuxtApp()
                 await $axios.get('/v1/profile/info')
                 authStore.isValidated = true
+                authStore.lastValidated = now
                 console.log('✅ Token validated successfully')
-            } catch (error) {
-                // Token invalid - پاک کن و redirect
-                console.error('❌ Token validation failed:', error)
-                authStore.clearToken()
-                localStorage.clear()
-                document.cookie.split(";").forEach(c => {
-                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/")
-                })
-                return navigateTo('/auth/login')
+            } catch (error: any) {
+                // فقط اگه واقعاً 401 Unauthenticated باشه
+                if (error?.response?.status === 401 && 
+                    (error?.response?.data?.message === 'Unauthenticated.' || 
+                     error?.response?.data?.message?.includes('Unauthenticated'))) {
+                    console.error('❌ Token validation failed - Unauthenticated')
+                    authStore.clearToken()
+                    return navigateTo('/auth/login')
+                } else {
+                    // Network error یا مشکل دیگه - token رو نگه دار
+                    console.warn('⚠️ Validation failed but keeping token:', error?.message)
+                    authStore.isValidated = true // فرض کن valid هست
+                    authStore.lastValidated = now
+                }
             }
         }
     }

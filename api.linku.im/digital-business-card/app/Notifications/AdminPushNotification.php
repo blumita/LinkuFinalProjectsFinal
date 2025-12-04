@@ -13,6 +13,7 @@ class AdminPushNotification extends Notification
     protected string $title;
     protected string $message;
     protected ?string $actionLink;
+    protected bool $isPinned;
 
     /**
      * Create a new notification instance.
@@ -21,12 +22,14 @@ class AdminPushNotification extends Notification
         string $notificationType,
         string $title,
         string $message,
-        ?string $actionLink = null
+        ?string $actionLink = null,
+        bool $isPinned = false
     ) {
         $this->notificationType = $notificationType;
         $this->title = $title;
         $this->message = $message;
         $this->actionLink = $actionLink;
+        $this->isPinned = $isPinned;
     }
 
     /**
@@ -47,6 +50,7 @@ class AdminPushNotification extends Notification
             'title' => $this->title,
             'message' => $this->message,
             'action_link' => $this->actionLink,
+            'is_pinned' => $this->isPinned,
             'time' => now()->toDateTimeString(),
         ];
     }

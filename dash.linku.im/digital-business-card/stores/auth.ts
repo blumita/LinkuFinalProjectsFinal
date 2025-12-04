@@ -7,6 +7,7 @@ export const useAuthStore = defineStore('auth', {
     state: () => ({
         token: null as string | null, // Auth token, initially null
         isValidated: false, // Track if token has been validated with API
+        lastValidated: 0 as number, // Timestamp of last validation
     }),
 
     // Actions to manipulate the token
@@ -27,6 +28,7 @@ export const useAuthStore = defineStore('auth', {
         clearToken() {
             this.token = null
             this.isValidated = false
+            this.lastValidated = 0
             safeStorage.removeItem('auth_token')
             // Remove cookie
             if (import.meta.client) {
@@ -45,6 +47,11 @@ export const useAuthStore = defineStore('auth', {
                     document.cookie = `auth_token=${savedToken}; path=/; max-age=${maxAge}; SameSite=Lax`
                 }
             }
+        },
+
+        // Logout method (alias for clearToken)
+        logout() {
+            this.clearToken()
         }
     },
 

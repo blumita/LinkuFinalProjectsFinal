@@ -7,6 +7,7 @@ export interface NotificationApiResponse {
     message: string
     created_at: string
     read_at: string | null
+    is_pinned?: boolean
 }
 
 export interface Notification {
@@ -17,6 +18,7 @@ export interface Notification {
     description: string
     createdAt: Date
     read: boolean
+    is_pinned?: boolean
     actions: {
         label: string
         type: 'primary' | 'secondary'

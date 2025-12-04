@@ -31,6 +31,7 @@ class NotificationController
         
         // استفاده از paginate به جای get
         $notificationsPaginated = $user->notifications()
+            ->orderByRaw("CASE WHEN JSON_EXTRACT(data, '$.is_pinned') = true THEN 0 ELSE 1 END")
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
 
@@ -39,6 +40,7 @@ class NotificationController
             $title = $n->data['title'] ?? '';
             $message = $n->data['message'] ?? '';
             $time = $n->data['time'] ?? '';
+            $isPinned = $n->data['is_pinned'] ?? false;
 
             // بررسی نوع Enum
             if (in_array($type, SubscriptionNotificationType::casesEnumValues())) {
@@ -58,6 +60,7 @@ class NotificationController
                 'read_at' => $n->read_at,
                 'time' => $time,
                 'created_at' => $n->created_at,
+                'is_pinned' => $isPinned,
             ];
         });
 
@@ -142,6 +145,7 @@ class NotificationController
             'message' => 'required|string|max:1000',
             'actionLink' => 'nullable|string|max:500',
             'scheduledFor' => 'nullable|date|after:now', // برای زمان‌بندی
+            'isPinned' => 'nullable|boolean',
         ]);
 
         $users = collect();
@@ -187,6 +191,7 @@ class NotificationController
                 'sent_count' => 0,
                 'scheduled_for' => $validated['scheduledFor'],
                 'is_sent' => false,
+                'is_pinned' => $validated['isPinned'] ?? false,
             ]);
 
             return response()->json([
@@ -207,7 +212,8 @@ class NotificationController
                 $validated['type'],
                 $validated['title'],
                 $validated['message'],
-                $validated['actionLink'] ?? null
+                $validated['actionLink'] ?? null,
+                $validated['isPinned'] ?? false
             ));
             $sentCount++;
 
@@ -248,6 +254,7 @@ class NotificationController
             'sent_count' => $sentCount,
             'delivered_count' => $pushSentCount,
             'is_sent' => true,
+            'is_pinned' => $validated['isPinned'] ?? false,
         ]);
 
         return response()->json([

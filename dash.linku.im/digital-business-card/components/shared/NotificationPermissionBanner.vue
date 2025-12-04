@@ -1,53 +1,44 @@
 <template>
-  <Transition name="slide-down">
+  <Transition name="toast-slide">
     <div
       v-if="show"
-      class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-primary to-primary/90 text-white shadow-lg"
+      class="fixed top-4 left-4 right-4 z-[9999] mx-auto max-w-md"
     >
-      <div class="container mx-auto px-4 py-3">
-        <div class="flex items-center justify-between gap-3">
-          <!-- Icon & Message -->
-          <div class="flex items-center gap-3 flex-1">
-            <div class="flex-shrink-0">
-              <svg class="w-6 h-6 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium leading-tight">
-                برای دریافت تخفیف‌ها، بروزرسانی‌ها و اطلاع‌رسانی‌های مهم، اعلان‌ها را فعال کنید
-              </p>
-            </div>
+      <div class="bg-card/95 backdrop-blur-md rounded-xl shadow-lg border border-border p-3">
+        <div class="flex items-center gap-3">
+          <!-- Icon -->
+          <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <i class="ti ti-bell text-primary text-xl"></i>
+          </div>
+          
+          <!-- Message -->
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-foreground">
+              فعال‌سازی اعلان‌ها
+            </p>
+            <p class="text-xs text-muted-foreground mt-0.5">
+              برای دریافت آپدیت‌ها
+            </p>
           </div>
 
           <!-- Actions -->
           <div class="flex items-center gap-2 flex-shrink-0">
-            <!-- Enable Button -->
             <button
               @click="handleEnable"
               :disabled="loading"
-              class="px-4 py-2 bg-white text-primary font-semibold rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-all disabled:opacity-50 text-sm whitespace-nowrap"
+              class="px-3 py-1.5 bg-primary text-primary-foreground text-xs font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
             >
-              <span v-if="!loading">فعال‌سازی</span>
-              <span v-else class="flex items-center gap-2">
-                <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>در حال فعال‌سازی...</span>
-              </span>
+              <span v-if="!loading">فعال کن</span>
+              <span v-else>...</span>
             </button>
 
-            <!-- Close Button -->
             <button
               @click="handleDismiss"
               :disabled="loading"
-              class="p-2 hover:bg-white/20 rounded-lg transition-colors disabled:opacity-50"
+              class="p-1.5 hover:bg-muted rounded-lg transition-colors disabled:opacity-50"
               aria-label="بستن"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
+              <i class="ti ti-x text-muted-foreground text-lg"></i>
             </button>
           </div>
         </div>
@@ -134,18 +125,18 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.slide-down-enter-active,
-.slide-down-leave-active {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+.toast-slide-enter-active,
+.toast-slide-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.slide-down-enter-from {
-  transform: translateY(-100%);
+.toast-slide-enter-from {
+  transform: translateY(-100px);
   opacity: 0;
 }
 
-.slide-down-leave-to {
-  transform: translateY(-100%);
+.toast-slide-leave-to {
+  transform: translateY(-100px);
   opacity: 0;
 }
 </style>

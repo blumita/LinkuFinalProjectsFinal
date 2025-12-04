@@ -289,11 +289,19 @@
                 <!-- Icon -->
                 <div 
                   :class="[
-                    'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0',
+                    'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 relative',
                     getNotificationStyle(notification).bg
                   ]"
                 >
                   <i :class="[getNotificationStyle(notification).icon, getNotificationStyle(notification).color, 'text-xl']"></i>
+                  <!-- Pinned indicator -->
+                  <div 
+                    v-if="notification.is_pinned"
+                    class="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center"
+                    title="پین شده"
+                  >
+                    <i class="ti ti-pin-filled text-white text-xs"></i>
+                  </div>
                 </div>
 
                 <!-- Content -->
@@ -356,11 +364,19 @@
               <div class="flex items-start gap-2.5">
                 <div 
                   :class="[
-                    'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0',
+                    'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 relative',
                     getNotificationStyle(notification).bg
                   ]"
                 >
                   <i :class="[getNotificationStyle(notification).icon, getNotificationStyle(notification).color, 'text-lg']"></i>
+                  <!-- Pinned indicator -->
+                  <div 
+                    v-if="notification.is_pinned"
+                    class="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 rounded-full flex items-center justify-center"
+                    title="پین شده"
+                  >
+                    <i class="ti ti-pin-filled text-white text-[10px]"></i>
+                  </div>
                 </div>
 
                 <div class="flex-1 min-w-0">
