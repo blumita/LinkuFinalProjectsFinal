@@ -14,6 +14,16 @@ const httpsConfig = hasCert ? {
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-12',
+  
+  // غیرفعال کردن build manifest برای جلوگیری از خطا
+  app: {
+    buildAssetsDir: '/_nuxt/',
+  },
+  
+  experimental: {
+    payloadExtraction: false,
+  },
+  
   devServer: {
     port: 3000,
     host: 'localhost',
@@ -47,47 +57,10 @@ export default defineNuxtConfig({
       __VUE_PROD_DEVTOOLS__: false
     },
     build: {
-      chunkSizeWarningLimit: 1000,
+      chunkSizeWarningLimit: 1500,
       rollupOptions: {
         output: {
-          manualChunks: (id) => {
-            // Core Vue packages
-            if (id.includes('node_modules/vue/') || id.includes('node_modules/@vue/')) {
-              return 'vue-vendor'
-            }
-            if (id.includes('node_modules/vue-router/')) {
-              return 'vue-router'
-            }
-            if (id.includes('node_modules/pinia/')) {
-              return 'pinia'
-            }
-            
-            // UI Libraries
-            if (id.includes('node_modules/swiper/')) {
-              return 'swiper'
-            }
-            if (id.includes('node_modules/qrcode')) {
-              return 'qrcode'
-            }
-            
-            // HTTP & Utils
-            if (id.includes('node_modules/axios/')) {
-              return 'axios'
-            }
-            if (id.includes('node_modules/lodash')) {
-              return 'lodash'
-            }
-            
-            // Maps
-            if (id.includes('node_modules/mapbox-gl') || id.includes('node_modules/maplibre-gl')) {
-              return 'maps'
-            }
-            
-            // Other large dependencies
-            if (id.includes('node_modules/')) {
-              return 'vendor'
-            }
-          }
+          manualChunks: undefined // غیرفعال کردن برای جلوگیری از خطای exports
         }
       }
     }
