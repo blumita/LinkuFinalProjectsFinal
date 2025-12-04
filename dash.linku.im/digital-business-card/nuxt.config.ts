@@ -47,19 +47,46 @@ export default defineNuxtConfig({
       __VUE_PROD_DEVTOOLS__: false
     },
     build: {
-      chunkSizeWarningLimit: 600,
+      chunkSizeWarningLimit: 1000,
       rollupOptions: {
         output: {
-          manualChunks: {
+          manualChunks: (id) => {
             // Core Vue packages
-            'vue-vendor': ['vue', 'vue-router', '@vue/reactivity', '@vue/runtime-core', '@vue/runtime-dom', '@vue/shared'],
-            'pinia': ['pinia'],
+            if (id.includes('node_modules/vue/') || id.includes('node_modules/@vue/')) {
+              return 'vue-vendor'
+            }
+            if (id.includes('node_modules/vue-router/')) {
+              return 'vue-router'
+            }
+            if (id.includes('node_modules/pinia/')) {
+              return 'pinia'
+            }
             
-            // UI Components
-            'swiper': ['swiper'],
+            // UI Libraries
+            if (id.includes('node_modules/swiper/')) {
+              return 'swiper'
+            }
+            if (id.includes('node_modules/qrcode')) {
+              return 'qrcode'
+            }
             
-            // HTTP & API
-            'axios': ['axios'],
+            // HTTP & Utils
+            if (id.includes('node_modules/axios/')) {
+              return 'axios'
+            }
+            if (id.includes('node_modules/lodash')) {
+              return 'lodash'
+            }
+            
+            // Maps
+            if (id.includes('node_modules/mapbox-gl') || id.includes('node_modules/maplibre-gl')) {
+              return 'maps'
+            }
+            
+            // Other large dependencies
+            if (id.includes('node_modules/')) {
+              return 'vendor'
+            }
           }
         }
       }
