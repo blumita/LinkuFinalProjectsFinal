@@ -55,8 +55,17 @@ fi
 
 echo -e "${YELLOW}6. ریستارت Nuxt با PM2...${NC}"
 if command -v pm2 &> /dev/null; then
-    pm2 restart dash-linku
-    echo -e "${GREEN}✅ PM2 ریستارت شد (dash-linku)${NC}"
+    # کشتن پروسه‌های zombie پورت 3000
+    lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+    
+    # توقف و حذف پروسه قبلی
+    pm2 delete dash-linku 2>/dev/null || true
+    
+    # اجرا با ecosystem config
+    pm2 start ecosystem.config.js
+    pm2 save
+    
+    echo -e "${GREEN}✅ PM2 با ecosystem config شروع شد (dash-linku)${NC}"
 else
     echo -e "${YELLOW}⚠️  PM2 نصب نیست. نیاز به ریستارت دستی${NC}"
 fi
