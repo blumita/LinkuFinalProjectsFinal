@@ -59,7 +59,7 @@ export const useMessageCounts = () => {
       questionBoxCount.value = questionData.unreadCount || 0
       
       // نظرسنجی - استفاده از API خاص count (فقط total count داره)
-      const pollResponse = await axios.get(`card/${cardId}/poll/votes`, {
+      const pollResponse = await axios.get(`card/${cardId}/votes`, {
         params: { page: 1, perPage: 1 }
       })
       // Poll API فعلاً فقط total داره، وقتی unread اضافه شد به unreadCount تغییر بده
