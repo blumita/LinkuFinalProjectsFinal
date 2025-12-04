@@ -233,7 +233,10 @@ const copied = ref(false)
 
 const discount = computed(() => {
   const id = route.params.id as string
-  return rewardStore.rewards.find(r => r.id === id || r.code === id)
+  // جستجو با ID یا code
+  return rewardStore.rewards.find(r => {
+    return String(r.id) === String(id) || r.code === id
+  })
 })
 
 onMounted(async () => {

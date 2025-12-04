@@ -183,6 +183,85 @@
           />
         </div>
 
+        <!-- Banner Image Upload -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            تصویر بنر (اختیاری)
+          </label>
+          <div class="space-y-2">
+            <input
+              type="file"
+              @change="handleBannerUpload"
+              accept="image/*"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white file:ml-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-500 file:text-white file:cursor-pointer hover:file:bg-blue-600"
+            />
+            <div v-if="bannerPreview" class="relative w-full h-32 rounded-xl overflow-hidden border border-gray-300 dark:border-gray-600">
+              <img :src="bannerPreview" class="w-full h-full object-cover" alt="Banner preview" />
+              <button
+                type="button"
+                @click="removeBanner"
+                class="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
+              >
+                <i class="ti ti-x text-sm"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Icon Image Upload -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            آیکون (اختیاری)
+          </label>
+          <div class="space-y-2">
+            <input
+              type="file"
+              @change="handleIconUpload"
+              accept="image/*"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white file:ml-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-500 file:text-white file:cursor-pointer hover:file:bg-blue-600"
+            />
+            <div v-if="iconPreview" class="relative w-24 h-24 rounded-xl overflow-hidden border border-gray-300 dark:border-gray-600">
+              <img :src="iconPreview" class="w-full h-full object-cover" alt="Icon preview" />
+              <button
+                type="button"
+                @click="removeIcon"
+                class="absolute top-1 right-1 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
+              >
+                <i class="ti ti-x text-xs"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Background Color Picker -->
+        <div>
+          <label for="backgroundColor" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            رنگ پس‌زمینه (اختیاری)
+          </label>
+          <div class="flex gap-3">
+            <input
+              id="backgroundColor"
+              v-model="notificationData.backgroundColor"
+              type="color"
+              class="w-20 h-12 border border-gray-300 dark:border-gray-600 rounded-xl cursor-pointer"
+            />
+            <input
+              v-model="notificationData.backgroundColor"
+              type="text"
+              placeholder="#ffffff"
+              class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            />
+            <button
+              v-if="notificationData.backgroundColor"
+              @click="notificationData.backgroundColor = ''"
+              type="button"
+              class="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              <i class="ti ti-x"></i>
+            </button>
+          </div>
+        </div>
+
         <!-- Pin Notification -->
         <div class="flex items-center gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800 rounded-xl">
           <input
@@ -369,8 +448,15 @@ const notificationData = ref({
   title: '',
   message: '',
   actionLink: '',
-  isPinned: false
+  isPinned: false,
+  backgroundColor: ''
 })
+
+// Image upload state
+const bannerFile = ref<File | undefined>(undefined)
+const iconFile = ref<File | undefined>(undefined)
+const bannerPreview = ref<string | undefined>(undefined)
+const iconPreview = ref<string | undefined>(undefined)
 
 // Computed
 const filteredUsers = computed(() => {
@@ -437,16 +523,60 @@ const removeUser = (userId: number) => {
   selectedUsers.value = selectedUsers.value.filter(u => u.id !== userId)
 }
 
+// Image upload handlers
+const handleBannerUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  
+  if (file) {
+    bannerFile.value = file
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      bannerPreview.value = e.target?.result as string
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+const handleIconUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  
+  if (file) {
+    iconFile.value = file
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      iconPreview.value = e.target?.result as string
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+const removeBanner = () => {
+  bannerFile.value = undefined
+  bannerPreview.value = undefined
+}
+
+const removeIcon = () => {
+  iconFile.value = undefined
+  iconPreview.value = undefined
+}
+
 const resetForm = () => {
   notificationData.value = {
     title: '',
     message: '',
     actionLink: '',
-    isPinned: false
+    isPinned: false,
+    backgroundColor: ''
   }
   selectedUsers.value = []
   userSearchQuery.value = ''
   showUserResults.value = false
+  bannerFile.value = undefined
+  iconFile.value = undefined
+  bannerPreview.value = undefined
+  iconPreview.value = undefined
 }
 
 const sendNotification = async () => {
@@ -455,19 +585,64 @@ const sendNotification = async () => {
   isSending.value = true
 
   try {
-    const payload = {
-      recipients: selectedRecipients.value,
-      userIds: selectedRecipients.value === 'specific' ? selectedUsers.value.map(u => u.id) : [],
-      type: selectedType.value,
-      title: notificationData.value.title,
-      message: notificationData.value.message,
-      actionLink: notificationData.value.actionLink || null,
-      isPinned: notificationData.value.isPinned
+    const hasImages = bannerFile.value || iconFile.value
+    
+    let response
+    
+    if (hasImages) {
+      // Use FormData for file uploads
+      const formData = new FormData()
+      formData.append('recipients', selectedRecipients.value)
+      formData.append('type', selectedType.value)
+      formData.append('title', notificationData.value.title)
+      formData.append('message', notificationData.value.message)
+      
+      if (notificationData.value.actionLink) {
+        formData.append('actionLink', notificationData.value.actionLink)
+      }
+      
+      if (notificationData.value.backgroundColor) {
+        formData.append('backgroundColor', notificationData.value.backgroundColor)
+      }
+      
+      formData.append('isPinned', notificationData.value.isPinned ? '1' : '0')
+      
+      if (selectedRecipients.value === 'specific') {
+        selectedUsers.value.forEach((user, index) => {
+          formData.append(`userIds[${index}]`, user.id.toString())
+        })
+      }
+      
+      if (bannerFile.value) {
+        formData.append('imageUrl', bannerFile.value)
+      }
+      
+      if (iconFile.value) {
+        formData.append('iconUrl', iconFile.value)
+      }
+      
+      response = await axios.post('/user/admin/notifications/send', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+    } else {
+      // Use regular JSON payload
+      const payload = {
+        recipients: selectedRecipients.value,
+        userIds: selectedRecipients.value === 'specific' ? selectedUsers.value.map(u => u.id) : [],
+        type: selectedType.value,
+        title: notificationData.value.title,
+        message: notificationData.value.message,
+        actionLink: notificationData.value.actionLink || null,
+        backgroundColor: notificationData.value.backgroundColor || null,
+        isPinned: notificationData.value.isPinned
+      }
+      
+      response = await axios.post('/user/admin/notifications/send', payload)
     }
 
-    const { data } = await axios.post('/user/admin/notifications/send', payload)
-
-    sentCount.value = data.sentCount || 0
+    sentCount.value = response.data.sentCount || 0
     showSuccessToast.value = true
     
     setTimeout(() => {

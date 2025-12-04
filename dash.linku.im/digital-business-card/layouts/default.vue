@@ -369,7 +369,7 @@ provide('topbarConfig', topbarConfig)
              showBottomNav ? 'pb-20' : 'pb-0',
              route.path.includes('/checkout') || !showBottomNav ? '' : 'lg:px-4 px-2'
            ]">
-        <NuxtPage :search="searchQuery" @open-share="openShareModal"/>
+        <slot :search="searchQuery" @open-share="openShareModal"/>
       </div>
 
       <!-- ✅ Bottom Navigation - فقط صفحه اصلی داشبورد -->

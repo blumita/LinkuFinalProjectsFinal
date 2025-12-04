@@ -163,7 +163,7 @@ onMounted(async () => {
     const id = route.params.id
     await notificationStore.fetchNotifications()
     
-    notification.value = notificationStore.notifications.find(n => n.id === parseInt(id as string))
+    notification.value = notificationStore.notifications.find(n => String(n.id) === String(id))
     
     // Mark as read if unread
     if (notification.value && !notification.value.read) {

@@ -95,8 +95,8 @@ export const useRewardStore = defineStore('reward', {
               usageLimit: discount.usage_limit || discount.usageLimit || discount.max_uses,
               usageCount: discount.usage_count || discount.usageCount || discount.used_count,
               appliesTo: discount.applies_to || discount.appliesTo || discount.applicable_items,
-              banner: discount.banner || discount.banner_image || discount.image_url,
-              image: discount.image || discount.icon || discount.icon_url
+              banner: discount.banner || discount.banner_image || discount.image_url || null,
+              image: discount.icon || discount.image || discount.icon_url || null
             }
           })
         } else {
