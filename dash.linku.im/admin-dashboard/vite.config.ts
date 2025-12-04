@@ -13,42 +13,33 @@ export default defineConfig({
     // vueDevTools(),
   ],
   build: {
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 1500,
     rollupOptions: {
       output: {
+        // اضافه کردن hash برای cache busting
+        entryFileNames: 'assets/[name]-[hash].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
         manualChunks: (id) => {
-          // Core Vue packages
-          if (id.includes('node_modules/vue/') || id.includes('node_modules/@vue/')) {
-            return 'vue-vendor'
-          }
-          if (id.includes('node_modules/vue-router/')) {
-            return 'vue-router'
-          }
-          if (id.includes('node_modules/pinia/')) {
-            return 'pinia'
-          }
+          // فقط کتابخونه‌های سنگین رو جدا می‌کنیم
+          // Vue و پیوستگی‌هاش رو با هم نگه می‌داریم
           
-          // Charts
+          // Charts - سنگین
           if (id.includes('node_modules/apexcharts') || id.includes('node_modules/vue3-apexcharts')) {
             return 'charts'
           }
           
-          // HTTP
-          if (id.includes('node_modules/axios/')) {
-            return 'axios'
-          }
-          
-          // Excel/PDF
+          // Excel/PDF - خیلی سنگین
           if (id.includes('node_modules/xlsx') || id.includes('node_modules/jspdf')) {
             return 'export-libs'
           }
           
-          // TinyMCE
+          // TinyMCE - خیلی سنگین
           if (id.includes('node_modules/tinymce') || id.includes('node_modules/@tinymce')) {
             return 'tinymce'
           }
           
-          // Other vendor code
+          // بقیه vendor ها با Vue با هم
           if (id.includes('node_modules/')) {
             return 'vendor'
           }
