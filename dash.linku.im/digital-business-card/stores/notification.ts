@@ -89,6 +89,7 @@ export const useNotificationStore = defineStore('notifications', () => {
                 imageUrl: n.image_url,
                 iconUrl: n.icon_url,
                 backgroundColor: n.background_color,
+                actionLink: n.action_link,
                 actions: getActionsByType(n.type || 'general', n.raw_type || 'unknown')
             }))
             

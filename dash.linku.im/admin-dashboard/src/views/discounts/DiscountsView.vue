@@ -494,7 +494,7 @@
                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white file:ml-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-500 file:text-white file:cursor-pointer hover:file:bg-blue-600"
               />
               <div v-if="bannerPreview || formData.banner" class="relative w-full h-32 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600">
-                <img :src="bannerPreview || formData.banner" class="w-full h-full object-cover" alt="Banner preview" />
+                <img :src="(bannerPreview || formData.banner) || undefined" class="w-full h-full object-cover" alt="Banner preview" />
                 <button
                   type="button"
                   @click="removeBanner"
@@ -517,7 +517,7 @@
                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white file:ml-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-500 file:text-white file:cursor-pointer hover:file:bg-blue-600"
               />
               <div v-if="iconPreview || formData.icon" class="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600">
-                <img :src="iconPreview || formData.icon" class="w-full h-full object-cover" alt="Icon preview" />
+                <img :src="(iconPreview || formData.icon) || undefined" class="w-full h-full object-cover" alt="Icon preview" />
                 <button
                   type="button"
                   @click="removeIcon"
@@ -652,15 +652,15 @@ const formData = ref({
   value: 0,
   maxUsage: undefined as number | undefined,
   expiryDate: '',
-  banner: null as string | null,
-  icon: null as string | null
+  banner: undefined as string | undefined,
+  icon: undefined as string | undefined
 })
 
 // File upload refs
-const bannerFile = ref<File | null>(null)
-const iconFile = ref<File | null>(null)
-const bannerPreview = ref<string | null>(null)
-const iconPreview = ref<string | null>(null)
+const bannerFile = ref<File | undefined>(undefined)
+const iconFile = ref<File | undefined>(undefined)
+const bannerPreview = ref<string | undefined>(undefined)
+const iconPreview = ref<string | undefined>(undefined)
 
 // Sample data
 const discountCodes = computed(()=>discountStore.discounts)
@@ -807,15 +807,15 @@ const editDiscount = async (discount: DiscountCode) => {
     value: discount.value,
     maxUsage: discount.maxUsage,
     expiryDate: discount.expiryDate || '',
-    banner: (discount as any).banner || null,
-    icon: (discount as any).icon || null
+    banner: (discount as any).banner || undefined,
+    icon: (discount as any).icon || undefined
   }
   
   // Load existing images for preview
-  bannerPreview.value = null
-  iconPreview.value = null
-  bannerFile.value = null
-  iconFile.value = null
+  bannerPreview.value = undefined
+  iconPreview.value = undefined
+  bannerFile.value = undefined
+  iconFile.value = undefined
   
   showEditModal.value = true
 }
@@ -889,15 +889,15 @@ const handleIconUpload = (event: Event) => {
 }
 
 const removeBanner = () => {
-  bannerFile.value = null
-  bannerPreview.value = null
-  formData.value.banner = null
+  bannerFile.value = undefined
+  bannerPreview.value = undefined
+  formData.value.banner = undefined
 }
 
 const removeIcon = () => {
-  iconFile.value = null
-  iconPreview.value = null
-  formData.value.icon = null
+  iconFile.value = undefined
+  iconPreview.value = undefined
+  formData.value.icon = undefined
 }
 
 // مثال استفاده
@@ -1008,10 +1008,10 @@ const closeModals = () => {
   editingDiscount.value = null
   
   // Clear image states
-  bannerFile.value = null
-  iconFile.value = null
-  bannerPreview.value = null
-  iconPreview.value = null
+  bannerFile.value = undefined
+  iconFile.value = undefined
+  bannerPreview.value = undefined
+  iconPreview.value = undefined
   
   if (showAddModal.value === false) {
     /*formData.value = {

@@ -25,19 +25,19 @@
         <!-- Header Card with Icon -->
         <div 
           class="bg-card border border-border rounded-2xl p-6 space-y-4"
-          :style="notification.background_color ? { backgroundColor: notification.background_color } : {}"
+          :style="notification.backgroundColor ? { backgroundColor: notification.backgroundColor } : {}"
         >
           <div class="flex items-start gap-4">
             <!-- Icon -->
             <div 
               :class="[
                 'w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0',
-                notification.background_color ? 'bg-white/20' : getNotificationStyle(notification).bg
+                notification.backgroundColor ? 'bg-white/20' : getNotificationStyle(notification).bg
               ]"
             >
               <img 
-                v-if="notification.icon_url" 
-                :src="notification.icon_url" 
+                v-if="notification.iconUrl"
+                :src="notification.iconUrl"
                 class="w-full h-full object-cover rounded-xl"
                 alt="Icon"
               />
@@ -45,7 +45,7 @@
                 v-else 
                 :class="[
                   getNotificationStyle(notification).icon, 
-                  notification.background_color ? 'text-white' : getNotificationStyle(notification).color,
+                  notification.backgroundColor ? 'text-white' : getNotificationStyle(notification).color,
                   'text-3xl'
                 ]"
               ></i>
@@ -56,7 +56,7 @@
               <h2 class="text-xl font-bold text-foreground">{{ notification.title }}</h2>
               <div class="flex items-center gap-2 text-sm text-muted-foreground">
                 <i class="ti ti-clock text-base"></i>
-                <span>{{ formatTime(notification.created_at) }}</span>
+                <span>{{ formatTime(notification.createdAt) }}</span>
               </div>
             </div>
 
@@ -80,9 +80,9 @@
         </div>
 
         <!-- Large Image -->
-        <div v-if="notification.image_url" class="bg-card border border-border rounded-2xl overflow-hidden">
+        <div v-if="notification.imageUrl" class="bg-card border border-border rounded-2xl overflow-hidden">
           <img 
-            :src="notification.image_url" 
+            :src="notification.imageUrl" 
             class="w-full h-auto object-cover"
             alt="Notification Image"
           />
@@ -91,14 +91,14 @@
         <!-- Message Card -->
         <div class="bg-card border border-border rounded-2xl p-6 space-y-4">
           <h3 class="text-lg font-semibold text-foreground">پیام</h3>
-          <p class="text-foreground leading-relaxed whitespace-pre-wrap">{{ notification.message }}</p>
+          <p class="text-foreground leading-relaxed whitespace-pre-wrap">{{ notification.description }}</p>
         </div>
 
         <!-- Action Link Card -->
-        <div v-if="notification.action_link" class="bg-card border border-border rounded-2xl p-6 space-y-4">
+        <div v-if="notification.actionLink" class="bg-card border border-border rounded-2xl p-6 space-y-4">
           <h3 class="text-lg font-semibold text-foreground">لینک عملیات</h3>
           <a 
-            :href="notification.action_link"
+            :href="notification.actionLink"
             target="_blank"
             rel="noopener noreferrer"
             class="flex items-center justify-between p-4 bg-primary/10 hover:bg-primary/20 rounded-xl transition-colors group"
@@ -122,7 +122,7 @@
           </div>
           <div class="flex items-center justify-between py-2">
             <span class="text-muted-foreground">تاریخ دریافت</span>
-            <span class="text-foreground font-medium">{{ formatFullDate(notification.created_at) }}</span>
+            <span class="text-foreground font-medium">{{ formatFullDate(notification.createdAt) }}</span>
           </div>
         </div>
       </div>
@@ -149,13 +149,14 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useNotificationStore } from '~/stores/notification'
+import type { Notification } from '~/types/notification'
 
 const route = useRoute()
 const router = useRouter()
 const notificationStore = useNotificationStore()
 
 const loading = ref(true)
-const notification = ref(null)
+const notification = ref<Notification | undefined>(undefined)
 
 onMounted(async () => {
   try {
@@ -175,8 +176,8 @@ onMounted(async () => {
   }
 })
 
-const getNotificationStyle = (notification: any) => {
-  const rawTypeStyles = {
+const getNotificationStyle = (notification: Notification) => {
+  const rawTypeStyles: Record<string, { icon: string; color: string; bg: string }> = {
     'discount_code': {
       icon: 'ti ti-ticket',
       color: 'text-orange-500',
@@ -231,11 +232,11 @@ const getNotificationStyle = (notification: any) => {
     }
   }
 
-  return typeStyles[notification.type] || typeStyles.general
+return typeStyles[notification.type as keyof typeof typeStyles] || typeStyles.general
 }
 
 const getTypeLabel = (type: string) => {
-  const labels = {
+  const labels: Record<string, string> = {
     subscription: 'اشتراک',
     payment: 'پرداخت',
     security: 'امنیت',
@@ -245,16 +246,17 @@ const getTypeLabel = (type: string) => {
   return labels[type] || 'عمومی'
 }
 
-const formatTime = (date: string) => {
+const formatTime = (date: string | Date) => {
   const now = new Date()
-  const diff = now.getTime() - new Date(date).getTime()
+  const targetDate = typeof date === 'string' ? new Date(date) : date
+  const diff = now.getTime() - targetDate.getTime()
   const seconds = Math.floor(diff / 1000)
   const minutes = Math.floor(seconds / 60)
   const hours = Math.floor(minutes / 60)
   const days = Math.floor(hours / 24)
 
   if (days > 7) {
-    return new Date(date).toLocaleDateString('fa-IR')
+    return targetDate.toLocaleDateString('fa-IR')
   } else if (days > 0) {
     return `${days} روز پیش`
   } else if (hours > 0) {
@@ -266,8 +268,9 @@ const formatTime = (date: string) => {
   }
 }
 
-const formatFullDate = (date: string) => {
-  return new Date(date).toLocaleDateString('fa-IR', {
+const formatFullDate = (date: string | Date) => {
+  const targetDate = typeof date === 'string' ? new Date(date) : date
+  return targetDate.toLocaleDateString('fa-IR', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

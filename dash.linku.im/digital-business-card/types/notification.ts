@@ -11,6 +11,7 @@ export interface NotificationApiResponse {
     image_url?: string
     icon_url?: string
     background_color?: string
+    action_link?: string
 }
 
 export interface Notification {
@@ -25,6 +26,7 @@ export interface Notification {
     imageUrl?: string
     iconUrl?: string
     backgroundColor?: string
+    actionLink?: string
     actions: {
         label: string
         type: 'primary' | 'secondary'
