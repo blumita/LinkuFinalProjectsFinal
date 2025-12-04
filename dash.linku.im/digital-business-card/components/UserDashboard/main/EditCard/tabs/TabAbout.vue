@@ -35,9 +35,10 @@
     </div>
 
     <!-- بیوگرافی - آخرین فیلد -->
-    <TextAreaInput label="بیوگرافی" v-model="form.bio" placeholder="درباره خود توضیح دهید..."
-                   :maxlength="100"
-                   :error="form.bio && form.bio.length > 100 ? 'حداکثر 100 کاراکتر مجاز است' : ''"
+    <TextAreaInput label="بیوگرافی" v-model="form.bio" placeholder="درباره خود توضیح دهید... (تا 10 خط)"
+                   :maxlength="500"
+                   :rows="10"
+                   :error="form.bio && form.bio.length > 500 ? 'حداکثر 500 کاراکتر مجاز است' : ''"
     />
     <TextInput label="عنوان دکمه ذخیره مخاطب" v-model="form.saveContact" placeholder="دکمه ذخیره مخاطب"
                :maxlength="20"

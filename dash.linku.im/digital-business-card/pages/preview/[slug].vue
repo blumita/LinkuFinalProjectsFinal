@@ -263,7 +263,7 @@
                 formData.layout === 'portrait' ? 'text-justify' :
                 'text-justify'
               ]"
-                  style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; line-clamp: 3; white-space: pre-line;"
+                  style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 10; -webkit-box-orient: vertical; line-clamp: 10; white-space: pre-line;"
               >
                 {{ formData.bio }}
               </div>
