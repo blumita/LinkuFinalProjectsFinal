@@ -1,4 +1,0 @@
-const PaymentHistoryPage_vue_vue_type_style_index_0_scoped_cc9d9b4f_lang = ".overflow-x-auto[data-v-cc9d9b4f]{scrollbar-width:none;-ms-overflow-style:none}.overflow-x-auto[data-v-cc9d9b4f]::-webkit-scrollbar{display:none}.page-enter-active[data-v-cc9d9b4f],.page-leave-active[data-v-cc9d9b4f]{transition:all .3s ease}.page-enter-from[data-v-cc9d9b4f]{opacity:0;transform:translate(100%)}.page-leave-to[data-v-cc9d9b4f]{opacity:0;transform:translate(-100%)}";
-
-export { PaymentHistoryPage_vue_vue_type_style_index_0_scoped_cc9d9b4f_lang as P };
-//# sourceMappingURL=PaymentHistoryPage-styles-1.mjs-DUt28RHj.mjs.map

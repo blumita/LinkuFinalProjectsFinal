@@ -1,4 +1,0 @@
-const AuthForm_vue_vue_type_style_index_0_scoped_1d07c7f8_lang = ".direction-ltr[data-v-1d07c7f8]{direction:ltr}input[type=tel][data-v-1d07c7f8]{direction:ltr;text-align:left}input[type=text][data-v-1d07c7f8]{text-align:center}.otp-input[data-v-1d07c7f8]{direction:ltr!important;text-align:center!important;unicode-bidi:bidi-override;writing-mode:horizontal-tb}input[type=text][data-v-1d07c7f8]:focus{animation:pulse-input-1d07c7f8 .2s ease-in-out}@keyframes pulse-input-1d07c7f8{0%{transform:scale(1)}50%{transform:scale(1.01)}to{transform:scale(1)}}.ti-check[data-v-1d07c7f8]{animation:check-appear-1d07c7f8 .3s ease-in-out}@keyframes check-appear-1d07c7f8{0%{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}.bg-black\\/5[data-v-1d07c7f8]{background:linear-gradient(135deg,#00000008,#00000014)}";
-
-export { AuthForm_vue_vue_type_style_index_0_scoped_1d07c7f8_lang as A };
-//# sourceMappingURL=AuthForm-styles-1.mjs-DRu5Zw1t.mjs.map

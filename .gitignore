@@ -9,7 +9,8 @@ vendor/
 
 # Build cache only (not the final build outputs)
 .nuxt/
-
+.output/
+dist/
 # Logs
 *.log
 npm-debug.log*

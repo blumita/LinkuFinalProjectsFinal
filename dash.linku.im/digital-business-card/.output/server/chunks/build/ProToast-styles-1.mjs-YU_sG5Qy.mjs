@@ -1,4 +1,0 @@
-const ProToast_vue_vue_type_style_index_0_scoped_2c5a754a_lang = ".slide-fade-enter-active[data-v-2c5a754a],.slide-fade-leave-active[data-v-2c5a754a]{transition:all .3s ease}.slide-fade-enter-from[data-v-2c5a754a]{opacity:0;transform:translateY(-10px)}.slide-fade-enter-to[data-v-2c5a754a],.slide-fade-leave-from[data-v-2c5a754a]{opacity:1;transform:translateY(0)}.slide-fade-leave-to[data-v-2c5a754a]{opacity:0;transform:translateY(-10px)}@keyframes toastBar-2c5a754a{0%{width:100%}to{width:0}}.animate-toast-bar[data-v-2c5a754a]{animation:toastBar-2c5a754a 3s linear forwards}";
-
-export { ProToast_vue_vue_type_style_index_0_scoped_2c5a754a_lang as P };
-//# sourceMappingURL=ProToast-styles-1.mjs-YU_sG5Qy.mjs.map

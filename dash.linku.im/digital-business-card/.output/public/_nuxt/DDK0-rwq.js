@@ -1,1 +1,0 @@
-import{B as e,n as a}from"#entry";const n=e(async t=>{if(!["/auth/login","/auth/register","/auth/forgot-password","/auth/reset-password"].includes(t.path)&&!localStorage.getItem("auth_token"))return a("/auth/login")});export{n as default};
