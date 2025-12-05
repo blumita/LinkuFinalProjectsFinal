@@ -21,14 +21,13 @@
         ? 'w-13 h-13 flex-shrink-0 rounded-xl flex items-center justify-center overflow-hidden'
         : 'w-16 h-16 rounded-xl flex items-center justify-center mb-2 overflow-hidden'"
       :style="{ 
-        backgroundColor: iconColor || '#ffffff',
-        color: iconColor ? (iconColor === '#ffffff' || iconColor === '#FFFFFF' ? '#000000' : '#ffffff') : '#666666'
+        backgroundColor: iconColor && iconColor !== 'transparent' ? iconColor : (isDarkTheme || isLightTheme ? 'transparent' : '#f3f4f6')
       }"
     >
       <component 
         :is="iconComponent"
         :size="isListMode ? 20 : 24"
-        class="transition-colors"
+        v-bind="iconColor && iconColor !== 'transparent' ? { color: iconColor, filled: isIconFilled } : {}"
       />
     </div>
 
@@ -73,16 +72,17 @@
       <!-- آیکون و عنوان -->
       <div class="flex flex-col items-center mb-4">
         <div 
-          class="w-12 h-12 rounded-xl flex items-center justify-center mb-2"
+          class="w-12 h-12 rounded-xl flex items-center justify-center mb-2 cursor-pointer hover:opacity-80 transition-opacity"
           :style="{ 
-            backgroundColor: iconColor || 'transparent',
-            color: iconColor ? (iconColor === '#ffffff' || iconColor === '#FFFFFF' ? '#000000' : '#ffffff') : '#666666'
+            backgroundColor: iconColor && iconColor !== 'transparent' ? iconColor : '#f3f4f6'
           }"
+          @click="downloadVCard"
+          title="کلیک کنید برای ذخیره در مخاطبین"
         >
           <component
               :is="iconComponent"
               :size="24"
-              class="transition-colors"
+              v-bind="iconColor && iconColor !== 'transparent' ? { color: iconColor, filled: isIconFilled } : {}"
           />
         </div>
         <div class="font-bold text-sm sm:text-base text-gray-800 leading-snug"
@@ -96,15 +96,7 @@
         </div>
       </div>
 
-      <!-- دکمه ذخیره - لینک‌ها در بک‌گراند ذخیره می‌شوند -->
-      <button
-          class="mt-4 px-4 py-3 text-white text-sm rounded-lg hover:opacity-90 transition font-medium flex items-center justify-center gap-2 w-full"
-          :style="{ backgroundColor: iconColor || '#10b981' }"
-          @click="downloadVCard"
-      >
-        <i class="ti ti-address-book"></i>
-        ذخیره در مخاطبین
-      </button>
+      <!-- Auto-download removed - clicking icon will download vCard -->
 
     </template>
 

@@ -190,12 +190,16 @@
           <draggable
             v-model="form.links"
             :animation="200"
+            :delay="150"
+            :delay-on-touch-only="true"
+            :touch-start-threshold="5"
             ghost-class="ghost-item"
             chosen-class="chosen-item"
             drag-class="drag-item"
             item-key="id"
             handle=".drag-handle"
             class="space-y-2"
+            @start="isDragging = true"
             @end="onDragEnd"
           >
             <template #item="{ element: link, index }">
@@ -205,7 +209,7 @@
               >
                 <!-- Handle للسحب -->
                 <div class="flex items-center gap-3">
-                  <div class="drag-handle cursor-grab active:cursor-grabbing transition-opacity p-2 -m-2 touch-none">
+                  <div class="drag-handle cursor-grab active:cursor-grabbing p-2 -m-2 hover:bg-muted/50 rounded-lg transition-all" style="touch-action: none; -webkit-user-select: none; user-select: none;">
                     <i class="ti ti-grip-vertical text-muted-foreground text-xl"></i>
                   </div>
                   
@@ -463,7 +467,7 @@
               type="button"
               class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-destructive/10 text-destructive hover:text-destructive/80 transition-colors"
               title="حذف"
-              @click="() => { removeLink(editingLinkIndex); cancelEdit(); }"
+              @click="() => { removeLink(editingLinkIndex); }"
             >
               <i class="ti ti-trash text-lg" />
             </button>
@@ -480,13 +484,23 @@
             @cancel="cancelEdit"
             @back="cancelEdit"
             @submit="saveEditedLink"
-            @delete="() => { removeLink(editingLinkIndex); cancelEdit(); }"
+            @delete="() => removeLink(editingLinkIndex)"
           />
         </div>
       </div>
     </div>
   </div>
   <InfoToast :visible="showToast" :message="toastMessage" :icon="toastIcon"/>
+  <ConfirmDialog
+    :visible="showDeleteConfirm"
+    title="حذف محتوا"
+    :message="`آیا از حذف '${linkToDelete?.title || linkToDelete?.name || 'این مورد'}' اطمینان دارید؟`"
+    icon="ti ti-trash"
+    confirm-text="بله، حذف شود"
+    cancel-text="انصراف"
+    @confirm="confirmDelete"
+    @cancel="cancelDelete"
+  />
 </template>
 
 <script setup>
@@ -498,6 +512,7 @@ import AddLinkModal from '@/components/UserDashboard/modals/AddLinkModal.vue'
 import BottomSheet from '@/components/ui/BottomSheet.vue'
 import LayoutSelector from './components/LayoutSelector.vue'
 import InfoToast from "~/components/UserDashboard/modals/InfoToast.vue"
+import ConfirmDialog from "~/components/UserDashboard/modals/ConfirmDialog.vue"
 import {useFormStore} from "~/stores/form.js"
 import draggable from 'vuedraggable'
 import {useIconComponents} from '~/composables/useIconComponentsMap'
@@ -515,6 +530,11 @@ const isPageLoading = ref(true)
 
 // حالت drag & drop
 const isDragging = ref(false)
+
+// حالت تایید حذف
+const showDeleteConfirm = ref(false)
+const linkToDelete = ref(null)
+const linkIndexToDelete = ref(-1)
 
 // Lead form preview toggle - default false to not block editing
 const showLeadFormPreview = ref(false)
@@ -587,7 +607,7 @@ watch(() => form.layout, (newLayout) => {
 }, { immediate: true })
 
 // Functions
-function handleAddLink(newItem) {
+async function handleAddLink(newItem) {
   // اضافه کردن لینک جدید به store
   if (!form.links) {
     form.links = []
@@ -611,18 +631,21 @@ function handleAddLink(newItem) {
     enabled: cleanedItem.enabled !== undefined ? cleanedItem.enabled : true
   }
   
-  // ایجاد لینک جدید در سرور
-  createNewLink(normalizedLink)
+  // ایجاد لینک جدید در سرور و منتظر ماندن برای نتیجه
+  const success = await createNewLink(normalizedLink)
   
-  showInfoToast('لینک با موفقیت اضافه شد', 'ti-check')
-  showAddModal.value = false
+  if (success) {
+    showInfoToast('لینک با موفقیت اضافه شد', 'ti-check')
+    showAddModal.value = false
+  }
 }
 
 // تابع ایجاد لینک جدید در سرور
 async function createNewLink(linkData) {
   if (!cardId.value) {
     console.warn('No cardId available for creating link')
-    return
+    showInfoToast('خطا: شناسه کارت یافت نشد', 'ti-alert-triangle')
+    return false
   }
   
   try {
@@ -632,6 +655,7 @@ async function createNewLink(linkData) {
     const payloadLink = {
       action: linkData.action || '',
       baseUrl: linkData.baseUrl || '',
+      countryCode: linkData.countryCode || '',
       enabled: linkData.enabled !== undefined ? linkData.enabled : true,
       icon: linkData.icon ? JSON.stringify(linkData.icon) : null,
       id: linkData.id || `${Date.now()}_${Math.random().toString(36).slice(2)}`,
@@ -642,6 +666,7 @@ async function createNewLink(linkData) {
       username: linkData.username || '',
       placeholder: linkData.placeholder ? JSON.stringify(linkData.placeholder) : null,
       showDescription: linkData.showDescription || false,
+      description: linkData.description || '',
       // اضافه کردن فیلدهای اضافی که ممکن است مورد نیاز باشد
       fullName: linkData.fullName || '',
       phoneNumber: linkData.phoneNumber || '',
@@ -673,17 +698,8 @@ async function createNewLink(linkData) {
       longitude: linkData.longitude || '',
       zoom: linkData.zoom || '',
       fields: linkData.fields || '',
-      selectedItems: linkData.selectedItems || ''
-    }
-    
-    // فقط اگر description معتبر باشد آن را اضافه کن
-    if (linkData.description && linkData.description.trim() && linkData.description.trim() !== '') {
-      payloadLink.description = linkData.description.trim()
-    }
-    
-    // فقط اگر customIcon معتبر باشد آن را اضافه کن
-    if (linkData.customIcon && linkData.customIcon.trim()) {
-      payloadLink.customIcon = linkData.customIcon
+      selectedItems: linkData.selectedItems || '',
+      customIcon: linkData.customIcon || ''
     }
     
     console.log('Creating new link:', payloadLink)
@@ -706,13 +722,15 @@ async function createNewLink(linkData) {
       // بروزرسانی iframe
       sendFormDataToIframe()
       
+      return true
     } else {
       throw new Error(response.data.message || 'خطا در ایجاد لینک')
     }
     
   } catch (error) {
     console.error('Error creating link:', error)
-    showInfoToast('خطا در ایجاد لینک', 'ti-alert-triangle')
+    showInfoToast('خطا در ایجاد لینک: ' + (error.response?.data?.message || error.message), 'ti-alert-triangle')
+    return false
   }
 }
 
@@ -977,8 +995,9 @@ async function saveEditedLink(updatedItem) {
       action: item.action ?? '',
       fields: item.fields ?? "",
       baseUrl: item.baseUrl ?? '',
+      countryCode: item.countryCode ?? '',
       customIcon: item.customIcon ?? '',
-      description: item.description ?? '',
+      description: item.showDescription && item.description ? item.description : '',
       enabled: item.enabled,
       icon: item.icon 
         ? (typeof item.icon === 'string' ? item.icon : JSON.stringify(item.icon)) 
@@ -1038,7 +1057,17 @@ async function saveEditedLink(updatedItem) {
 }
 
 function removeLink(index) {
-  // حذف لینک از store و سرور
+  // نمایش modal تایید حذف
+  if (form.links && form.links.length > index) {
+    linkToDelete.value = form.links[index]
+    linkIndexToDelete.value = index
+    showDeleteConfirm.value = true
+  }
+}
+
+function confirmDelete() {
+  // حذف لینک از store و سرور پس از تایید
+  const index = linkIndexToDelete.value
   if (form.links && form.links.length > index) {
     const linkToRemove = form.links[index]
     
@@ -1052,6 +1081,23 @@ function removeLink(index) {
       showInfoToast('لینک حذف شد', 'ti-check')
     }
   }
+  
+  // بستن modal ویرایش اگر باز است
+  if (showEditSheet.value) {
+    cancelEdit()
+  }
+  
+  // بستن modal و ریست کردن state
+  showDeleteConfirm.value = false
+  linkToDelete.value = null
+  linkIndexToDelete.value = -1
+}
+
+function cancelDelete() {
+  // انصراف از حذف
+  showDeleteConfirm.value = false
+  linkToDelete.value = null
+  linkIndexToDelete.value = -1
 }
 
 // تابع حذف لینک از سرور
@@ -1487,7 +1533,7 @@ async function handleLayoutConfirm(layout) {
     // Save to API if cardId exists
     if (props.cardId) {
       const formData = new FormData()
-      formData.append('layoutMode', layout)
+      formData.append('layout', layout)
       
       // Also save current theme colors if they exist  
       if (form.themeColor) {

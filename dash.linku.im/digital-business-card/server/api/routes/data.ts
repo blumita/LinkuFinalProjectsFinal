@@ -561,6 +561,24 @@ export default defineEventHandler(() => {
             "enabled": true,
           },
           {
+            "id": "wechat",
+            "name": "وی‌چت",
+            "type": "link",
+            "action": "wechat",
+            "description": "",
+            "icon": {
+              "type": "component",
+              "name": "wechat",
+            },
+            "baseUrl": "https://weixin.qq.com/",
+            "placeholder": {
+              "title": "وی‌چت",
+              "link": "آیدی وی‌چت"
+            },
+            "value": "",
+            "enabled": true,
+          },
+          {
             "id": "aparat",
             "name": "آپارات",
             "type": "link",

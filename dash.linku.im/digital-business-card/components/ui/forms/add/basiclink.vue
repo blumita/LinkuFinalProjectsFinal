@@ -53,6 +53,56 @@
     <!-- Inputs -->
     <div class="space-y-4">
 
+      <!-- WhatsApp Type selector -->
+      <div v-if="form.action === 'whatsapp'" class="space-y-2">
+        <label class="block text-sm font-medium text-foreground">نوع لینک WhatsApp</label>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            @click="form.whatsappType = 'phone'"
+            :class="form.whatsappType === 'phone' ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'"
+            class="flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-colors"
+          >
+            <i class="ti ti-phone ml-1"></i>
+            شماره تلفن
+          </button>
+          <button
+            type="button"
+            @click="form.whatsappType = 'channel'"
+            :class="form.whatsappType === 'channel' ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'"
+            class="flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-colors"
+          >
+            <i class="ti ti-link ml-1"></i>
+            لینک کانال
+          </button>
+        </div>
+      </div>
+
+      <!-- Protocol selector for website -->
+      <div v-if="form.action === 'safari' || form.action === 'website'" class="space-y-2">
+        <label class="block text-sm font-medium text-foreground">پروتکل</label>
+        <div class="flex gap-4">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input 
+              type="radio" 
+              v-model="form.protocol" 
+              value="https" 
+              class="w-4 h-4 text-primary focus:ring-2 focus:ring-primary/20"
+            />
+            <span class="text-sm text-foreground">HTTPS</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input 
+              type="radio" 
+              v-model="form.protocol" 
+              value="http" 
+              class="w-4 h-4 text-primary focus:ring-2 focus:ring-primary/20"
+            />
+            <span class="text-sm text-foreground">HTTP</span>
+          </label>
+        </div>
+      </div>
+
       <div>
         <label class="block text-sm font-medium text-foreground mb-1">
           {{ getInputLabel() }}
@@ -61,10 +111,13 @@
           <span v-if="showPrefix() && !['call','number'].includes(form.action)" class="inline-flex items-center px-3 rounded-l bg-muted border border-r-0 border-border text-muted-foreground text-sm ltr">
             {{ form.baseUrl || getPrefixForAction() }}
           </span>
-          <span
+          <input
               v-if="['call','number'].includes(form.action)"
-              class="ltr inline-flex items-center px-3 rounded-l bg-muted border border-r-0 border-border text-muted-foreground text-sm"
-          >+98</span>
+              v-model="form.countryCode"
+              type="text"
+              placeholder="+98"
+              class="ltr inline-flex items-center px-2 rounded-l bg-muted border border-r-0 border-border text-muted-foreground text-sm w-16 text-center focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
           <input
             v-if="isUsernameAction()"
             v-model="form.username"
@@ -89,6 +142,7 @@
             type="text"
             :placeholder="getInputPlaceholder()"
             class="w-full px-4 py-3 bg-background border border-border rounded-lg text-sm rtl text-right text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            @input="handleWebsiteInput"
           />
         </div>
       </div>
@@ -196,6 +250,9 @@ const baseUrls = {
 const form = reactive({
   ...props.link,
   baseUrl: props.link?.baseUrl || (props.link?.action && baseUrls[props.link.action]) || '',
+  countryCode: props.link?.countryCode || '+98',
+  protocol: props.link?.protocol || 'https',
+  whatsappType: props.link?.whatsappType || 'phone',
   icon: props.link?.icon || (props.link?.action ? { type: 'component', name: props.link.action } : undefined),
   showDescription: props.link?.showDescription ?? false,
   description: props.link?.description || '',
@@ -277,14 +334,13 @@ function handleIconUpload(event) {
     reader.readAsDataURL(file)
   }
 }
-const COUNTRY_CODE = '+98'
-
 function submitForm() {
 
   let cleanValue = form.value.trim()
   if (["call", "number"].includes(form.action)) {
+    const countryCode = form.countryCode?.trim() || '+98'
     if (!cleanValue.startsWith('+')) {
-      cleanValue = COUNTRY_CODE + cleanValue.replace(/^0+/, '') // حذف صفرهای اول
+      cleanValue = countryCode + cleanValue.replace(/^0+/, '') // حذف صفرهای اول
     }
   }
 
@@ -303,6 +359,9 @@ function submitForm() {
   const result = {
     ...form,
     value,
+    countryCode: ['call','number'].includes(form.action) ? (form.countryCode?.trim() || '+98') : undefined,
+    protocol: ['safari','website'].includes(form.action) ? form.protocol : undefined,
+    whatsappType: form.action === 'whatsapp' ? form.whatsappType : undefined,
     description: form.showDescription ? form.description : '',
     customIcon: form.customIcon || undefined
   }
@@ -395,6 +454,15 @@ function handlePrefixedInput(e) {
   // Remove common prefixes
   val = val.replace(/^mailto:/i, '').replace(/^tel:/i, '').replace(/^sms:/i, '').replace(/^facetime:/i, '')
   form.value = val
+}
+
+function handleWebsiteInput(e) {
+  // Remove http:// or https:// if user manually types it for website/safari actions
+  if (form.action === 'safari' || form.action === 'website') {
+    let val = e.target.value
+    val = val.replace(/^https?:\/\//i, '')
+    form.value = val
+  }
 }
 
 // Restrict Persian characters in number fields (phone numbers, etc.)

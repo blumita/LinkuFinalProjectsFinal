@@ -1,9 +1,10 @@
 <template>
-  <form class="bg-background rounded-xl space-y-6 w-full max-h-[90vh] overflow-y-auto p-4" @submit.prevent="onSubmit">
+  <div class="bg-background flex flex-col h-full">
+    <div class="flex-1 overflow-y-auto p-4 space-y-6 pb-20 lg:pb-4">
 
     <!-- Icon Upload -->
-    <div class="flex flex-row items-center gap-3 w-full justify-start rtl:justify-start">
-      <div class="relative w-20 h-20 flex-shrink-0 order-1">
+    <div class="flex items-center gap-4">
+      <div class="relative w-20 h-20">
         <img v-if="form.customIcon" :src="form.customIcon" class="w-full h-full rounded-xl bg-muted object-cover cursor-pointer" @click="fileInputRef?.click()" >
         <!-- Dynamic icon component -->
         <div
@@ -13,7 +14,7 @@
         >
           <component 
             :is="iconComponent"
-            :size="50"
+            :size="80"
             v-bind="iconColor ? { color: iconColor, filled: isIconFilled } : {}"
           />
         </div>
@@ -38,47 +39,83 @@
           class="hidden" @change="handleIconUpload"
         >
       </div>
-      <p class="text-sm text-blue-500 font-medium cursor-pointer order-2" @click="fileInputRef?.click()">برای تغییر آیکون کلیک کنید</p>
+      <div class="flex flex-col items-start gap-2 flex-1">
+        <p class="text-sm text-primary font-medium cursor-pointer" @click="fileInputRef?.click()">برای تغییر آیکون کلیک کنید</p>
+      </div>
     </div>
 
-    <!-- Form Fields -->
+    <!-- Inputs -->
     <div class="space-y-4">
-      <BaseInput v-model="form.title" label="عنوان کارت بانکی" placeholder="مثال: کارت پس‌انداز، کارت حقوق" required />
-      <BaseInput v-model="form.description" label="توضیحات (اختیاری)" placeholder="توضیح کوتاه در مورد این کارت" />
-    </div>
-
-    <!-- Card Information -->
-    <div class="border border-border rounded-lg p-4 bg-muted">
-      <h3 class="font-bold text-lg text-foreground mb-4 flex items-center gap-2">
-        <i class="ti ti-credit-card text-primary" />
-        اطلاعات کارت بانکی
-      </h3>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <BaseInput 
-          v-model="card.cardNumber" 
-          label="شماره کارت" 
-          placeholder="1234123412341234" 
-          required 
-          pattern="[0-9]{16}" 
-          maxlength="16" 
-          @input="formatCardInput"
-        />
-        
-        <BaseInput 
-          v-model="card.accountHolder" 
-          label="نام صاحب حساب" 
-          placeholder="نام و نام خانوادگی" 
+      <div>
+        <label class="block text-sm font-medium text-foreground mb-1">عنوان کارت بانکی <span class="text-destructive">*</span></label>
+        <input 
+          v-model="form.title" 
+          type="text" 
+          placeholder="مثال: کارت پس‌انداز، کارت حقوق" 
           required
+          class="w-full px-4 py-3 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
         />
+      </div>
+
+      <!-- Toggle for description -->
+      <div class="flex items-center justify-between">
+        <div>
+          <label class="text-sm font-medium text-foreground">نمایش توضیحات</label>
+          <p class="text-xs text-muted-foreground mt-1">فعال‌سازی حالت لیستی با نمایش توضیحات</p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input 
+            type="checkbox" 
+            v-model="showDescription" 
+            class="sr-only peer"
+          />
+          <div class="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+        </label>
+      </div>
+
+      <div v-if="showDescription">
+        <label class="block text-sm font-medium text-foreground mb-1">توضیحات</label>
+        <textarea
+          v-model="form.description"
+          placeholder="توضیح کوتاه در مورد این کارت"
+          rows="3"
+          class="w-full px-4 py-3 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+        ></textarea>
+      </div>
+    
+      <!-- Card Information -->
+      <div class="space-y-4 pt-2">
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-1">شماره کارت <span class="text-destructive">*</span></label>
+          <input 
+            v-model="card.cardNumber" 
+            type="text"
+            placeholder="1234123412341234" 
+            required
+            pattern="[0-9]{16}" 
+            maxlength="16" 
+            class="w-full px-4 py-3 bg-background border border-border rounded-lg text-sm text-foreground ltr focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            @input="formatCardInput"
+          />
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-1">نام صاحب حساب</label>
+          <input 
+            v-model="card.accountHolder" 
+            type="text"
+            placeholder="نام و نام خانوادگی" 
+            class="w-full px-4 py-3 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+          />
+        </div>
         
         <!-- Bank Selection -->
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-foreground mb-2">بانک صادرکننده *</label>
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-1">بانک صادرکننده <span class="text-destructive">*</span></label>
           <div class="relative">
             <button 
               type="button" 
-              class="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" 
+              class="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm" 
               @click="card.showBankDropdown = !card.showBankDropdown"
             >
               <span>{{ card.bankName ? (card.bankName === '__other' ? card.customBank || 'بانک دیگر...' : card.bankName) : 'انتخاب کنید...' }}</span>
@@ -88,46 +125,57 @@
               <li 
                 v-for="bank in banks" 
                 :key="bank" 
-                :class="['px-4 py-3 cursor-pointer hover:bg-muted text-foreground', card.bankName === bank && 'bg-primary text-primary-foreground hover:bg-primary']"
+                :class="['px-4 py-3 cursor-pointer hover:bg-muted text-foreground text-sm', card.bankName === bank && 'bg-primary text-primary-foreground hover:bg-primary']"
                 @click="card.bankName = bank; card.showBankDropdown = false"
               >
                 {{ bank }}
               </li>
               <li 
-                :class="['px-4 py-3 cursor-pointer hover:bg-muted border-t border-border text-foreground', card.bankName === '__other' && 'bg-primary text-primary-foreground hover:bg-primary']"
+                :class="['px-4 py-3 cursor-pointer hover:bg-muted border-t border-border text-sm', card.bankName === '__other' && 'bg-primary text-primary-foreground hover:bg-primary']"
                 @click="card.bankName = '__other'; card.showBankDropdown = false"
               >
                 بانک دیگر...
               </li>
             </ul>
           </div>
-          <BaseInput 
-            v-if="card.bankName === '__other'" 
-            v-model="card.customBank" 
-            label="نام بانک" 
-            placeholder="نام بانک را وارد کنید" 
-            class="mt-3"
-            required
+          <div v-if="card.bankName === '__other'" class="mt-3">
+            <input 
+              v-model="card.customBank" 
+              type="text"
+              placeholder="نام بانک را وارد کنید" 
+              required
+              class="w-full px-4 py-3 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            />
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-1">شماره حساب</label>
+          <input 
+            v-model="card.accountNumber" 
+            type="text"
+            placeholder="1234567890123456" 
+            class="w-full px-4 py-3 bg-background border border-border rounded-lg text-sm text-foreground ltr focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
           />
         </div>
         
-        <BaseInput 
-          v-model="card.accountNumber" 
-          label="شماره حساب (اختیاری)" 
-          placeholder="1234567890123456" 
-        />
-        
-        <BaseInput 
-          v-model="card.ibanNumber" 
-          label="شماره شبا (اختیاری)" 
-          placeholder="IR123456789012345678901234" 
-          @input="formatIbanInput"
-        />
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-1">شماره شبا</label>
+          <input 
+            v-model="card.ibanNumber" 
+            type="text"
+            placeholder="IR123456789012345678901234" 
+            class="w-full px-4 py-3 bg-background border border-border rounded-lg text-sm text-foreground ltr focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            @input="formatIbanInput"
+          />
+        </div>
       </div>
     </div>
+    
+    </div>
 
-    <!-- Action Buttons -->
-    <div class="border-t border-border bg-background p-4">
+    <!-- Fixed Bottom Actions -->
+    <div class="border-t border-border bg-background p-4 fixed bottom-0 left-0 right-0 lg:relative lg:bottom-auto lg:left-auto lg:right-auto">
       <div class="flex items-center gap-3">
         <button type="button" class="flex-1 bg-muted text-muted-foreground font-medium py-3 rounded-lg hover:bg-muted/80 transition-colors" @click="$emit('cancel')">
           انصراف
@@ -138,11 +186,10 @@
         </button>
       </div>
     </div>
-  </form>
+  </div>
 </template>
 
 <script setup lang="ts">
-import BaseInput from '~/components/ui/BaseInput.vue';
 import { reactive, ref, computed, onMounted, onUnmounted } from 'vue';
 import { useToast } from '~/composables/useToast';
 import { useIconComponents } from '~/composables/useIconComponentsMap';
@@ -165,6 +212,8 @@ const formStore = useFormStore();
 const banks = [
   'ملت', 'ملی', 'صادرات', 'تجارت', 'کشاورزی', 'مسکن', 'پاسارگاد', 'پارسیان', 'سامان', 'سپه', 'اقتصاد نوین', 'انصار', 'دی', 'سینا', 'شهر', 'آینده', 'ایران زمین', 'قوامین', 'رسالت', 'حکمت ایرانیان', 'گردشگری', 'کارآفرین', 'توسعه تعاون', 'توسعه صادرات', 'مهر ایران', 'صنعت و معدن', 'رفاه کارگران', 'سرمایه', 'پست بانک', 'خاورمیانه', 'ایران ونزوئلا', 'قرض الحسنه مهر', 'قرض الحسنه رسالت', 'مهر اقتصاد', 'تات', 'آینده', 'موسسه ملل', 'موسسه کوثر', 'موسسه نور', 'موسسه اعتباری توسعه',
 ];
+
+const showDescription = ref(!!(props.link?.description && props.link.description.trim()));
 
 const form = reactive({
   icon: props.link?.icon || '',
@@ -230,12 +279,6 @@ function onSubmit() {
     return;
   }
   
-  // اعتبارسنجی نام صاحب حساب
-  if (!card.accountHolder.trim()) {
-    error('نام صاحب حساب', 'نام صاحب حساب الزامی است');
-    return;
-  }
-  
   // ارسال داده‌ها
   emit('submit', {
     ...card,
@@ -245,7 +288,7 @@ function onSubmit() {
     icon: form.icon,
     customIcon: form.customIcon,
     title: form.title,
-    description: form.description,
+    description: showDescription.value ? form.description : '',
     type: 'block' // تضمین اینکه همیشه بلاک باشد
   });
 }

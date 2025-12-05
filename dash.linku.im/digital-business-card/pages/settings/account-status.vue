@@ -183,12 +183,12 @@ const { $pwa } = useNuxtApp()
 
 const goBack = () => {
   if ($pwa?.safeNavigateBack) {
-    $pwa.safeNavigateBack('/settings')
+    $pwa.safeNavigateBack('/profile')
   } else {
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
                          (window.navigator as any).standalone === true
     if (isStandalone || window.history.length <= 2) {
-      window.location.href = '/settings'
+      window.location.href = '/profile'
     } else {
       window.history.back()
     }

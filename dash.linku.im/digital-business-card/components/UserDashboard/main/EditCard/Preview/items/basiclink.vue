@@ -51,6 +51,7 @@
 import { computed } from 'vue'
 import { useFormStore } from '~/stores/form'
 import { useIconComponents } from '@/composables/useIconComponentsMap'
+import { useDeepLink } from '@/composables/useDeepLink'
 
 const props = defineProps({
   link: { type: Object, required: true },
@@ -61,9 +62,10 @@ const props = defineProps({
   isBackgroundDark: { type: Boolean, default: false }
 })
 
-// دسترسی به store
+// دسترسی به store و deep link composable
 const formStore = useFormStore()
 const formData = computed(() => props.formData || formStore)
+const { getDeepLink, getWebsiteUrl, getWhatsAppUrl } = useDeepLink()
 
 // Get icon data and component
 const sanitizedLink = computed(() => {
@@ -161,11 +163,38 @@ const base = baseUrls[props.link.action]
 const protocolRegex = /^(https?:|mailto:|tel:|facetime:|sms:|ftp:|ftps:|chrome:|edge:|file:|data:|webcal:|tg:|geo:|maps:|intent:|app:|custom:|\/)/i
 
 const finalUrl = computed(() => {
-  if (!base) return value
-  if (protocolRegex.test(value)) return value
-  if (/^https?:\/\//i.test(value)) return value
-  if (base.endsWith(':')) return `${base}${value}`
-  return `${base}${value.replace(/^[@+]/, '')}`
+  const action = props.link.action
+  const linkValue = value || ''
+  
+  // Handle website/safari with protocol selector
+  if (action === 'safari' || action === 'website') {
+    const protocol = props.link.protocol || 'https'
+    return getWebsiteUrl(linkValue, protocol)
+  }
+  
+  // Handle WhatsApp with type selector (phone or channel)
+  if (action === 'whatsapp') {
+    const whatsappType = props.link.whatsappType || 'phone'
+    return getWhatsAppUrl(linkValue, whatsappType)
+  }
+  
+  // Handle social media with deep linking
+  const deepLinkActions = [
+    'instagram', 'linkedin', 'facebook', 'twitter', 'x', 
+    'youtube', 'telegram', 'tiktok', 'snapchat', 'threads',
+    'pinterest', 'spotify'
+  ]
+  
+  if (deepLinkActions.includes(action)) {
+    return getDeepLink(action, linkValue, base)
+  }
+  
+  // Default behavior for other links
+  if (!base) return linkValue
+  if (protocolRegex.test(linkValue)) return linkValue
+  if (/^https?:\/\//i.test(linkValue)) return linkValue
+  if (base.endsWith(':')) return `${base}${linkValue}`
+  return `${base}${linkValue.replace(/^[@+]/, '')}`
 })
 
 // Remove all inline/fixed widths, use Tailwind for appearance only

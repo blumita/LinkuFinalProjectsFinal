@@ -17,7 +17,7 @@
       />
       
       <!-- هدر ثابت -->
-      <div class="fixed top-0 left-0 right-0 z-50 pointer-events-none">
+      <div class="fixed top-0 left-0 right-0 z-50 pointer-events-none" style="position: -webkit-sticky; position: sticky;">
         <div class="absolute top-4 ltr:right-4 rtl:left-4 pointer-events-auto">
             <button
                 @click.prevent.stop="showOptionsMenu = !showOptionsMenu"

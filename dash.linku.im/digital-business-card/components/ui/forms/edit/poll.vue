@@ -72,7 +72,7 @@ import { reactive, ref, computed } from 'vue'
 const { getIconComponent } = useIconComponents();
 
 const props = defineProps({ link: Object })
-const emit = defineEmits(['save', 'cancel', 'delete', 'back'])
+const emit = defineEmits(['submit', 'cancel', 'delete', 'back'])
 
 // Access form store for dynamic coloring
 const formStore = useFormStore()
@@ -112,7 +112,7 @@ function autoAddOption(idx) {
   }
 }
 function submitForm() {
-  emit('save', { ...form, options: form.options.map(v => v.trim()).filter(Boolean) })
+  emit('submit', { ...form, options: form.options.map(v => v.trim()).filter(Boolean) })
 }
 </script>
 

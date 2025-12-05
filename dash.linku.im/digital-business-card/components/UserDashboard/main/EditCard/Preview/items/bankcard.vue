@@ -11,14 +11,19 @@
       tabindex="0"
       role="button"
     >
-      <div :class="[
-        isListMode ? 'flex-shrink-0 rounded-xl flex items-center overflow-hidden w-[54px] h-[54px]' : 'w-[54px] h-[54px] rounded-xl flex items-center justify-center mb-2 overflow-hidden',
-        isDarkTheme || isLightTheme ? '' : 'bg-gray-100'
-      ]">
+      <div 
+        :class="[
+          isListMode ? 'flex-shrink-0 rounded-xl flex items-center overflow-hidden w-[54px] h-[54px]' : 'w-[54px] h-[54px] rounded-xl flex items-center justify-center mb-2 overflow-hidden',
+          isDarkTheme || isLightTheme ? '' : 'bg-gray-100'
+        ]"
+        :style="{ 
+          backgroundColor: iconColor && iconColor !== 'transparent' ? iconColor : (isDarkTheme || isLightTheme ? 'transparent' : '#f3f4f6')
+        }"
+      >
         <component 
           :is="iconComponent"
           :size="50"
-          v-bind="iconColor ? { color: iconColor, filled: isIconFilled } : {}"
+          v-bind="iconColor && iconColor !== 'transparent' ? { color: iconColor, filled: isIconFilled } : {}"
         />
       </div>
       <div :class="isListMode ? 'flex flex-col justify-center flex-1 min-w-0 ' + (formData?.layout === 'left' ? 'text-left' : 'text-right') : 'w-full text-center mt-0 flex-1 flex flex-col justify-center'">

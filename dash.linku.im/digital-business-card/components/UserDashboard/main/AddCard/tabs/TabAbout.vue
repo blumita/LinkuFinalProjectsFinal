@@ -183,6 +183,7 @@
 <script setup>
 import {ref, computed, onMounted} from 'vue'
 import {defaultFields, useFormStore} from '~/stores/form'
+import {useUserStore} from '~/stores/user'
 import ImageUploader from '../../EditCard/tabs/about/ImageUploader.vue'
 import TextInput from '../../EditCard/tabs/about/TextInput.vue'
 import TextAreaInput from '../../EditCard/tabs/about/TextAreaInput.vue'
@@ -308,6 +309,10 @@ async function saveForm() {
       await uploadImages(newCard.id)
 
       formStore.addCard(newCard)
+
+      // بروزرسانی userStore برای نمایش real-time در داشبورد
+      const userStore = useUserStore()
+      await userStore.fetchUser()
 
       //showInfoToast(response.data.message, 'ti-check')
       message.value = response.data.message // مقداردهی درست

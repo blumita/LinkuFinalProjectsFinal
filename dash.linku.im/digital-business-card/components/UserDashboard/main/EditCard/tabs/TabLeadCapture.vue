@@ -576,12 +576,23 @@ const saveForm = async () => {
 const saveLeadSettings = async (form, cardId) => {
 
   try {
+    // تنظیف و نرمال‌سازی فیلدها
+    const cleanedFields = form.fields.map(field => ({
+      id: field.id,
+      label: field.label?.trim() || '',
+      name: field.name || '',
+      required: field.required ?? false,
+      type: field.type || 'text',
+      options: field.type === 'dropdown' && Array.isArray(field.options) 
+        ? field.options.filter(opt => opt && opt.trim()).map(opt => opt.trim())
+        : []
+    }))
 
     const response = await $axios.post(`v1/cards/${cardId}/leadsetting`, {
-      formTitle: form.formTitle,
-      fields: form.fields,
-      submitButtonText: form.connectButtonText,
-      formDisclaimer: form.formDisclaimer
+      formTitle: form.formTitle?.trim() || '',
+      fields: cleanedFields,
+      submitButtonText: form.connectButtonText?.trim() || 'ارسال',
+      formDisclaimer: form.formDisclaimer?.trim() || 'اطلاعات شما محرمانه می‌ماند'
     })
     showInfoToast(response.data.message, 'ti-check')
     return response.data

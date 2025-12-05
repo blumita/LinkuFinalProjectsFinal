@@ -14,6 +14,7 @@ export { default as tiktok } from './tiktok.vue'
 export { default as twitch } from './twitch.vue'
 export { default as twitter } from './x.vue' // x.vue exported as twitter
 export { default as virgool } from './virgool.vue'
+export { default as wechat } from './wechat.vue'
 export { default as x } from './x.vue'
 export { default as youtube } from './youtube.vue'
 export { default as aparat } from './aparat.vue'

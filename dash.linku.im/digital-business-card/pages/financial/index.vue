@@ -12,7 +12,7 @@
         >
           <!-- Back Button -->
           <button
-            @click="$router.back()"
+            @click="goBack"
             class="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted transition-colors"
             style="pointer-events: auto !important; position: relative !important;"
           >
@@ -251,9 +251,24 @@ interface Transaction {
   endDate?: string
 }
 
-const { $axios } = useNuxtApp()
+const { $axios, $pwa } = useNuxtApp()
 const loading = ref(true)
 const transactions = ref<Transaction[]>([])
+
+// PWA safe navigation
+const goBack = () => {
+  if ($pwa?.safeNavigateBack) {
+    $pwa.safeNavigateBack('/profile')
+  } else {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                         (window.navigator as any).standalone === true
+    if (isStandalone || window.history.length <= 2) {
+      window.location.href = '/profile'
+    } else {
+      window.history.back()
+    }
+  }
+}
 const selectedFilter = ref('all')
 
 // فیلتر تراکنش‌ها بر اساس فیلتر انتخابی

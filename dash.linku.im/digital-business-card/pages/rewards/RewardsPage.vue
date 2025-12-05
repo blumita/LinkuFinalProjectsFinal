@@ -186,15 +186,27 @@ const discounts = computed(() => rewardStore.rewards)
 // Methods
 
 const formatDate = (dateString: string): string => {
-  const date = new Date(dateString)
-  return new Intl.DateTimeFormat('fa-IR').format(date)
+  if (!dateString) return 'نامشخص'
+  try {
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return 'نامشخص'
+    return new Intl.DateTimeFormat('fa-IR').format(date)
+  } catch {
+    return 'نامشخص'
+  }
 }
 
 const getDaysRemaining = (expiryDate: string): number => {
-  const today = new Date('2025-09-24') // تاریخ فعلی
-  const expiry = new Date(expiryDate)
-  const timeDiff = expiry.getTime() - today.getTime()
-  return Math.ceil(timeDiff / (1000 * 3600 * 24))
+  if (!expiryDate) return 0
+  try {
+    const today = new Date()
+    const expiry = new Date(expiryDate)
+    if (isNaN(expiry.getTime())) return 0
+    const timeDiff = expiry.getTime() - today.getTime()
+    return Math.ceil(timeDiff / (1000 * 3600 * 24))
+  } catch {
+    return 0
+  }
 }
 
 const getProgressPercentage = (expiryDate: string): number => {

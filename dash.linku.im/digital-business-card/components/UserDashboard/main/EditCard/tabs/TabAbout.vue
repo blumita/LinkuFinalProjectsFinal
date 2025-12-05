@@ -44,18 +44,12 @@
                :maxlength="20"
                :error="form.saveContact && form.saveContact.length > 20 ? 'حداکثر ۲۰ کاراکتر مجاز است' : ''"
     />
-    <!-- بخش رنگ‌بندی یکپارچه -->
+    <!-- بخش رنگ‌بندی -->
     <div>
-      <h3 class="text-base font-medium text-foreground mb-3">رنگ‌بندی کارت</h3>
+      <h3 class="text-base font-medium text-foreground mb-3">رنگبندی پروفایل</h3>
       <div class="bg-card border border-border p-6 rounded-xl space-y-6">
-        <!-- انتخاب رنگ اصلی -->
-        <div class="space-y-3">
-          <h4 class="text-sm font-semibold text-foreground">رنگ اصلی</h4>
-          <p class="text-xs text-muted-foreground">با انتخاب یک رنگ، هم پس‌زمینه و هم رنگ آیکون‌ها تنظیم می‌شود</p>
-          <ThemePicker />
-        </div>
+        <ThemePicker />
         
-        <!-- تنظیمات پیشرفته -->
         <div class="pt-4 border-t border-border/50">
           <IconColorPicker :selected="form.iconColor" :matchThemeColor="form.matchThemeColor"
                            @update="color => form.iconColor = color"
@@ -135,7 +129,7 @@ async function saveForm() {
   formData.append('themeColor', JSON.stringify(form.themeColor || {}))
   formData.append('iconColor', JSON.stringify(form.iconColor || {}))
   formData.append('matchThemeColor', form.matchThemeColor ? 1 : 0)
-  formData.append('layoutMode', form.layout || '')
+  formData.append('layout', form.layout || '')
 
   try {
     // Send form data to backend

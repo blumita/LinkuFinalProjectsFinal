@@ -4,7 +4,7 @@
     <div class="fixed top-0 left-0 right-0 z-40 bg-card border-b border-border">
       <div class="flex items-center h-14 px-4 lg:px-8">
         <button
-          @click="router.back()"
+          @click="goBack"
           class="flex items-center justify-center w-10 h-10 rounded-lg text-foreground hover:bg-accent transition-colors"
         >
           <i class="ti ti-arrow-right text-xl"></i>
@@ -280,6 +280,17 @@ import { useRouter } from 'vue-router'
 import { useMessageCounts } from '~/composables/useMessageCounts'
 
 const router = useRouter()
+
+// PWA safe navigation
+const goBack = () => {
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                       (window.navigator as any).standalone === true
+  if (isStandalone || window.history.length <= 2) {
+    window.location.href = '/dashboard'
+  } else {
+    window.history.back()
+  }
+}
 
 const {
   luckyDiceCount,

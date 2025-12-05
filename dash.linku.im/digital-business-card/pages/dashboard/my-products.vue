@@ -116,7 +116,7 @@ function goBack() {
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
                        (window.navigator).standalone === true
   if (isStandalone || window.history.length <= 2) {
-    router.push('/dashboard')
+    router.push('/profile')
   } else {
     router.back()
   }

@@ -1,6 +1,6 @@
 <template>
   <div class="fixed inset-0 backdrop-blur bg-black/50 flex items-center justify-center z-[200] p-0 lg:p-4">
-    <div v-if="!activeForm" class="bg-card rounded-none lg:rounded-2xl w-full max-h-screen lg:max-w-5xl xl:max-w-6xl text-right lg:max-h-[90vh] lg:h-auto flex flex-col relative border-0 lg:border border-border overflow-y-auto overflow-x-hidden">
+    <div v-if="!activeForm" class="bg-card rounded-none lg:rounded-2xl w-full h-screen lg:max-w-5xl xl:max-w-6xl text-right lg:h-[90vh] flex flex-col relative border-0 lg:border border-border overflow-hidden">
 
 
       <button class="text-muted-foreground hover:text-foreground text-4xl absolute top-4 left-4 z-10 w-10 h-10 flex items-center justify-center transition-colors" @click="$emit('close')">&times;</button>
@@ -60,8 +60,24 @@
 
         <!-- Section Content -->
         <div class="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+          <!-- Skeleton Loader -->
+          <div v-if="categories.length === 0" class="px-4 md:px-8 lg:px-12 py-4 space-y-6">
+            <div v-for="i in 3" :key="i">
+              <div class="h-5 w-32 bg-muted rounded animate-pulse mb-3"></div>
+              <div class="hidden lg:grid lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                <div v-for="j in 8" :key="j" class="flex items-center gap-3 border border-border bg-card p-3 rounded-xl">
+                  <div class="w-10 h-10 bg-muted rounded-lg animate-pulse flex-shrink-0"></div>
+                  <div class="flex-1 space-y-2">
+                    <div class="h-4 bg-muted rounded animate-pulse w-3/4"></div>
+                    <div class="h-3 bg-muted rounded animate-pulse w-1/2"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Search Results Counter -->
-          <div v-if="searchQuery.trim()" class="mb-4 mt-4 text-sm text-muted-foreground px-4 md:px-8 lg:px-12">
+          <div v-else-if="searchQuery.trim()" class="mb-4 mt-4 text-sm text-muted-foreground px-4 md:px-8 lg:px-12">
             <span v-if="filteredItems.length > 0">
               {{ filteredItems.length }} مورد یافت شد
             </span>
@@ -70,7 +86,7 @@
             </span>
           </div>
 
-          <div class="h-full">
+          <div v-if="categories.length > 0" class="h-full">
             <div v-if="filteredItems.length > 0" class="pr-4 pb-4">
               <template v-for="(group, index) in groupedItems" :key="index">
                 <!-- Hide group title on desktop when a specific category tab is selected -->
@@ -220,6 +236,7 @@
               </template>
             </div>
             <div v-else class="text-center text-muted-foreground mt-6 px-4 md:px-8 lg:px-12">موردی یافت نشد.</div>
+          </div>
           </div>
         </div>
     </div>
@@ -384,12 +401,12 @@ const filteredItems = computed(() => {
     const label = getItemLabel(item).toLowerCase()
     if (label.includes(q)) return true
 
-    // جستجو در توضیحات آیتم
+    // جستجو در توضیحات أیتم
     const itemWithDescription = item as AnyItem & { description?: string }
     const description = itemWithDescription.description?.toLowerCase() || ''
     if (description.includes(q)) return true
 
-    // جستجو در action آیتم
+    // جستجو در action آیتم (نام انگلیسی)
     const action = item.action?.toLowerCase() || ''
     if (action.includes(q)) return true
 

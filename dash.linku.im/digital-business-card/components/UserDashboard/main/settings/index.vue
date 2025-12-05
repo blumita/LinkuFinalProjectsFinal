@@ -433,9 +433,9 @@ export default {
         this.phoneError = "";
 
         this.showInfoToast(response.data.message, 'ti-check');
-        this.userStore.user.userName = this.form.username;
-        this.userStore.user.email = this.form.email;
-        this.userStore.user.phone = this.form.phone;
+        
+        // بروزرسانی کامل userStore برای نمایش real-time در داشبورد
+        await this.userStore.fetchUser();
 
       } catch (error) {
         if (error.response && error.response.data) {

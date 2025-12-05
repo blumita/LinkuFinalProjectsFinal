@@ -2,9 +2,10 @@
   <!-- Static Map Preview with Marker (for preview mode) -->
   <div 
     v-if="props.showMarker && !props.interactive"
-    class="h-full w-full relative"
+    class="h-full w-full relative touch-auto select-none"
+    style="touch-action: pan-x pan-y pinch-zoom;"
   >
-    <div ref="staticMapContainer" class="h-full w-full" />
+    <div ref="staticMapContainer" class="h-full w-full" style="touch-action: pan-x pan-y pinch-zoom;" />
     <!-- Static Marker (only show if not showing circle) -->
     <div 
       v-if="!props.showCircle"
@@ -494,16 +495,21 @@ const initStaticMap = async () => {
       center: [props.longitude, props.latitude],
       zoom: props.zoom,
       attributionControl: false,
-      interactive: false,
-      dragPan: false,
-      scrollZoom: false,
-      doubleClickZoom: false,
-      touchZoomRotate: false,
+      interactive: true, // ✅ تعاملی کردن نقشه
+      dragPan: true, // ✅ اجازه کشیدن نقشه
+      scrollZoom: true, // ✅ اجازه زوم با اسکرول
+      doubleClickZoom: true, // ✅ اجازه زوم با دابل کلیک
+      touchZoomRotate: true, // ✅ اجازه زوم و چرخش با تاچ
+      touchPitch: false, // خاموش کردن تغییر زاویه با تاچ
+      dragRotate: false, // خاموش کردن چرخش با ماوس
+      pitchWithRotate: false,
       // Iran bounds
       maxBounds: [
         [43.5, 23.5], // Southwest
         [64.0, 40.5]  // Northeast
       ],
+      minZoom: 8, // ✅ زوم مینیمم بیشتر برای بهتر دیده شدن
+      maxZoom: 18,
       // RTL support
       localIdeographFontFamily: "'Shabnam', 'Tahoma', sans-serif"
     })
@@ -515,6 +521,25 @@ const initStaticMap = async () => {
       if (props.showCircle) {
         addCircleToMap(staticMap, props.longitude, props.latitude, props.iconColor)
       }
+      
+      // ✅ اضافه کردن کنترل‌های زوم
+      staticMap.addControl(new mapboxgl.NavigationControl({
+        showCompass: false,
+        visualizePitch: false
+      }), 'bottom-left')
+      
+      // ✅ اضافه کردن دکمه موقعیت یاب
+      staticMap.addControl(
+        new mapboxgl.GeolocateControl({
+          positionOptions: {
+            enableHighAccuracy: true
+          },
+          trackUserLocation: true,
+          showUserHeading: true,
+          showUserLocation: true
+        }),
+        'bottom-left'
+      )
     })
     
   } catch (error) {

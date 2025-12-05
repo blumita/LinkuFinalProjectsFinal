@@ -241,7 +241,8 @@
           <div class="flex gap-3">
             <input
               id="backgroundColor"
-              v-model="notificationData.backgroundColor"
+              :value="validColorValue"
+              @input="handleColorInput"
               type="color"
               class="w-20 h-12 border border-gray-300 dark:border-gray-600 rounded-xl cursor-pointer"
             />
@@ -478,6 +479,23 @@ const canSend = computed(() => {
          notificationData.value.message.trim() !== '' &&
          (selectedRecipients.value !== 'specific' || selectedUsers.value.length > 0)
 })
+
+// Validate and return a valid hex color for the color input
+const validColorValue = computed(() => {
+  const color = notificationData.value.backgroundColor
+  // Check if it's a valid hex color
+  if (color && /^#[0-9A-Fa-f]{6}$/.test(color)) {
+    return color
+  }
+  // Return default color for the picker
+  return '#ffffff'
+})
+
+// Handle color input change
+const handleColorInput = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  notificationData.value.backgroundColor = target.value
+}
 
 // Methods
 const getUserInitials = (name: string) => {
