@@ -14,7 +14,7 @@ self.addEventListener('activate', (event) => {
 // Push event - دریافت نوتیفیکیشن واقعی گوشی
 self.addEventListener('push', (event) => {
     let notificationData = {
-        title: 'لینکو',
+        title: 'از طرف لینکو',
         body: 'شما یک پیام جدید دارید',
         icon: '/AppImages/android/android-launchericon-192-192.png',
         badge: '/AppImages/android/android-launchericon-96-96.png',
@@ -33,7 +33,7 @@ self.addEventListener('push', (event) => {
         try {
             const data = event.data.json()
             notificationData = {
-                title: data.title || 'لینکو',
+                title: data.title || 'از طرف لینکو',
                 body: data.message || data.body || 'شما یک پیام جدید دارید',
                 icon: '/AppImages/android/android-launchericon-192-192.png',
                 badge: '/AppImages/android/android-launchericon-96-96.png',

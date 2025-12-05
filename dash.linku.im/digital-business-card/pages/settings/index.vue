@@ -541,7 +541,7 @@
         </button>
 
         <p class="text-xs text-muted-foreground text-center mt-4">
-          این قابلیت فقط در دستگاه‌های پشتیبانی‌کننده Face ID / Touch ID کار می‌کند
+          این قابلیت فقط در محصول‌های پشتیبانی‌کننده Face ID / Touch ID کار می‌کند
         </p>
       </div>
     </UiBottomSheet>

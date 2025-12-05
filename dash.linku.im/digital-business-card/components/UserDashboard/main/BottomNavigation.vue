@@ -152,12 +152,17 @@ const drawQR = async () => {
   
   try {
     const QRCode = (await import('qrcode')).default
+    
+    // استفاده از رنگ سفارشی از تنظیمات کارت
+    const qrColor = defaultCard.value?.qrColor || '#000000'
+    const qrBgColor = defaultCard.value?.qrBgColor || '#ffffff'
+    
     await QRCode.toCanvas(qrCanvas.value, profileLink.value, {
       width: 200,
       margin: 1,
       color: {
-        dark: '#000000',
-        light: '#ffffff'
+        dark: qrColor,
+        light: qrBgColor
       },
       errorCorrectionLevel: 'H'
     })
@@ -224,12 +229,16 @@ const downloadQR = async () => {
     highResCanvas.width = 1000
     highResCanvas.height = 1000
     
+    // استفاده از رنگ سفارشی از تنظیمات کارت
+    const qrColor = defaultCard.value?.qrColor || '#000000'
+    const qrBgColor = defaultCard.value?.qrBgColor || '#ffffff'
+    
     await QRCode.toCanvas(highResCanvas, profileLink.value, {
       width: 1000,
       margin: 2,
       color: {
-        dark: '#000000',
-        light: '#ffffff'
+        dark: qrColor,
+        light: qrBgColor
       },
       errorCorrectionLevel: 'H'
     })

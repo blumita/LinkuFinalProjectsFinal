@@ -33,6 +33,20 @@
           title="کلیک برای مسیریابی"
       />
     </div>
+    
+    <!-- آدرس و توضیحات زیر نقشه -->
+    <div v-if="mapData?.address || mapData?.description" class="px-3 py-3 space-y-2">
+      <!-- آدرس -->
+      <div v-if="mapData?.address" class="flex items-start gap-2">
+        <i class="ti ti-map-pin text-primary text-base mt-0.5 flex-shrink-0"></i>
+        <p class="text-sm text-foreground leading-relaxed break-words">{{ mapData.address }}</p>
+      </div>
+      
+      <!-- توضیحات -->
+      <div v-if="mapData?.description && mapData.description.trim()" class="text-xs text-muted-foreground leading-relaxed whitespace-pre-line break-words">
+        {{ mapData.description }}
+      </div>
+    </div>
   </div>
 
   <!-- BottomSheet: انتخاب نحوه باز کردن نقشه -->
@@ -43,11 +57,18 @@
     :closable="true"
   >
     <div class="p-4 space-y-3">
-      <!-- آدرس -->
-      <div v-if="mapData?.address" class="bg-muted/50 rounded-xl p-3 mb-4">
-        <div class="flex items-start gap-2">
-          <i class="ti ti-map-pin text-primary mt-0.5"></i>
-          <p class="text-sm text-foreground leading-relaxed">{{ mapData.address }}</p>
+      <!-- آدرس و توضیحات -->
+      <div v-if="mapData?.address || mapData?.description" class="bg-muted/50 rounded-xl p-4 mb-4 space-y-3">
+        <!-- آدرس -->
+        <div v-if="mapData?.address" class="flex items-start gap-2">
+          <i class="ti ti-map-pin text-primary text-lg mt-0.5 flex-shrink-0"></i>
+          <p class="text-sm text-foreground leading-relaxed break-words">{{ mapData.address }}</p>
+        </div>
+        
+        <!-- توضیحات -->
+        <div v-if="mapData?.description && mapData.description.trim()" class="flex items-start gap-2">
+          <i class="ti ti-info-circle text-muted-foreground text-lg mt-0.5 flex-shrink-0"></i>
+          <p class="text-xs text-muted-foreground leading-relaxed whitespace-pre-line break-words">{{ mapData.description }}</p>
         </div>
       </div>
 

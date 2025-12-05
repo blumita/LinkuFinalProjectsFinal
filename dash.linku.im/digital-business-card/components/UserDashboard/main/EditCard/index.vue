@@ -11,10 +11,23 @@
         </div>
         
         <div class="flex items-center gap-2">
+          <!-- دکمه پیش‌نمایش فرم لید (فقط در صورت فعال بودن) -->
+          <button
+            v-if="form.isLeadCaptureEnabled"
+            @click="toggleLeadFormPreview"
+            type="button"
+            class="bg-accent hover:bg-accent/80 text-accent-foreground px-3 py-2 rounded-xl flex items-center gap-2"
+            :title="showLeadFormPreview ? 'پنهان کردن فرم' : 'نمایش پیش‌نمایش فرم'"
+          >
+            <i :class="showLeadFormPreview ? 'ti ti-eye-off' : 'ti ti-eye'" class="text-base"></i>
+          </button>
+          
           <!-- دکمه فرم ارتباط -->
           <button
-            @click.stop="goToLeadCapture"
+            @click.prevent.stop="goToLeadCapture"
+            @keydown.enter.prevent.stop="goToLeadCapture"
             type="button"
+            tabindex="-1"
             class="bg-primary text-primary-foreground px-3 py-2 rounded-xl flex items-center gap-2 relative z-[101]"
           >
             <i class="ti ti-message text-base"/>
@@ -502,6 +515,16 @@ const isPageLoading = ref(true)
 
 // حالت drag & drop
 const isDragging = ref(false)
+
+// Lead form preview toggle - default false to not block editing
+const showLeadFormPreview = ref(false)
+
+// Toggle function for lead form preview button
+const toggleLeadFormPreview = () => {
+  showLeadFormPreview.value = !showLeadFormPreview.value
+  // Send updated state to iframe
+  sendFormDataToIframe()
+}
 
 // Icon system
 const {getIconComponent: getIconComponentFromMap, getSafeIcon} = useIconComponents()
@@ -1567,9 +1590,14 @@ const sendFormDataToIframe = () => {
   try {
     // Use toRaw to avoid RefImpl serialization issues
     const rawFormData = toRaw(form.$state)
+    const dataToSend = JSON.parse(JSON.stringify(rawFormData))
+    
+    // Add showLeadFormPreview state to control lead form visibility in iframe
+    dataToSend.showLeadFormPreview = showLeadFormPreview.value
+    
     iframeRef.value.contentWindow.postMessage({
       type: 'FORM_DATA_UPDATE',
-      data: JSON.parse(JSON.stringify(rawFormData))
+      data: dataToSend
     }, window.location.origin)
   } catch (error) {
   }

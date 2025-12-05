@@ -35,7 +35,7 @@
     </div>
 
     <!-- Header -->
-    <div class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
+    <div class="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm">
       <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-16">
           <button @click="$router.back()" class="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
@@ -43,8 +43,8 @@
             <span class="text-sm font-medium">بازگشت</span>
           </button>
           <div class="text-center">
-            <h1 class="text-lg font-bold text-foreground">تکمیل خرید</h1>
-            <p class="text-xs text-muted-foreground">جزئیات سفارش شما</p>
+            <h1 class="text-lg font-bold text-foreground">جزئیات سفارش شما</h1>
+            <p class="text-xs text-muted-foreground">تکمیل خرید اشتراک</p>
           </div>
           <div class="w-20"></div>
         </div>
@@ -723,6 +723,9 @@ const showSuccessModal = ref(false)
 const isNonIranIP = ref(false)
 const showDiscountSheet = ref(false)
 const discountCode = ref('')
+const appliedDiscountCode = ref('')
+const discountValue = ref(0)
+const discountType = ref('')
 const isCheckingDiscount = ref(false)
 const discountStatus = ref<{ type: 'success' | 'error', message: string, amount?: string } | null>(null)
 
@@ -959,7 +962,7 @@ const proceedToPayment = async () => {
     const paymentData = {
       planId: Number(planId),
       amount: amountInRials,
-      discountCode: '',
+      discountCode: appliedDiscountCode.value || '',
       metadata,
       gateway: 'zarinpal'
     }
@@ -970,7 +973,7 @@ const proceedToPayment = async () => {
     const response = await $axios.post('/payment', {
       planId: Number(planId),
       amount: amountInRials,
-      discountCode: '',
+      discountCode: appliedDiscountCode.value || '',
       metadata: metadata,
       gateway: 'zarinpal'
     })
@@ -984,11 +987,28 @@ const proceedToPayment = async () => {
       toast.error('لینک پرداخت دریافت نشد')
     }
   } catch (error: any) {
+    console.error('Payment error:', error)
     
-    const errorMsg = error.response?.data?.message || 'خطا در برقراری ارتباط با درگاه پرداخت'
-    toast.error(errorMsg.includes('redirect_url_not_created') 
-      ? 'خطا در ایجاد لینک پرداخت. لطفاً با پشتیبانی تماس بگیرید.' 
-      : errorMsg)
+    let errorMsg = 'خطا در برقراری ارتباط با درگاه پرداخت'
+    
+    if (error.response?.data?.message) {
+      errorMsg = error.response.data.message
+    } else if (error.response?.status === 500) {
+      errorMsg = 'خطا در سرور. لطفاً چند لحظه دیگر تلاش کنید.'
+    } else if (error.response?.status === 422) {
+      errorMsg = 'اطلاعات وارد شده نامعتبر است.'
+    } else if (!navigator.onLine) {
+      errorMsg = 'اتصال اینترنت خود را بررسی کنید.'
+    }
+    
+    // نمایش پیام خطای واضح‌تر
+    if (errorMsg.includes('redirect_url_not_created') || errorMsg.includes('gateway')) {
+      toast.error('خطا در ایجاد لینک پرداخت. لطفاً با پشتیبانی تماس بگیرید.\nشماره پشتیبانی: 021-12345678', {
+        duration: 5000
+      })
+    } else {
+      toast.error(errorMsg, { duration: 4000 })
+    }
   } finally {
     isLoading.value = false
   }
@@ -1079,6 +1099,30 @@ onMounted(async () => {
       toast.error('پلن انتخابی یافت نشد')
       router.push('/dashboard/checkout')
       return
+    }
+    
+    // بررسی وجود کد تخفیف در query parameters
+    if (route.query.discountCode && route.query.discountValue && route.query.discountType) {
+      discountCode.value = String(route.query.discountCode)
+      appliedDiscountCode.value = String(route.query.discountCode)
+      discountValue.value = Number(route.query.discountValue)
+      discountType.value = String(route.query.discountType)
+      
+      // نمایش پیام موفقیت
+      let discountText = ''
+      if (discountType.value === 'percentage') {
+        discountText = `${discountValue.value}٪`
+      } else if (discountType.value === 'fixed') {
+        discountText = `${discountValue.value.toLocaleString('fa-IR')} تومان`
+      }
+      
+      discountStatus.value = {
+        type: 'success',
+        message: `کد تخفیف "${discountCode.value}" اعمال شد`,
+        amount: discountText
+      }
+      
+      toast.success(`کد تخفیف ${discountText} اعمال شد`, { duration: 3000 })
     }
     
   } catch (error) {

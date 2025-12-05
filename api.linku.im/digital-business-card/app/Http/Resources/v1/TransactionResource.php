@@ -44,7 +44,7 @@ class TransactionResource extends JsonResource
             'method' => $this->translatePaymentMethod($this->payment_method),
             'originalAmount' => (int)$this->order->plan->price,
             'discount' =>(int) $this->order->plan->discount ?? null,
-            'discountCode' => $this->order->metadata['discountCode'],
+            'discountCode' => $this->order->metadata['discountCode'] ?? null,
             'discountAmount' =>(int) $value/10,
             'paymentMethod' => $this->gateway,
             'ref' => $this->ref_id,

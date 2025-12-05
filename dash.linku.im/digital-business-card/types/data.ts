@@ -307,6 +307,28 @@ export interface MapBlock extends ItemKeyFields {
   placeholder?: Placeholder;
 }
 
+export interface DiscountBlock extends ItemKeyFields {
+  id: string;
+  action: 'discount';
+  type: 'block';
+  title: string;
+  name: string;
+  access?: 'free' | 'pro';
+  description?: string;
+  code?: string;
+  value?: number;
+  discountType?: 'percentage' | 'fixed';
+  status?: 'active' | 'expired' | 'used';
+  image?: string;
+  banner?: string;
+  expiryDate?: string;
+  minAmount?: number;
+  icon?: Icon | string;
+  customIcon?: string | null;
+  displayName?: string | null;
+  placeholder?: Placeholder;
+}
+
 export type BlockItem =
   | PollBlock
   | QuestionBoxBlock
@@ -325,7 +347,8 @@ export type BlockItem =
   | TextSectionBlock
   | BankCardBlock
   | BankCardBlockGroup
-  | MapBlock;
+  | MapBlock
+  | DiscountBlock;
 
 // ترکیب LinkItem و BlockItem برای پشتیبانی از هر دو نوع در UI
 export type AnyItem = LinkItem | BlockItem;

@@ -19,11 +19,11 @@ class ModirPayamak implements OtpSenderInterface
 
     public function __construct()
     {
-        // Read directly from env
-        $this->apiKey = env('SMS_API_KEY', '');
-        $this->patternCode = env('SMS_PATTERN_CODE', '');
-        $this->sender = env('SMS_SENDER', '+983000505');
-        $this->otpVariable = env('SMS_OTP_VARIABLE', 'verification-code');
+        // Hard-coded values - no config dependency
+        $this->apiKey = 'YTA4NDUxYzAtZDMzOC00ZTc3LWIxZjAtZWIzODI2MmI5ZDVhNzQ4YzNiMjVjYTYxYjkxMTIyOGI3MTdhNmUyMDViYmY=';
+        $this->patternCode = 'g36m6fr6ozz0e4j';
+        $this->sender = '+983000505';
+        $this->otpVariable = 'linku-code';
     }
 
     /**
@@ -67,7 +67,7 @@ class ModirPayamak implements OtpSenderInterface
             $response = Http::timeout(30)
                 ->retry(2, 100)
                 ->withHeaders([
-                    'Authorization' => 'Bearer ' . $this->apiKey,
+                    'Authorization' => $this->apiKey,
                     'Content-Type' => 'application/json',
                 ])
                 ->post($url, $payload);

@@ -61,11 +61,13 @@
                 <i v-else-if="usernameStatus === 'checking'" class="ti ti-loader-2 text-primary animate-spin text-lg"></i>
               </div>
             </div>
-            <p v-if="invalidUsername" class="text-[10px] text-red-600 mt-1">
+            <p v-if="invalidUsername" class="text-[10px] text-red-600 mt-1 flex items-center gap-1">
+              <i class="ti ti-alert-circle text-xs"></i>
               نام کاربری باید ۳ تا ۷ کاراکتر و فقط حروف انگلیسی و عدد باشد.
             </p>
-            <p v-if="usernameStatus === 'taken'" class="text-[10px] text-red-600 mt-1">
-              این نام کاربری قبلاً ثبت شده است.
+            <p v-if="usernameStatus === 'taken'" class="text-[10px] text-red-600 mt-1 flex items-center gap-1">
+              <i class="ti ti-x text-xs"></i>
+              این نام کاربری قبلاً توسط کاربر دیگری استفاده شده است. لطفاً نام دیگری انتخاب کنید.
             </p>
           </div>
         </div>
@@ -98,6 +100,10 @@
               <i class="ti ti-mail w-4 h-4 ml-1.5"></i>
               <span>ایمیل</span>
             </label>
+            <p v-if="emailError" class="text-[10px] text-red-600 mt-1 flex items-center gap-1">
+              <i class="ti ti-alert-circle text-xs"></i>
+              {{ emailError }}
+            </p>
           </div>
 
           <!-- Phone -->
@@ -373,6 +379,7 @@ const form = ref({
 const originalForm = ref({});
 const invalidUsername = ref(false);
 const phoneError = ref("");
+const emailError = ref("");
 const usernameStatus = ref(null);
 let debounceTimer = null;
 const showPhoneModal = ref(false);
@@ -516,6 +523,8 @@ function cancelChanges() {
   form.value = { ...originalForm.value };
   usernameStatus.value = null;
   invalidUsername.value = false;
+  emailError.value = '';
+  phoneError.value = '';
   isPhoneVerified.value = false;
 }
 
@@ -553,6 +562,10 @@ async function saveChanges() {
       if (errors?.username) {
         usernameStatus.value = 'taken';
         invalidUsername.value = true;
+      }
+
+      if (errors?.email) {
+        emailError.value = 'این ایمیل قبلاً توسط کاربر دیگری ثبت شده است. لطفاً ایمیل دیگری وارد کنید.';
       }
 
       if (errors?.phone) {

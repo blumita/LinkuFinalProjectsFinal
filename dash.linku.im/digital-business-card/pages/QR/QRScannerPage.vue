@@ -99,7 +99,7 @@
         <!-- Clean instructions -->
         <div class="absolute bottom-32 left-4 right-4 text-center z-50">
           <div class="bg-black/30 backdrop-blur-sm rounded-xl p-3">
-            <p class="text-white text-base font-medium">QR کد را در قاب قرار دهید</p>
+            <p class="text-white text-base font-medium">کد QR روی محصول را برای فعال‌سازی اسکن کنید</p>
           </div>
         </div>
       </div>
@@ -150,7 +150,7 @@
           variant="tonal-primary"
           size="lg"
           rounded
-          @click="handleManualInput"
+          @click.stop="openManualInput"
           class="qr-footer-button"
         />
 
@@ -626,6 +626,16 @@ const goToMyQRCode = () => {
 
 // Handle manual input - stop camera first
 const handleManualInput = () => {
+  stopCamera()
+  showManualInputSheet.value = true
+}
+
+// Open manual input with proper event handling
+const openManualInput = (event?: MouseEvent) => {
+  if (event) {
+    event.preventDefault()
+    event.stopPropagation()
+  }
   stopCamera()
   showManualInputSheet.value = true
 }

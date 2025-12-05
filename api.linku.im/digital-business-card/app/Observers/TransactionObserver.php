@@ -52,7 +52,7 @@ class TransactionObserver
             ]);
 
             //check discount code for order
-            if ($order->metadata['discountCode']) {
+            if (isset($order->metadata['discountCode']) && $order->metadata['discountCode']) {
                 $discount = Discount::where('code', $order->metadata['discountCode'])->first();
 
                 if ($discount) {

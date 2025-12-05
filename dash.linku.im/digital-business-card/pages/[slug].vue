@@ -41,12 +41,13 @@
       </div>
       
       <!-- فوتر -->
+
       <div class="mt-10 pt-6 border-t border-gray-100">
-        <div class="flex items-center justify-center gap-2 text-sm text-gray-500">
+        <a href="https://linku.im" class="flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors">
           <img src="/logo.svg" alt="Linku" class="w-4 h-4" />
           <span>کارت ویزیت دیجیتال</span>
           <span class="font-bold text-gray-700">لینکو</span>
-        </div>
+        </a>
       </div>
     </div>
   </div>
@@ -83,7 +84,7 @@
           <!-- منوی سه نقطه در گوشه بالا -->
           <div class="absolute top-4 ltr:right-4 rtl:left-4 z-20">
             <button
-                @click.prevent.stop="showOptionsMenu = !showOptionsMenu"
+                @click="toggleOptionsMenu"
                 type="button"
                 class="w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all duration-300 border border-white/20"
             >
@@ -92,12 +93,11 @@
 
             <!-- منوی کشویی -->
             <div
-                v-show="showOptionsMenu"
-                @click.stop
+                v-if="showOptionsMenu"
                 class="absolute top-12 ltr:right-0 rtl:left-0 bg-white/95 backdrop-blur-lg rounded-xl shadow-2xl border border-white/30 py-2 min-w-[160px] z-30"
             >
               <button
-                  @click.stop="showShareModal = true; showOptionsMenu = false"
+                  @click="openShareModal"
                   type="button"
                   class="w-full text-right px-4 py-3 hover:bg-gray-50/80 flex items-center gap-3 text-gray-700 transition-all duration-200"
               >
@@ -105,7 +105,7 @@
                 اشتراک‌گذاری
               </button>
               <button
-                  @click.stop="showReportModal = true; showOptionsMenu = false"
+                  @click="openReportModal"
                   type="button"
                   class="w-full text-right px-4 py-3 hover:bg-gray-50/80 flex items-center gap-3 text-gray-700 transition-all duration-200"
               >
@@ -689,18 +689,16 @@
       <div
           class="fixed inset-0 flex flex-col items-center justify-center bg-white text-black z-50"
       >
-        <!-- لوگو در مرکز -->
-        <img
-            src="/logo/logo.png"
-            alt="Logo"
-            class="w-32 h-32 mb-10 object-contain"
-        />
-
-        <!-- لودر سه‌دایره‌ای -->
-        <div class="flex space-x-3">
-          <span class="w-3 h-3 bg-black rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-          <span class="w-3 h-3 bg-black rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-          <span class="w-3 h-3 bg-black rounded-full animate-bounce"></span>
+        <!-- متن در حال بارگذاری -->
+        <div class="text-center space-y-6">
+          <h2 class="text-2xl font-bold text-gray-800">در حال بارگذاری...</h2>
+          
+          <!-- لودر سه‌دایره‌ای -->
+          <div class="flex justify-center space-x-reverse space-x-3">
+            <span class="w-3 h-3 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+            <span class="w-3 h-3 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+            <span class="w-3 h-3 bg-blue-600 rounded-full animate-bounce"></span>
+          </div>
         </div>
       </div>
     </transition>
@@ -1074,6 +1072,24 @@ const showOptionsMenu = ref(false)
 const showShareModal = ref(false)
 const reportType = ref('')
 const reportDescription = ref('')
+
+// متدهای باز/بسته کردن modal ها
+const toggleOptionsMenu = (event) => {
+  event?.stopPropagation()
+  showOptionsMenu.value = !showOptionsMenu.value
+}
+
+const openShareModal = (event) => {
+  event?.stopPropagation()
+  showShareModal.value = true
+  showOptionsMenu.value = false
+}
+
+const openReportModal = (event) => {
+  event?.stopPropagation()
+  showReportModal.value = true
+  showOptionsMenu.value = false
+}
 
 // Close options menu when clicking outside
 onMounted(async () => {
@@ -1865,8 +1881,7 @@ const shareProfile = async () => {
 
   const shareData = {
     title: formData.name || 'پروفایل لینکو',
-    text: `پروفایل ${formData.name || 'کاربر'} را در لینکو مشاهده کنید`,
-    url: window.location.href
+    text: `برای مشاهده پروفایل، روی لینک زیر کلیک کنید 👇🏻\n\n${window.location.href}`,
   }
 
   // بررسی دقیق‌تر Web Share API

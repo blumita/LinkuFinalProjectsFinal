@@ -7,11 +7,12 @@
       class="w-full h-full"
     />
 
-    <!-- نمایش فرم لید به صورت پاپ‌آپ جداگانه -->
+    <!-- نمایش فرم لید به صورت پاپ‌آپ جداگانه - فقط در حالت پیش‌نمایش -->
+    <!-- در حالت edit نمایش نمی‌دهیم تا مانع ویرایش نشود -->
     <Layouts.LayoutLeadForm
-      v-if="mergedFormData.isLeadCaptureEnabled"
+      v-if="mergedFormData.isLeadCaptureEnabled && showLeadFormPreview"
       :form="mergedFormData"
-      @close="mergedFormData.isLeadCaptureEnabled = false"
+      @close="showLeadFormPreview = false"
       class="absolute inset-0 z-50 bg-white/10 backdrop-blur-[1px] flex items-center justify-center m-0"
     />
   </div>
@@ -26,6 +27,9 @@ import * as Layouts from '@/components/UserDashboard/main/EditCard/Preview/layou
 const props = defineProps<{
   form?: any // داده‌های فرم از EditCard
 }>()
+
+// وضعیت نمایش فرم لید - به صورت پیش‌فرض false تا مانع ویرایش نشود
+const showLeadFormPreview = ref(false)
 
 const formStore = useFormStore()
 
@@ -43,6 +47,11 @@ const mergedFormData = computed(() => {
         storeState[key] = props.form[key]
       }
     })
+    
+    // اگر showLeadFormPreview از props آمده، آن را به‌کار بریم
+    if (props.form.showLeadFormPreview !== undefined) {
+      showLeadFormPreview.value = props.form.showLeadFormPreview
+    }
 
     return {
       ...formStore.$state,

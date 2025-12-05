@@ -1,1 +1,0 @@
-import{n as e}from"#entry";import{y as a,j as o,k as t,x as n}from"./Ct89Yiyn.js";import"./CU4qPF7-.js";import"./ngrFHoWO.js";const d=a({__name:"qr-scanner",setup(r){return o(()=>{e("/dashboard/activate")}),(s,c)=>(n(),t("div"))}});export{d as default};

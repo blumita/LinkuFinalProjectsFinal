@@ -1,0 +1,1 @@
+import o from"./Dnt_juoW.js";import{k as t,C as r,i as e}from"#entry";import"./Bv-RA7Kk.js";import"./DlAUqK2U.js";import"./DJY3EWAx.js";import"./0dA2cnp7.js";import"./DyClqVU4.js";import"./Cr5Iw68y.js";const l=t({__name:"customize-link",setup(i){return(m,p)=>(e(),r(o))}});export{l as default};

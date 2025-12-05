@@ -19,7 +19,12 @@ export default defineNuxtPlugin(() => {
       'allow-scripts',
       'allow-same-origin',
       'Outdated Optimize Dep',
-      'error caught during app initialization'
+      'error caught during app initialization',
+      'NuxtPage',
+      'NuxtLayout',
+      'Your project has pages',
+      'Your project has layouts',
+      'RouterView'
     ]
 
     const errorFilters = [

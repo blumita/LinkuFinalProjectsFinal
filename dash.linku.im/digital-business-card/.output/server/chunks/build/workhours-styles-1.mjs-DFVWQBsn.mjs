@@ -1,0 +1,4 @@
+const workhours_vue_vue_type_style_index_0_scoped_fdb76b91_lang = '.form-switch-themed[data-v-fdb76b91]{-webkit-appearance:none;-moz-appearance:none;appearance:none;background-color:hsl(var(--muted-foreground)/.3);border-radius:9999px;cursor:pointer;height:20px;position:relative;transition:background-color .2s;width:36px}.form-switch-themed[data-v-fdb76b91]:checked{background-color:hsl(var(--primary))}.form-switch-themed[data-v-fdb76b91]:before{background:#fff;border-radius:9999px;content:"";height:16px;left:2px;position:absolute;top:2px;transition:transform .2s ease;width:16px}.form-switch-themed[data-v-fdb76b91]:checked:before{transform:translate(16px)}';
+
+export { workhours_vue_vue_type_style_index_0_scoped_fdb76b91_lang as w };
+//# sourceMappingURL=workhours-styles-1.mjs-DFVWQBsn.mjs.map

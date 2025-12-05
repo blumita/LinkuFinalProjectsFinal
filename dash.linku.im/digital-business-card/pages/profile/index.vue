@@ -134,16 +134,16 @@
                   <i class="ti ti-chevron-left text-muted-foreground"></i>
                 </button>
 
-                <!-- دستگاه‌های من -->
+                <!-- محصولات من -->
                 <button
                   @click="handleMenuClick('mydevice')"
                   class="w-full flex items-center justify-between p-4 hover:bg-muted transition-colors"
                 >
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center">
-                      <i class="ti ti-devices text-cyan-500 text-lg"></i>
+                      <i class="ti ti-device-mobile-check text-cyan-500 text-lg"></i>
                     </div>
-                    <span class="font-medium text-foreground">دستگاه‌های فعال من</span>
+                    <span class="font-medium text-foreground">محصولات فعال من</span>
                   </div>
                   <i class="ti ti-chevron-left text-muted-foreground"></i>
                 </button>
@@ -450,14 +450,14 @@
             <i class="ti ti-chevron-left text-muted-foreground text-sm"></i>
           </button>
 
-          <!-- دستگاه‌های من -->
+          <!-- محصولات من -->
           <button
             @click="handleMenuClick('mydevice')"
             class="w-full flex items-center justify-between py-4 hover:bg-muted transition-colors"
           >
             <div class="flex items-center gap-3">
-              <i class="ti ti-devices text-primary text-lg"></i>
-              <span class="font-medium text-foreground text-base">دستگاه‌های فعال من</span>
+              <i class="ti ti-device-mobile-check text-primary text-lg"></i>
+              <span class="font-medium text-foreground text-base">محصولات فعال من</span>
             </div>
             <i class="ti ti-chevron-left text-muted-foreground text-sm"></i>
           </button>
@@ -698,7 +698,7 @@ const handleMenuClick = (menu: string) => {
       navigateTo('/dashboard/activate')
       break
     case 'mydevice':
-      navigateTo('/dashboard/activate')
+      navigateTo('/dashboard/my-products')
       break
     case 'premium':
       navigateTo('/dashboard/checkout')

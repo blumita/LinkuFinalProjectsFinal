@@ -89,25 +89,46 @@
             v-for="discount in filteredDiscounts" 
             :key="discount.id"
             :class="[
-              'bg-card border border-border p-5 lg:p-6 rounded-xl transition-all flex flex-col',
+              'bg-card border border-border rounded-xl transition-all flex flex-col overflow-hidden',
               discount.status === 'active' 
                 ? 'cursor-pointer hover:shadow-lg hover:border-primary/30' 
                 : 'opacity-60'
             ]"
             @click="discount.status === 'active' ? viewDiscountDetail(discount.id) : null"
           >
-            <div class="flex items-start justify-between mb-3">
-              <div class="flex-1">
-                <div class="flex items-center gap-2 mb-2 flex-wrap">
-                  <h4 class="font-medium text-foreground lg:text-base">{{ discount.title }}</h4>
-                  <span :class="[
-                    'text-xs px-2.5 py-1 rounded-full font-medium',
-                    getDiscountStatusClass(discount.status)
-                  ]">
-                    {{ getDiscountStatusText(discount.status) }}
-                  </span>
-                </div>
-                <p class="text-sm text-muted-foreground mb-4 line-clamp-2">{{ discount.description }}</p>
+            <!-- Banner Image -->
+            <div v-if="discount.banner" class="relative w-full h-32 lg:h-40 overflow-hidden">
+              <img 
+                :src="discount.banner" 
+                :alt="discount.title"
+                class="w-full h-full object-cover"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+              <div class="absolute top-3 right-3 bg-primary/95 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">
+                <i class="ti ti-discount text-sm"></i>
+                {{ discount.value }}{{ discount.type === 'percentage' ? '%' : ' ریال' }}
+              </div>
+              <span :class="[
+                'absolute top-3 left-3 text-xs px-2.5 py-1 rounded-full font-medium backdrop-blur-sm',
+                getDiscountStatusClass(discount.status)
+              ]">
+                {{ getDiscountStatusText(discount.status) }}
+              </span>
+            </div>
+
+            <div class="p-5 lg:p-6">
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-2 flex-wrap">
+                    <h4 class="font-medium text-foreground lg:text-base">{{ discount.title }}</h4>
+                    <span v-if="!discount.banner" :class="[
+                      'text-xs px-2.5 py-1 rounded-full font-medium',
+                      getDiscountStatusClass(discount.status)
+                    ]">
+                      {{ getDiscountStatusText(discount.status) }}
+                    </span>
+                  </div>
+                  <p class="text-sm text-muted-foreground mb-4 line-clamp-2">{{ discount.description }}</p>
                 
                 <!-- Progress Bar -->
                 <div v-if="discount.status === 'active' && getDaysRemaining(discount.expiryDate) <= 7 && getDaysRemaining(discount.expiryDate) > 0" class="mb-4">
@@ -125,23 +146,30 @@
                   </div>
                 </div>
                 
-                <div class="flex items-center gap-4 text-xs text-muted-foreground mb-4 lg:mb-0">
-                  <span class="flex items-center gap-1.5">
-                    <i class="ti ti-percentage"></i>
-                    {{ discount.value }}{{ discount.type === 'percentage' ? '%' : ' ریال' }}
-                  </span>
-                  <span class="flex items-center gap-1.5">
-                    <i class="ti ti-calendar"></i>
-                    {{ formatDate(discount.expiryDate) }}
-                  </span>
+                  <div class="flex items-center gap-4 text-xs text-muted-foreground mb-4 lg:mb-0">
+                    <span v-if="!discount.banner" class="flex items-center gap-1.5">
+                      <i class="ti ti-percentage"></i>
+                      {{ discount.value }}{{ discount.type === 'percentage' ? '%' : ' ریال' }}
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                      <i class="ti ti-calendar"></i>
+                      {{ formatDate(discount.expiryDate) }}
+                    </span>
+                  </div>
+                </div>
+                <!-- Icon/Image -->
+                <div class="w-14 h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl flex items-center justify-center border border-primary/20 overflow-hidden flex-shrink-0">
+                  <img 
+                    v-if="discount.image" 
+                    :src="discount.image" 
+                    :alt="discount.title"
+                    class="w-full h-full object-cover"
+                  />
+                  <i v-else class="ti ti-discount text-primary text-2xl lg:text-3xl"></i>
                 </div>
               </div>
-              <div class="w-14 h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl flex items-center justify-center border border-primary/20">
-                <i class="ti ti-discount text-primary text-2xl lg:text-3xl"></i>
-              </div>
-            </div>
-            
-            <div class="pt-3 mt-auto border-t border-border">
+              
+              <div class="pt-3 mt-auto border-t border-border">
               <button 
                 v-if="discount.status === 'active'"
                 @click.stop="copyDiscountCode(discount.code)"
@@ -181,6 +209,7 @@
         </div>
       </div>
       </div>
+    </div>
     </div>
   </div>
 </template>

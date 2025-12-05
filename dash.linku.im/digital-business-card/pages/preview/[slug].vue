@@ -15,6 +15,58 @@
           class="absolute inset-0 w-full h-full pointer-events-none"
           :style="{ backgroundColor: getLighterColor(formData?.themeColor?.background ?? '#ffffff'), zIndex: 0, transition: 'background-color 0.3s' }"
       />
+      
+      <!-- هدر ثابت -->
+      <div class="fixed top-0 left-0 right-0 z-50 pointer-events-none">
+        <div class="absolute top-4 ltr:right-4 rtl:left-4 pointer-events-auto">
+            <button
+                @click.prevent.stop="showOptionsMenu = !showOptionsMenu"
+                type="button"
+                class="w-10 h-10 rounded-full flex items-center justify-center text-white transition-all duration-300 shadow-lg"
+                :style="{
+                  backgroundColor: formData?.themeColor?.background || '#3b82f6',
+                  opacity: 0.95
+                }"
+            >
+              <i class="ti ti-dots-vertical text-lg"></i>
+            </button>
+
+            <!-- منوی کشویی -->
+            <div
+                v-show="showOptionsMenu"
+                @click.stop
+                class="absolute top-12 ltr:right-0 rtl:left-0 bg-white rounded-xl shadow-2xl border py-2 min-w-[160px] z-30"
+                :style="{
+                  borderColor: formData?.themeColor?.background || '#3b82f6',
+                  borderWidth: '2px'
+                }"
+            >
+              <button
+                  @click.stop="showShareModal = true; showOptionsMenu = false"
+                  type="button"
+                  class="w-full text-right px-4 py-3 hover:opacity-90 flex items-center gap-3 transition-all duration-200 font-medium"
+                  :style="{
+                    color: formData?.themeColor?.background || '#3b82f6'
+                  }"
+              >
+                <i class="ti ti-share text-lg"></i>
+                اشتراک‌گذاری
+              </button>
+              <button
+                  @click.stop="showReportModal = true; showOptionsMenu = false"
+                  type="button"
+                  class="w-full text-right px-4 py-3 hover:opacity-90 flex items-center gap-3 transition-all duration-200 font-medium"
+                  :style="{
+                    color: formData?.themeColor?.background || '#3b82f6'
+                  }"
+              >
+                <i class="ti ti-flag text-lg"></i>
+                گزارش محتوا
+              </button>
+            </div>
+        </div>
+      </div>
+      
       <!-- محتوای اصلی -->
       <div class="relative z-10 flex-1 pb-8 overflow-auto scrollbar-hide">
         <!-- کاور -->
@@ -30,40 +82,6 @@
                 :style="`background-image: url('${formData.coverImage}')`"
             ></div>
           </template>
-          <!-- منوی سه نقطه در گوشه بالا -->
-          <div class="absolute top-4 ltr:right-4 rtl:left-4 z-20">
-            <button
-                @click.prevent.stop="showOptionsMenu = !showOptionsMenu"
-                type="button"
-                class="w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all duration-300 border border-white/20"
-            >
-              <i class="ti ti-dots-vertical text-sm"></i>
-            </button>
-
-            <!-- منوی کشویی -->
-            <div
-                v-show="showOptionsMenu"
-                @click.stop
-                class="absolute top-12 ltr:right-0 rtl:left-0 bg-white/95 backdrop-blur-lg rounded-xl shadow-2xl border border-white/30 py-2 min-w-[160px] z-30"
-            >
-              <button
-                  @click.stop="showShareModal = true; showOptionsMenu = false"
-                  type="button"
-                  class="w-full text-right px-4 py-3 hover:bg-gray-50/80 flex items-center gap-3 text-gray-700 transition-all duration-200"
-              >
-                <i class="ti ti-share text-gray-600"></i>
-                اشتراک‌گذاری
-              </button>
-              <button
-                  @click.stop="showReportModal = true; showOptionsMenu = false"
-                  type="button"
-                  class="w-full text-right px-4 py-3 hover:bg-gray-50/80 flex items-center gap-3 text-gray-700 transition-all duration-200"
-              >
-                <i class="ti ti-flag text-gray-600"></i>
-                گزارش محتوا
-              </button>
-            </div>
-          </div>
 
           <!-- گرادینت برای فید کردن پایین عکس - فقط در حالت پورتریت -->
           <div

@@ -150,6 +150,10 @@ async function saveForm() {
 
       await uploadImages(cardId.value)
 
+      // بروزرسانی userStore برای نمایش real-time در داشبورد
+      const userStore = useUserStore()
+      await userStore.fetchUser()
+
       showInfoToast(response.data.message, 'ti-check')
 
     } else {

@@ -18,113 +18,6 @@ export default defineNuxtConfig({
   // غیرفعال کردن build manifest برای جلوگیری از خطا
   app: {
     buildAssetsDir: '/_nuxt/',
-  },
-  
-  experimental: {
-    payloadExtraction: false,
-  },
-  
-  devServer: {
-    port: 3000,
-    host: 'localhost',
-    // SSL فقط در development (اگر certificate موجود باشد)
-    https: httpsConfig
-  },
-  vite: {
-    server: {
-      // SSL فقط در development (اگر certificate موجود باشد)
-      https: httpsConfig,
-      hmr: {
-        protocol: 'ws',
-        host: 'localhost',
-        overlay: false,
-      }
-    },
-    optimizeDeps: {
-      include: ['object-assign'],
-      exclude: ['vue-router'] // Exclude vue-router to prevent hydration issues
-    },
-    vue: {
-      template: {
-        compilerOptions: {
-          whitespace: 'preserve'
-        }
-      }
-    },
-    define: {
-      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
-      __VUE_OPTIONS_API__: true,
-      __VUE_PROD_DEVTOOLS__: false
-    },
-    build: {
-      chunkSizeWarningLimit: 1500,
-      rollupOptions: {
-        output: {
-          manualChunks: undefined // غیرفعال کردن برای جلوگیری از خطای exports
-        }
-      }
-    }
-  },
-  nitro: {
-    // Removed devProxy - using server-side API routes in /server/api/ instead
-    routeRules: {
-      '/board/**': { ssr: false }, // Disable SSR for board pages to avoid proxy conflicts
-      '/auth/**': { ssr: false }, // Disable SSR for auth pages to fix 403 error
-      '/preview/**': {
-        ssr: true,
-        headers: {
-          'X-Frame-Options': 'SAMEORIGIN',
-          'Content-Security-Policy': "frame-ancestors 'self'; sandbox allow-scripts allow-same-origin allow-forms"
-        }
-      },
-      '/api/sitemap.xml': { headers: { 'Content-Type': 'application/xml' } },
-      //'/:slug': { redirect: '/preview/:slug', statusCode: 200 } // برای rewrite باید statusCode رو 200 بذاری
-    }
-  },
-  css: [
-    '@/assets/css/main.css'
-  ],
-  vue: {
-    compilerOptions: {
-      isCustomElement: (tag: string) => tag.startsWith('ion-')
-    },
-    runtimeCompiler: process.env.NODE_ENV === 'development'
-  },
-  components: true,
-  ssr: true,
-  
-  // Modules
-  modules: [
-    '@pinia/nuxt'
-  ],
-  
-  // SSR optimization to prevent hydration mismatches
-  experimental: {
-    payloadExtraction: false, // Disabled to prevent hydration issues
-    renderJsonPayloads: false,
-    typedPages: false
-  },
-  
-  // Client-side plugins to ensure proper hydration
-  plugins: [
-    '~/plugins/auth-sync.client.ts', // Auth token sync (must be first)
-    '~/plugins/theme.client.ts', // Theme detection plugin
-    '~/plugins/axios.ts',
-    '~/plugins/scroll.ts',
-    '~/plugins/vue-warnings.client.ts', // Added Vue warnings suppression
-    '~/plugins/router-init.client.ts', // Added router initialization
-    '~/plugins/pwa-navigation.client.ts', // PWA navigation handling
-    '~/plugins/seo.client.ts', // SEO optimization plugin
-    '~/plugins/permissions.client.ts', // PWA permissions (camera, location, NFC)
-    '~/plugins/service-worker.client.ts', // Service Worker & Push Notifications
-  ],
-  postcss: {
-    plugins: {
-      '@tailwindcss/postcss': {},
-      autoprefixer: {},
-    },
-  },
-  app: {
     head: {
       htmlAttrs: {
         lang: 'fa',
@@ -254,6 +147,112 @@ export default defineNuxtConfig({
         }
       ]
     }
+  },
+  
+  devServer: {
+    port: 3000,
+    host: 'localhost',
+    // SSL فقط در development (اگر certificate موجود باشد)
+    https: httpsConfig
+  },
+  vite: {
+    server: {
+      // SSL فقط در development (اگر certificate موجود باشد)
+      https: httpsConfig,
+      hmr: {
+        protocol: httpsConfig ? 'wss' : 'ws',
+        host: 'localhost',
+        port: 3000,
+        overlay: false,
+      }
+    },
+    optimizeDeps: {
+      include: ['object-assign'],
+      exclude: ['vue-router'] // Exclude vue-router to prevent hydration issues
+    },
+    vue: {
+      template: {
+        compilerOptions: {
+          whitespace: 'preserve'
+        }
+      }
+    },
+    define: {
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
+      __VUE_OPTIONS_API__: true,
+      __VUE_PROD_DEVTOOLS__: false
+    },
+    build: {
+      chunkSizeWarningLimit: 1500,
+      rollupOptions: {
+        output: {
+          manualChunks: undefined // غیرفعال کردن برای جلوگیری از خطای exports
+        }
+      }
+    }
+  },
+  nitro: {
+    // Removed devProxy - using server-side API routes in /server/api/ instead
+    routeRules: {
+      '/board/**': { ssr: false }, // Disable SSR for board pages to avoid proxy conflicts
+      '/auth/**': { ssr: false }, // Disable SSR for auth pages to fix 403 error
+      '/preview/**': {
+        ssr: true,
+        headers: {
+          'X-Frame-Options': 'SAMEORIGIN',
+          'Content-Security-Policy': "frame-ancestors 'self'; sandbox allow-scripts allow-same-origin allow-forms"
+        }
+      },
+      '/api/sitemap.xml': { headers: { 'Content-Type': 'application/xml' } },
+      //'/:slug': { redirect: '/preview/:slug', statusCode: 200 } // برای rewrite باید statusCode رو 200 بذاری
+    }
+  },
+  css: [
+    '@/assets/css/main.css'
+  ],
+  vue: {
+    compilerOptions: {
+      isCustomElement: (tag: string) => tag.startsWith('ion-')
+    },
+    runtimeCompiler: process.env.NODE_ENV === 'development'
+  },
+  components: true,
+  ssr: true,
+  
+  // Modules
+  modules: [
+    '@pinia/nuxt'
+  ],
+  
+  // SSR optimization to prevent hydration mismatches
+  experimental: {
+    payloadExtraction: false, // Disabled to prevent hydration issues
+    renderJsonPayloads: false,
+    typedPages: false
+  },
+  
+  // Suppress false-positive warnings
+  debug: false,
+  logLevel: process.env.NODE_ENV === 'development' ? 'info' : 'silent',
+  
+  // Client-side plugins to ensure proper hydration
+  plugins: [
+    '~/plugins/auth-sync.client.ts', // Auth token sync (must be first)
+    '~/plugins/theme.client.ts', // Theme detection plugin
+    '~/plugins/axios.ts',
+    '~/plugins/scroll.ts',
+    '~/plugins/vue-warnings.client.ts', // Added Vue warnings suppression
+    '~/plugins/router-init.client.ts', // Added router initialization
+    '~/plugins/pwa-navigation.client.ts', // PWA navigation handling
+    '~/plugins/seo.client.ts', // SEO optimization plugin
+    '~/plugins/permissions.client.ts', // PWA permissions (camera, location, NFC)
+    '~/plugins/service-worker.client.ts', // Service Worker & Push Notifications
+  ],
+  postcss: {
+    plugins: {
+      '@tailwindcss/postcss': {},
+      autoprefixer: {},
+    },
   },
   runtimeConfig: {
     apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://api.linku.im',
