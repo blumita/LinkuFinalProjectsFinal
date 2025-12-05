@@ -19,11 +19,11 @@ class ModirPayamak implements OtpSenderInterface
 
     public function __construct()
     {
-        // Hard-coded values - no config dependency
-        $this->apiKey = 'YTA4NDUxYzAtZDMzOC00ZTc3LWIxZjAtZWIzODI2MmI5ZDVhNzQ4YzNiMjVjYTYxYjkxMTIyOGI3MTdhNmUyMDViYmY=';
-        $this->patternCode = 'g36m6fr6ozz0e4j';
-        $this->sender = '+983000505';
-        $this->otpVariable = 'linku-code';
+        // Read from environment variables directly (bypass config cache)
+        $this->apiKey = $_ENV['SMS_API_KEY'] ?? env('SMS_API_KEY', '');
+        $this->patternCode = $_ENV['SMS_PATTERN_CODE'] ?? env('SMS_PATTERN_CODE', 'g36m6fr6ozz0e4j');
+        $this->sender = $_ENV['SMS_SENDER'] ?? env('SMS_SENDER', '+983000505');
+        $this->otpVariable = $_ENV['SMS_OTP_VARIABLE'] ?? env('SMS_OTP_VARIABLE', 'linku-code');
     }
 
     /**
