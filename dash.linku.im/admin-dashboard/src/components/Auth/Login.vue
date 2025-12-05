@@ -345,7 +345,7 @@ const sendEmailOTP = async () => {
   isLoading.value = true
   
   try {
-    const response = await axios.post('/admin/sendOtpEmail', {
+    const response = await axios.post('/auth/admin/sendOtpEmail', {
       email: username.value.trim().toLowerCase()
     })
     
@@ -372,7 +372,7 @@ const sendPhoneOTP = async () => {
     const cleanedPhone = username.value.replace(/\D/g, '')
     const normalizedPhone = cleanedPhone.startsWith('0') ? cleanedPhone.slice(1) : cleanedPhone
     
-    const response = await axios.post('/admin/sendOtpSms', {
+    const response = await axios.post('/auth/admin/sendOtpSms', {
       phone: normalizedPhone,
       countryCode: '+98'
     })
@@ -404,7 +404,7 @@ const loginWithPassword = async () => {
   isLoading.value = true
   
   try {
-    const response = await axios.post('/admin/directLogin', {
+    const response = await axios.post('/auth/admin/directLogin', {
       username: username.value.trim(),
       password: password.value
     })
@@ -510,7 +510,7 @@ const verifyOtpCode = async () => {
     let response
     
     if (inputType.value === 'email') {
-      response = await axios.post('/admin/verifyOtpEmail', {
+      response = await axios.post('/auth/admin/verifyOtpEmail', {
         email: username.value.trim().toLowerCase(),
         code: fullCode
       })
@@ -518,7 +518,7 @@ const verifyOtpCode = async () => {
       const cleanedPhone = username.value.replace(/\D/g, '')
       const normalizedPhone = cleanedPhone.startsWith('0') ? cleanedPhone.slice(1) : cleanedPhone
       
-      response = await axios.post('/admin/verifyOtpSms', {
+      response = await axios.post('/auth/admin/verifyOtpSms', {
         phone: normalizedPhone,
         countryCode: '+98',
         code: fullCode

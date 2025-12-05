@@ -223,6 +223,13 @@ const router = createRouter({
       component: SecurityDashboardView,
       meta: { requiresAuth: true }
     },
+    // 404 - آدرس نامعتبر
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('@/views/NotFoundView.vue'),
+      meta: { layout: 'auth' }
+    },
   ],
 })
 

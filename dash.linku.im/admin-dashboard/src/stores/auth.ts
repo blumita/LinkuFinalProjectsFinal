@@ -103,7 +103,7 @@ export const useAuthStore = defineStore('auth', {
             this.isVerifying = true
             
             try {
-                const response = await apiClient.get('/admin/me', {
+                const response = await apiClient.get('/user/admin/me', {
                     headers: {
                         Authorization: `Bearer ${this.token}`
                     },
