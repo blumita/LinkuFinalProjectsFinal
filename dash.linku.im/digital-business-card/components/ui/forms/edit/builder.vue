@@ -9,10 +9,11 @@
         <div v-else class="w-full h-full rounded-xl bg-muted flex items-center justify-center text-muted-foreground text-2xl cursor-pointer" @click="fileInput?.click()">
           <i class="ti ti-form" />
         </div>
-        <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleIconUpload" >
+        <input ref="fileInput" type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/bmp,image/svg+xml" class="hidden" @change="handleIconUpload" >
       </div>
       <div class="flex flex-col items-start justify-center flex-1 order-2">
         <p class="text-sm text-blue-500 font-medium cursor-pointer" @click="fileInput?.click()">برای تغییر آیکون کلیک کنید</p>
+        <p class="text-xs text-gray-500 mt-1">فرمت‌های مجاز: PNG, JPG, JPEG, WEBP, BMP, SVG</p>
       </div>
     </div>
     <div class="mb-4">
@@ -297,7 +298,7 @@ function removeField(idx) {
 function submitForm() {
   const newLink = {
     ...form,
-    id: form.id || `${Date.now()}_${Math.random().toString(36).slice(2)}`,
+    id: form.id,
     title: form.title || 'فرم داینامیک',
     action: form.action || 'builder',
     type: form.type || 'block',
@@ -306,6 +307,7 @@ function submitForm() {
     thankYouMessage: thankYouMessage.value,
     enabled: form.enabled ?? true,
   }
+  console.log('Submitting form:', newLink)
   emit('save', newLink)
 }
 function getDropdownOptions(field) {

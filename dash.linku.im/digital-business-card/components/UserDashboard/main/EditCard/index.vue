@@ -1131,12 +1131,12 @@ async function deleteLinkFromServer(linkId, index) {
     const nuxtApp = useNuxtApp()
     const axios = nuxtApp.$axios
     
-    console.log('Deleting link:', linkId)
+    console.log('Deleting link:', linkId, 'from card:', cardId.value)
     
-    const response = await axios.delete(`v1/cards/${cardId.value}/links/${linkId}/delete`)
+    const response = await axios.delete(`v1/cards/${cardId.value}/links/${linkId}`)
     
     if (response.data.success) {
-      console.log('Link deleted successfully')
+      console.log('Link deleted successfully from server')
       
       // حذف از store محلی
       if (form.links && form.links.length > index) {
@@ -1146,24 +1146,18 @@ async function deleteLinkFromServer(linkId, index) {
       // بروزرسانی iframe
       sendFormDataToIframe()
       
-      showInfoToast('لینک حذف شد', 'ti-check')
+      showInfoToast(response.data.message || 'لینک با موفقیت حذف شد', 'ti-check')
     } else {
-      // حتی اگر سرور موفق نبود، از UI حذف کن
-      if (form.links && form.links.length > index) {
-        form.links.splice(index, 1)
-      }
-      sendFormDataToIframe()
-      showInfoToast('لینک حذف شد', 'ti-check')
+      console.error('Server returned unsuccessful response')
+      showInfoToast(response.data.message || 'خطا در حذف لینک', 'ti-alert-triangle')
     }
     
   } catch (error) {
-    console.error('Error deleting link:', error)
-    // حتی در صورت خطا، از UI حذف کن
-    if (form.links && form.links.length > index) {
-      form.links.splice(index, 1)
-    }
-    sendFormDataToIframe()
-    showInfoToast('لینک حذف شد', 'ti-check')
+    console.error('Error deleting link from server:', error)
+    
+    // نمایش پیام خطا
+    const errorMessage = error.response?.data?.message || 'خطا در حذف لینک از سرور'
+    showInfoToast(errorMessage, 'ti-alert-triangle')
   }
 }
 
@@ -1712,11 +1706,14 @@ watch(() => form.$state, () => {
   }
 }, { deep: true })
 
-watch(() => form.cards, (c) => {
-  if (process.client) {
-    form.setAboutFrom(String(cardId.value))
+// Watch card changes only when cardId actually changes
+let lastLoadedCardId = null
+watch(() => cardId.value, (newCardId, oldCardId) => {
+  if (process.client && newCardId && newCardId !== oldCardId && newCardId !== lastLoadedCardId) {
+    lastLoadedCardId = newCardId
+    form.setAboutFrom(String(newCardId))
   }
-}, {immediate: true})
+}, {immediate: false})
 
 // همگام‌سازی لینک‌ها بین stores
 watch(() => form.links, (newLinks) => {

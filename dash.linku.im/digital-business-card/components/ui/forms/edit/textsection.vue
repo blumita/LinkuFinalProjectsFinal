@@ -9,7 +9,7 @@
         <div v-else class="w-full h-full rounded-xl bg-muted flex items-center justify-center text-muted-foreground text-2xl cursor-pointer" @click="fileInput?.click()">
           <i class="ti ti-section" />
         </div>
-        <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleIconUpload" >
+        <input ref="fileInput" type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/bmp,image/svg+xml" class="hidden" @change="handleIconUpload" >
       </div>
       <p class="text-sm text-blue-500 font-medium cursor-pointer order-2" @click="fileInput?.click()">برای تغییر آیکون کلیک کنید</p>
     </div>

@@ -130,7 +130,7 @@
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               درگاه پرداخت فعال
             </label>
-            <button disabled
+            <button
                 @click="showActiveGatewayDropdown = !showActiveGatewayDropdown"
                 class="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg
                      focus:ring-2 focus:ring-blue-500 focus:border-blue-500
@@ -179,7 +179,7 @@
               کلید API درگاه
             </label>
             <div class="relative">
-              <input disabled
+              <input
                   v-model="settings.gatewayApiKey"
                   :type="showGatewayApiKey ? 'text' : 'password'"
                   class="w-full px-4 py-3 pl-12 border border-slate-300 dark:border-slate-600 rounded-lg
@@ -187,7 +187,7 @@
                        bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
                   placeholder="کلید API درگاه پرداخت"
               />
-              <button disabled
+              <button
                   @click="showGatewayApiKey = !showGatewayApiKey"
                   type="button"
                   class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
@@ -202,7 +202,7 @@
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               شناسه پذیرنده
             </label>
-            <input disabled
+            <input
                 v-model="settings.merchantId"
                 type="text"
                 class="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg
@@ -223,7 +223,7 @@
               </p>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
-              <input disabled
+              <input
                   v-model="settings.paymentTestMode"
                   type="checkbox"
                   class="sr-only peer"
@@ -236,6 +236,21 @@
                          after:h-5 after:w-5 after:transition-all dark:border-slate-600
                          peer-checked:bg-blue-600"></div>
             </label>
+          </div>
+          
+          <!-- Save Button -->
+          <div class="pt-4">
+            <button
+                @click="savePaymentSettings"
+                :disabled="isSavingPayment"
+                class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg
+                     transition-colors duration-200 flex items-center justify-center
+                     disabled:bg-slate-400 disabled:cursor-not-allowed"
+            >
+              <i v-if="!isSavingPayment" class="ti ti-device-floppy ml-2"></i>
+              <i v-else class="ti ti-loader animate-spin ml-2"></i>
+              {{ isSavingPayment ? 'در حال ذخیره...' : 'ذخیره تنظیمات درگاه' }}
+            </button>
           </div>
         </div>
       </div>
@@ -774,6 +789,7 @@ interface Settings {
 const isSaving = ref(false)
 const isSavingSupport = ref(false)
 const isSavingSms = ref(false)
+const isSavingPayment = ref(false)
 const isChangingPassword = ref(false)
 const passwordError = ref('')
 const message = ref('')
@@ -1137,6 +1153,35 @@ const saveSmsSettings = async () => {
     }, 3000)
   } finally {
     isSavingSms.value = false
+  }
+}
+
+// Save Payment Gateway settings
+const savePaymentSettings = async () => {
+  try {
+    isSavingPayment.value = true
+    await axios.post('/user/admin/settings/payment', {
+      activeGateway: settings.activeGateway,
+      gatewayApiKey: settings.gatewayApiKey,
+      merchantId: settings.merchantId,
+      paymentTestMode: settings.paymentTestMode
+    })
+    
+    messageType.value = 'success'
+    message.value = 'تنظیمات درگاه پرداخت با موفقیت ذخیره شد'
+    
+    setTimeout(() => {
+      message.value = ''
+    }, 3000)
+  } catch (error) {
+    messageType.value = 'error'
+    message.value = 'خطا در ذخیره تنظیمات درگاه پرداخت'
+    
+    setTimeout(() => {
+      message.value = ''
+    }, 3000)
+  } finally {
+    isSavingPayment.value = false
   }
 }
 

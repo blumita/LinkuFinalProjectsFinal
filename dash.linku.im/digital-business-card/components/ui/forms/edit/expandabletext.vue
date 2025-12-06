@@ -9,7 +9,7 @@
         <div v-else class="w-full h-full rounded-xl bg-muted flex items-center justify-center text-muted-foreground text-2xl cursor-pointer" @click="fileInput?.click()">
           <i class="ti ti-file-text" />
         </div>
-        <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleIconUpload" :disabled="form.isSubmitting" >
+        <input ref="fileInput" type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/bmp,image/svg+xml" class="hidden" @change="handleIconUpload" :disabled="form.isSubmitting" >
       </div>
       <p class="text-sm text-blue-500 font-medium cursor-pointer order-2" @click="fileInput?.click()">برای تغییر آیکون کلیک کنید</p>
     </div>
@@ -21,7 +21,7 @@
         <textarea
           v-model="form.value"
           rows="6"
-          :placeholder="props.link.placeholder?.link || 'مثلاً متن درباره خدمات ما...'"
+          :placeholder="(props.link.placeholder && typeof props.link.placeholder === 'object' && props.link.placeholder.text) || 'مثلاً متن درباره خدمات ما...'"
           class="w-full px-4 py-3 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
           :disabled="form.isSubmitting"
         ></textarea>

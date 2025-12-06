@@ -32,10 +32,11 @@
             v-bind="iconColor ? { color: iconColor, filled: isIconFilled } : {}"
           />
         </div>
-        <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleIconUpload">
+        <input ref="fileInput" type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/bmp,image/svg+xml" class="hidden" @change="handleIconUpload">
       </div>
       <div class="flex flex-col items-start justify-center flex-1">
         <p class="text-sm text-primary font-medium cursor-pointer" @click="fileInput?.click()">کلیک کنید تا آیکون تغییر کند</p>
+        <p class="text-xs text-muted-foreground mt-1">فرمت‌های مجاز: PNG, JPG, JPEG, WEBP, BMP, SVG</p>
       </div>
     </div>
     <div class="mb-4">

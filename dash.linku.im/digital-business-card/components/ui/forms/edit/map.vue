@@ -32,7 +32,7 @@
                @click="fileInput?.click()">
             <i class="ti ti-map-pin"/>
           </div>
-          <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleIconUpload">
+          <input ref="fileInput" type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/bmp,image/svg+xml" class="hidden" @change="handleIconUpload">
         </div>
         <p class="text-sm text-primary font-medium cursor-pointer order-2" @click="fileInput?.click()">برای تغییر آیکون
           کلیک کنید</p>

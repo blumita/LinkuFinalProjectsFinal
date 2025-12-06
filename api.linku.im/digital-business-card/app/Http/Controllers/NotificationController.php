@@ -206,6 +206,13 @@ class NotificationController
         $sentCount = 0;
         $pushSentCount = 0;
 
+        // لاگ کاربران پیدا شده
+        \Log::info('📱 [Push Notification] Found users', [
+            'recipients' => $validated['recipients'],
+            'total_users' => $users->count(),
+            'user_ids' => $users->pluck('id')->toArray()
+        ]);
+
         // اگه زمان‌بندی شده باشه، فقط لاگ می‌کنیم و ارسال نمی‌کنیم
         if (!empty($validated['scheduledFor'])) {
             $log = NotificationLog::create([
@@ -234,6 +241,12 @@ class NotificationController
         // جمع‌آوری Push Subscriptions از جدول push_subscriptions
         $pushSubscriptions = [];
         
+        \Log::info('📤 [Push Notification] Starting immediate send', [
+            'title' => $validated['title'],
+            'message' => $validated['message'],
+            'type' => $validated['type']
+        ]);
+        
         // ارسال فوری
         foreach ($users as $user) {
             // ارسال نوتیفیکیشن Database
@@ -251,13 +264,29 @@ class NotificationController
 
             // اضافه کردن Push Subscriptions از جدول push_subscriptions (کاربران عادی)
             $userPushSubscriptions = \App\Models\PushSubscription::where('user_id', $user->id)->get();
+            
+            \Log::info('👤 [Push Notification] Processing user', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'subscriptions_count' => $userPushSubscriptions->count()
+            ]);
+            
             foreach ($userPushSubscriptions as $sub) {
                 $pushSubscriptions[] = $sub->toWebPushFormat();
+                \Log::info('📱 [Push Subscription] Added subscription', [
+                    'user_id' => $user->id,
+                    'subscription_id' => $sub->id,
+                    'endpoint' => substr($sub->endpoint, 0, 50) . '...'
+                ]);
             }
         }
 
         // ارسال Push واقعی به گوشی‌ها
         if (!empty($pushSubscriptions)) {
+            \Log::info('🚀 [Push Notification] Starting push send', [
+                'total_subscriptions' => count($pushSubscriptions)
+            ]);
+            
             try {
                 if (class_exists(\Minishlink\WebPush\WebPush::class)) {
                     $webPushService = app(\App\Services\WebPushService::class);
@@ -268,12 +297,23 @@ class NotificationController
                         $validated['actionLink'] ?? null
                     );
                     $pushSentCount = $pushResult['sent'];
+                    
+                    \Log::info('✅ [Push Notification] Push send completed', [
+                        'sent' => $pushResult['sent'],
+                        'failed' => $pushResult['failed'],
+                        'total' => $pushResult['total']
+                    ]);
                 } else {
-                    \Log::info('WebPush package not installed. Skipping push notifications.');
+                    \Log::warning('⚠️ [Push Notification] WebPush package not installed. Skipping push notifications.');
                 }
             } catch (\Exception $e) {
-                \Log::warning('Failed to send push notifications: ' . $e->getMessage());
+                \Log::error('❌ [Push Notification] Failed to send push notifications', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
             }
+        } else {
+            \Log::warning('⚠️ [Push Notification] No push subscriptions found for users');
         }
 
         // ثبت در لاگ

@@ -28,7 +28,7 @@
         <input
           ref="fileInput"
           type="file"
-          accept="image/*"
+          accept="image/png,image/jpeg,image/jpg,image/webp,image/bmp,image/svg+xml"
           class="hidden" @change="handleIconUpload"
         >
       </div>
@@ -48,7 +48,7 @@
         <input
           v-model="form.value"
           type="text"
-          :placeholder="form.placeholder?.link || 'https://www.youtube.com/embed/_vhf0RZg0fg'"
+          :placeholder="(form.placeholder && typeof form.placeholder === 'object' && form.placeholder.url) || 'https://www.youtube.com/embed/_vhf0RZg0fg'"
           class="w-full px-4 py-3 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
         >
       </div>

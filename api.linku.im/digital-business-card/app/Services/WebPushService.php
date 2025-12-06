@@ -31,14 +31,10 @@ class WebPushService
 
         $payload = json_encode([
             'title' => $title,
-            'message' => $message,
             'body' => $message,
+            'message' => $message,
             'url' => $url ?? '/dashboard/notifications',
-            'actionLink' => $url ?? '/dashboard/notifications',
-            'icon' => '/AppImages/android/android-launchericon-192-192.png',
-            'badge' => '/AppImages/android/android-launchericon-96-96.png',
             'timestamp' => now()->timestamp,
-            'vibrate' => [200, 100, 200],
             ...$options
         ]);
 
@@ -76,20 +72,22 @@ class WebPushService
     {
         $payload = json_encode([
             'title' => $title,
-            'message' => $message,
             'body' => $message,
+            'message' => $message,
             'url' => $url ?? '/dashboard/notifications',
-            'actionLink' => $url ?? '/dashboard/notifications',
-            'icon' => '/AppImages/android/android-launchericon-192-192.png',
-            'badge' => '/AppImages/android/android-launchericon-96-96.png',
             'timestamp' => now()->timestamp,
-            'vibrate' => [200, 100, 200],
+        ]);
+
+        \Log::info('📦 [WebPushService] Preparing bulk push', [
+            'subscriptions_count' => count($subscriptions),
+            'title' => $title,
+            'payload_size' => strlen($payload)
         ]);
 
         $successCount = 0;
         $failCount = 0;
 
-        foreach ($subscriptions as $sub) {
+        foreach ($subscriptions as $index => $sub) {
             if (is_string($sub)) {
                 $sub = json_decode($sub, true);
             }
@@ -97,20 +95,45 @@ class WebPushService
             try {
                 $pushSubscription = Subscription::create($sub);
                 $this->webPush->queueNotification($pushSubscription, $payload);
+                \Log::debug('📤 [WebPushService] Queued notification', [
+                    'index' => $index + 1,
+                    'endpoint' => substr($sub['endpoint'] ?? 'unknown', 0, 50) . '...'
+                ]);
             } catch (\Exception $e) {
                 $failCount++;
+                \Log::error('❌ [WebPushService] Failed to queue notification', [
+                    'index' => $index + 1,
+                    'error' => $e->getMessage(),
+                    'endpoint' => substr($sub['endpoint'] ?? 'unknown', 0, 50) . '...'
+                ]);
                 continue;
             }
         }
 
         // ارسال تمام نوتیفیکیشن‌های صف
+        \Log::info('🔄 [WebPushService] Flushing queued notifications');
+        
         foreach ($this->webPush->flush() as $report) {
             if ($report->isSuccess()) {
                 $successCount++;
+                \Log::debug('✅ [WebPushService] Push sent successfully', [
+                    'endpoint' => substr($report->getEndpoint(), 0, 50) . '...'
+                ]);
             } else {
                 $failCount++;
+                \Log::warning('⚠️ [WebPushService] Push failed', [
+                    'endpoint' => substr($report->getEndpoint(), 0, 50) . '...',
+                    'reason' => $report->getReason(),
+                    'expired' => $report->isSubscriptionExpired()
+                ]);
             }
         }
+
+        \Log::info('🏁 [WebPushService] Bulk push completed', [
+            'success' => $successCount,
+            'failed' => $failCount,
+            'total' => count($subscriptions)
+        ]);
 
         return [
             'success' => true,

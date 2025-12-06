@@ -27,7 +27,7 @@
         <input 
           ref="fileInput"
           type="file" 
-          accept="image/*" 
+          accept="image/png,image/jpeg,image/jpg,image/webp,image/bmp,image/svg+xml" 
           class="hidden" 
           @change="handleIconUpload" 
         />
@@ -69,7 +69,7 @@
         <input 
           ref="backgroundFileInput"
           type="file" 
-          accept="image/*" 
+          accept="image/png,image/jpeg,image/jpg,image/webp,image/bmp,image/svg+xml" 
           class="hidden" 
           @change="handleBackgroundUpload"
         >

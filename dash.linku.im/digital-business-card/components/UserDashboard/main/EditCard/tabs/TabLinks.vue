@@ -71,6 +71,7 @@
       <component
           v-else
           :is="getEditComponent(editingItem)"
+          :key="`edit-${editingItem.id}-${Date.now()}`"
           :link="editingItem"
           :cardId="cardId"
           @cancel="cancelEdit"

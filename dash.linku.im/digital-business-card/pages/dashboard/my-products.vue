@@ -65,7 +65,7 @@
         <p class="text-xs lg:text-sm text-muted-foreground mb-6">هنوز محصولی را فعال نکرده‌اید</p>
         <button
           @click="goToActivate"
-          class="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors"
+          class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-xl font-medium hover:bg-primary/90 transition-colors"
         >
           <i class="ti ti-plus"></i>
           <span>فعال‌سازی محصول جدید</span>
@@ -76,7 +76,7 @@
       <div v-if="activatedCards.length" class="mt-6 lg:mt-8">
         <button
           @click="goToActivate"
-          class="w-full bg-gradient-to-r from-primary to-primary/80 text-white py-4 rounded-xl font-semibold hover:from-primary/90 hover:to-primary/70 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+          class="w-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-4 rounded-xl font-semibold hover:from-primary/90 hover:to-primary/70 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
         >
           <i class="ti ti-plus text-xl"></i>
           <span>فعال‌سازی محصول جدید</span>

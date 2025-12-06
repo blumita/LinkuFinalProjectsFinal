@@ -595,6 +595,22 @@
             </div>
           </div>
         </div>
+
+        <!-- Discount Code - Mobile -->
+        <div class="bg-card rounded-xl p-4 shadow-sm border border-border">
+          <button @click="showDiscountSheet = true" class="w-full flex items-center justify-between text-right hover:bg-muted/50 p-2 rounded-lg transition-colors">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <i class="ti ti-discount-2 text-primary text-xl"></i>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-foreground">کد تخفیف دارید؟</div>
+                <div class="text-xs text-muted-foreground">برای اعمال کد تخفیف کلیک کنید</div>
+              </div>
+            </div>
+            <i class="ti ti-chevron-left text-muted-foreground"></i>
+          </button>
+        </div>
       </div>
       </template>
     </div>
@@ -675,9 +691,12 @@
               </div>
 
               <!-- Popular Discounts -->
-              <div class="pt-4 border-t border-border">
+              <div v-if="popularDiscounts.length > 0" class="pt-4 border-t border-border">
                 <div class="text-xs text-muted-foreground mb-3">کدهای تخفیف محبوب</div>
-                <div class="space-y-2">
+                <div v-if="loadingPopularDiscounts" class="space-y-2">
+                  <div v-for="n in 3" :key="n" class="w-full h-16 bg-muted rounded-lg animate-pulse"></div>
+                </div>
+                <div v-else class="space-y-2">
                   <button 
                     v-for="code in popularDiscounts" 
                     :key="code.code"
@@ -728,13 +747,32 @@ const discountValue = ref(0)
 const discountType = ref('')
 const isCheckingDiscount = ref(false)
 const discountStatus = ref<{ type: 'success' | 'error', message: string, amount?: string } | null>(null)
+const { $axios } = useNuxtApp()
 
-// Popular discount codes
-const popularDiscounts = ref([
-  { code: 'WELCOME20', description: 'تخفیف ویژه کاربران جدید', discount: '20%' },
-  { code: 'SUMMER2025', description: 'تخفیف تابستانه', discount: '15%' },
-  { code: 'SPECIAL10', description: 'تخفیف ویژه', discount: '10%' }
-])
+// Popular discount codes from server
+const popularDiscounts = ref<Array<{ code: string, description: string, discount: string }>>([])
+const loadingPopularDiscounts = ref(false)
+
+// Fetch popular discount codes from server
+const fetchPopularDiscounts = async () => {
+  loadingPopularDiscounts.value = true
+  try {
+    const response = await $axios.get('/discounts/popular')
+    if (response.data?.success && Array.isArray(response.data.data)) {
+      popularDiscounts.value = response.data.data.map((item: any) => ({
+        code: item.code || '',
+        description: item.description || item.name || 'تخفیف ویژه',
+        discount: item.type === 'percentage' ? `${item.value}%` : `${item.value.toLocaleString('fa-IR')} تومان`
+      }))
+    }
+  } catch (error) {
+    console.error('Error fetching popular discounts:', error)
+    // If API fails, keep empty array (no mock data)
+    popularDiscounts.value = []
+  } finally {
+    loadingPopularDiscounts.value = false
+  }
+}
 
 // Check if user is using non-Iranian IP
 const checkIPLocation = async () => {
@@ -1034,28 +1072,38 @@ const goToDashboard = () => {
 }
 
 const applyDiscount = async () => {
-  if (!discountCode.value) return
+  if (!discountCode.value || !selectedPlan.value) return
   
   isCheckingDiscount.value = true
   discountStatus.value = null
   
   try {
-    // TODO: Replace with actual API call
-    // const { $axios } = useNuxtApp()
-    // const response = await $axios.post('/discount/validate', { code: discountCode.value })
+    const response = await $axios.post('/discounts/validate', {
+      code: discountCode.value,
+      planId: selectedPlan.value.id
+    })
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // Mock response - replace with actual API response
-    const mockValid = ['WELCOME20', 'SUMMER2025', 'SPECIAL10'].includes(discountCode.value.toUpperCase())
-    
-    if (mockValid) {
+    if (response.data?.success && response.data.data) {
+      const discount = response.data.data
+      appliedDiscountCode.value = discountCode.value
+      discountValue.value = discount.value || 0
+      discountType.value = discount.type || 'percentage'
+      
+      let discountText = ''
+      if (discount.type === 'percentage') {
+        discountText = `${discount.value}٪`
+      } else if (discount.type === 'fixed') {
+        discountText = `${discount.value.toLocaleString('fa-IR')} تومان`
+      }
+      
       discountStatus.value = {
         type: 'success',
         message: 'کد تخفیف با موفقیت اعمال شد',
-        amount: '20,000 تومان'
+        amount: discountText
       }
+      
+      toast.success(`تخفیف ${discountText} اعمال شد`)
+      
       // Close sheet after 2 seconds
       setTimeout(() => {
         showDiscountSheet.value = false
@@ -1063,13 +1111,23 @@ const applyDiscount = async () => {
     } else {
       discountStatus.value = {
         type: 'error',
-        message: 'کد تخفیف نامعتبر است'
+        message: response.data?.message || 'کد تخفیف نامعتبر است'
       }
     }
-  } catch (error) {
+  } catch (error: any) {
+    let errorMessage = 'خطا در بررسی کد تخفیف'
+    
+    if (error.response?.data?.message) {
+      errorMessage = error.response.data.message
+    } else if (error.response?.status === 404) {
+      errorMessage = 'کد تخفیف یافت نشد'
+    } else if (error.response?.status === 422) {
+      errorMessage = 'کد تخفیف منقضی شده یا غیرفعال است'
+    }
+    
     discountStatus.value = {
       type: 'error',
-      message: 'خطا در بررسی کد تخفیف'
+      message: errorMessage
     }
   } finally {
     isCheckingDiscount.value = false
@@ -1097,6 +1155,9 @@ onMounted(async () => {
     
     // Check IP location
     await checkIPLocation()
+    
+    // Fetch popular discounts from server
+    await fetchPopularDiscounts()
     
     // Fetch plans if not loaded
     if (planStore.plans.length === 0) {

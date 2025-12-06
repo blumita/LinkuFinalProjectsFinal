@@ -134,4 +134,52 @@ class SettingsController extends Controller
 
         return response()->json(['message' => 'تنظیمات پیامک با موفقیت ذخیره شد']);
     }
+
+    /**
+     * Get payment gateway settings
+     */
+    public function getPaymentSettings(): JsonResponse
+    {
+        $settings = Setting::whereIn('key', [
+            'activeGateway', 'gatewayApiKey', 'merchantId', 'paymentTestMode'
+        ])->pluck('value', 'key')->toArray();
+
+        return response()->json([
+            'activeGateway' => $settings['activeGateway'] ?? 'zarinpal',
+            'gatewayApiKey' => $settings['gatewayApiKey'] ?? '',
+            'merchantId' => $settings['merchantId'] ?? '',
+            'paymentTestMode' => filter_var($settings['paymentTestMode'] ?? false, FILTER_VALIDATE_BOOLEAN),
+        ]);
+    }
+
+    /**
+     * Update payment gateway settings
+     */
+    public function updatePaymentSettings(Request $request): JsonResponse
+    {
+        $request->validate([
+            'activeGateway' => 'nullable|string|in:zarinpal,mellat,pasargad,saman,parsian',
+            'gatewayApiKey' => 'nullable|string',
+            'merchantId' => 'nullable|string',
+            'paymentTestMode' => 'nullable|boolean',
+        ]);
+
+        $settings = [
+            'activeGateway' => $request->activeGateway,
+            'gatewayApiKey' => $request->gatewayApiKey,
+            'merchantId' => $request->merchantId,
+            'paymentTestMode' => $request->paymentTestMode,
+        ];
+
+        foreach ($settings as $key => $value) {
+            if ($value !== null) {
+                Setting::set($key, $value);
+            }
+        }
+
+        // Clear config cache so changes take effect
+        \Artisan::call('config:clear');
+
+        return response()->json(['message' => 'تنظیمات درگاه پرداخت با موفقیت ذخیره شد']);
+    }
 }

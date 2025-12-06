@@ -61,6 +61,12 @@
         class="w-full h-screen flex flex-col overflow-hidden relative scrollbar-hide"
         :dir="formData?.layout === 'left' ? 'ltr' : 'rtl'"
     >
+      <!-- پس‌زمینه سفید -->
+      <div
+          class="absolute inset-0 w-full h-full pointer-events-none"
+          :style="`background-color: ${formData?.themeColor?.background || '#ffffff'}; z-index: 0; opacity: 0.03;`"
+      />
+      
       <!-- محتوای اصلی -->
       <div class="relative z-10 flex-1 pb-8 overflow-auto scrollbar-hide">
         <!-- کاور -->

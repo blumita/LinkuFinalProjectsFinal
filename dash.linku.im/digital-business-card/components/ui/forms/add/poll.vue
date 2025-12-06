@@ -33,7 +33,7 @@
           <input
             ref="fileInput"
             type="file"
-            accept="image/*"
+            accept="image/png,image/jpeg,image/jpg,image/webp,image/bmp,image/svg+xml"
             class="hidden"
             @change="handleIconUpload"
           >
@@ -71,7 +71,7 @@
         <input
           v-model="form.value"
           type="text"
-          :placeholder="form.placeholder?.link || 'مثلاً نظرتون درباره خدمات ما؟'"
+          :placeholder="(form.placeholder && typeof form.placeholder === 'object' && form.placeholder.text) || 'مثلاً نظرتون درباره خدمات ما؟'"
           class="w-full px-4 py-2 bg-muted rounded-lg border border-border text-sm text-foreground"
         >
       </div>

@@ -23,7 +23,7 @@
             v-bind="iconColor ? { color: iconColor, filled: isIconFilled } : {}"
           />
         </div>
-        <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleIconUpload" >
+        <input ref="fileInput" type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/bmp,image/svg+xml" class="hidden" @change="handleIconUpload" >
       </div>
       <p class="text-sm text-primary font-medium cursor-pointer" @click="fileInput?.click()">برای تغییر آیکون کلیک کنید</p>
       <p v-if="iconError" class="text-xs text-destructive mt-1">آیکون الزامی است</p>
