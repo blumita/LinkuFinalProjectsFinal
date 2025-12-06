@@ -61,11 +61,6 @@
         class="w-full h-screen flex flex-col overflow-hidden relative scrollbar-hide"
         :dir="formData?.layout === 'left' ? 'ltr' : 'rtl'"
     >
-      <!-- پس‌زمینه سفید -->
-      <div
-          class="absolute inset-0 w-full h-full pointer-events-none"
-          style="background-color: #ffffff; z-index: 0;"
-      />
       <!-- محتوای اصلی -->
       <div class="relative z-10 flex-1 pb-8 overflow-auto scrollbar-hide">
         <!-- کاور -->
@@ -86,7 +81,7 @@
             <button
                 @click="toggleOptionsMenu"
                 type="button"
-                class="w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all duration-300 border border-white/20"
+                class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all duration-300 border border-gray-200"
             >
               <i class="ti ti-dots-vertical text-sm"></i>
             </button>
@@ -94,20 +89,20 @@
             <!-- منوی کشویی -->
             <div
                 v-if="showOptionsMenu"
-                class="absolute top-12 ltr:right-0 rtl:left-0 bg-white/95 backdrop-blur-lg rounded-xl shadow-2xl border border-white/30 py-2 min-w-[160px] z-30"
+                class="absolute top-12 ltr:right-0 rtl:left-0 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 min-w-[160px] z-30"
             >
               <button
-                  @click="openShareModal"
+                  @click="openShareModal($event)"
                   type="button"
-                  class="w-full text-right px-4 py-3 hover:bg-gray-50/80 flex items-center gap-3 text-gray-700 transition-all duration-200"
+                  class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-all duration-200"
               >
                 <i class="ti ti-share text-gray-600"></i>
                 اشتراک‌گذاری
               </button>
               <button
-                  @click="openReportModal"
+                  @click="openReportModal($event)"
                   type="button"
-                  class="w-full text-right px-4 py-3 hover:bg-gray-50/80 flex items-center gap-3 text-gray-700 transition-all duration-200"
+                  class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-all duration-200"
               >
                 <i class="ti ti-flag text-gray-600"></i>
                 گزارش محتوا
@@ -449,7 +444,7 @@
         <div v-if="!formData.removeBranding" class="flex items-center justify-center py-6 px-6">
              <div v-if="!formData.removeBranding" class="flex items-center justify-center py-6 px-6">
           <div
-              class="flex items-center gap-2 text-xs text-gray-500 bg-gray-100/50 px-4 py-2 rounded-full border border-gray-200/50 backdrop-blur-sm">
+              class="flex items-center gap-2 text-xs text-gray-500 bg-gray-100 px-4 py-2 rounded-full border border-gray-200">
             <img src="/logo.svg" alt="Linku Logo" class="w-4 h-4" />
             <span class="font-medium">ساخته شده با</span>
             <span class="font-bold text-gray-700">لینکو</span>
@@ -674,7 +669,7 @@
       <!-- Lead Capture Modal -->
       <div
           v-if="formData.isLeadCaptureEnabled"
-          class="fixed inset-0 bg-white/70 bg-opacity-50 z-50 w-full p-4 backdrop-blur-[1px]"
+          class="fixed inset-0 bg-gray-50 z-50 w-full p-4"
           style="display: grid; place-items: center;"
       >
         <LayoutLeadForm class="w-full" @close="closeLeadCapture" :cardId="cardId" :slug="slug" :isDefault="isDefault"/>
@@ -1414,8 +1409,14 @@ function getComponent(item) {
     if (!item) return markRaw('div')  // fallback ساده
 
     // اگر action وجود داره و component مربوطه موجوده
-    if (item.action && PreviewItems[item.action]) {
-      return markRaw(PreviewItems[item.action])
+    if (item.action) {
+      // Make action lowercase for case-insensitive matching
+      const actionLower = item.action.toLowerCase()
+      
+      // Check if component exists with lowercase action name
+      if (PreviewItems[actionLower]) {
+        return markRaw(PreviewItems[actionLower])
+      }
     }
 
     // بر اساس type انتخاب کن

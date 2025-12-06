@@ -838,25 +838,49 @@ const toGregorian = (shamsiDate: string): string => {
 }
 
 const toJalaali = (gregorianDate: string | Date): string => {
-  const dateStr = typeof gregorianDate === 'string'
-      ? gregorianDate
-      : gregorianDate.toISOString().split('T')[0] // "YYYY-MM-DD"
+  try {
+    if (!gregorianDate) return 'بدون انقضا'
+    
+    const dateStr = typeof gregorianDate === 'string'
+        ? gregorianDate
+        : gregorianDate.toISOString().split('T')[0] // "YYYY-MM-DD"
 
-  const [gy, gm, gd] = dateStr.split('-').map(Number)
-  const { jy, jm, jd } = jalaali.toJalaali(gy, gm, gd)
-  return `${jy}/${String(jm).padStart(2, '0')}/${String(jd).padStart(2, '0')}`
+    if (!dateStr || dateStr.trim() === '') return 'بدون انقضا'
+    
+    const parts = dateStr.split('-')
+    if (parts.length !== 3) return 'بدون انقضا'
+    
+    const [gy, gm, gd] = parts.map(Number)
+    
+    // Validate numbers
+    if (isNaN(gy) || isNaN(gm) || isNaN(gd)) return 'بدون انقضا'
+    if (gy < 1900 || gy > 2100) return 'بدون انقضا'
+    if (gm < 1 || gm > 12) return 'بدون انقضا'
+    if (gd < 1 || gd > 31) return 'بدون انقضا'
+    
+    const { jy, jm, jd } = jalaali.toJalaali(gy, gm, gd)
+    return `${jy}/${String(jm).padStart(2, '0')}/${String(jd).padStart(2, '0')}`
+  } catch (error) {
+    console.error('Error converting date to Jalaali:', error)
+    return 'بدون انقضا'
+  }
 }
 
 const formatDate = (date: string | null | undefined): string => {
   if (!date || typeof date !== 'string' || date.trim() === '') return 'بدون انقضا'
 
-  const normalized = normalizePersianDigits(date)
+  try {
+    const normalized = normalizePersianDigits(date)
 
-  if (/^(13|14)\d{2}\/\d{1,2}\/\d{1,2}$/.test(normalized)) {
-    return date
+    if (/^(13|14)\d{2}\/\d{1,2}\/\d{1,2}$/.test(normalized)) {
+      return date
+    }
+
+    return toJalaali(date)
+  } catch (error) {
+    console.error('Error formatting date:', error)
+    return 'بدون انقضا'
   }
-
-  return toJalaali(date)
 }
 
 // Image upload handlers

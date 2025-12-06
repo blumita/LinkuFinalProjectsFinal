@@ -411,6 +411,12 @@ const loginWithPassword = async () => {
     
     if (response.data?.success && response.data?.token) {
       authStore.setToken(response.data.token)
+      // Verify token to set user data
+      const verified = await authStore.verifyToken()
+      if (!verified) {
+        showInfoToast('خطا در احراز هویت. لطفاً دوباره تلاش کنید', 'ti-alert-triangle')
+        return
+      }
       await nextTick()
       showInfoToast('ورود موفقیت‌آمیز بود', 'ti-check')
       setTimeout(() => {
@@ -527,6 +533,16 @@ const verifyOtpCode = async () => {
 
     if (response?.data?.token) {
       authStore.setToken(response.data.token)
+      // Verify token to set user data
+      const verified = await authStore.verifyToken()
+      if (!verified) {
+        otpError.value = true
+        otp.value = ['', '', '', '']
+        const container = otpContainer.value
+        if (container) (container.children[0] as HTMLInputElement)?.focus()
+        showInfoToast('خطا در احراز هویت. لطفاً دوباره تلاش کنید', 'ti-alert-triangle')
+        return
+      }
       await nextTick()
       showInfoToast('ورود موفقیت‌آمیز بود', 'ti-check')
       setTimeout(() => {

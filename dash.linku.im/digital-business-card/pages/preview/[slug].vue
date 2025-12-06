@@ -1288,8 +1288,14 @@ function getComponent(item) {
     if (!item) return markRaw('div')  // fallback ساده
 
     // اگر action وجود داره و component مربوطه موجوده
-    if (item.action && PreviewItems[item.action]) {
-      return markRaw(PreviewItems[item.action])
+    if (item.action) {
+      // Make action lowercase for case-insensitive matching
+      const actionLower = item.action.toLowerCase()
+      
+      // Check if component exists with lowercase action name
+      if (PreviewItems[actionLower]) {
+        return markRaw(PreviewItems[actionLower])
+      }
     }
 
     // بر اساس type انتخاب کن
