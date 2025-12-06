@@ -169,7 +169,6 @@
                     :modules="modules"
                     :slides-per-view="'auto'"
                     :space-between="12"
-                    :free-mode="{ enabled: true, sticky: false, momentumBounce: false }"
                     :grab-cursor="true"
                     :touch-start-prevent-default="false"
                     :resistance-ratio="0"
@@ -237,7 +236,6 @@
             </div>
             <div v-else class="text-center text-muted-foreground mt-6 px-4 md:px-8 lg:px-12">موردی یافت نشد.</div>
           </div>
-          </div>
         </div>
     </div>
   </div>
@@ -284,10 +282,17 @@ import { Swiper, SwiperSlide } from 'swiper/vue'
 import { FreeMode } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/free-mode'
+// @ts-ignore
 import type { AnyItem, IconType } from '~/types/data'
+// @ts-ignore
 import * as AddForms from '~/components/ui/forms/add'
+// @ts-ignore
 import { useModalIconComponents } from '~/composables/useModalIconComponents'
 import InfoToast from "~/components/UserDashboard/modals/InfoToast.vue";
+// @ts-ignore
+import { useUserStore } from '~/stores/user'
+// @ts-ignore
+import { useSafeFormStore } from '~/composables/useSafeFormStore'
 const showToast = ref(false)
 const toastTitle = ref('')
 const toastType = ref('warning')
@@ -364,7 +369,7 @@ function getItemIconComponent(item: AnyItem) {
 
 onMounted(async () => {
   try {
-    const data = await $fetch('/api/routes/data')
+    const data = await $fetch<{ categories?: Array<{ title: string; type?: string; items: any[] }> }>('/api/routes/data')
     if (!data?.categories) return
 
     const merged: AnyItem[] = []
