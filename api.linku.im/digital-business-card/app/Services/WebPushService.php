@@ -29,13 +29,20 @@ class WebPushService
             $subscription = json_decode($subscription, true);
         }
 
+        // استاندارد Web Push Notification
         $payload = json_encode([
-            'title' => $title,
-            'body' => $message,
-            'message' => $message,
-            'url' => $url ?? '/dashboard/notifications',
-            'timestamp' => now()->timestamp,
-            ...$options
+            'notification' => [
+                'title' => $title,
+                'body' => $message,
+                'icon' => '/icon-192x192.png',
+                'badge' => '/badge-96x96.png',
+                'tag' => 'linku-notification',
+                'requireInteraction' => false,
+                'data' => [
+                    'url' => $url ?? '/dashboard/notifications',
+                    'timestamp' => now()->timestamp,
+                ]
+            ]
         ]);
 
         try {
@@ -70,12 +77,20 @@ class WebPushService
      */
     public function sendBulkNotifications(array $subscriptions, string $title, string $message, ?string $url = null)
     {
+        // استاندارد Web Push Notification
         $payload = json_encode([
-            'title' => $title,
-            'body' => $message,
-            'message' => $message,
-            'url' => $url ?? '/dashboard/notifications',
-            'timestamp' => now()->timestamp,
+            'notification' => [
+                'title' => $title,
+                'body' => $message,
+                'icon' => '/icon-192x192.png',
+                'badge' => '/badge-96x96.png',
+                'tag' => 'linku-notification',
+                'requireInteraction' => false,
+                'data' => [
+                    'url' => $url ?? '/dashboard/notifications',
+                    'timestamp' => now()->timestamp,
+                ]
+            ]
         ]);
 
         \Log::info('📦 [WebPushService] Preparing bulk push', [

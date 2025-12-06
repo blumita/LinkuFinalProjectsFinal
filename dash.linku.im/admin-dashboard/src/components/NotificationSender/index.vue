@@ -183,71 +183,7 @@
           />
         </div>
 
-        <!-- Banner Image Upload -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            تصویر بنر (اختیاری)
-          </label>
-          <div class="space-y-2">
-            <input
-              type="file"
-              @change="handleBannerUpload"
-              accept="image/*"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white file:ml-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-500 file:text-white file:cursor-pointer hover:file:bg-blue-600"
-            />
-            <div v-if="bannerPreview" class="relative w-full h-32 rounded-xl overflow-hidden border border-gray-300 dark:border-gray-600">
-              <img :src="bannerPreview" class="w-full h-full object-cover" alt="Banner preview" />
-              <button
-                type="button"
-                @click="removeBanner"
-                class="absolute top-2 right-2 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
-              >
-                <i class="ti ti-x text-sm"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Icon Image Upload -->
-        <div>
-          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            آیکون (اختیاری)
-          </label>
-          <div class="space-y-2">
-            <input
-              type="file"
-              @change="handleIconUpload"
-              accept="image/*"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white file:ml-4 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-500 file:text-white file:cursor-pointer hover:file:bg-blue-600"
-            />
-            <div v-if="iconPreview" class="relative w-24 h-24 rounded-xl overflow-hidden border border-gray-300 dark:border-gray-600">
-              <img :src="iconPreview" class="w-full h-full object-cover" alt="Icon preview" />
-              <button
-                type="button"
-                @click="removeIcon"
-                class="absolute top-1 right-1 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
-              >
-                <i class="ti ti-x text-xs"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Background Color Picker -->
-        <div>
-          <label for="backgroundColor" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-            رنگ پس‌زمینه (اختیاری)
-          </label>
-          <div class="flex gap-3">
-            <input
-              id="backgroundColor"
-              :value="validColorValue"
-              @input="handleColorInput"
-              type="color"
-              class="w-20 h-12 border border-gray-300 dark:border-gray-600 rounded-xl cursor-pointer"
-            />
-            <input
-              v-model="notificationData.backgroundColor"
+        <!-- Is Pinned -->
               type="text"
               placeholder="#ffffff"
               class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"

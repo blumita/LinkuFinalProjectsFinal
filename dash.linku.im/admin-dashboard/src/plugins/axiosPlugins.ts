@@ -40,6 +40,15 @@ export default {
                 // Handle 401 Unauthorized
                 if (error.response?.status === 401) {
                     const authStore = useAuthStore()
+                    
+                    // لاگ برای دیدن کدوم API داره 401 برمی‌گردونه
+                    console.error('🔴 401 Unauthorized:', {
+                        url: error.config?.url,
+                        method: error.config?.method,
+                        response: error.response?.data,
+                        headers: error.config?.headers
+                    })
+                    
                     console.warn('Token expired or invalid, logging out...')
                     authStore.logout()
                     
