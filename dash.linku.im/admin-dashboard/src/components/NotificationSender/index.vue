@@ -183,22 +183,6 @@
           />
         </div>
 
-        <!-- Is Pinned -->
-              type="text"
-              placeholder="#ffffff"
-              class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-            />
-            <button
-              v-if="notificationData.backgroundColor"
-              @click="notificationData.backgroundColor = ''"
-              type="button"
-              class="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
-              <i class="ti ti-x"></i>
-            </button>
-          </div>
-        </div>
-
         <!-- Pin Notification -->
         <div class="flex items-center gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800 rounded-xl">
           <input
