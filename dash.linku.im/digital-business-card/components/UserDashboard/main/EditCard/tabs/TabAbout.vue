@@ -148,6 +148,12 @@ async function saveForm() {
       const userStore = useUserStore()
       await userStore.fetchUser()
 
+      // بروزرسانی formStore با داده‌های جدید
+      const formStore = useFormStore()
+      if (formStore && cardId.value) {
+        formStore.setAboutFrom(cardId.value)
+      }
+
       showInfoToast(response.data.message, 'ti-check')
 
     } else {
