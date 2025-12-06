@@ -243,31 +243,12 @@ function handleContactClick(item) {
   window.location.href = url
 }
 async function downloadVCard() {
-  // گرفتن همه لینک‌ها از selectedItems یا لیست کامل لینک‌ها
+  // فقط لینک‌های انتخاب شده در کارت تماس رو بگیر
   let items = []
   
-  // اول از selectedItems که در کارت تماس انتخاب شده‌اند
+  // فقط از selectedItems استفاده کن
   if (props.link && props.link.selectedItems && Array.isArray(props.link.selectedItems)) {
     items = [...props.link.selectedItems]
-  }
-  
-  // همچنین همه لینک‌های پروفایل رو هم اضافه کن (فقط type=link)
-  if (formData.value && formData.value.links && Array.isArray(formData.value.links)) {
-    formData.value.links.forEach((link) => {
-      // فقط لینک‌ها (نه بلاک‌ها) و آیتم‌هایی که فعال هستند
-      if (link.type === 'link' && link.enabled !== false) {
-        // چک کن که قبلاً اضافه نشده باشه
-        const exists = items.some(item => item.id === link.id || item.value === link.value)
-        if (!exists) {
-          items.push({
-            id: link.id,
-            action: link.action,
-            value: link.value,
-            name: link.displayName || link.title || link.name || ''
-          })
-        }
-      }
-    })
   }
 
   if (items.length === 0) return

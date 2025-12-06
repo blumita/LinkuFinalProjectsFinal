@@ -10,10 +10,10 @@
         class="w-full h-screen flex flex-col overflow-hidden relative scrollbar-hide"
         :dir="formData?.layout === 'left' ? 'ltr' : 'rtl'"
     >
-      <!-- پس‌زمینه با رنگ کمرنگ‌تر -->
+      <!-- پس‌زمینه سفید -->
       <div
           class="absolute inset-0 w-full h-full pointer-events-none"
-          :style="{ backgroundColor: getLighterColor(formData?.themeColor?.background ?? '#ffffff'), zIndex: 0, transition: 'background-color 0.3s' }"
+          style="background-color: #ffffff; z-index: 0;"
       />
       
       <!-- هدر ثابت -->
@@ -87,12 +87,7 @@
           <div
               v-if="formData?.layout === 'portrait'"
               class="absolute inset-0"
-              :style="{
-            background: `linear-gradient(to bottom,
-              transparent 50%,
-              ${getLighterColor(formData?.themeColor?.background ?? '#ffffff')} 85%,
-              ${getLighterColor(formData?.themeColor?.background ?? '#ffffff')} 100%)`
-          }"
+              style="background: linear-gradient(to bottom, transparent 50%, #ffffff 85%, #ffffff 100%);"
           />
 
           <!-- آواتار و لوگو - موقعیت بر اساس layout -->

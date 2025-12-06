@@ -179,26 +179,43 @@ function handleIconUpload(event) {
   }
 }
 
-async function toggleItemSelection(itemId) {
-  const item = profileItems.value.find(item => item.id === itemId)
-  if (item) {
-    selectedMap.value[itemId] = !selectedMap.value[itemId]
-
-    const response = await $axios.patch(`v1/cards/${props.cardId}/links/${itemId}`, {enabled: selectedMap.value[itemId]});
-  }
+function toggleItemSelection(itemId) {
+  // فقط selectedMap رو تغییر بده - ذخیره واقعی موقع submit انجام میشه
+  selectedMap.value[itemId] = !selectedMap.value[itemId]
 }
 
 function submitForm() {
-  const selectedItems = profileItems.value.filter(i => selectedMap.value[i.id]);
-  emit('submit', { ...form, selectedItems });
+  // فقط آیتم‌های انتخاب شده رو بگیر و اطلاعات کامل اون‌ها رو ارسال کن
+  const selectedItems = profileItems.value
+    .filter(i => selectedMap.value[i.id])
+    .map(i => ({
+      id: i.originalItem.id,
+      action: i.originalItem.action,
+      value: i.originalItem.value,
+      name: i.name,
+      originalItem: i.originalItem
+    }));
+  
+  emit('submit', { ...form, selectedItems, action: 'contactcard' });
 }
+
 onMounted(() => {
-  if (formStore && Array.isArray(formStore.links)) {
-    formStore.links.forEach(link => {
-      if (link.type === 'link') {
-        selectedMap.value[link.id] = link.enabled === true
+  // اگر در حال ویرایش هستیم و selectedItems داریم، از اون استفاده کن
+  if (props.link?.selectedItems && Array.isArray(props.link.selectedItems)) {
+    props.link.selectedItems.forEach(item => {
+      if (item.id) {
+        selectedMap.value[item.id] = true
       }
     })
+  } else {
+    // اگر selectedItems نداریم، از enabled status لینک‌ها استفاده کن
+    if (formStore && Array.isArray(formStore.links)) {
+      formStore.links.forEach(link => {
+        if (link.type === 'link' && link.enabled === true) {
+          selectedMap.value[link.id] = true
+        }
+      })
+    }
   }
 })
 

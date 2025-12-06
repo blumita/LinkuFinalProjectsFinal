@@ -278,9 +278,8 @@ const form = reactive<MapBlock & { showDescription?: boolean }>({
   icon: props.link?.icon || {type: 'component', path: 'linkumap'},
   customIcon: props.link?.customIcon || '',
   displayName: props.link?.displayName || '',
-  placeholder: props.link?.placeholder || {},
   access: props.link?.access || 'free',
-  showDescription: typeof props.link?.showDescription === 'boolean' ? props.link.showDescription : false,
+  showDescription: !!(props.link?.description && props.link.description.trim()),
 })
 
 // اگر لینک موجود داره، location selected رو true کن

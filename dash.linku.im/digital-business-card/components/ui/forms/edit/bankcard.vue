@@ -282,14 +282,14 @@ function onSubmit() {
   // ارسال داده‌ها
   emit('submit', {
     ...card,
-    action:'bankcard',
+    action: 'bankcard',
     cardNumber: cleanedCardNumber,
     bankName: bankName,
     icon: form.icon,
     customIcon: form.customIcon,
     title: form.title,
     description: showDescription.value ? form.description : '',
-    type: 'block' // تضمین اینکه همیشه بلاک باشد
+    type: 'block'
   });
 }
 

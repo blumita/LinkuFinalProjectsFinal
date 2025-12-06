@@ -186,7 +186,15 @@ const hasValidAuth = computed(() => {
 })
 
 // User data
-const userName = computed(() => userStore.user?.name || 'کاربر')
+const userName = computed(() => {
+  // اولویت با نام کارت دیفالت (که در card_users ذخیره میشه)
+  const defaultCard = formStore.defaultCard || formStore.cards?.[0]
+  if (defaultCard?.name) {
+    return defaultCard.name
+  }
+  // در غیر این صورت از userStore استفاده کن
+  return userStore.user?.name || 'کاربر'
+})
 const userUserName = computed(() => userStore.user?.userName || userStore.user?.username || '')
 const userAvatar = computed(() => userStore.user?.avatar || '/logo.svg')
 const isPro = computed(() => userStore.user?.isPro || false)

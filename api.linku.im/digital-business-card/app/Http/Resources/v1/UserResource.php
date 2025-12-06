@@ -19,9 +19,16 @@ class UserResource extends JsonResource
             $fullName = $this->name;
         }
         
+        // Get name from default card if exists, otherwise use user name
+        $displayName = $this->name;
+        $defaultCard = $this->cards()->where('is_default', true)->first();
+        if ($defaultCard && $defaultCard->user) {
+            $displayName = $defaultCard->user->name ?: $this->name;
+        }
+        
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'name' => $displayName,
             'fullName' => $fullName,
             'firstName'=>$this->first_name,
             'lastName'=>$this->last_name,
