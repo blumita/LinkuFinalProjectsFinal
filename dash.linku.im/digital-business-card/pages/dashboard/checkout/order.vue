@@ -913,11 +913,11 @@ const selectedPlan = computed(() => {
     id: plan.id,
     title: plan.title,
     duration: plan.duration,
-    monthlyPrice: `${formatPrice(monthlyPrice)} ت`,
-    totalPrice: `${formatPrice(finalPrice)} ت`,
-    originalPrice: `${formatPrice(plan.price)} ت`,
+    monthlyPrice: `${formatPrice(monthlyPrice)} تومان`,
+    totalPrice: `${formatPrice(finalPrice)} تومان`,
+    originalPrice: `${formatPrice(plan.price)} تومان`,
     discount: `${plan.discount}٪`,
-    discountAmount: `${formatPrice(discountAmount)} ت`,
+    discountAmount: `${formatPrice(discountAmount)} تومان`,
     icon: getIconForPlan(plan.duration),
     months: months,
     hasDiscount: plan.discount > 0
@@ -990,25 +990,34 @@ const proceedToPayment = async () => {
     console.error('Payment error:', error)
     
     let errorMsg = 'خطا در برقراری ارتباط با درگاه پرداخت'
+    let errorTitle = 'خطا در پرداخت'
     
+    // بررسی پیام خطای سرور
     if (error.response?.data?.message) {
-      errorMsg = error.response.data.message
+      const serverMsg = error.response.data.message
+      
+      // خطای redirect_url_not_created
+      if (serverMsg.includes('redirect_url_not_created') || serverMsg === 'messages.redirect_url_not_created') {
+        errorTitle = 'درگاه پرداخت غیرفعال است'
+        errorMsg = 'متأسفانه درگاه پرداخت در حال حاضر غیرفعال است. لطفاً با پشتیبانی تماس بگیرید یا بعداً مجدداً تلاش کنید.'
+      } else {
+        errorMsg = serverMsg
+      }
     } else if (error.response?.status === 500) {
+      errorTitle = 'خطای سرور'
       errorMsg = 'خطا در سرور. لطفاً چند لحظه دیگر تلاش کنید.'
     } else if (error.response?.status === 422) {
+      errorTitle = 'اطلاعات نامعتبر'
       errorMsg = 'اطلاعات وارد شده نامعتبر است.'
     } else if (!navigator.onLine) {
+      errorTitle = 'قطع اینترنت'
       errorMsg = 'اتصال اینترنت خود را بررسی کنید.'
     }
     
-    // نمایش پیام خطای واضح‌تر
-    if (errorMsg.includes('redirect_url_not_created') || errorMsg.includes('gateway')) {
-      toast.error('خطا در ایجاد لینک پرداخت. لطفاً با پشتیبانی تماس بگیرید.\nشماره پشتیبانی: 021-12345678', {
-        duration: 5000
-      })
-    } else {
-      toast.error(errorMsg, { duration: 4000 })
-    }
+    // نمایش toast با جزئیات بیشتر
+    toast.error(errorMsg, {
+      duration: 6000
+    })
   } finally {
     isLoading.value = false
   }

@@ -13,7 +13,10 @@ export default defineNuxtPlugin((nuxtApp) => {
     api.interceptors.request.use(config => {
         const authStore = useAuthStore()
 
-        authStore.hydrateToken() // Restore token on page load
+        // فقط اگر token توی store نیست، یکبار hydrate کن
+        if (!authStore.token) {
+            authStore.hydrateToken()
+        }
 
         const token = authStore.token
 

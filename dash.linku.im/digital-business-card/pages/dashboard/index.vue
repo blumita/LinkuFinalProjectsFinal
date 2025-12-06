@@ -178,9 +178,8 @@ const showPreviewMobile = ref(false)
 // چک امنیتی - اگه token نیست رندر نکن
 const hasValidAuth = computed(() => {
   if (import.meta.client) {
-    const token = localStorage.getItem('auth_token')
-    const cookieToken = document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1]
-    return !!(token || cookieToken)
+    // از authStore استفاده کن به جای مستقیم خوندن localStorage
+    return authStore.isAuthenticated
   }
   return false // در SSR رندر نکن
 })
@@ -228,7 +227,11 @@ const copyProfileLink = async () => {
 
 // بارگذاری اطلاعات کاربر
 onMounted(async () => {
-  authStore.hydrateToken()
+  // فقط اگر token توی store نیست، hydrate کن
+  if (!authStore.token) {
+    authStore.hydrateToken()
+  }
+  
   if (authStore.isAuthenticated) {
     await userStore.fetchUser()
     formStore.cards = userStore.cards

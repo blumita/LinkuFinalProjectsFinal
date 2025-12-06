@@ -17,21 +17,16 @@ export default defineNuxtRouteMiddleware(async (to) => {
     if (import.meta.client) {
         const authStore = useAuthStore()
         
-        // اول از store بخون، بعد از localStorage و cookie
-        let token = authStore.token
-        if (!token) {
-            token = localStorage.getItem('auth_token') || document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1] || null
+        // اگر token در store نیست، فقط یکبار hydrate کن
+        if (!authStore.token) {
+            authStore.hydrateToken()
         }
+        
+        const token = authStore.token
         
         if (!token) {
             console.log('❌ No token found - redirecting to login')
             return navigateTo('/auth/login')
-        }
-        
-        // اگه token توی store نیست، set کن
-        if (!authStore.token) {
-            console.log('✅ Hydrating token to store')
-            authStore.setToken(token)
         }
         
         // Validate با API (فقط یکبار یا بعد از 5 دقیقه)

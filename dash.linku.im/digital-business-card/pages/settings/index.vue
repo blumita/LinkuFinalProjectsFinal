@@ -568,15 +568,15 @@ const { $pwa } = useNuxtApp()
 
 const goBack = () => {
   if ($pwa?.safeNavigateBack) {
-    $pwa.safeNavigateBack('/profile')
+    $pwa.safeNavigateBack('/dashboard')
   } else {
     // fallback
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
                          (window.navigator as any).standalone === true
     if (isStandalone || window.history.length <= 2) {
-      window.location.href = '/profile'
+      router.push('/dashboard')
     } else {
-      window.history.back()
+      router.back()
     }
   }
 }

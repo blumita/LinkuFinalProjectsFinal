@@ -97,21 +97,7 @@
                 v-if="['ماه', '3ماه', '6ماه', 'سال'].includes(plan.duration)"
                 class="text-3xl font-extrabold opacity-95"
             >
-              <template v-if="plan.duration === 'ماه'">
-                {{ Math.round(finalMonthlyPrice(plan)).toLocaleString('fa-IR') }} تومان
-              </template>
-
-              <template v-if="plan.duration === '3ماه'">
-                {{ Math.round(finalMonthlyPrice(plan)).toLocaleString('fa-IR') }} تومان
-              </template>
-
-              <template v-else-if="plan.duration === '6ماه'">
-                {{ Math.round(finalMonthlyPrice(plan)).toLocaleString('fa-IR') }} تومان
-              </template>
-
-              <template v-else-if="plan.duration === 'سال'">
-                {{ Math.round(finalMonthlyPrice(plan)).toLocaleString('fa-IR') }} تومان
-              </template>
+              {{ Math.round(finalMonthlyPrice(plan)).toLocaleString('fa-IR') }} تومان
             </p>
           </div>
 

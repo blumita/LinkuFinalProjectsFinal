@@ -236,6 +236,11 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
+  // Hydrate token once from sessionStorage if not already done
+  if (!authStore.isHydrated) {
+    authStore.hydrateToken()
+  }
+
   // اگر مسیر نیاز به auth دارد (همه جا به جز login)
   if (to.meta.requiresAuth) {
     // اول چک کنیم توکن وجود داره یا نه
@@ -245,17 +250,19 @@ router.beforeEach(async (to, from, next) => {
       return next({ name: 'login', replace: true })
     }
     
-    // همیشه با سرور چک کنیم (حتی اگر قبلا verify شده باشد)
-    try {
-      const isValid = await authStore.verifyToken()
-      if (!isValid) {
-        console.warn('🚫 Invalid token - redirecting to login')
+    // فقط اگه هنوز verify نشده باشه، با سرور چک کن
+    if (!authStore.isVerified) {
+      try {
+        const isValid = await authStore.verifyToken()
+        if (!isValid) {
+          console.warn('🚫 Invalid token - redirecting to login')
+          return next({ name: 'login', replace: true })
+        }
+      } catch (error) {
+        console.error('🚫 Token verification error:', error)
+        authStore.logout()
         return next({ name: 'login', replace: true })
       }
-    } catch (error) {
-      console.error('🚫 Token verification error:', error)
-      authStore.logout()
-      return next({ name: 'login', replace: true })
     }
   }
 

@@ -63,19 +63,29 @@ const setStoredUser = (user: any): void => {
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
-        token: getStoredToken(),
-        user: getStoredUser(),
+        token: '',
+        user: null,
         isVerified: false,
-        isVerifying: false
+        isVerifying: false,
+        isHydrated: false
     }),
     getters: {
         isAuthenticated: (state) => !!state.token && state.token.length > 0 && state.isVerified
     },
     actions: {
+        // Hydrate token from sessionStorage once
+        hydrateToken() {
+            if (!this.isHydrated) {
+                this.token = getStoredToken()
+                this.user = getStoredUser()
+                this.isHydrated = true
+            }
+        },
         setToken(token: string) {
             this.token = token
             setStoredToken(token)
             this.isVerified = false
+            this.isHydrated = true
         },
         setUser(user: any) {
             this.user = user
@@ -86,6 +96,7 @@ export const useAuthStore = defineStore('auth', {
             this.user = null
             this.isVerified = false
             this.isVerifying = false
+            this.isHydrated = false
             clearStoredToken()
         },
         async verifyToken(): Promise<boolean> {

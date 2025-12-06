@@ -266,7 +266,7 @@
                 <div v-else class="h-6 mb-3"></div>
                 
                 <div class="text-3xl font-bold mb-4" :class="getPlanTextColor(index)">
-                  {{ Math.round(plan.price / 1000) }} ت
+                  {{ Math.round(plan.price).toLocaleString('fa-IR') }} تومان
                 </div>
                 <button 
                   @click="goToOrder(plan.id)" 

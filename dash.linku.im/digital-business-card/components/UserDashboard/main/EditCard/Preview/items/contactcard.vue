@@ -187,7 +187,14 @@ const sanitizedLink = computed(() => {
   return sanitized
 })
 
-const iconData = computed(() => sanitizedLink.value?.icon || null)
+const iconData = computed(() => {
+  // اگر link.icon وجود داره و خالی نیست، استفاده کن
+  if (sanitizedLink.value?.icon) {
+    return sanitizedLink.value.icon
+  }
+  // در غیر این صورت، ایکون پیش‌فرض contactcard
+  return { type: 'component', name: 'contactcard' }
+})
 
 // Icon color logic - return user selected color or undefined for default SVG colors
 const iconColor = computed(() => {
@@ -207,8 +214,11 @@ const isIconFilled = computed(() => {
 
 const iconComponent = computed(() => {
   const component = getIconComponent(iconData.value);
-  // Default to contactcard component if no component found
-  return component || null; // Let the template handle the fallback
+  // اگر ایکون پیدا نشد، از ایکون contactcard پیش‌فرض استفاده کن
+  if (!component) {
+    return getIconComponent({ type: 'component', name: 'contactcard' })
+  }
+  return component
 })
 const isLinkType = computed(() => props.link.type === 'link' || props.link.action !== 'contactcard');
 const isListMode = computed(() => sanitizedLink.value?.description && sanitizedLink.value.description.trim());

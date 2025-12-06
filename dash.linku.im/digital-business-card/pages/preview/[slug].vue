@@ -87,7 +87,11 @@
           <div
               v-if="formData?.layout === 'portrait'"
               class="absolute inset-0"
-              style="background: linear-gradient(to bottom, transparent 50%, #ffffff 85%, #ffffff 100%);"
+              :style="{
+            background: `linear-gradient(to bottom,
+              transparent 60%,
+              ${getLighterColor(formData?.themeColor?.background ?? '#ffffff')} 100%)`
+          }"
           />
 
           <!-- آواتار و لوگو - موقعیت بر اساس layout -->

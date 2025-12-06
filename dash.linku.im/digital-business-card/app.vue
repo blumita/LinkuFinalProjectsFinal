@@ -19,22 +19,26 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '~/stores/auth'
 
 const router = useRouter()
+const authStore = useAuthStore()
 const authChecked = ref(false)
 
 onMounted(() => {
+  // Hydrate token once at app start
+  if (!authStore.token) {
+    authStore.hydrateToken()
+  }
+  
   // چک فوری authentication
   const currentPath = window.location.pathname.toLowerCase()
   const publicPaths = ['/auth', '/login', '/register', '/forgot-password', '/reset-password', '/', '/card', '/c/']
   const isPublicPath = publicPaths.some(p => currentPath === p || currentPath.startsWith(p))
   
   if (!isPublicPath) {
-    // صفحه محافظت شده - چک token
-    const token = localStorage.getItem('auth_token')
-    const cookieToken = document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1]
-    
-    if (!token && !cookieToken) {
+    // صفحه محافظت شده - چک token از authStore
+    if (!authStore.isAuthenticated) {
       // هیچ token ای نیست - پاک کن و برو لاگین
       localStorage.clear()
       document.cookie.split(";").forEach(c => {

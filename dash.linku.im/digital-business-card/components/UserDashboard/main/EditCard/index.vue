@@ -168,19 +168,33 @@
 
         <!-- سوئیچ فرم لید -->
         <div class="bg-card p-4 sm:p-6 rounded-xl mb-6 border border-border mt-8">
-          <div class="flex items-center justify-between">
-            <div>
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex-1">
               <h3 class="text-base font-semibold text-foreground mb-1">فرم دریافت اطلاعات</h3>
               <p class="text-sm text-muted-foreground">فعال‌سازی فرم برای جمع‌آوری اطلاعات بازدیدکنندگان</p>
             </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input 
-                type="checkbox" 
-                v-model="form.isLeadCaptureEnabled"
-                class="sr-only peer"
+            
+            <div class="flex items-center gap-3">
+              <!-- دکمه ویرایش فرمساز (دسکتاپ و موبایل) -->
+              <button
+                @click.prevent.stop="goToLeadCapture"
+                type="button"
+                class="px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
               >
-              <div class="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-card after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-            </label>
+                <i class="ti ti-edit text-base"></i>
+                <span class="hidden sm:inline">ویرایش فرم</span>
+              </button>
+              
+              <!-- سوئیچ فعال/غیرفعال -->
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  v-model="form.isLeadCaptureEnabled"
+                  class="sr-only peer"
+                >
+                <div class="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-card after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              </label>
+            </div>
           </div>
         </div>
         
