@@ -78,6 +78,11 @@ export const useAuthStore = defineStore('auth', {
             if (!this.isHydrated) {
                 this.token = getStoredToken()
                 this.user = getStoredUser()
+                // اگر هم توکن و هم یوزر وجود داشت، فرض می‌کنیم verified است
+                // (نیازی به verify مجدد در هر refresh نیست)
+                if (this.token && this.user) {
+                    this.isVerified = true
+                }
                 this.isHydrated = true
             }
         },

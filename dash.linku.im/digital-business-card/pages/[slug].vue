@@ -682,18 +682,12 @@
   <template v-else>
     <transition name="fade">
       <div
-          class="fixed inset-0 flex flex-col items-center justify-center bg-white text-black z-50"
+          class="fixed inset-0 flex items-center justify-center bg-white z-50"
       >
-        <!-- متن در حال بارگذاری -->
-        <div class="text-center space-y-6">
-          <h2 class="text-2xl font-bold text-gray-800">در حال بارگذاری...</h2>
-          
-          <!-- لودر سه‌دایره‌ای -->
-          <div class="flex justify-center space-x-reverse space-x-3">
-            <span class="w-3 h-3 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-            <span class="w-3 h-3 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-            <span class="w-3 h-3 bg-blue-600 rounded-full animate-bounce"></span>
-          </div>
+        <!-- لودر دایره چرخان -->
+        <div class="flex flex-col items-center gap-4">
+          <div class="w-10 h-10 border-3 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+          <p class="text-sm text-gray-500">در حال بارگذاری</p>
         </div>
       </div>
     </transition>

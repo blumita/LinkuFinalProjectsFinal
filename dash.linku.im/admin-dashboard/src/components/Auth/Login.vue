@@ -420,7 +420,7 @@ const loginWithPassword = async () => {
       await nextTick()
       showInfoToast('ورود موفقیت‌آمیز بود', 'ti-check')
       setTimeout(() => {
-        window.location.href = '/'
+        router.push({ name: 'home' })
       }, 500)
     } else {
       showInfoToast(response.data?.message || 'نام کاربری یا رمز عبور اشتباه است', 'ti-alert-triangle')
@@ -546,7 +546,7 @@ const verifyOtpCode = async () => {
       await nextTick()
       showInfoToast('ورود موفقیت‌آمیز بود', 'ti-check')
       setTimeout(() => {
-        window.location.href = '/'
+        router.push({ name: 'home' })
       }, 500)
     } else {
       otpError.value = true
