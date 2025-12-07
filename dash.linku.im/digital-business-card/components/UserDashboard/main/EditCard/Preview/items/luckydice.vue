@@ -337,7 +337,7 @@ const checkForPlay = async () => {
     const response = await $axios.get(`club/${props.link?.hash}/luckyDice/check`)
     emit('message',response.data.message || '')
     return response.status === 200
-  } catch (error: any) {
+  } catch (error) {
     if (error.response?.status === 403) {
       emit('message',error.response.data.message || '')
       return false

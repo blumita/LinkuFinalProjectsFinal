@@ -759,7 +759,7 @@ export default defineComponent({
         }
         result.value=response.data.data.result.result
 
-      } catch (error:any) {
+      } catch (error) {
       }
     }
     const checkForPlay = async () => {
@@ -767,7 +767,7 @@ export default defineComponent({
         const response = await axios.get(`club/${props.link?.hash}/luckyWheel/check`)
         emit('message',response.data.message || '')
         return response.status === 200
-      } catch (error: any) {
+      } catch (error) {
         if (error.response?.status === 403) {
           emit('message',error.response.data.message || '')
           return false
