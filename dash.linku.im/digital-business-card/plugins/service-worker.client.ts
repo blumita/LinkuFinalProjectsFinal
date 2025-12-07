@@ -50,7 +50,19 @@ export default defineNuxtPlugin(async () => {
     // تابع برای ثبت Push Subscription
     const subscribeToPush = async () => {
       try {
-        const VAPID_PUBLIC_KEY = 'BFzttfamBJ5XHjuy55yNQTCdkR2rbgE3J0oYQHmEgoiRJPPrLWPt5lkTBZn7jS30UBdMLCeBplkznfAoZSjXkUY'
+        // دریافت VAPID key از API
+        const { $axios } = useNuxtApp()
+        let VAPID_PUBLIC_KEY = 'BBrc3IGoGmr0QFGKjlze9bcN13pPYTxNiKlsumViMDsMocHhc6MTnWJYb5CP0bI-nni13kBrzXK4vKkDY2QA2yc'
+        
+        try {
+          const { data } = await $axios.get('/vapid-public-key')
+          if (data.publicKey) {
+            VAPID_PUBLIC_KEY = data.publicKey
+            console.log('✅ VAPID key loaded from API:', VAPID_PUBLIC_KEY.substring(0, 20) + '...')
+          }
+        } catch (error) {
+          console.warn('⚠️ Failed to load VAPID from API, using default')
+        }
         
         const subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,

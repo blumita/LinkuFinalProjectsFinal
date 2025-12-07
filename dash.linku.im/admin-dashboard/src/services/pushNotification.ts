@@ -2,8 +2,27 @@
  * سرویس مدیریت Push Notifications
  */
 
-// کلید عمومی VAPID از بک‌اند
-const VAPID_PUBLIC_KEY = 'BFzttfamBJ5XHjuy55yNQTCdkR2rbgE3J0oYQHmEgoiRJPPrLWPt5lkTBZn7jS30UBdMLCeBplkznfAoZSjXkUY';
+import axios from 'axios'
+
+// کلید عمومی VAPID از بک‌اند (fallback)
+let VAPID_PUBLIC_KEY = 'BBrc3IGoGmr0QFGKjlze9bcN13pPYTxNiKlsumViMDsMocHhc6MTnWJYb5CP0bI-nni13kBrzXK4vKkDY2QA2yc';
+
+/**
+ * دریافت VAPID key از API
+ */
+async function fetchVapidKey(): Promise<string> {
+  try {
+    const apiUrl = import.meta.env.VITE_API_URL || 'https://api.linku.im'
+    const response = await axios.get(`${apiUrl}/vapid-public-key`)
+    if (response.data.publicKey) {
+      VAPID_PUBLIC_KEY = response.data.publicKey
+      console.log('✅ VAPID key loaded from API:', VAPID_PUBLIC_KEY.substring(0, 20) + '...')
+    }
+  } catch (error) {
+    console.warn('⚠️ Failed to load VAPID from API, using default:', error)
+  }
+  return VAPID_PUBLIC_KEY
+}
 
 /**
  * تبدیل Base64 URL-safe به Uint8Array
@@ -82,8 +101,11 @@ export async function createPushSubscription(): Promise<PushSubscription | null>
       return subscription;
     }
 
+    // دریافت VAPID key از API
+    const vapidKey = await fetchVapidKey()
+    
     // ایجاد subscription جدید
-    const convertedVapidKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+    const convertedVapidKey = urlBase64ToUint8Array(vapidKey);
     
     subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,

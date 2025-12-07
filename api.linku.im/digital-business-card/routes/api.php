@@ -912,3 +912,12 @@ Route::fallback(function () {
         'status' => 404,
     ], 404);
 });
+
+// Public VAPID endpoint (no authentication required) - returns only public key
+Route::get('/vapid-public-key', function() {
+    $settings = \App\Models\Setting::whereIn('key', ['vapidPublicKey'])->pluck('value', 'key')->toArray();
+    
+    return response()->json([
+        'publicKey' => $settings['vapidPublicKey'] ?? config('services.vapid.public_key') ?? env('VAPID_PUBLIC_KEY', '')
+    ]);
+});
