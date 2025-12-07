@@ -11,11 +11,26 @@ class WebPushService
 
     public function __construct()
     {
+        $publicKey = config('services.vapid.public_key') ?? env('VAPID_PUBLIC_KEY');
+        $privateKey = config('services.vapid.private_key') ?? env('VAPID_PRIVATE_KEY');
+
+        // اگر کلیدها موجود نیستند، لاگ کن و exception نزن
+        if (empty($publicKey) || empty($privateKey)) {
+            \Log::warning('⚠️ VAPID keys not configured. Push notifications will be disabled.', [
+                'public_key_set' => !empty($publicKey),
+                'private_key_set' => !empty($privateKey),
+            ]);
+            
+            // یک WebPush ساده بدون VAPID بساز (فقط برای جلوگیری از crash)
+            $this->webPush = new WebPush([]);
+            return;
+        }
+
         $this->webPush = new WebPush([
             'VAPID' => [
                 'subject' => 'mailto:support@linku.im',
-                'publicKey' => env('VAPID_PUBLIC_KEY'),
-                'privateKey' => env('VAPID_PRIVATE_KEY'),
+                'publicKey' => $publicKey,
+                'privateKey' => $privateKey,
             ]
         ]);
     }
@@ -25,6 +40,15 @@ class WebPushService
      */
     public function sendNotification($subscription, string $title, string $message, ?string $url = null, ?array $options = [])
     {
+        // بررسی که VAPID تنظیم شده باشد
+        if (!$this->isConfigured()) {
+            \Log::warning('⚠️ Push notification skipped - VAPID not configured');
+            return [
+                'success' => false,
+                'message' => 'VAPID keys not configured'
+            ];
+        }
+
         if (is_string($subscription)) {
             $subscription = json_decode($subscription, true);
         }
@@ -77,6 +101,18 @@ class WebPushService
      */
     public function sendBulkNotifications(array $subscriptions, string $title, string $message, ?string $url = null)
     {
+        // بررسی که VAPID تنظیم شده باشد
+        if (!$this->isConfigured()) {
+            \Log::warning('⚠️ Bulk push notifications skipped - VAPID not configured');
+            return [
+                'success' => false,
+                'sent' => 0,
+                'failed' => count($subscriptions),
+                'total' => count($subscriptions),
+                'message' => 'VAPID keys not configured'
+            ];
+        }
+
         // استاندارد Web Push Notification
         $payload = json_encode([
             'notification' => [
@@ -156,5 +192,16 @@ class WebPushService
             'failed' => $failCount,
             'total' => count($subscriptions)
         ];
+    }
+
+    /**
+     * بررسی اینکه VAPID keys تنظیم شده‌اند
+     */
+    private function isConfigured(): bool
+    {
+        $publicKey = config('services.vapid.public_key') ?? env('VAPID_PUBLIC_KEY');
+        $privateKey = config('services.vapid.private_key') ?? env('VAPID_PRIVATE_KEY');
+        
+        return !empty($publicKey) && !empty($privateKey);
     }
 }

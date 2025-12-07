@@ -4,7 +4,7 @@
     <div class="fixed top-0 left-0 right-0 z-40 bg-card border-b border-border">
       <div class="flex items-center h-14 px-4 max-w-5xl mx-auto">
         <button
-          @click="goBack"
+          @click="() => goBack('/dashboard')"
           class="flex items-center justify-center w-10 h-10 rounded-lg text-foreground hover:bg-accent transition-colors"
         >
           <i class="ti ti-arrow-right text-xl"></i>
@@ -496,6 +496,134 @@
       </div>
     </UiBottomSheet>
 
+    <!-- Notification Settings Bottom Sheet -->
+    <UiBottomSheet
+      v-model="isNotificationSheetOpen"
+      title="تنظیمات اعلان‌ها"
+      size="auto"
+      :closable="true"
+      :close-on-backdrop="true"
+    >
+      <div class="px-6 py-4 pb-6 space-y-6">
+        <!-- Push Notification Status -->
+        <div class="text-center">
+          <div class="w-20 h-20 mx-auto rounded-full bg-blue-500/10 flex items-center justify-center mb-4">
+            <i :class="[
+              'text-4xl',
+              notificationPermission === 'granted' ? 'ti ti-bell-ringing text-blue-500' : 'ti ti-bell-off text-muted-foreground'
+            ]"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-foreground mb-2">
+            {{ notificationPermission === 'granted' ? 'اعلان‌ها فعال است' : 'اعلان‌ها غیرفعال است' }}
+          </h3>
+          <p class="text-sm text-muted-foreground">
+            {{ notificationPermission === 'granted' 
+              ? 'شما اعلان‌های مهم را دریافت می‌کنید' 
+              : 'برای دریافت اعلان‌های مهم، دسترسی را فعال کنید' 
+            }}
+          </p>
+        </div>
+
+        <!-- Enable/Disable Button -->
+        <button
+          v-if="notificationPermission !== 'granted'"
+          @click="handleEnableNotifications"
+          :disabled="isEnablingNotifications"
+          class="w-full h-12 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          <i v-if="isEnablingNotifications" class="ti ti-loader animate-spin text-xl"></i>
+          <span>{{ isEnablingNotifications ? 'در حال فعال‌سازی...' : 'فعال کردن اعلان‌ها' }}</span>
+        </button>
+
+        <!-- Notification Settings (if granted) -->
+        <div v-if="notificationPermission === 'granted'" class="space-y-4">
+          <!-- System Notifications -->
+          <div class="flex items-center justify-between p-4 bg-card border border-border rounded-xl">
+            <div class="flex items-center gap-3">
+              <i class="ti ti-bell text-foreground text-xl"></i>
+              <div>
+                <div class="font-medium text-foreground">اعلان‌های سیستمی</div>
+                <div class="text-xs text-muted-foreground">اطلاعیه‌های مهم سیستم</div>
+              </div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" v-model="notificationSettings.system" class="sr-only peer" @change="saveNotificationSettings">
+              <div class="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+            </label>
+          </div>
+
+          <!-- Subscription Notifications -->
+          <div class="flex items-center justify-between p-4 bg-card border border-border rounded-xl">
+            <div class="flex items-center gap-3">
+              <i class="ti ti-crown text-foreground text-xl"></i>
+              <div>
+                <div class="font-medium text-foreground">اعلان‌های اشتراک</div>
+                <div class="text-xs text-muted-foreground">تمدید و وضعیت اشتراک</div>
+              </div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" v-model="notificationSettings.subscription" class="sr-only peer" @change="saveNotificationSettings">
+              <div class="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+            </label>
+          </div>
+
+          <!-- Payment Notifications -->
+          <div class="flex items-center justify-between p-4 bg-card border border-border rounded-xl">
+            <div class="flex items-center gap-3">
+              <i class="ti ti-credit-card text-foreground text-xl"></i>
+              <div>
+                <div class="font-medium text-foreground">اعلان‌های پرداخت</div>
+                <div class="text-xs text-muted-foreground">تراکنش‌ها و پرداخت‌ها</div>
+              </div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" v-model="notificationSettings.payment" class="sr-only peer" @change="saveNotificationSettings">
+              <div class="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+            </label>
+          </div>
+
+          <!-- Security Notifications -->
+          <div class="flex items-center justify-between p-4 bg-card border border-border rounded-xl">
+            <div class="flex items-center gap-3">
+              <i class="ti ti-shield-check text-foreground text-xl"></i>
+              <div>
+                <div class="font-medium text-foreground">اعلان‌های امنیتی</div>
+                <div class="text-xs text-muted-foreground">ورود و فعالیت‌های حساب</div>
+              </div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" v-model="notificationSettings.security" class="sr-only peer" @change="saveNotificationSettings">
+              <div class="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+            </label>
+          </div>
+
+          <!-- Test Notification Button -->
+          <button
+            @click="sendTestNotification"
+            :disabled="isSendingTest"
+            class="w-full h-12 rounded-xl border-2 border-primary text-primary font-medium hover:bg-primary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            <i v-if="isSendingTest" class="ti ti-loader animate-spin text-xl"></i>
+            <i v-else class="ti ti-send text-xl"></i>
+            <span>{{ isSendingTest ? 'در حال ارسال...' : 'ارسال اعلان تستی' }}</span>
+          </button>
+        </div>
+
+        <!-- Help Text -->
+        <div class="p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl">
+          <div class="flex gap-3">
+            <i class="ti ti-info-circle text-blue-500 text-xl flex-shrink-0"></i>
+            <div class="text-sm text-muted-foreground">
+              <p class="mb-2">برای دریافت اعلان‌های مهم، PWA لینکو را نصب کنید و دسترسی اعلان را فعال کنید.</p>
+              <p v-if="notificationPermission === 'denied'" class="text-red-500">
+                ⚠️ دسترسی اعلان‌ها در تنظیمات مرورگر غیرفعال شده. لطفاً از تنظیمات مرورگر دسترسی را فعال کنید.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </UiBottomSheet>
+
     <!-- Biometric Settings Bottom Sheet -->
     <UiBottomSheet
       v-model="isBiometricSheetOpen"
@@ -593,6 +721,33 @@ const defaultCard = computed(() => formStore.defaultCard)
 // Theme management
 const isThemeSheetOpen = ref(false)
 const isLanguageSheetOpen = ref(false)
+const isNotificationSheetOpen = ref(false)
+
+// Notification management
+const notificationPermission = ref<NotificationPermission>('default')
+const isEnablingNotifications = ref(false)
+const isSendingTest = ref(false)
+const notificationSettings = ref({
+  system: true,
+  subscription: true,
+  payment: true,
+  security: true
+})
+
+// Check notification permission on mount
+if (process.client && 'Notification' in window) {
+  notificationPermission.value = Notification.permission
+  
+  // Load notification settings from localStorage
+  const savedSettings = localStorage.getItem('notification-settings')
+  if (savedSettings) {
+    try {
+      notificationSettings.value = JSON.parse(savedSettings)
+    } catch (e) {
+      // Keep defaults
+    }
+  }
+}
 
 // Theme mode
 const currentThemeMode = ref<'light' | 'dark' | 'system'>('system')
@@ -685,7 +840,7 @@ const handleSettingClick = (setting: string) => {
       isLanguageSheetOpen.value = true
       break
     case 'notifications':
-      router.push('/settings/notifications')
+      isNotificationSheetOpen.value = true
       break
     case 'biometric':
       isBiometricSheetOpen.value = true
@@ -732,6 +887,92 @@ const handleBiometricToggle = async () => {
     }
   }
   isBiometricSheetOpen.value = false
+}
+
+// Notification handlers
+const handleEnableNotifications = async () => {
+  if (!('Notification' in window)) {
+    alert('مرورگر شما از اعلان‌ها پشتیبانی نمی‌کند')
+    return
+  }
+
+  isEnablingNotifications.value = true
+
+  try {
+    const permission = await Notification.requestPermission()
+    notificationPermission.value = permission
+
+    if (permission === 'granted') {
+      // Subscribe to push notifications
+      const { $subscribeToPush } = useNuxtApp()
+      if ($subscribeToPush) {
+        const success = await $subscribeToPush()
+        if (success) {
+          alert('✅ اعلان‌ها با موفقیت فعال شدند')
+        } else {
+          alert('⚠️ اعلان فعال شد اما ثبت push notification با خطا مواجه شد')
+        }
+      } else {
+        alert('✅ اعلان‌ها فعال شدند')
+      }
+    } else if (permission === 'denied') {
+      alert('❌ دسترسی به اعلان‌ها رد شد. لطفاً از تنظیمات مرورگر دسترسی را فعال کنید.')
+    }
+  } catch (error) {
+    console.error('Error enabling notifications:', error)
+    alert('خطا در فعال‌سازی اعلان‌ها')
+  } finally {
+    isEnablingNotifications.value = false
+  }
+}
+
+const saveNotificationSettings = () => {
+  if (process.client) {
+    localStorage.setItem('notification-settings', JSON.stringify(notificationSettings.value))
+  }
+}
+
+const sendTestNotification = async () => {
+  if (notificationPermission.value !== 'granted') {
+    alert('ابتدا باید دسترسی اعلان را فعال کنید')
+    return
+  }
+
+  isSendingTest.value = true
+
+  try {
+    // اول یه نوتیفیکیشن محلی نشون بده
+    if ('Notification' in window) {
+      new Notification('تست اعلان لینکو', {
+        body: 'این یک اعلان تستی است ✨',
+        icon: '/AppImages/android/android-launchericon-192-192.png',
+        badge: '/AppImages/android/android-launchericon-96-96.png',
+        tag: 'test-notification',
+        requireInteraction: false,
+        vibrate: [200, 100, 200],
+        timestamp: Date.now()
+      })
+    }
+
+    // بعد درخواست به سرور بفرست (اگه بکند API داره)
+    const { $axios } = useNuxtApp()
+    try {
+      await $axios.post('/user/push-subscription/test')
+      alert('✅ اعلان تستی ارسال شد')
+    } catch (error: any) {
+      // اگه API خطا داد، بررسی کن چه خطایی بوده
+      if (error.response?.data?.message) {
+        alert('⚠️ ' + error.response.data.message)
+      } else {
+        console.log('Test notification API error:', error)
+      }
+    }
+  } catch (error) {
+    console.error('Error sending test notification:', error)
+    alert('خطا در ارسال اعلان تستی')
+  } finally {
+    isSendingTest.value = false
+  }
 }
 
 const handleThemeModeChange = (mode: 'light' | 'dark' | 'system') => {
