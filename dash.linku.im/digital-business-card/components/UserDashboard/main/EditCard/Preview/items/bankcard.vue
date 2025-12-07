@@ -20,7 +20,14 @@
           backgroundColor: iconColor && iconColor !== 'transparent' ? iconColor : (isDarkTheme || isLightTheme ? 'transparent' : '#f3f4f6')
         }"
       >
+        <img
+          v-if="link?.customIcon"
+          :src="link.customIcon"
+          class="w-full h-full object-contain"
+          alt="custom icon"
+        />
         <component 
+          v-else
           :is="iconComponent"
           :size="50"
           v-bind="iconColor && iconColor !== 'transparent' ? { color: iconColor, filled: isIconFilled } : {}"
@@ -56,7 +63,14 @@
             <div class="p-4 border-b border-gray-200">
               <div class="flex items-center gap-3">
                 <div class="flex items-center justify-center flex-shrink-0 rounded-lg w-12 h-12 border border-gray-200">
+                  <img
+                    v-if="link?.customIcon"
+                    :src="link.customIcon"
+                    class="w-full h-full object-contain"
+                    alt="custom icon"
+                  />
                   <component 
+                    v-else
                     :is="iconComponent"
                     :size="24"
                     v-bind="iconColor ? { color: iconColor, filled: isIconFilled } : {}"

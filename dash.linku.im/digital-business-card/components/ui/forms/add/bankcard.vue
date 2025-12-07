@@ -248,6 +248,7 @@ const isIconFilled = computed(() => {
 })
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
+const isSubmitting = ref(false);
 
 const card = reactive({
   cardNumber: '',
@@ -259,7 +260,10 @@ const card = reactive({
   showBankDropdown: false,
 });
 
-function onSubmit() {
+async function onSubmit() {
+  // جلوگیری از ارسال مکرر
+  if (isSubmitting.value) return;
+  
   // اعتبارسنجی شماره کارت
   const cleanedCardNumber = (card.cardNumber || '').replace(/\s+/g, '');
   if (!/^\d{16}$/.test(cleanedCardNumber)) {
@@ -274,32 +278,43 @@ function onSubmit() {
     return;
   }
   
-  // ارسال داده‌ها
-  emit('submit', {
-    ...card,
-    action:'bankcard',
-    cardNumber: cleanedCardNumber,
-    bankName: bankName,
-    icon: form.icon,
-    customIcon: form.customIcon,
-    title: form.title,
-    description: showDescription.value ? form.description : '',
-    type: 'block' // تضمین اینکه همیشه بلاک باشد
-  });
+  isSubmitting.value = true;
   
-  // پاک کردن فرم
-  card.cardNumber = '';
-  card.accountHolder = '';
-  card.bankName = '';
-  card.customBank = '';
-  card.accountNumber = '';
-  card.ibanNumber = '';
-  card.showBankDropdown = false;
-  form.icon = '';
-  form.customIcon = '';
-  form.title = '';
-  form.description = '';
-  showDescription.value = false;
+  try {
+    // ارسال داده‌ها
+    emit('submit', {
+      ...card,
+      action:'bankcard',
+      cardNumber: cleanedCardNumber,
+      bankName: bankName,
+      icon: form.icon,
+      customIcon: form.customIcon,
+      title: form.title,
+      description: showDescription.value ? form.description : '',
+      type: 'block' // تضمین اینکه همیشه بلاک باشد
+    });
+    
+    // پاک کردن فرم بعد از تاخیر کوتاه
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    card.cardNumber = '';
+    card.accountHolder = '';
+    card.bankName = '';
+    card.customBank = '';
+    card.accountNumber = '';
+    card.ibanNumber = '';
+    card.showBankDropdown = false;
+    form.icon = '';
+    form.customIcon = '';
+    form.title = '';
+    form.description = '';
+    showDescription.value = false;
+  } finally {
+    // بازگردانی وضعیت بعد از تاخیر
+    setTimeout(() => {
+      isSubmitting.value = false;
+    }, 300);
+  }
 }
 
 function handleClickOutside(event: MouseEvent) {
@@ -335,12 +350,6 @@ function formatIbanInput(event: Event) {
   }
   card.ibanNumber = value;
 }
-onMounted(() => {
-  window.addEventListener('mousedown', handleClickOutside);
-});
-onUnmounted(() => {
-  window.removeEventListener('mousedown', handleClickOutside);
-});
 
 function handleIconUpload(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0];
@@ -352,6 +361,13 @@ function handleIconUpload(event: Event) {
   };
   reader.readAsDataURL(file);
 }
+
+onMounted(() => {
+  window.addEventListener('mousedown', handleClickOutside);
+});
+onUnmounted(() => {
+  window.removeEventListener('mousedown', handleClickOutside);
+});
 </script>
 
 <style scoped>

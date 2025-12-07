@@ -5,7 +5,7 @@
       <div class="max-w-4xl mx-auto px-4 py-4">
         <div class="flex items-center gap-3">
           <button
-            @click="$router.back()"
+            @click="goBack()"
             class="w-10 h-10 flex items-center justify-center rounded-xl bg-background hover:bg-secondary transition-colors"
           >
             <i class="ti ti-arrow-right text-xl text-primary"></i>
@@ -118,11 +118,15 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
 
 definePageMeta({
   middleware: 'require-activated',
   layout: 'default'
 })
+
+// Navigation
+const { goBack } = useSafeNavigation()
 
 // Data
 const isDataLoaded = ref(true)

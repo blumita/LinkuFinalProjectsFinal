@@ -16,7 +16,14 @@
         isListMode ? 'flex-shrink-0 rounded-xl flex items-center overflow-hidden w-[54px] h-[54px]' : 'w-[54px] h-[54px] rounded-xl flex items-center justify-center mb-2 overflow-hidden',
         isDarkTheme || isLightTheme ? '' : 'bg-gray-100'
       ]">
+        <img
+          v-if="link?.customIcon"
+          :src="link.customIcon"
+          class="w-full h-full object-contain"
+          alt="custom icon"
+        />
         <component 
+          v-else
           :is="iconComponent"
           :size="50"
           v-bind="iconColor ? { color: iconColor, filled: isIconFilled } : {}"
@@ -42,7 +49,14 @@
       <template #header>
         <div class="flex justify-between items-center p-4 border-b border-gray-100 bg-white">
           <div class="flex items-center gap-3">
+            <img
+              v-if="link?.customIcon"
+              :src="link.customIcon"
+              class="w-12 h-12 object-contain"
+              alt="custom icon"
+            />
             <component 
+              v-else
               :is="iconComponent"
               :size="50"
               v-bind="iconColor ? { color: iconColor, filled: isIconFilled } : {}"

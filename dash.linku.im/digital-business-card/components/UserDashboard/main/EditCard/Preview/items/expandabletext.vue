@@ -9,7 +9,14 @@
       :aria-expanded="expanded"
     >
       <span class="flex items-center gap-2">
+        <img
+          v-if="link?.customIcon"
+          :src="link.customIcon"
+          class="w-12 h-12 object-contain"
+          alt="custom icon"
+        />
         <component 
+          v-else
           :is="iconComponent"
           :size="50"
           v-bind="iconColor ? { color: iconColor, filled: isIconFilled } : {}"

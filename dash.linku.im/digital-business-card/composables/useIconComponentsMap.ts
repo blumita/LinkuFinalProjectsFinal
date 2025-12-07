@@ -61,6 +61,8 @@ export const iconComponentsMap: Record<string, unknown> = {
   'igap': SocialMediaIcons.igap,
   'medium': SocialMediaIcons.medium,
   'virgool': SocialMediaIcons.virgool,
+  'wechat': SocialMediaIcons.wechat,
+  'we-chat': SocialMediaIcons.wechat, // variant
   
   // Business icons
   'app_link': BusinessIcons.app_link,

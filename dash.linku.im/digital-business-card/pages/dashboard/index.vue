@@ -105,7 +105,7 @@
                 <!-- Info -->
                 <div class="text-center mt-3 mb-4">
                   <div class="flex items-center justify-center gap-1">
-                    <h3 class="text-[15px] font-extrabold text-foreground">{{ userName }}</h3>
+                    <h3 class="text-[15px] font-extrabold text-foreground">{{ activeCard.name || userName }}</h3>
                     <i v-if="isPro" class="ti ti-rosette-discount-check-filled text-primary text-xl"></i>
                   </div>
                   <p class="text-[12px] text-muted-foreground mt-1">{{ activeCard.bio || 'پروفایل شما' }}</p>
@@ -186,12 +186,7 @@ const hasValidAuth = computed(() => {
 
 // User data
 const userName = computed(() => {
-  // اولویت با نام کارت دیفالت (که در card_users ذخیره میشه)
-  const defaultCard = formStore.defaultCard || formStore.cards?.[0]
-  if (defaultCard?.name) {
-    return defaultCard.name
-  }
-  // در غیر این صورت از userStore استفاده کن
+  // از user.name در userStore استفاده کن (نام واقعی کاربر)
   return userStore.user?.name || 'کاربر'
 })
 const userUserName = computed(() => userStore.user?.userName || userStore.user?.username || '')

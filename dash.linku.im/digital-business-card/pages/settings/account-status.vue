@@ -177,23 +177,7 @@ definePageMeta({
 const router = useRouter()
 const formStore = useFormStore()
 const userStore = useUserStore()
-
-// PWA safe navigation
-const { $pwa } = useNuxtApp()
-
-const goBack = () => {
-  if ($pwa?.safeNavigateBack) {
-    $pwa.safeNavigateBack('/profile')
-  } else {
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                         (window.navigator as any).standalone === true
-    if (isStandalone || window.history.length <= 2) {
-      window.location.href = '/profile'
-    } else {
-      window.history.back()
-    }
-  }
-}
+const { goBack } = useSafeNavigation()
 
 const defaultCard = computed(() => formStore.defaultCard)
 const user = computed(() => userStore.user || {})

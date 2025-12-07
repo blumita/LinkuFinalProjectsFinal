@@ -278,19 +278,10 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useMessageCounts } from '~/composables/useMessageCounts'
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
 
 const router = useRouter()
-
-// PWA safe navigation
-const goBack = () => {
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                       (window.navigator as any).standalone === true
-  if (isStandalone || window.history.length <= 2) {
-    window.location.href = '/dashboard'
-  } else {
-    window.history.back()
-  }
-}
+const { goBack } = useSafeNavigation()
 
 const {
   luckyDiceCount,

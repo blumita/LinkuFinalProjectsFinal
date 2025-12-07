@@ -5,12 +5,14 @@ import {useUserStore} from "~/stores/user"
 import {useAuthStore} from "~/stores/auth"
 import {useFormStore} from "~/stores/form"
 import {navigateTo} from "#app"
+import {useSafeNavigation} from '~/composables/useSafeNavigation'
 
 const userStore = useUserStore()
 const authStore = useAuthStore()
 const formStore = useFormStore()
 const route = useRoute()
 const router = useRouter()
+const { goBack } = useSafeNavigation()
 
 // تشخیص دسکتاپ یا موبایل
 const isDesktop = ref(false)
@@ -45,10 +47,6 @@ const getPageTitle = (path: string) => {
 }
 
 const pageTitle = computed(() => getPageTitle(route.path))
-
-const goBack = () => {
-  router.back()
-}
 </script>
 
 <template>

@@ -237,6 +237,7 @@ import { useRoute, useRouter } from 'vue-router'
 import BottomSheet from '~/components/ui/BottomSheet.vue'
 import { useUserStore } from '~/stores/user.js'
 import { useFormStore } from '~/stores/form.js'
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
 
 const route = useRoute()
 const router = useRouter()
@@ -244,6 +245,7 @@ const userStore = useUserStore()
 const formStore = useFormStore()
 const showProfileSelector = ref(false)
 const showSupportSheet = ref(false)
+const { goBack: safeGoBack } = useSafeNavigation()
 
 // Page titles mapping
 const pageTitles = {
@@ -302,7 +304,7 @@ const goBack = () => {
   if (route.path.includes('/dashboard/edit-card')) {
     navigateTo('/dashboard')
   } else {
-    router.back()
+    safeGoBack('/dashboard')
   }
 }
 

@@ -1602,24 +1602,6 @@ export default defineEventHandler(() => {
             },
             "value": "",
             "enabled": true
-          },
-          {
-            "id": "virgool",
-            "name": "ویرگول",
-            "type": "link",
-            "action": "virgool",
-            "description": "",
-            "icon": {
-              "type": "component",
-              "name": "virgool",
-            },
-            "baseUrl": "https://virgool.io/@",
-            "placeholder": {
-              "title": "ویرگول",
-              "link": "یوزرنیم یا لینک ویرگول"
-            },
-            "value": "",
-            "enabled": true
           }
         ]
       }

@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
 
 // Props
 defineProps({
@@ -71,7 +71,7 @@ defineProps({
   }
 })
 
-const router = useRouter()
+const { goBack } = useSafeNavigation()
 
 // Navigation items
 const navItems = [
@@ -80,11 +80,6 @@ const navItems = [
   { icon: 'ti ti-gift', label: 'جوایز', to: '/rewards' },
   { icon: 'ti ti-settings', label: 'تنظیمات', to: '/settings' }
 ]
-
-// Methods
-const goBack = () => {
-  router.back()
-}
 </script>
 
 <style scoped>

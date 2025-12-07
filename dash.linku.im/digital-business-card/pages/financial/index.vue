@@ -12,7 +12,7 @@
         >
           <!-- Back Button -->
           <button
-            @click="goBack"
+            @click="() => goBack('/settings')"
             class="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted transition-colors"
             style="pointer-events: auto !important; position: relative !important;"
           >
@@ -217,6 +217,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useNuxtApp } from 'nuxt/app'
 import type { AxiosInstance } from 'axios'
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
 
 definePageMeta({
   middleware: 'require-activated',
@@ -252,23 +253,9 @@ interface Transaction {
 }
 
 const { $axios, $pwa } = useNuxtApp()
+const { goBack } = useSafeNavigation()
 const loading = ref(true)
 const transactions = ref<Transaction[]>([])
-
-// PWA safe navigation
-const goBack = () => {
-  if ($pwa?.safeNavigateBack) {
-    $pwa.safeNavigateBack('/profile')
-  } else {
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                         (window.navigator as any).standalone === true
-    if (isStandalone || window.history.length <= 2) {
-      window.location.href = '/profile'
-    } else {
-      window.history.back()
-    }
-  }
-}
 const selectedFilter = ref('all')
 
 // فیلتر تراکنش‌ها بر اساس فیلتر انتخابی

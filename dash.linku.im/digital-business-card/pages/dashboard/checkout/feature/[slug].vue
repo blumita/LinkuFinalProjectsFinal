@@ -10,7 +10,7 @@
       <i class="ti ti-alert-circle text-6xl text-muted-foreground mb-4"></i>
       <p class="text-muted-foreground text-center">{{ error }}</p>
       <button 
-        @click="router.back()" 
+        @click="goBack()" 
         class="mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
       >
         بازگشت
@@ -101,9 +101,11 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
 
 const router = useRouter()
 const route = useRoute()
+const { goBack } = useSafeNavigation()
 
 const feature = ref<any>(null)
 const isLoading = ref(true)

@@ -16,6 +16,9 @@
       <template v-if="isImage(link.value)">
         <img :src="link.value" class="w-full h-full object-cover" alt="file" />
       </template>
+      <template v-else-if="link?.customIcon">
+        <img :src="link.customIcon" class="w-full h-full object-contain" alt="custom icon" />
+      </template>
       <template v-else>
         <component 
           :is="iconComponent"

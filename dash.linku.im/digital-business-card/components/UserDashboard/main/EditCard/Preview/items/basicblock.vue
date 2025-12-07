@@ -6,7 +6,14 @@
     ]">
       <div class="flex items-center gap-4 p-3 w-full text-right">
         <div :class="['flex items-center justify-center flex-shrink-0 rounded-xl overflow-hidden w-14 h-14', isDarkTheme || isLightTheme ? '' : iconBackgroundClass]">
+          <img
+            v-if="link?.customIcon"
+            :src="link.customIcon"
+            class="w-full h-full object-contain"
+            alt="custom icon"
+          />
           <component 
+            v-else
             :is="iconComponent"
             :size="32"
             v-bind="iconColor ? { color: iconColor, filled: isIconFilled } : {}"

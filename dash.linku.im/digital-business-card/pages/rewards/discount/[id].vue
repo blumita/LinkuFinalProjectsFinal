@@ -4,7 +4,7 @@
     <div class="fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200">
       <div class="flex items-center h-14 px-4">
         <button
-          @click="$router.back()"
+          @click="goBack()"
           class="flex items-center justify-center w-10 h-10 rounded-lg text-gray-900 hover:bg-gray-100 transition-colors"
         >
           <i class="ti ti-arrow-right text-xl"></i>
@@ -207,7 +207,7 @@
         <h3 class="text-xl font-semibold text-gray-900 mb-2">کد تخفیف یافت نشد</h3>
         <p class="text-gray-600 mb-6">این کد تخفیف حذف شده یا وجود ندارد</p>
         <button
-          @click="$router.back()"
+          @click="goBack()"
           class="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
         >
           بازگشت به لیست تخفیف‌ها
@@ -222,11 +222,13 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRewardStore } from '~/stores/reward'
 import { useToast } from '~/composables/useToast'
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
 
 const route = useRoute()
 const router = useRouter()
 const rewardStore = useRewardStore()
 const toast = useToast()
+const { goBack } = useSafeNavigation()
 
 const loading = ref(true)
 const copied = ref(false)

@@ -562,24 +562,7 @@ definePageMeta({
 const router = useRouter()
 const formStore = useFormStore()
 const userStore = useUserStore()
-
-// PWA safe navigation
-const { $pwa } = useNuxtApp()
-
-const goBack = () => {
-  if ($pwa?.safeNavigateBack) {
-    $pwa.safeNavigateBack('/dashboard')
-  } else {
-    // fallback
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                         (window.navigator as any).standalone === true
-    if (isStandalone || window.history.length <= 2) {
-      router.push('/dashboard')
-    } else {
-      router.back()
-    }
-  }
-}
+const { goBack } = useSafeNavigation()
 
 // WebAuthn
 const { 

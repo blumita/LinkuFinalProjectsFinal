@@ -7,7 +7,14 @@
       role="button"
     >
       <div class="flex items-center justify-center flex-shrink-0 rounded-xl overflow-hidden">
+        <img
+          v-if="link?.customIcon"
+          :src="link.customIcon"
+          class="w-12 h-12 object-contain"
+          alt="custom icon"
+        />
         <component 
+          v-else
           :is="iconComponent"
           :size="50"
           v-bind="iconColor ? { color: iconColor, filled: isIconFilled } : {}"
@@ -26,7 +33,14 @@
       <template #header>
         <div class="flex justify-between items-center p-4 border-b border-gray-100 bg-white">
           <div class="flex items-center gap-3">
+            <img
+              v-if="link?.customIcon"
+              :src="link.customIcon"
+              class="w-5 h-5 object-contain"
+              alt="custom icon"
+            />
             <component
+              v-else
               :is="iconComponent"
               :size="20"
               v-bind="iconColor ? { color: iconColor, filled: isIconFilled } : {}"

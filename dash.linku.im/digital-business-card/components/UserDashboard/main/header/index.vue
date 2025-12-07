@@ -136,6 +136,7 @@ import EditPhoneModal from '~/components/UserDashboard/modals/EditPhoneModal.vue
 import ActionMenu from '~/components/ui/ActionMenu.vue'
 import NotificationMenu from '~/components/ui/NotificationMenu.vue'
 import {useFormStore} from "~/stores/form.js";
+import {useSafeNavigation} from '~/composables/useSafeNavigation'
 
 const props = defineProps({
   showBack: Boolean,
@@ -175,16 +176,18 @@ const menuOpen = ref(false)
 const showEditModal = ref(false)
 const userPhone = ref(props.userPhone)
 const mobileSearchOpen = ref(false)
+const { goBack: safeGoBack } = useSafeNavigation()
+
 // متدها
 const goBack = () => {
   if (process.client) {
     const currentPath = window.location.pathname
     if (currentPath.includes('/dashboard/edit-card')) {
       // اگه تو صفحه تنظیمات بود، برو داشبورد
-      window.location.href = '/dashboard/dashboard'
+      navigateTo('/dashboard/dashboard')
     } else {
-      // در غیر این صورت، برگرد به عقب
-      window.history.back()
+      // استفاده از navigation امن
+      safeGoBack('/dashboard')
     }
   }
 }

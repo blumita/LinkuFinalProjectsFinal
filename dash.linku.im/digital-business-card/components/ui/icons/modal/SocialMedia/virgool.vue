@@ -1,12 +1,29 @@
 <template>
-  <svg :width="size" :height="size" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Virgool Persian comma icon -->
-    <path d="M12 2C13.5 2 14.9 2.5 16.1 3.4C17.5 4.5 18.4 6 18.7 7.7C19.2 10 18.5 12.1 16.9 13.9C15.9 15 14.6 15.8 13.1 16.3C12.7 16.4 12.3 16.5 11.8 16.6C12 17 12.2 17.4 12.4 17.7C11.6 18.3 10.8 18.9 10 19.4C9.5 18.7 9.1 18.1 8.6 17.4C8.1 16.6 7.5 15.9 7 15.1C6.5 14.5 6.1 13.8 5.8 13C5.3 12 5.2 10.9 5.4 9.8C5.7 8 6.9 6.6 8.7 5.9C9.4 5.7 10.1 5.5 10.9 5.5C11.1 5.5 11.3 5.5 11.6 5.5C11.4 6 11.2 6.4 11 6.9C10.8 6.8 10.7 6.8 10.5 6.8C9.3 6.7 8.2 7.5 7.9 8.7C7.5 10.1 8 11.4 9.2 12C10.5 12.7 12 12.3 12.8 11C13.4 10 13.3 8.6 12.5 7.7C12.1 7.3 11.6 7 11 6.9C11.2 6.4 11.4 6 11.6 5.5V2H12Z"
-          :fill="props.color || 'currentColor'"/>
+  <svg 
+    :width="size" 
+    :height="size" 
+    viewBox="0 0 80 80" 
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <!-- Background with rounded corners -->
+    <path 
+      :fill="props.color || '#000000'" 
+      d="M18.0952 0H61.9048C71.9048 0 80 8.09524 80 18.0952V61.9048C80 71.9048 71.9048 80 61.9048 80H18.0952C8.09524 80 0 71.9048 0 61.9048V18.0952C0 8.09524 8.09524 0 18.0952 0Z"
+    />
+    
+    <!-- Virgool logo (scaled and centered) -->
+    <g transform="translate(20, 20) scale(3.33)">
+      <path 
+        :fill="textColor"
+        d="M11.214 0A9.646 9.646 0 0 0 8.97.522C5.462 1.787 3.438 4.448 3.167 8.234c-.261 3.647 1.388 6.36 4.45 8.236.777.48 1.683.742 2.564 1.109-.811 1.134-1.666 2.311-2.53 3.524 1.431.977 2.818 1.929 4.232 2.897.13-.166.21-.27.288-.375 1.378-1.902 2.783-3.795 4.144-5.715 1.186-1.684 2.39-3.367 3.473-5.121 1.073-1.736 1.265-3.69.907-5.68-.549-3.06-2.968-5.926-6.281-6.85-.688 1.163-1.679 2.853-1.99 3.366.505.171 1.027.28 1.478.51 1.79.914 2.817 2.362 2.827 4.403.013 2.123-1.007 3.7-2.907 4.548-3.21 1.442-6.176-.664-6.822-3.173-.286-1.092-.263-2.197.271-3.209.53-1.023 1.129-2.007 1.724-3.003z"
+      />
+    </g>
   </svg>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+
 interface Props {
   size?: number | string
   filled?: boolean
@@ -17,5 +34,27 @@ const props = withDefaults(defineProps<Props>(), {
   size: 24,
   filled: false,
   color: ''
+})
+
+// تابع برای تشخیص رنگ سفید
+const isWhiteColor = (color: string): boolean => {
+  if (!color || color === "transparent") return false
+  
+  // حذف # از ابتدای رنگ hex
+  const hex = color.replace("#", "").toLowerCase()
+  
+  // بررسی اینکه رنگ سفید باشد
+  return hex === "ffffff" || hex === "fff" || color.toLowerCase() === "white"
+}
+
+// تعیین رنگ متن بر اساس رنگ پس‌زمینه
+const textColor = computed(() => {
+  if (!props.color) return '#ffffff' // رنگ پیش‌فرض سفید
+  return isWhiteColor(props.color) ? '#000000' : '#ffffff'
+})
+
+// Component name
+defineOptions({
+  name: 'VirGoolModalIcon'
 })
 </script>

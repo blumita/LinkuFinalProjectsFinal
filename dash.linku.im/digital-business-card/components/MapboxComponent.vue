@@ -495,23 +495,29 @@ const initStaticMap = async () => {
       center: [props.longitude, props.latitude],
       zoom: props.zoom,
       attributionControl: false,
-      interactive: true, // ✅ تعاملی کردن نقشه
-      dragPan: true, // ✅ اجازه کشیدن نقشه
-      scrollZoom: true, // ✅ اجازه زوم با اسکرول
-      doubleClickZoom: true, // ✅ اجازه زوم با دابل کلیک
-      touchZoomRotate: true, // ✅ اجازه زوم و چرخش با تاچ
-      touchPitch: false, // خاموش کردن تغییر زاویه با تاچ
-      dragRotate: false, // خاموش کردن چرخش با ماوس
+      interactive: true,
+      dragPan: true,
+      scrollZoom: true,
+      doubleClickZoom: true,
+      touchZoomRotate: true,
+      touchPitch: false,
+      dragRotate: false,
       pitchWithRotate: false,
+      keyboard: true,
+      cooperativeGestures: false,
       // Iran bounds
       maxBounds: [
-        [43.5, 23.5], // Southwest
-        [64.0, 40.5]  // Northeast
+        [43.5, 23.5],
+        [64.0, 40.5]
       ],
-      minZoom: 8, // ✅ زوم مینیمم بیشتر برای بهتر دیده شدن
+      minZoom: 8,
       maxZoom: 18,
       // RTL support
-      localIdeographFontFamily: "'Shabnam', 'Tahoma', sans-serif"
+      localIdeographFontFamily: "'Shabnam', 'Tahoma', sans-serif",
+      // Performance optimizations
+      renderWorldCopies: false,
+      trackResize: true,
+      preserveDrawingBuffer: false
     })
     
     staticMap.on('load', () => {
@@ -521,25 +527,6 @@ const initStaticMap = async () => {
       if (props.showCircle) {
         addCircleToMap(staticMap, props.longitude, props.latitude, props.iconColor)
       }
-      
-      // ✅ اضافه کردن کنترل‌های زوم
-      staticMap.addControl(new mapboxgl.NavigationControl({
-        showCompass: false,
-        visualizePitch: false
-      }), 'bottom-left')
-      
-      // ✅ اضافه کردن دکمه موقعیت یاب
-      staticMap.addControl(
-        new mapboxgl.GeolocateControl({
-          positionOptions: {
-            enableHighAccuracy: true
-          },
-          trackUserLocation: true,
-          showUserHeading: true,
-          showUserLocation: true
-        }),
-        'bottom-left'
-      )
     })
     
   } catch (error) {

@@ -57,27 +57,9 @@ const personStrokeColor = computed(() => {
   return isWhiteColor(props.color) ? '#000000' : '#ffffff'
 })
 
-const tabColor1 = computed(() => {
-  if (!props.color) return '#39b54a' // Default green
-  // استفاده از رنگ اصلی با opacity متفاوت برای تب اول
-  return props.color + '80' // 50% opacity
-})
-
-const tabColor2 = computed(() => {
-  if (!props.color) return '#f7931e' // Default orange
-  // استفاده از رنگ اصلی با opacity متفاوت برای تب دوم
-  return props.color + 'B3' // 70% opacity
-})
-
-const tabColor3 = computed(() => {
-  if (!props.color) return '#29abe2' // Default blue
-  // استفاده از رنگ اصلی با opacity متفاوت برای تب سوم
-  return props.color + 'CC' // 80% opacity
-})
-
-const tabColor4 = computed(() => {
-  if (!props.color) return '#ffdab4' // Default light orange
-  // استفاده از رنگ اصلی با opacity متفاوت برای تب چهارم
-  return props.color + '66' // 40% opacity
-})
+// رنگ‌های تب - همیشه از رنگ‌های پیش‌فرض استفاده می‌شود
+const tabColor1 = computed(() => '#39b54a') // Default green
+const tabColor2 = computed(() => '#f7931e') // Default orange  
+const tabColor3 = computed(() => '#29abe2') // Default blue
+const tabColor4 = computed(() => '#ffdab4') // Default light orange
 </script>

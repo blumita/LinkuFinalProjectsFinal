@@ -512,6 +512,22 @@
           </div>
         </div>
 
+        <!-- Discount Code - Mobile -->
+        <div class="bg-card rounded-xl p-4 shadow-sm border border-border">
+          <button @click="showDiscountSheet = true" class="w-full flex items-center justify-between text-right hover:bg-muted/50 p-2 rounded-lg transition-colors">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <i class="ti ti-discount-2 text-primary text-xl"></i>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-foreground">کد تخفیف دارید؟</div>
+                <div class="text-xs text-muted-foreground">برای اعمال کد تخفیف کلیک کنید</div>
+              </div>
+            </div>
+            <i class="ti ti-chevron-left text-muted-foreground"></i>
+          </button>
+        </div>
+
         <!-- Payment Methods -->
         <div class="bg-card rounded-xl p-6 shadow-sm border border-border">
           <h3 class="text-lg font-semibold text-foreground mb-4 flex items-center">
@@ -594,22 +610,6 @@
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Discount Code - Mobile -->
-        <div class="bg-card rounded-xl p-4 shadow-sm border border-border">
-          <button @click="showDiscountSheet = true" class="w-full flex items-center justify-between text-right hover:bg-muted/50 p-2 rounded-lg transition-colors">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <i class="ti ti-discount-2 text-primary text-xl"></i>
-              </div>
-              <div>
-                <div class="text-sm font-medium text-foreground">کد تخفیف دارید؟</div>
-                <div class="text-xs text-muted-foreground">برای اعمال کد تخفیف کلیک کنید</div>
-              </div>
-            </div>
-            <i class="ti ti-chevron-left text-muted-foreground"></i>
-          </button>
         </div>
       </div>
       </template>

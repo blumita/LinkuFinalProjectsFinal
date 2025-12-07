@@ -7,6 +7,7 @@ import BottomNavigation from '~/components/UserDashboard/main/BottomNavigation.v
 import ShareModal from '~/components/UserDashboard/modals/ShareModal.vue'
 import CardSelect from '~/components/UserDashboard/main/header/CardSelect.vue'
 import NotificationPermissionBanner from '~/components/shared/NotificationPermissionBanner.vue'
+import PWAInstallPrompt from '~/components/shared/PWAInstallPrompt.vue'
 import {useUserStore} from "~/stores/user";
 import {useAuthStore} from "~/stores/auth";
 import {useFormStore} from "~/stores/form";
@@ -335,6 +336,11 @@ provide('topbarConfig', topbarConfig)
     <!-- ✅ Notification Permission Banner -->
     <ClientOnly>
       <NotificationPermissionBanner />
+    </ClientOnly>
+
+    <!-- ✅ PWA Install Prompt -->
+    <ClientOnly>
+      <PWAInstallPrompt />
     </ClientOnly>
 
     <!-- ✅ Main Content -->

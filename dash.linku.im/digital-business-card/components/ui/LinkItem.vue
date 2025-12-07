@@ -22,10 +22,17 @@
 
       <!-- Icon -->
       <div class="relative w-10 h-10 rounded-xl flex items-center justify-center bg-white">
+        <!-- Custom uploaded icon (base64) -->
+        <img
+            v-if="link?.customIcon"
+            :src="link.customIcon"
+            class="w-full h-full object-contain rounded-xl"
+            alt="custom icon"
+        />
         <!-- Dynamic icon component -->
         <component
+            v-else-if="iconComponent"
             :is="iconComponent"
-            v-if="iconComponent"
             :size="32"
             :color="hasCustomColor ? iconColor : undefined"
             :filled="hasCustomColor"

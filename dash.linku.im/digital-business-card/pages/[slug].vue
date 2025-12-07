@@ -684,19 +684,9 @@
       <!-- Toast container is handled by useToast composable -->
     </div>
   </div>
-  <!-- 🟢 Splash Screen -->
+  <!-- 🟢 Loading State - Skeleton -->
   <template v-else>
-    <transition name="fade">
-      <div
-          class="fixed inset-0 flex items-center justify-center bg-white z-50"
-      >
-        <!-- لودر دایره چرخان -->
-        <div class="flex flex-col items-center gap-4">
-          <div class="w-10 h-10 border-3 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
-          <p class="text-sm text-gray-500">در حال بارگذاری</p>
-        </div>
-      </div>
-    </transition>
+    <SkeletonProfile />
   </template>
 </template>
 <script setup>
@@ -1981,6 +1971,7 @@ const copyLink = async () => {
     // اول سعی می‌کنیم از Clipboard API استفاده کنیم
     if (navigator.clipboard && window.isSecureContext) {
       await navigator.clipboard.writeText(window.location.href)
+      success('لینک کپی شد', 'لینک در کلیپ‌بورد شما ذخیره شد')
       showShareModal.value = false
       return
     }
@@ -1999,35 +1990,48 @@ const copyLink = async () => {
     document.body.removeChild(textArea)
 
     if (successful) {
+      success('لینک کپی شد', 'لینک در کلیپ‌بورد شما ذخیره شد')
       showShareModal.value = false
+    } else {
+      error('خطا در کپی لینک')
     }
-  } catch (error) {
-    showShareModal.value = false
+  } catch (err) {
+    console.error('خطا در کپی لینک:', err)
+    error('خطا در کپی لینک')
   }
 }
 
 // Submit Report Function
-const submitReport = () => {
+const submitReport = async () => {
   if (!reportType.value) {
     error('لطفاً نوع گزارش را انتخاب کنید')
     return
   }
 
-  // شبیه‌سازی ارسال گزارش
-  console.log('گزارش ارسال شد:', {
-    type: reportType.value,
-    description: reportDescription.value,
-    url: window.location.href,
-    timestamp: new Date().toISOString()
-  })
+  try {
+    // ارسال گزارش به API
+    const response = await $fetch('/api/report/content', {
+      method: 'POST',
+      body: {
+        type: reportType.value,
+        description: reportDescription.value,
+        url: window.location.href
+      }
+    })
 
-  // نمایش پیام موفقیت
-  success('گزارش شما با موفقیت ارسال شد')
+    if (response.success) {
+      // نمایش پیام موفقیت
+      success('گزارش شما با موفقیت ارسال شد')
 
-  // بستن modal و ریست کردن فرم
-  showReportModal.value = false
-  reportType.value = ''
-  reportDescription.value = ''
+      // بستن modal و ریست کردن فرم
+      showReportModal.value = false
+      reportType.value = ''
+      reportDescription.value = ''
+    }
+  } catch (err) {
+    console.error('خطا در ارسال گزارش:', err)
+    error(err?.data?.message || 'خطا در ارسال گزارش. لطفاً دوباره تلاش کنید')
+  }
 }
 
 definePageMeta({layout: 'preview'})

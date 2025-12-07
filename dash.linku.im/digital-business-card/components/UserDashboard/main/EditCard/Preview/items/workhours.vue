@@ -11,7 +11,14 @@
         role="button"
       >
         <div :class="['flex items-center justify-center flex-shrink-0 rounded-xl overflow-hidden', isDarkTheme || isLightTheme ? '' : iconBackgroundClass]">
+          <img
+            v-if="props.link?.customIcon"
+            :src="props.link.customIcon"
+            class="w-12 h-12 object-contain"
+            alt="custom icon"
+          />
           <component 
+            v-else
             :is="iconComponent"
             :size="50"
             v-bind="iconColor ? { color: iconColor, filled: isIconFilled } : {}"

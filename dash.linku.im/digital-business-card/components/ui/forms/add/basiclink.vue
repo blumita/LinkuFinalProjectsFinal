@@ -108,7 +108,7 @@
           {{ getInputLabel() }}
         </label>
         <div class="flex rtl flex-row-reverse">
-          <span v-if="showPrefix() && !['call','number'].includes(form.action)" class="inline-flex items-center px-3 rounded-l bg-muted border border-r-0 border-border text-muted-foreground text-sm ltr">
+          <span v-if="showPrefix() && !['call','number'].includes(form.action) && !(form.action === 'whatsapp' && form.whatsappType === 'channel')" class="inline-flex items-center px-3 rounded-l bg-muted border border-r-0 border-border text-muted-foreground text-sm ltr">
             {{ form.baseUrl || getPrefixForAction() }}
           </span>
           <input
@@ -119,12 +119,19 @@
               class="ltr inline-flex items-center px-2 rounded-l bg-muted border border-r-0 border-border text-muted-foreground text-sm w-16 text-center focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
           <input
-            v-if="isUsernameAction()"
+            v-if="isUsernameAction() && !(form.action === 'whatsapp' && form.whatsappType === 'channel')"
             v-model="form.username"
             type="text"
             :placeholder="getInputPlaceholder()"
             class="w-full px-4 py-3 bg-background border border-border rounded-lg text-sm rtl text-right text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             :class="showPrefix() ? 'rounded-l-none' : ''"
+          />
+          <input
+            v-else-if="form.action === 'whatsapp' && form.whatsappType === 'channel'"
+            v-model="form.value"
+            type="url"
+            placeholder="مثال: https://whatsapp.com/channel/0029VaeW5Uk..."
+            class="w-full px-4 py-3 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary ltr"
           />
           <input
             v-else-if="isPrefixAction()"
@@ -369,6 +376,10 @@ function submitForm() {
 }
 
 function isUsernameAction() {
+  // WhatsApp channel should not be treated as username action
+  if (form.action === 'whatsapp' && form.whatsappType === 'channel') {
+    return false;
+  }
   const usernameActions = [
     'telegram','whatsapp','eitaa', 'instagram', 'linkedin', 'facebook', 'clubhouse', 'snapchat', 'threads', 'tiktok', 'twitch', 'twitter', 'x', 'rubika', 'youtube','aparat', 'app_link', 'cashapp', 'paypal', 'venmo', 'zelle', 'raymit', 'remit', 'zarinpal', 'igap', 'discord', 'bale', 'linktree', 'poshmark', 'figma', 'medium', 'soundcloud', 'spotify', 'youtubemusic', 'github', 'teams', 'zoom', 'reviews', 'nshan', 'balad', 'bald', 'trustpilot', 'trustwallet', 'microsoft_bookings', 'chili-piper', 'chili_piper'
   ];
@@ -390,6 +401,10 @@ function getPrefixForAction() {
 
 // Dynamic label and placeholder detection from input JSON
 function getInputLabel() {
+  // WhatsApp channel label
+  if (form.action === 'whatsapp' && form.whatsappType === 'channel') {
+    return 'لینک کانال WhatsApp';
+  }
   if (form.action === 'email') {
     return 'ایمیل';
   }
@@ -409,6 +424,10 @@ function getInputLabel() {
 }
 
 function getInputPlaceholder() {
+  // WhatsApp channel placeholder
+  if (form.action === 'whatsapp' && form.whatsappType === 'channel') {
+    return 'مثال: https://whatsapp.com/channel/0029VaeW5Uk...';
+  }
   if (form.action === 'email') {
     return 'مثال: example@email.com';
   }

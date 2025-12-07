@@ -184,6 +184,7 @@
 import {ref, onMounted, computed} from 'vue'
 import {useNuxtApp, useRouter} from "nuxt/app";
 import InfoToast from "~/components/UserDashboard/modals/InfoToast.vue";
+import {useSafeNavigation} from '~/composables/useSafeNavigation'
 
 const router = useRouter()
 const devices = ref([])
@@ -195,6 +196,7 @@ const profiles = computed(() => formStore.cards.map(card => ({
   role: card.job || 'کاربر'
 })))
 const {$axios} = useNuxtApp()
+const { goBack: safeGoBack } = useSafeNavigation()
 
 // Toast
 const showToast = ref(false)
@@ -228,13 +230,7 @@ function handleBack() {
 }
 
 function goBack() {
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                       (window.navigator).standalone === true
-  if (isStandalone || window.history.length <= 2) {
-    router.push('/dashboard')
-  } else {
-    router.back()
-  }
+  safeGoBack('/dashboard')
 }
 
 // Device & Profile Selection

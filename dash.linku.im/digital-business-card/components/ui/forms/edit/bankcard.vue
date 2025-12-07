@@ -253,6 +253,7 @@ const isIconFilled = computed(() => {
 })
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
+const isSubmitting = ref(false);
 
 const card = reactive({
   cardNumber: props.link?.cardNumber || '',
@@ -264,7 +265,10 @@ const card = reactive({
   showBankDropdown: false,
 });
 
-function onSubmit() {
+async function onSubmit() {
+  // جلوگیری از ارسال مکرر
+  if (isSubmitting.value) return;
+  
   // اعتبارسنجی شماره کارت
   const cleanedCardNumber = (card.cardNumber || '').replace(/\s+/g, '');
   if (!/^\d{16}$/.test(cleanedCardNumber)) {
@@ -279,18 +283,28 @@ function onSubmit() {
     return;
   }
   
-  // ارسال داده‌ها
-  emit('submit', {
-    ...card,
-    action: 'bankcard',
-    cardNumber: cleanedCardNumber,
-    bankName: bankName,
-    icon: form.icon,
-    customIcon: form.customIcon,
-    title: form.title,
-    description: showDescription.value ? form.description : '',
-    type: 'block'
-  });
+  isSubmitting.value = true;
+  
+  try {
+    // ارسال داده‌ها
+    emit('submit', {
+      ...card,
+      action: 'bankcard',
+      cardNumber: cleanedCardNumber,
+      bankName: bankName,
+      icon: form.icon,
+      customIcon: form.customIcon,
+      title: form.title,
+      description: showDescription.value ? form.description : '',
+      type: 'block'
+    });
+    
+    await new Promise(resolve => setTimeout(resolve, 100));
+  } finally {
+    setTimeout(() => {
+      isSubmitting.value = false;
+    }, 300);
+  }
 }
 
 function handleClickOutside(event: MouseEvent) {

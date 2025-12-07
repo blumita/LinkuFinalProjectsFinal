@@ -521,6 +521,7 @@
 import {ref, computed, watch, onMounted, onUnmounted, toRaw} from 'vue'
 import {useRoute} from '#app'
 import {useSafeFormStore} from '~/composables/useSafeFormStore'
+import {useSafeNavigation} from '~/composables/useSafeNavigation'
 import TabAbout from '@/components/UserDashboard/main/EditCard/tabs/TabAbout.vue'
 import AddLinkModal from '@/components/UserDashboard/modals/AddLinkModal.vue'
 import BottomSheet from '@/components/ui/BottomSheet.vue'
@@ -538,6 +539,7 @@ const props = defineProps({cardId: String, cardSlug: String})
 const formStore = useSafeFormStore()
 const form = useFormStore()
 const route = useRoute()
+const { goBack: safeGoBack } = useSafeNavigation()
 
 // Loading state
 const isPageLoading = ref(true)
@@ -1578,19 +1580,8 @@ function goBack() {
     return
   }
   
-  // بررسی PWA standalone mode
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                       (window.navigator).standalone === true
-  
-  // در PWA اگر history کم است، به dashboard برو بجای back
-  if (isStandalone) {
-    // در PWA همیشه به dashboard برو تا از اپ خارج نشه
-    window.location.href = '/dashboard'
-  } else if (window.history.length > 2) {
-    window.history.back()
-  } else {
-    window.location.href = '/dashboard'
-  }
+  // استفاده از navigation امن
+  safeGoBack('/dashboard')
 }
 
 function goToLeadCapture() {

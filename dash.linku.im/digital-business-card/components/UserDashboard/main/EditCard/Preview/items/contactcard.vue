@@ -24,7 +24,14 @@
         backgroundColor: iconColor && iconColor !== 'transparent' ? iconColor : (isDarkTheme || isLightTheme ? 'transparent' : '#f3f4f6')
       }"
     >
+      <img
+        v-if="sanitizedLink?.customIcon"
+        :src="sanitizedLink.customIcon"
+        class="w-full h-full object-contain"
+        alt="custom icon"
+      />
       <component 
+        v-else
         :is="iconComponent"
         :size="isListMode ? 20 : 24"
         v-bind="iconColor && iconColor !== 'transparent' ? { color: iconColor, filled: isIconFilled } : {}"
@@ -62,42 +69,97 @@
     </div>
   </a>
 
-  <!-- برای بلاک‌ها -->
-  <div v-else class="flex flex-col items-center justify-center rounded-xl p-4 w-full text-center"
-       :class="[
-         isDarkTheme ? 'backdrop-blur bg-white/[0.02]' : isLightTheme ? 'backdrop-blur bg-black/[0.02]' : 'bg-gradient-to-br from-white/60 via-white/30 to-white/10 backdrop-blur border'
-       ]">
+  <!-- برای بلاک‌ها (contactcard در حالت block) -->
+  <div 
+    v-else 
+    :class="[
+      'rounded-xl w-full',
+      sanitizedLink.action === 'contactcard' && (isListMode || sanitizedLink.description)
+        ? 'flex items-center gap-4 backdrop-blur p-2 ' + (formData?.layout === 'left' ? 'text-left' : 'text-right') + (isDarkTheme ? ' bg-white/[0.02]' : isLightTheme ? ' bg-black/[0.02]' : ' bg-gradient-to-br from-white/60 via-white/30 to-white/10 border border-white/20')
+        : 'flex flex-col items-center justify-center p-4 text-center' + (isDarkTheme ? ' backdrop-blur bg-white/[0.02]' : isLightTheme ? ' backdrop-blur bg-black/[0.02]' : ' bg-gradient-to-br from-white/60 via-white/30 to-white/10 backdrop-blur border')
+    ]"
+  >
     <!-- اگر contactcard هست -->
     <template v-if="sanitizedLink.action === 'contactcard'">
-      <!-- آیکون و عنوان -->
-      <div class="flex flex-col items-center mb-4">
-        <div 
-          class="w-12 h-12 rounded-xl flex items-center justify-center mb-2 cursor-pointer hover:opacity-80 transition-opacity"
+      <!-- حالت list/grid با description -->
+      <template v-if="isListMode || sanitizedLink.description">
+        <!-- آیکون -->
+        <div
+          :class="'w-13 h-13 flex-shrink-0 rounded-xl flex items-center justify-center overflow-hidden cursor-pointer hover:opacity-80 transition-opacity'"
           :style="{ 
-            backgroundColor: iconColor && iconColor !== 'transparent' ? iconColor : '#f3f4f6'
+            backgroundColor: iconColor && iconColor !== 'transparent' ? iconColor : (isDarkTheme || isLightTheme ? 'transparent' : '#f3f4f6')
           }"
           @click="downloadVCard"
-          title="کلیک کنید برای ذخیره در مخاطبین"
+          :title="'کلیک کنید برای ذخیره در مخاطبین'"
         >
+          <img
+            v-if="sanitizedLink?.customIcon"
+            :src="sanitizedLink.customIcon"
+            class="w-full h-full object-contain"
+            alt="custom icon"
+          />
           <component
+            v-else
+            :is="iconComponent"
+            :size="20"
+            v-bind="iconColor && iconColor !== 'transparent' ? { color: iconColor, filled: isIconFilled } : {}"
+          />
+        </div>
+
+        <!-- متن -->
+        <div
+          :class="'flex flex-col justify-center flex-1 min-w-0 ' + (formData?.layout === 'left' ? 'text-left' : 'text-right')"
+        >
+          <div
+            :class="[
+              'font-bold text-xs leading-snug break-words ' + (formData?.layout === 'left' ? 'text-left' : 'text-right'),
+              isDarkTheme ? 'text-white' : 'text-gray-800'
+            ]"
+          >
+            {{ sanitizedLink.title || sanitizedLink.name || 'کارت تماس' }}
+          </div>
+          <div
+            v-if="sanitizedLink.description && sanitizedLink.description.trim()"
+            :class="[
+              'text-xs font-normal mt-1 leading-relaxed whitespace-pre-line break-words ' + (formData?.layout === 'left' ? 'text-left' : 'text-right'),
+              isDarkTheme ? 'text-gray-300' : 'text-gray-700'
+            ]"
+          >
+            {{ sanitizedLink.description }}
+          </div>
+        </div>
+      </template>
+
+      <!-- حالت عادی بدون description -->
+      <template v-else>
+        <div class="flex flex-col items-center">
+          <div 
+            class="w-12 h-12 rounded-xl flex items-center justify-center mb-2 cursor-pointer hover:opacity-80 transition-opacity"
+            :style="{ 
+              backgroundColor: iconColor && iconColor !== 'transparent' ? iconColor : '#f3f4f6'
+            }"
+            @click="downloadVCard"
+            title="کلیک کنید برای ذخیره در مخاطبین"
+          >
+            <img
+              v-if="sanitizedLink?.customIcon"
+              :src="sanitizedLink.customIcon"
+              class="w-full h-full object-contain"
+              alt="custom icon"
+            />
+            <component
+              v-else
               :is="iconComponent"
               :size="24"
               v-bind="iconColor && iconColor !== 'transparent' ? { color: iconColor, filled: isIconFilled } : {}"
-          />
+            />
+          </div>
+          <div class="font-bold text-sm sm:text-base text-gray-800 leading-snug"
+               :class="isDarkTheme ? 'text-white' : 'text-gray-800'">
+            {{ sanitizedLink.title || sanitizedLink.name || 'کارت تماس' }}
+          </div>
         </div>
-        <div class="font-bold text-sm sm:text-base text-gray-800 leading-snug"
-             :class="isDarkTheme ? 'text-white' : 'text-gray-800'">
-          {{ sanitizedLink.title || sanitizedLink.name || 'کارت تماس' }}
-        </div>
-        <div v-if="sanitizedLink.description && sanitizedLink.description.trim()" 
-             class="text-xs mt-1"
-             :class="isDarkTheme ? 'text-gray-300' : 'text-gray-500'">
-          {{ sanitizedLink.description }}
-        </div>
-      </div>
-
-      <!-- Auto-download removed - clicking icon will download vCard -->
-
+      </template>
     </template>
 
     <!-- سایر بلاک‌ها -->
@@ -112,7 +174,14 @@
 
     <!-- fallback ساده -->
     <template v-else>
+      <img
+        v-if="sanitizedLink?.customIcon"
+        :src="sanitizedLink.customIcon"
+        class="w-12 h-12 object-contain mb-2"
+        alt="custom icon"
+      />
       <component
+          v-else
           :is="iconComponent"
           :size="50"
           v-bind="iconColor ? { color: iconColor, filled: isIconFilled } : {}"

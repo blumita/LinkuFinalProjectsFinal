@@ -239,18 +239,22 @@ class CardLinkController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     * @throws AuthorizationException|ValidationException
+     * @throws AuthorizationException
      */
     public function destroy(Request $request, $card, $cardLink): JsonResponse
     {
-        $validated = $request->validate([
-            'fieldName' => 'required|string',
-        ]);
-
-        //
         $this->authorize('update', $card);
 
-        $this->service->removeLinkFromCard($validated['fieldName'], $cardLink);
+        // Delete all associated files
+        if ($cardLink->files()->exists()) {
+            foreach ($cardLink->files as $file) {
+                \Storage::disk(config('file-manager.disk'))->delete($file->path);
+                $file->delete();
+            }
+        }
+
+        // Delete the link itself
+        $cardLink->delete();
 
         return $this->ok(__('messages.link_removed'));
 

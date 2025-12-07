@@ -16,9 +16,16 @@
       isListMode ? 'flex-shrink-0 rounded-xl flex items-center overflow-hidden w-[54px] h-[54px]' : 'w-[54px] h-[54px] rounded-xl flex items-center justify-center mb-2 overflow-hidden',
       isDarkTheme || isLightTheme ? '' : 'bg-gray-100'
     ]">
+      <!-- Custom uploaded icon (base64) -->
+      <img
+        v-if="sanitizedLink?.customIcon"
+        :src="sanitizedLink.customIcon"
+        class="w-full h-full object-contain"
+        alt="custom icon"
+      />
       <!-- Dynamic icon component -->
       <component
-        v-if="iconComponent && iconData?.type === 'component'"
+        v-else-if="iconComponent && iconData?.type === 'component'"
         :is="iconComponent"
         :size="50"
         v-bind="iconColor ? { color: iconColor, filled: isIconFilled } : {}"
