@@ -32,6 +32,27 @@ export const useDeepLink = () => {
    * App URL schemes for different social media platforms
    */
   const appSchemes = {
+    // تماس و پیام
+    call: {
+      ios: (phone) => `tel:${phone}`,
+      android: (phone) => `tel:${phone}`,
+      web: (phone) => `tel:${phone}`
+    },
+    number: {
+      ios: (phone) => `sms:${phone}`,
+      android: (phone) => `sms:${phone}`,
+      web: (phone) => `sms:${phone}`
+    },
+    email: {
+      ios: (email) => `mailto:${email}`,
+      android: (email) => `mailto:${email}`,
+      web: (email) => `mailto:${email}`
+    },
+    facetime: {
+      ios: (contact) => `facetime:${contact}`,
+      android: (contact) => `facetime:${contact}`, // در اندروید کار نمیکنه اما harmless است
+      web: (contact) => `facetime:${contact}`
+    },
     instagram: {
       ios: (username) => `instagram://user?username=${username}`,
       android: (username) => `intent://instagram.com/_u/${username}/#Intent;package=com.instagram.android;scheme=https;end`,
@@ -69,7 +90,7 @@ export const useDeepLink = () => {
     },
     whatsapp: {
       ios: (phone) => `whatsapp://send?phone=${phone}`,
-      android: (phone) => `intent://send/${phone}#Intent;package=com.whatsapp;scheme=whatsapp;end`,
+      android: (phone) => `intent://send?phone=${phone}#Intent;package=com.whatsapp;scheme=whatsapp;end`,
       web: (phone) => `https://wa.me/${phone}`
     },
     tiktok: {
@@ -96,6 +117,116 @@ export const useDeepLink = () => {
       ios: (username) => `spotify:user:${username}`,
       android: (username) => `intent://open.spotify.com/user/${username}#Intent;package=com.spotify.music;scheme=https;end`,
       web: (username) => `https://open.spotify.com/user/${username}`
+    },
+    // اپلیکیشن‌های ایرانی
+    eitaa: {
+      ios: (username) => `eitaa://profile/${username}`,
+      android: (username) => `eitaa://profile/${username}`,
+      web: (username) => `https://eitaa.com/${username}`
+    },
+    rubika: {
+      ios: (username) => `rubika://profile/${username}`,
+      android: (username) => `rubika://profile/${username}`,
+      web: (username) => `https://rubika.ir/${username}`
+    },
+    bale: {
+      ios: (username) => `bale://profile/${username}`,
+      android: (username) => `bale://profile/${username}`,
+      web: (username) => `https://ble.ir/${username}`
+    },
+    igap: {
+      ios: (username) => `igap://profile/${username}`,
+      android: (username) => `igap://profile/${username}`,
+      web: (username) => `https://igap.net/${username}`
+    },
+    aparat: {
+      ios: (username) => `aparat://video/${username}`,
+      android: (username) => `intent://aparat.com/v/${username}#Intent;package=ir.aparat.android;scheme=https;end`,
+      web: (username) => `https://aparat.com/v/${username}`
+    },
+    // نقشه و حمل و نقل
+    snapp: {
+      ios: (location) => `snapp://ride?lat=&lng=`,
+      android: (location) => `intent://snapp.ir#Intent;package=cab.snapp.passenger.play;scheme=https;end`,
+      web: (location) => `https://snapp.ir`
+    },
+    divar: {
+      ios: (link) => link.startsWith('http') ? link : `https://divar.ir/${link}`,
+      android: (link) => `intent://divar.ir/${link}#Intent;package=ir.divar;scheme=https;end`,
+      web: (link) => link.startsWith('http') ? link : `https://divar.ir/${link}`
+    },
+    balad: {
+      ios: (location) => `balad://search?q=${location}`,
+      android: (location) => `intent://search?q=${location}#Intent;package=ir.balad.client;scheme=balad;end`,
+      web: (location) => `https://balad.ir`
+    },
+    neshan: {
+      ios: (location) => `neshan://search?text=${location}`,
+      android: (location) => `intent://search?text=${location}#Intent;package=org.rajman.neshan;scheme=neshan;end`,
+      web: (location) => `https://neshan.org`
+    },
+    // موسیقی
+    spotify: {
+      ios: (username) => `spotify:user:${username}`,
+      android: (username) => `intent://open.spotify.com/user/${username}#Intent;package=com.spotify.music;scheme=https;end`,
+      web: (username) => `https://open.spotify.com/user/${username}`
+    },
+    apple_music: {
+      ios: (artist) => `music://music.apple.com/artist/${artist}`,
+      android: (artist) => `https://music.apple.com/artist/${artist}`,
+      web: (artist) => `https://music.apple.com/artist/${artist}`
+    },
+    youtube_music: {
+      ios: (channel) => `youtubemusic://youtube.com/${channel}`,
+      android: (channel) => `intent://youtube.com/${channel}#Intent;package=com.google.android.apps.youtube.music;scheme=https;end`,
+      web: (channel) => `https://music.youtube.com/${channel}`
+    },
+    // شبکه‌های اجتماعی دیگر
+    discord: {
+      ios: (server) => `discord://discord.com/invite/${server}`,
+      android: (server) => `intent://discord.com/invite/${server}#Intent;package=com.discord;scheme=https;end`,
+      web: (server) => `https://discord.com/invite/${server}`
+    },
+    clubhouse: {
+      ios: (username) => `clubhouse://join?username=${username}`,
+      android: (username) => `https://clubhouse.com/@${username}`,
+      web: (username) => `https://clubhouse.com/@${username}`
+    },
+    twitch: {
+      ios: (channel) => `twitch://stream/${channel}`,
+      android: (channel) => `intent://twitch.tv/${channel}#Intent;package=tv.twitch.android.app;scheme=https;end`,
+      web: (channel) => `https://twitch.tv/${channel}`
+    },
+    wechat: {
+      ios: (id) => `weixin://dl/chat?${id}`,
+      android: (id) => `weixin://dl/chat?${id}`,
+      web: (id) => `https://weixin.qq.com`
+    },
+    medium: {
+      ios: (username) => `medium://p/${username}`,
+      android: (username) => `intent://medium.com/@${username}#Intent;package=com.medium.reader;scheme=https;end`,
+      web: (username) => `https://medium.com/@${username}`
+    },
+    // توسعه و کار
+    github: {
+      ios: (username) => `github://github.com/${username}`,
+      android: (username) => `intent://github.com/${username}#Intent;package=com.github.android;scheme=https;end`,
+      web: (username) => `https://github.com/${username}`
+    },
+    zoom: {
+      ios: (meeting) => `zoomus://zoom.us/join?confno=${meeting}`,
+      android: (meeting) => `intent://zoom.us/join?confno=${meeting}#Intent;package=us.zoom.videomeetings;scheme=https;end`,
+      web: (meeting) => `https://zoom.us/j/${meeting}`
+    },
+    googlemeet: {
+      ios: (meeting) => `googlemeet://meet.google.com/${meeting}`,
+      android: (meeting) => `intent://meet.google.com/${meeting}#Intent;package=com.google.android.apps.meetings;scheme=https;end`,
+      web: (meeting) => `https://meet.google.com/${meeting}`
+    },
+    teams: {
+      ios: (meeting) => `msteams://teams.microsoft.com/l/meetup-join/${meeting}`,
+      android: (meeting) => `intent://teams.microsoft.com/l/meetup-join/${meeting}#Intent;package=com.microsoft.teams;scheme=https;end`,
+      web: (meeting) => `https://teams.microsoft.com/l/meetup-join/${meeting}`
     }
   }
 

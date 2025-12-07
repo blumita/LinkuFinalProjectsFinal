@@ -187,9 +187,16 @@ const finalUrl = computed(() => {
   
   // Handle social media with deep linking
   const deepLinkActions = [
+    'call', 'number', 'email', 'facetime', // تماس و پیام
     'instagram', 'linkedin', 'facebook', 'twitter', 'x', 
-    'youtube', 'telegram', 'tiktok', 'snapchat', 'threads',
-    'pinterest', 'spotify'
+    'youtube', 'telegram', 'whatsapp', 'tiktok', 'snapchat', 'threads',
+    'pinterest', 'spotify', 'apple_music', 'youtube_music',
+    // اپ‌های ایرانی
+    'eitaa', 'rubika', 'bale', 'igap', 'aparat', 'snapp', 'divar',
+    'balad', 'neshan',
+    // سایر پلتفرم‌ها
+    'discord', 'clubhouse', 'twitch', 'wechat', 'medium',
+    'github', 'zoom', 'googlemeet', 'teams'
   ]
   
   if (deepLinkActions.includes(action)) {

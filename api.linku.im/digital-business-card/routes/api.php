@@ -414,6 +414,8 @@ Route::middleware(['auth:sanctum','log.activity'])
         Route::post('/settings/sms', [SettingsController::class, 'updateSmsSettings']);
         Route::get('/settings/payment', [SettingsController::class, 'getPaymentSettings']);
         Route::post('/settings/payment', [SettingsController::class, 'updatePaymentSettings']);
+        Route::get('/settings/vapid', [SettingsController::class, 'getVapidSettings']);
+        Route::post('/settings/vapid', [SettingsController::class, 'updateVapidSettings']);
 
         Route::get('/notifications', [NotificationController::class, 'adminNotifications'])
             ->name('admin.notify.notifications');

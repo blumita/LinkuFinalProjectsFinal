@@ -173,8 +173,27 @@
             </ul>
           </div>
 
-          <!-- Gateway API Key -->
+          <!-- Merchant ID (Primary for Zarinpal) -->
           <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              <span v-if="settings.activeGateway === 'zarinpal'">شناسه پذیرنده (Merchant ID) - کلید اصلی زرین‌پال</span>
+              <span v-else>شناسه پذیرنده</span>
+            </label>
+            <input
+                v-model="settings.merchantId"
+                type="text"
+                class="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg
+                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                     bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                :placeholder="settings.activeGateway === 'zarinpal' ? 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' : 'شناسه پذیرنده درگاه'"
+            />
+            <p v-if="settings.activeGateway === 'zarinpal'" class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              برای زرین‌پال فقط Merchant ID لازم است (36 کاراکتر UUID)
+            </p>
+          </div>
+
+          <!-- Gateway API Key (Only for non-Zarinpal gateways) -->
+          <div v-if="settings.activeGateway !== 'zarinpal'">
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               کلید API درگاه
             </label>
@@ -195,21 +214,9 @@
                 <i :class="showGatewayApiKey ? 'ti ti-eye-off' : 'ti ti-eye'"></i>
               </button>
             </div>
-          </div>
-
-          <!-- Merchant ID -->
-          <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              شناسه پذیرنده
-            </label>
-            <input
-                v-model="settings.merchantId"
-                type="text"
-                class="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg
-                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                     bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
-                placeholder="شناسه پذیرنده درگاه"
-            />
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              فقط برای درگاه‌هایی که نیاز به کلید API جداگانه دارند
+            </p>
           </div>
 
           <!-- Test Mode -->
@@ -375,6 +382,119 @@
             >
               <i class="ti ti-device-floppy ml-2" :class="{ 'animate-pulse': isSavingSms }"></i>
               {{ isSavingSms ? 'در حال ذخیره...' : 'ذخیره تنظیمات پیامک' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VAPID Keys Settings -->
+      <div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden">
+        <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+          <h2 class="text-xl font-semibold text-slate-900 dark:text-white flex items-center">
+            <i class="ti ti-bell-ringing text-orange-600 ml-3"></i>
+            تنظیمات کلیدهای VAPID (اعلان‌های Push)
+          </h2>
+        </div>
+        <div class="p-6 space-y-6">
+          <!-- VAPID Public Key -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              کلید عمومی VAPID
+            </label>
+            <div class="relative">
+              <input
+                  v-model="vapidSettings.publicKey"
+                  :type="showVapidPublicKey ? 'text' : 'password'"
+                  class="w-full px-4 py-3 pl-12 border border-slate-300 dark:border-slate-600 rounded-lg
+                       focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                       bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-mono text-xs"
+                  placeholder="BFzttfamBJ5XHjuy55yNQTCdkR2rbgE3J0oYQHmEgoiRJPPrLWPt5lkTBZn7jS30UBdMLCeBplkznfAoZSjXkUY"
+              />
+              <button
+                  @click="showVapidPublicKey = !showVapidPublicKey"
+                  type="button"
+                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+              >
+                <i :class="showVapidPublicKey ? 'ti ti-eye-off' : 'ti ti-eye'"></i>
+              </button>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              کلید عمومی برای ثبت subscription در مرورگر کاربر
+            </p>
+          </div>
+
+          <!-- VAPID Private Key -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              کلید خصوصی VAPID
+            </label>
+            <div class="relative">
+              <input
+                  v-model="vapidSettings.privateKey"
+                  :type="showVapidPrivateKey ? 'text' : 'password'"
+                  class="w-full px-4 py-3 pl-12 border border-slate-300 dark:border-slate-600 rounded-lg
+                       focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                       bg-white dark:bg-slate-700 text-slate-900 dark:text-white font-mono text-xs"
+                  placeholder="8CZ6gF2j9bKzJzF6k3N5n4V8m7L6k5J4h3G2f1D0c9B8"
+              />
+              <button
+                  @click="showVapidPrivateKey = !showVapidPrivateKey"
+                  type="button"
+                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+              >
+                <i :class="showVapidPrivateKey ? 'ti ti-eye-off' : 'ti ti-eye'"></i>
+              </button>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              کلید خصوصی برای امضای پیام‌های Push در سرور
+            </p>
+          </div>
+
+          <!-- VAPID Subject -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              Subject (ایمیل یا URL)
+            </label>
+            <input
+                v-model="vapidSettings.subject"
+                type="text"
+                class="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg
+                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                     bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                placeholder="mailto:admin@linku.im or https://linku.im"
+            />
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              ایمیل یا URL برای شناسایی سرویس (مثال: mailto:admin@linku.im)
+            </p>
+          </div>
+
+          <!-- Generate New Keys Button -->
+          <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div class="flex items-start">
+              <i class="ti ti-info-circle text-blue-600 dark:text-blue-400 ml-2 mt-1"></i>
+              <div class="flex-1">
+                <p class="text-sm text-blue-800 dark:text-blue-300 mb-2">
+                  برای تولید کلیدهای جدید VAPID، دستور زیر را در ترمینال سرور اجرا کنید:
+                </p>
+                <code class="block bg-slate-800 text-green-400 p-3 rounded text-xs font-mono">
+                  php artisan webpush:vapid
+                </code>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save Button -->
+          <div class="pt-4">
+            <button
+                @click="saveVapidSettings"
+                :disabled="isSavingVapid"
+                class="w-full px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg
+                     transition-colors duration-200 flex items-center justify-center
+                     disabled:bg-slate-400 disabled:cursor-not-allowed"
+            >
+              <i v-if="!isSavingVapid" class="ti ti-device-floppy ml-2"></i>
+              <i v-else class="ti ti-loader animate-spin ml-2"></i>
+              {{ isSavingVapid ? 'در حال ذخیره...' : 'ذخیره کلیدهای VAPID' }}
             </button>
           </div>
         </div>
@@ -790,6 +910,7 @@ const isSaving = ref(false)
 const isSavingSupport = ref(false)
 const isSavingSms = ref(false)
 const isSavingPayment = ref(false)
+const isSavingVapid = ref(false)
 const isChangingPassword = ref(false)
 const passwordError = ref('')
 const message = ref('')
@@ -814,6 +935,13 @@ const smsSettings = reactive({
   smsSender: ''
 })
 
+// VAPID settings
+const vapidSettings = reactive({
+  publicKey: '',
+  privateKey: '',
+  subject: ''
+})
+
 // Support settings
 const supportSettings = reactive({
   phone: '',
@@ -836,6 +964,8 @@ const showNewPassword = ref(false)
 const showConfirmPassword = ref(false)
 const showGatewayApiKey = ref(false)
 const showSmsApiKey = ref(false)
+const showVapidPublicKey = ref(false)
+const showVapidPrivateKey = ref(false)
 
 // Settings data
 const settings = reactive<Settings>({
@@ -1089,6 +1219,16 @@ onMounted(async () => {
       securitySettings.email = userStore.user.email
     }
   }
+  
+  // Load VAPID settings
+  try {
+    const vapidRes = await axios.get('/user/admin/settings/vapid')
+    if (vapidRes.data) {
+      Object.assign(vapidSettings, vapidRes.data)
+    }
+  } catch (error) {
+    console.error('خطا در دریافت کلیدهای VAPID:', error)
+  }
 })
 
 // Change password
@@ -1206,6 +1346,30 @@ const saveSupportSettings = async () => {
     }, 3000)
   } finally {
     isSavingSupport.value = false
+  }
+}
+
+// Save VAPID settings
+const saveVapidSettings = async () => {
+  try {
+    isSavingVapid.value = true
+    await axios.post('/user/admin/settings/vapid', vapidSettings)
+    
+    messageType.value = 'success'
+    message.value = 'کلیدهای VAPID با موفقیت ذخیره شد'
+    
+    setTimeout(() => {
+      message.value = ''
+    }, 3000)
+  } catch (error) {
+    messageType.value = 'error'
+    message.value = 'خطا در ذخیره کلیدهای VAPID'
+    
+    setTimeout(() => {
+      message.value = ''
+    }, 3000)
+  } finally {
+    isSavingVapid.value = false
   }
 }
 </script>

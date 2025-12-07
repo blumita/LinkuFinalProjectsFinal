@@ -177,9 +177,92 @@ class SettingsController extends Controller
             }
         }
 
+        // Update .env file for GATEWAY_MERCHANT_ID
+        if ($request->merchantId) {
+            $envPath = base_path('.env');
+            $envContent = file_get_contents($envPath);
+            $pattern = "/^GATEWAY_MERCHANT_ID=.*/m";
+            $replacement = "GATEWAY_MERCHANT_ID={$request->merchantId}";
+            
+            if (preg_match($pattern, $envContent)) {
+                $envContent = preg_replace($pattern, $replacement, $envContent);
+            } else {
+                $envContent .= "\nGATEWAY_MERCHANT_ID={$request->merchantId}";
+            }
+            file_put_contents($envPath, $envContent);
+        }
+
         // Clear config cache so changes take effect
         \Artisan::call('config:clear');
 
         return response()->json(['message' => 'تنظیمات درگاه پرداخت با موفقیت ذخیره شد']);
+    }
+
+    /**
+     * Get VAPID keys settings
+     */
+    public function getVapidSettings(): JsonResponse
+    {
+        $settings = Setting::whereIn('key', [
+            'vapidPublicKey', 'vapidPrivateKey', 'vapidSubject'
+        ])->pluck('value', 'key')->toArray();
+
+        return response()->json([
+            'publicKey' => $settings['vapidPublicKey'] ?? config('services.vapid.public_key', ''),
+            'privateKey' => $settings['vapidPrivateKey'] ?? config('services.vapid.private_key', ''),
+            'subject' => $settings['vapidSubject'] ?? config('services.vapid.subject', ''),
+        ]);
+    }
+
+    /**
+     * Update VAPID keys settings
+     */
+    public function updateVapidSettings(Request $request): JsonResponse
+    {
+        $request->validate([
+            'publicKey' => 'nullable|string',
+            'privateKey' => 'nullable|string',
+            'subject' => 'nullable|string',
+        ]);
+
+        $settings = [
+            'vapidPublicKey' => $request->publicKey,
+            'vapidPrivateKey' => $request->privateKey,
+            'vapidSubject' => $request->subject,
+        ];
+
+        foreach ($settings as $key => $value) {
+            if ($value !== null) {
+                Setting::set($key, $value);
+            }
+        }
+
+        // Update .env file for VAPID keys
+        $envPath = base_path('.env');
+        $envContent = file_get_contents($envPath);
+
+        $updates = [
+            'VAPID_PUBLIC_KEY' => $request->publicKey ?? '',
+            'VAPID_PRIVATE_KEY' => $request->privateKey ?? '',
+            'VAPID_SUBJECT' => $request->subject ?? '',
+        ];
+
+        foreach ($updates as $key => $value) {
+            $pattern = "/^{$key}=.*/m";
+            $replacement = "{$key}={$value}";
+            
+            if (preg_match($pattern, $envContent)) {
+                $envContent = preg_replace($pattern, $replacement, $envContent);
+            } else {
+                $envContent .= "\n{$replacement}";
+            }
+        }
+
+        file_put_contents($envPath, $envContent);
+
+        // Clear config cache
+        \Artisan::call('config:clear');
+
+        return response()->json(['message' => 'کلیدهای VAPID با موفقیت ذخیره شد']);
     }
 }
