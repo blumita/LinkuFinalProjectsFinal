@@ -93,6 +93,15 @@ export default defineNuxtConfig({
           innerHTML: `
             (function() {
               try {
+                // چک کن که آیا صفحه پروفایل عمومی هست یا نه
+                const path = window.location.pathname;
+                const isPublicProfile = /^\/[a-zA-Z0-9_-]+$/.test(path) && !path.startsWith('/dashboard') && !path.startsWith('/auth') && !path.startsWith('/preview');
+                
+                // اگر صفحه پروفایل عمومی بود، تم رو اعمال نکن
+                if (isPublicProfile) {
+                  return;
+                }
+                
                 const savedThemeMode = localStorage.getItem('theme-mode') || localStorage.getItem('theme') || 'system';
                 const savedThemeColor = localStorage.getItem('theme-color') || 'blue';
                 

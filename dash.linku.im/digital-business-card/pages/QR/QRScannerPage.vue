@@ -5,7 +5,7 @@
       <div class="header-content">
         <div class="flex items-center justify-between">
           <button
-            @click="$router.go(-1)"
+            @click="goBack('/dashboard')"
             class="w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-sm flex items-center justify-center transition-colors flex-shrink-0"
           >
             <i class="ti ti-arrow-right text-white text-lg"></i>
@@ -330,6 +330,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useUserStore } from '~/stores/user'
 import { useFormStore } from '~/stores/form'
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
 
 definePageMeta({
   layout: 'default',
@@ -339,6 +340,7 @@ definePageMeta({
 // Stores
 const userStore = useUserStore()
 const formStore = useFormStore()
+const { goBack } = useSafeNavigation()
 
 // Computed user data
 const userName = computed(() => userStore.user?.name || 'کاربر')

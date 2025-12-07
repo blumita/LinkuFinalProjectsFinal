@@ -235,11 +235,11 @@ async function handleSubmit() {
   try {
 
     if (typeof props.slug !== 'undefined' && props.slug !== null) {
-      response.value = await axios.post(`cards/${props.slug}/leadAddToCard`, formData);
+      response.value = await $axios.post(`cards/${props.slug}/leadAddToCard`, formData);
     }
 
     if (typeof props.cardId !== 'undefined' && props.cardId !== null) {
-      response.value = await axios.post(`v1/cards/${props.cardId}/leads`, formData);
+      response.value = await $axios.post(`v1/cards/${props.cardId}/leads`, formData);
     }
 
 

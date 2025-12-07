@@ -1,5 +1,14 @@
-export default defineNuxtPlugin(() => {
+export default defineNuxtPlugin((nuxtApp) => {
   if (process.client) {
+    // چک کن که آیا صفحه پروفایل عمومی هست یا نه
+    const path = window.location.pathname
+    const isPublicProfile = /^\/[a-zA-Z0-9_-]+$/.test(path) && !path.startsWith('/dashboard') && !path.startsWith('/auth') && !path.startsWith('/preview')
+    
+    // اگر صفحه پروفایل عمومی بود، تم رو اعمال نکن
+    if (isPublicProfile) {
+      return
+    }
+    
     // بررسی تنظیمات ذخیره شده کاربر برای theme mode
     const savedThemeMode = localStorage.getItem('theme-mode') || localStorage.getItem('theme')
     const savedThemeColor = localStorage.getItem('theme-color')

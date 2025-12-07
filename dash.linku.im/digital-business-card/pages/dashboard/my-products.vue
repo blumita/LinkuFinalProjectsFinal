@@ -92,6 +92,7 @@
 import {ref, onMounted} from 'vue'
 import {useNuxtApp, useRouter} from "nuxt/app";
 import InfoToast from "~/components/UserDashboard/modals/InfoToast.vue";
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
 
 const router = useRouter()
 const {$axios} = useNuxtApp()
@@ -112,14 +113,9 @@ const activatedCards = ref([])
 const loadingActivated = ref(true)
 
 // Navigation
+const { goBack: goBackSafe } = useSafeNavigation()
 function goBack() {
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                       (window.navigator).standalone === true
-  if (isStandalone || window.history.length <= 2) {
-    router.push('/profile')
-  } else {
-    router.back()
-  }
+  goBackSafe('/profile')
 }
 
 function goToActivate() {

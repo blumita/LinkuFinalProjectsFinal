@@ -50,40 +50,21 @@ export const useStatsStore = defineStore('stats', {
     },
 
     statsCards(state): StatItem[] {
-      const filtered = (this as any).filteredStats as StatItem[]
-
-      const grouped = filtered.reduce<Record<string, StatItem[]>>((acc, item) => {
-        if (!acc[item.key]) acc[item.key] = []
-        acc[item.key].push(item)
+      // بر اساس key گروه‌بندی کن و آخرین مقدار را برگردان
+      const grouped = state.stats.reduce<Record<string, StatItem>>((acc, item) => {
+        // اگر این key قبلاً وجود نداشت یا تاریخ جدیدتری دارد، جایگزین کن
+        if (!acc[item.key] || moment(item.date).isAfter(moment(acc[item.key].date))) {
+          acc[item.key] = item
+        }
         return acc
       }, {})
 
-      return Object.entries(grouped).map(([key, items]) => {
-        const last = items.at(-1)!
-        
-        // اگر آیتم آخر داده trend دارد، از آن استفاده کن
-        // وگرنه از مقادیر value آیتم‌ها trend بساز
-        let trend = last.trend && last.trend.length > 0 
-          ? last.trend 
-          : items
-              .map(i =>
-                typeof i.value === 'string' ? parseInt(i.value) : Number(i.value)
-              )
-              .slice(-7) // محدود به ۷ مقدار آخر
-
-        // اگر هنوز هم trend خالی است، داده تصادفی بساز
-        if (!trend || trend.length === 0) {
-          trend = Array.from({ length: 7 }, () => Math.floor(Math.random() * 50) + 20)
-        }
-        return {
-          key,
-          label: last.label,
-          value: last.value,
-          trend,
-          tooltip: last.tooltip,
-          date: last.date
-        }
-      })
+      // تبدیل به آرایه و مرتب‌سازی
+      return Object.values(grouped).map(item => ({
+        ...item,
+        // اطمینان از اینکه trend همیشه آرایه است
+        trend: Array.isArray(item.trend) ? item.trend : []
+      }))
     },
 
     getLinks(state): StatLinkItem[] {
@@ -115,47 +96,44 @@ export const useStatsStore = defineStore('stats', {
         viewsByDate[today] = 0
       }
 
-      const statTypes = [
-        {key: 'pops', label: 'بازدید', tooltip: 'تعداد بازدید کلی'},
-        {key: 'linkTaps', label: 'کلیک لینک', tooltip: 'کلیک روی لینک‌ها'},
-        {key: 'connections', label: 'اتصالات جدید', tooltip: 'کاربران جدید'},
-        {key: 'ctr', label: 'نرخ کلیک‌پذیری', tooltip: 'نسبت کلیک به بازدید'},
-        {key: 'mapView', label: 'مشاهده روی نقشه (بزودی)', tooltip: 'نمایش روی نقشه'},
-        {key: 'ranking', label: 'رتبه بندی (بزودی)', tooltip: 'رتبه جستجو'}
-      ]
+      // ساخت آرایه تاریخ‌ها برای محاسبه trend
       const sortedDates = Array.from(
           new Set([
             ...Object.keys(viewsByDate),
             ...Object.keys(clicksByDate)
           ])
       ).sort()
-//
-      sortedDates.forEach((date) => {
-        statTypes.forEach((t, idx) => {
-          const value = (() => {
-            if (t.key === 'linkTaps') {
-              return clicksByDate[date] ?? 0
-            } else if (t.key === 'pops') {
-              return viewsByDate[date] ?? 0
-            } else if (t.key === 'ctr') {
-              const clicks = clicksByDate[date] ?? 0
-              const views = viewsByDate[date] ?? 0
-              return views === 0 ? '0%' : `${Math.floor((clicks / views) * 100)}%`
-            } else {
-              return 0 // 100 + idx * 20 + Math.floor(Math.random() * 30)
-            }
-          })()
 
+      // محاسبه trend ها (داده‌های روزانه)
+      const viewsTrend = sortedDates.map(date => viewsByDate[date] || 0)
+      const clicksTrend = sortedDates.map(date => clicksByDate[date] || 0)
+      const ctrTrend = sortedDates.map(date => {
+        const clicks = clicksByDate[date] || 0
+        const views = viewsByDate[date] || 0
+        return views === 0 ? 0 : Math.floor((clicks / views) * 100)
+      })
 
+      // محاسبه مجموع برای نمایش
+      const totalViews = Object.values(viewsByDate).reduce((sum, val) => sum + val, 0)
+      const totalClicks = Object.values(clicksByDate).reduce((sum, val) => sum + val, 0)
+      const avgCTR = totalViews === 0 ? 0 : Math.floor((totalClicks / totalViews) * 100)
 
-          this.stats.push({
-            key: t.key,
-            label: t.label,
-            value,
-            trend: [],
-            tooltip: t.tooltip,
-            date
-          })
+      // ساخت آمار با trend های واقعی
+      const statTypes = [
+        {key: 'pops', label: 'بازدید', value: totalViews, trend: viewsTrend, tooltip: 'تعداد کل بازدید در بازه انتخابی'},
+        {key: 'linkTaps', label: 'کلیک لینک', value: totalClicks, trend: clicksTrend, tooltip: 'تعداد کل کلیک روی لینک‌ها'},
+        {key: 'ctr', label: 'نرخ کلیک', value: `${avgCTR}%`, trend: ctrTrend, tooltip: 'نسبت کلیک به بازدید (CTR)'},
+      ]
+
+      // اضافه کردن یک آیتم برای هر نوع آمار
+      statTypes.forEach((t) => {
+        this.stats.push({
+          key: t.key,
+          label: t.label,
+          value: t.value,
+          trend: t.trend,
+          tooltip: t.tooltip,
+          date: today
         })
       })
       ///

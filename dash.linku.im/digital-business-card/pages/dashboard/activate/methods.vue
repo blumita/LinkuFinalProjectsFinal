@@ -318,6 +318,7 @@
 import {ref, onMounted, nextTick, computed, onUnmounted} from 'vue'
 import {useNuxtApp, useRouter, useRoute} from "nuxt/app";
 import InfoToast from "~/components/UserDashboard/modals/InfoToast.vue";
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
 
 const router = useRouter()
 const route = useRoute()
@@ -387,8 +388,9 @@ onMounted(() => {
 })
 
 // Navigation
+const { goBack: goBackSafe } = useSafeNavigation()
 function goBack() {
-  router.push('/dashboard/activate')
+  goBackSafe('/dashboard/activate')
 }
 
 function goToDashboard() {

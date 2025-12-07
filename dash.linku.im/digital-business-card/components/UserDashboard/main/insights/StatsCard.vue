@@ -1,6 +1,6 @@
 <template>
   <div
-    class="border border-border rounded-xl p-4 text-center shadow-sm bg-card min-h-[160px]"
+    class="border border-border rounded-xl p-4 text-center shadow-sm bg-card min-h-[180px] flex flex-col justify-between"
   >
     <!-- حالت لودینگ -->
     <template v-if="loading">
@@ -20,16 +20,16 @@
       <div class="text-2xl font-bold mb-1 text-foreground">{{ value }}</div>
       <div class="text-sm text-muted-foreground mb-2">{{ label }}</div>
 
-      <div class="h-[50px]">
+      <div class="h-[60px] -mx-2">
         <div v-if="!trend || trend.length === 0" class="flex items-center justify-center text-muted-foreground text-xs h-full">
-          داده‌ای برای نمودار موجود نیست
+          <i class="ti ti-chart-line text-2xl opacity-30"></i>
         </div>
         <client-only v-else>
           <ApexChart
             :options="chartOptions"
             :series="chartSeries"
-            type="line"
-            height="50"
+            type="area"
+            height="60"
           />
         </client-only>
       </div>
@@ -40,6 +40,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import ApexChart from 'vue3-apexcharts'
+import { useFormStore } from '~/stores/form'
 
 const props = defineProps<{
   label: string
@@ -48,13 +49,28 @@ const props = defineProps<{
   tooltip: string
   loading?: boolean
 }>()
-// تنظیمات چارت
-const chartOptions = {
+
+const formStore = useFormStore()
+
+// رنگ چارت بر اساس رنگ پروفایل
+const chartColor = computed(() => {
+  // اگر کاربر رنگ سفارشی انتخاب کرده، از آن استفاده کن
+  if (formStore.iconColor?.background && formStore.iconColor.background !== 'transparent') {
+    return formStore.iconColor.background
+  }
+  // در غیر این صورت از رنگ primary استفاده کن
+  return 'rgb(var(--color-primary))'
+})
+
+// تنظیمات چارت با رنگ داینامیک
+const chartOptions = computed(() => ({
   chart: {
     sparkline: { enabled: true },
     fontFamily: 'ShabnamFd, sans-serif',
     animations: {
-      enabled: false
+      enabled: true,
+      easing: 'easeinout',
+      speed: 800
     },
     toolbar: {
       show: false
@@ -62,35 +78,54 @@ const chartOptions = {
   },
   stroke: { 
     curve: 'smooth' as const, 
-    width: 2 
+    width: 3 
   },
-  colors: ['#666'],
-  tooltip: { enabled: false },
+  colors: [chartColor.value],
+  fill: {
+    type: 'gradient',
+    gradient: {
+      shade: 'light',
+      type: 'vertical',
+      shadeIntensity: 0.5,
+      opacityFrom: 0.7,
+      opacityTo: 0.3,
+      stops: [0, 100]
+    }
+  },
+  tooltip: { 
+    enabled: true,
+    theme: 'dark',
+    y: {
+      formatter: (val: number) => val.toString()
+    }
+  },
   xaxis: { 
     labels: { show: false },
     axisBorder: { show: false },
     axisTicks: { show: false }
   },
   yaxis: { 
-    show: false 
+    show: false,
+    min: 0
   },
   grid: { 
     show: false,
     padding: {
       left: 0,
       right: 0,
-      top: 5,
-      bottom: 5
+      top: 0,
+      bottom: 0
     }
   },
   dataLabels: { enabled: false }
-}
+}))
 
 // داده‌های چارت
 const chartSeries = computed(() => {
+  const data = props.trend && props.trend.length > 0 ? props.trend : [0]
   return [{
-    name: 'آمار',
-    data: props.trend || []
+    name: props.label,
+    data
   }]
 })
 </script>

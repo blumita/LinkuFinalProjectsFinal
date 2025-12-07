@@ -12,9 +12,13 @@ const nuxtApp = useNuxtApp()
 const $axios = nuxtApp.$axios as AxiosInstance
 const formStore = useFormStore()
 const cardId = ref('')
+const selectedCard = ref<any>(null)
 const statsCardsLoading = ref(true)
 const linksLoading = ref(true)
 const isLoading = ref(false)
+
+// لیست تمام کارت‌های کاربر
+const userCards = computed(() => formStore.cards || [])
 
 // استور - فقط در client-side
 const store = ref<any>(null)
@@ -61,9 +65,9 @@ const applyFilter = async (key: string) => {
       const response = await $axios.get(`cards/${cardId.value}/views`, {
         params: {from, to}
       });
-      // Ensure response data exists and is an array, otherwise default to an empty array
-      rawLinks = Array.isArray(formStore.defaultCard?.linksDataList) ?
-          formStore.defaultCard?.linksDataList?.map(link => formStore.normalizeLink(link)) : [];
+      // استفاده از لینک‌های کارت انتخاب شده
+      rawLinks = Array.isArray(selectedCard.value?.linksDataList) ?
+          selectedCard.value?.linksDataList?.map(link => formStore.normalizeLink(link)) : [];
 
       clicksByDate.value = response.data.data.clicks_by_date || {}
       viewsByDate.value = response.data.data.views_by_date || {}
@@ -88,13 +92,22 @@ watch(selectedRange, (val) => {
   applyFilter(val)
 })
 watchEffect(() => {
-
-  if (formStore.defaultCard?.id) {
+  // اگر کارت انتخاب شده تغییر کرد، آمار را بارگذاری کن
+  if (selectedCard.value?.id) {
+    cardId.value = selectedCard.value.id
+    applyFilter(selectedRange.value)
+  } else if (formStore.defaultCard?.id) {
+    // اگر کارتی انتخاب نشده، از کارت پیش‌فرض استفاده کن
+    selectedCard.value = formStore.defaultCard
     cardId.value = formStore.defaultCard.id
-  } else {
+    applyFilter(selectedRange.value)
   }
-  applyFilter(selectedRange.value)
 })
+
+// تابع تغییر کارت
+const changeCard = (card: any) => {
+  selectedCard.value = card
+}
 import {useIconComponents} from '~/composables/useIconComponentsMap'
 
 const {getIconComponent} = useIconComponents()
@@ -120,6 +133,37 @@ const iconColor = computed(() => {
 
 <template>
   <div v-if="store && statsCards && getLinks" class="px-4 pb-24 pt-4">
+    <!-- انتخاب کارت -->
+    <div v-if="userCards.length > 1" class="mb-4 bg-card rounded-xl border border-border p-3">
+      <label class="block text-sm font-medium text-foreground mb-2">انتخاب کارت:</label>
+      <div class="grid grid-cols-1 gap-2">
+        <button
+          v-for="card in userCards"
+          :key="card.id"
+          @click="changeCard(card)"
+          :class="[
+            'flex items-center justify-between p-3 rounded-lg border-2 transition-all',
+            selectedCard?.id === card.id
+              ? 'border-primary bg-primary/5'
+              : 'border-border hover:border-primary/50 bg-background'
+          ]"
+        >
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+              <img v-if="card.avatar" :src="card.avatar" :alt="card.name" class="w-full h-full object-cover" />
+              <i v-else class="ti ti-user text-muted-foreground"></i>
+            </div>
+            <div class="text-right">
+              <div class="font-medium text-foreground">{{ card.name || 'کارت بدون نام' }}</div>
+              <div class="text-xs text-muted-foreground">{{ card.slug }}</div>
+            </div>
+          </div>
+          <i v-if="card.isDefault" class="ti ti-star-filled text-primary"></i>
+          <i v-else-if="selectedCard?.id === card.id" class="ti ti-check text-primary"></i>
+        </button>
+      </div>
+    </div>
+
     <!-- فیلتر بازه زمانی -->
     <Filter v-model="selectedRange" :username="userStore.user?.name"/>
 

@@ -42,19 +42,13 @@ export const useSafeNavigation = () => {
       return
     }
 
-    // 2. در حالت PWA همیشه به fallback برو (جلوگیری از خروج از اپ)
-    if (isStandalone()) {
-      router.push(fallbackPath)
-      return
-    }
-
-    // 3. اگر history داریم، برگرد
+    // 2. اگر history داریم، برگرد (در هر حالتی: PWA یا Browser)
     if (hasHistory()) {
       router.back()
       return
     }
 
-    // 4. در غیر این صورت به fallback برو
+    // 3. در غیر این صورت به fallback برو
     router.push(fallbackPath)
   }
 

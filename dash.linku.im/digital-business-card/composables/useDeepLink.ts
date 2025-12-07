@@ -115,29 +115,46 @@ export const useDeepLink = () => {
     },
     // اپلیکیشن‌های ایرانی
     eitaa: {
-      ios: (username) => `eitaa://profile/${username}`,
-      android: (username) => `eitaa://profile/${username}`,
-      web: (username) => `https://eitaa.com/${username}`
+      ios: (username) => `eitaa://resolve?domain=${username.replace(/^@/, '')}`,
+      android: (username) => `eitaa://resolve?domain=${username.replace(/^@/, '')}`,
+      web: (username) => `https://eitaa.com/${username.replace(/^@/, '')}`
     },
     rubika: {
-      ios: (username) => `rubika://profile/${username}`,
-      android: (username) => `rubika://profile/${username}`,
-      web: (username) => `https://rubika.ir/${username}`
+      ios: (username) => `rubika://l.rubika.ir/${username.replace(/^@/, '')}`,
+      android: (username) => `intent://l.rubika.ir/${username.replace(/^@/, '')}#Intent;package=ir.resaneh1.iptv;scheme=https;end`,
+      web: (username) => `https://rubika.ir/${username.replace(/^@/, '')}`
     },
     bale: {
-      ios: (username) => `bale://profile/${username}`,
-      android: (username) => `bale://profile/${username}`,
-      web: (username) => `https://ble.ir/${username}`
+      ios: (username) => `bale://resolve?domain=${username.replace(/^@/, '')}`,
+      android: (username) => `bale://resolve?domain=${username.replace(/^@/, '')}`,
+      web: (username) => `https://ble.ir/${username.replace(/^@/, '')}`
     },
     igap: {
-      ios: (username) => `igap://profile/${username}`,
-      android: (username) => `igap://profile/${username}`,
-      web: (username) => `https://igap.net/${username}`
+      ios: (username) => `igap://resolve?domain=${username.replace(/^@/, '')}`,
+      android: (username) => `igap://resolve?domain=${username.replace(/^@/, '')}`,
+      web: (username) => `https://igap.net/${username.replace(/^@/, '')}`
     },
     aparat: {
-      ios: (username) => `aparat://video/${username}`,
-      android: (username) => `intent://aparat.com/v/${username}#Intent;package=ir.aparat.android;scheme=https;end`,
-      web: (username) => `https://aparat.com/v/${username}`
+      ios: (username) => {
+        // اگر username با v/ شروع شده، ویدیو است
+        if (username.startsWith('v/')) {
+          return `aparat://video/${username.replace('v/', '')}`
+        }
+        // در غیر این صورت، چنل است
+        return `aparat://channel/${username.replace(/^@/, '')}`
+      },
+      android: (username) => {
+        if (username.startsWith('v/')) {
+          return `intent://aparat.com/v/${username.replace('v/', '')}#Intent;package=ir.aparat.android;scheme=https;end`
+        }
+        return `intent://aparat.com/${username.replace(/^@/, '')}#Intent;package=ir.aparat.android;scheme=https;end`
+      },
+      web: (username) => {
+        if (username.startsWith('v/')) {
+          return `https://aparat.com/v/${username.replace('v/', '')}`
+        }
+        return `https://aparat.com/${username.replace(/^@/, '')}`
+      }
     },
     // نقشه و حمل و نقل
     snapp: {
@@ -233,29 +250,49 @@ export const useDeepLink = () => {
    * @returns {string} - The appropriate deep link or web fallback URL
    */
   const getDeepLink = (action, value, baseUrl = '') => {
-    if (!isMobile() || !value || !action) {
-      // Not mobile or missing data, return web URL
-      return baseUrl ? baseUrl + value.replace(/^[@+]/, '') : value
+    if (!value || !action) {
+      return '#'
+    }
+
+    // اگر value قبلاً URL کامل است، مستقیماً برگردان
+    if (/^(https?:|mailto:|tel:|facetime:|sms:|ftp:|ftps:|tg:|geo:|maps:|intent:|app:|custom:)/i.test(value)) {
+      return value
     }
 
     const scheme = appSchemes[action]
     if (!scheme) {
       // No deep link scheme available, return web URL
-      return baseUrl ? baseUrl + value.replace(/^[@+]/, '') : value
+      if (!baseUrl) return value
+      // Clean value از @ و + و سپس اضافه کن به baseUrl
+      const cleanValue = value.replace(/^[@+]/, '').trim()
+      // اگر value با baseUrl شروع شده، مستقیماً برگردان
+      if (value.includes(baseUrl)) return value
+      return baseUrl + cleanValue
     }
 
     // Clean username/value
     const cleanValue = value.replace(/^[@+]/, '').trim()
+    
+    // Remove baseUrl prefix if it exists in value
+    let finalValue = cleanValue
+    if (baseUrl && cleanValue.startsWith(baseUrl.replace(/^https?:\/\//, ''))) {
+      finalValue = cleanValue.replace(baseUrl.replace(/^https?:\/\//, ''), '')
+    }
 
-    // Return appropriate URL based on platform
+    // Return appropriate URL based on platform and mobile detection
+    if (!isMobile()) {
+      // Desktop: return web URL
+      return scheme.web(finalValue)
+    }
+
     if (isIOS()) {
-      return scheme.ios(cleanValue)
+      return scheme.ios(finalValue)
     } else if (isAndroid()) {
-      return scheme.android(cleanValue)
+      return scheme.android(finalValue)
     }
 
     // Fallback to web
-    return scheme.web(cleanValue)
+    return scheme.web(finalValue)
   }
 
   /**
