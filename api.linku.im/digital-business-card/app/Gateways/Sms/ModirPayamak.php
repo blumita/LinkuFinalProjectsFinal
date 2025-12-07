@@ -19,29 +19,10 @@ class ModirPayamak implements OtpSenderInterface
 
     public function __construct()
     {
-        // مقادیر پیش‌فرض - اگر از settings جدول بخوانیم، اینجا override می‌شود
         $this->apiKey = 'YTA4NDUxYzAtZDMzOC00ZTc3LWIxZjAtZWIzODI2MmI5ZDVhNzQ4YzNiMjVjYTYxYjkxMTIyOGI3MTdhNmUyMDViYmY=';
         $this->patternCode = 'g36m6fr6ozz0e4j';
         $this->sender = '+983000505';
         $this->otpVariable = 'linku-code';
-        
-        // سعی در خواندن از تنظیمات دیتابیس
-        try {
-            if (class_exists('\App\Models\Setting')) {
-                $apiKey = \App\Models\Setting::where('key', 'sms_api_key')->value('value');
-                $patternCode = \App\Models\Setting::where('key', 'sms_pattern_code')->value('value');
-                $sender = \App\Models\Setting::where('key', 'sms_sender')->value('value');
-                $otpVariable = \App\Models\Setting::where('key', 'sms_otp_variable')->value('value');
-                
-                if ($apiKey) $this->apiKey = $apiKey;
-                if ($patternCode) $this->patternCode = $patternCode;
-                if ($sender) $this->sender = $sender;
-                if ($otpVariable) $this->otpVariable = $otpVariable;
-            }
-        } catch (\Exception $e) {
-            // اگر مشکلی بود، از مقادیر پیش‌فرض استفاده می‌کنیم
-        }
-        }
     }
 
     /**
