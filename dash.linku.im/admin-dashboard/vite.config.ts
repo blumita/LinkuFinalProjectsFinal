@@ -15,13 +15,7 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 1500,
     // کاهش استفاده از حافظه برای سرورهای با RAM محدود
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      }
-    } as any,
+    minify: 'esbuild',
     rollupOptions: {
       // کاهش استفاده از CPU/RAM
       maxParallelFileOps: 2,
