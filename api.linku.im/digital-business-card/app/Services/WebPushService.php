@@ -53,20 +53,19 @@ class WebPushService
             $subscription = json_decode($subscription, true);
         }
 
-        // استاندارد Web Push Notification
+        // استاندارد Web Push Notification - مستقیم بدون wrapper
         $payload = json_encode([
-            'notification' => [
-                'title' => $title,
-                'body' => $message,
-                'icon' => '/icon-192x192.png',
-                'badge' => '/badge-96x96.png',
-                'tag' => 'linku-notification',
-                'requireInteraction' => false,
-                'data' => [
-                    'url' => $url ?? '/dashboard/notifications',
-                    'timestamp' => now()->timestamp,
-                ]
-            ]
+            'title' => $title,
+            'body' => $message,
+            'message' => $message, // برای سازگاری با SW قدیمی
+            'icon' => '/AppImages/android/android-launchericon-192-192.png',
+            'badge' => '/AppImages/android/android-launchericon-96-96.png',
+            'tag' => 'linku-notification',
+            'requireInteraction' => false,
+            'vibrate' => [200, 100, 200],
+            'url' => $url ?? '/dashboard/notifications',
+            'actionLink' => $url ?? '/dashboard/notifications',
+            'timestamp' => now()->timestamp,
         ]);
 
         try {
