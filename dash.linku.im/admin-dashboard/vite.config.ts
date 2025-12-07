@@ -14,36 +14,22 @@ export default defineConfig({
   ],
   build: {
     chunkSizeWarningLimit: 1500,
-    // کاهش استفاده از حافظه برای سرورهای با RAM محدود
+    // بهینه‌سازی برای سرور با 6GB RAM
     minify: 'esbuild',
+    target: 'es2015',
+    cssCodeSplit: true,
+    sourcemap: false,
     rollupOptions: {
-      // کاهش استفاده از CPU/RAM
-      maxParallelFileOps: 2,
+      // کاهش استفاده از CPU/RAM - فقط 1 فایل همزمان
+      maxParallelFileOps: 1,
       output: {
         // اضافه کردن hash برای cache busting
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
+        // کاهش تعداد chunk ها برای کاهش مصرف RAM
         manualChunks: (id) => {
-          // فقط کتابخونه‌های سنگین رو جدا می‌کنیم
-          // Vue و پیوستگی‌هاش رو با هم نگه می‌داریم
-          
-          // Charts - سنگین
-          if (id.includes('node_modules/apexcharts') || id.includes('node_modules/vue3-apexcharts')) {
-            return 'charts'
-          }
-          
-          // Excel/PDF - خیلی سنگین
-          if (id.includes('node_modules/xlsx') || id.includes('node_modules/jspdf')) {
-            return 'export-libs'
-          }
-          
-          // TinyMCE - خیلی سنگین
-          if (id.includes('node_modules/tinymce') || id.includes('node_modules/@tinymce')) {
-            return 'tinymce'
-          }
-          
-          // بقیه vendor ها با Vue با هم
+          // فقط یک vendor chunk برای همه
           if (id.includes('node_modules/')) {
             return 'vendor'
           }

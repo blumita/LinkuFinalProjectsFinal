@@ -94,7 +94,7 @@ export default defineNuxtPlugin(async () => {
       }
     }
 
-    // درخواست Permission فوری (نه بعد از 3 ثانیه)
+    // درخواست Permission فقط اگر قبلاً داده شده
     if ('Notification' in window) {
       // اگه permission داده شده، چک کن که subscription داره یا نه
       if (Notification.permission === 'granted') {
@@ -107,18 +107,7 @@ export default defineNuxtPlugin(async () => {
           await subscribeToPush()
         }
       }
-      // اگه هنوز نداده، فوراً درخواست کن (خودکار)
-      else if (Notification.permission === 'default') {
-        try {
-          const permission = await Notification.requestPermission()
-          
-          if (permission === 'granted') {
-            await subscribeToPush()
-          }
-        } catch (error) {
-          // Permission error
-        }
-      }
+      // اگه default است، منتظر می‌مانیم که کاربر از طریق بنر یا دکمه درخواست کند
     }
 
     // توابع برای دسترسی از بیرون
