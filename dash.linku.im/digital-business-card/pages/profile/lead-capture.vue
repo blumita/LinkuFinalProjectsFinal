@@ -6,7 +6,7 @@
       <div class="fixed top-0 left-0 right-0 w-full bg-background/95 backdrop-blur-lg border-b border-border z-50">
         <div class="flex items-center justify-between w-full px-4 py-3">
           <div class="flex items-center gap-3">
-            <button @click="() => goBack('/profile')" class="w-10 h-10 flex items-center justify-center rounded-xl bg-muted/50 hover:bg-accent transition-colors">
+            <button @click="goBack" class="w-10 h-10 flex items-center justify-center rounded-xl bg-muted/50 hover:bg-accent transition-colors">
               <i class="ti ti-arrow-right text-xl text-foreground"></i>
             </button>
             <h1 class="text-lg font-bold text-foreground">فرم ارتباط</h1>
@@ -23,7 +23,7 @@
       <div class="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t border-border p-4 z-50">
         <div class="flex gap-3">
           <button
-            @click="() => goBack('/profile')"
+            @click="goBack"
             class="flex-1 h-12 rounded-xl border border-border text-foreground font-medium hover:bg-muted transition-colors"
           >
             انصراف
@@ -43,7 +43,7 @@
       <div class="container mx-auto px-4 py-8">
         <div class="max-w-4xl mx-auto">
           <div class="mb-6">
-            <button @click="() => goBack('/profile')" class="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+            <button @click="goBack" class="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
               <i class="ti ti-arrow-right text-xl"></i>
               <span>بازگشت</span>
             </button>

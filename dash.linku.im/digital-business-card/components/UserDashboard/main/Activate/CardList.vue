@@ -192,7 +192,7 @@ const formStore = useFormStore()
 const profiles = computed(() => formStore.cards.map(card => ({
   id: Number(card.id),
   name: card.userName || 'بدون نام',
-  avatar: card.avatar || '/logo.svg',
+  avatar: card.avatar || null,
   role: card.job || 'کاربر'
 })))
 const {$axios} = useNuxtApp()

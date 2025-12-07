@@ -5,7 +5,7 @@
       <div class="header-content">
         <div class="flex items-center justify-between">
           <button
-            @click="goBack('/dashboard')"
+            @click="goBack"
             class="w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-sm flex items-center justify-center transition-colors flex-shrink-0"
           >
             <i class="ti ti-arrow-right text-white text-lg"></i>

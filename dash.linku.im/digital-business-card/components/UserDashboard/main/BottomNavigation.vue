@@ -491,10 +491,18 @@ watch(isBottomSheetOpen, (newValue) => {
               >
                 <div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-primary/30">
                   <img 
+                    v-if="selectedSharingProfile?.avatar || userAvatar"
                     :src="selectedSharingProfile?.avatar || userAvatar" 
                     :alt="userName"
                     class="w-full h-full object-cover"
                   />
+                  <div 
+                    v-else
+                    class="w-full h-full flex items-center justify-center"
+                    :style="{ backgroundColor: formStore.iconColor?.background || 'rgb(var(--color-primary))' }"
+                  >
+                    <i class="ti ti-user text-white text-xs"></i>
+                  </div>
                 </div>
                 <span class="text-sm font-medium text-foreground truncate flex-1">
                   {{ userName }}
@@ -767,10 +775,18 @@ watch(isBottomSheetOpen, (newValue) => {
             <!-- Avatar -->
             <div class="relative w-11 h-11 rounded-full overflow-hidden ring-2 ring-border bg-white">
               <img 
-                :src="profile.avatar || '/logo.svg'" 
+                v-if="profile.avatar"
+                :src="profile.avatar" 
                 :alt="profile.name"
                 class="w-full h-full object-cover"
               />
+              <div 
+                v-else
+                class="w-full h-full flex items-center justify-center"
+                :style="{ backgroundColor: formStore.iconColor?.background || 'rgb(var(--color-primary))' }"
+              >
+                <i class="ti ti-user text-white text-lg"></i>
+              </div>
             </div>
 
             <!-- Info -->

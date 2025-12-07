@@ -12,7 +12,7 @@
         >
           <!-- Back Button -->
           <button
-            @click="() => goBack('/settings')"
+            @click="goBack"
             class="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted transition-colors"
             style="pointer-events: auto !important; position: relative !important;"
           >

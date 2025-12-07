@@ -4,7 +4,7 @@
     <div class="fixed top-0 left-0 right-0 z-40 bg-card border-b border-border">
       <div class="flex items-center h-14 px-4 max-w-5xl mx-auto">
         <button
-          @click="() => goBack('/dashboard')"
+          @click="goBack"
           class="flex items-center justify-center w-10 h-10 rounded-lg text-foreground hover:bg-accent transition-colors"
         >
           <i class="ti ti-arrow-right text-xl"></i>

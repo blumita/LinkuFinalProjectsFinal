@@ -265,8 +265,13 @@
                 </div>
                 <div v-else class="h-6 mb-3"></div>
                 
-                <div class="text-3xl font-bold mb-4" :class="getPlanTextColor(index)">
-                  {{ Math.round(plan.price).toLocaleString('fa-IR') }} تومان
+                <div class="mb-4">
+                  <div v-if="plan.discount > 0" class="text-lg line-through text-gray-500/70 mb-1" :class="getPlanTextColor(index)">
+                    {{ Math.round(plan.price).toLocaleString('fa-IR') }} تومان
+                  </div>
+                  <div class="text-3xl font-bold" :class="getPlanTextColor(index)">
+                    {{ Math.round(plan.price * (1 - plan.discount / 100)).toLocaleString('fa-IR') }} تومان
+                  </div>
                 </div>
                 <button 
                   @click="goToOrder(plan.id)" 

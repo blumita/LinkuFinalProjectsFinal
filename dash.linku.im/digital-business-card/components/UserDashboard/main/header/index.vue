@@ -22,7 +22,7 @@
 
         <!-- نام کاربر -->
         <div v-if="userName" class="items-center gap-2 hidden md:flex min-w-0">
-          <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-sm text-white shrink-0">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm text-white shrink-0">
             <template v-if="form.defaultCard?.avatar">
               <img
                   :src="form.defaultCard.avatar"
@@ -30,9 +30,13 @@
                   class="w-7 h-7 rounded-full object-cover"
               />
             </template>
-            <template v-else>
-              <i class="ti ti-user" />
-            </template>
+            <div 
+              v-else
+              class="w-full h-full rounded-full flex items-center justify-center"
+              :style="{ backgroundColor: form.iconColor?.background || 'rgb(var(--color-primary))' }"
+            >
+              <i class="ti ti-user text-sm" />
+            </div>
           </div>
           <span class="font-semibold text-sm truncate text-gray-700">{{ userName }}</span>
         </div>

@@ -86,10 +86,18 @@
                 <div class="relative w-fit mx-auto">
                   <div class="w-24 h-24 rounded-full overflow-hidden ring-4 ring-card shadow-md bg-background">
                     <img 
+                      v-if="activeCard.avatar || userAvatar"
                       :src="activeCard.avatar || userAvatar" 
                       alt="پروفایل" 
                       class="w-full h-full object-cover"
                     />
+                    <div 
+                      v-else
+                      class="w-full h-full flex items-center justify-center"
+                      :style="{ backgroundColor: formStore.iconColor?.background || 'rgb(var(--color-primary))' }"
+                    >
+                      <i class="ti ti-user text-white text-5xl"></i>
+                    </div>
                   </div>
                   
                   <!-- chain icon -->
@@ -190,7 +198,7 @@ const userName = computed(() => {
   return userStore.user?.name || 'کاربر'
 })
 const userUserName = computed(() => userStore.user?.userName || userStore.user?.username || '')
-const userAvatar = computed(() => userStore.user?.avatar || '/logo.svg')
+const userAvatar = computed(() => userStore.user?.avatar || null)
 const isPro = computed(() => userStore.user?.isPro || false)
 
 // Active card

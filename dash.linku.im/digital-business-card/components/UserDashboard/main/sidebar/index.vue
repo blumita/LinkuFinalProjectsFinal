@@ -102,12 +102,14 @@
           <template v-else-if="card?.avatar">
             <img :src="card?.avatar" alt="User Avatar" class="w-11 h-11 rounded-full object-cover ring-2 ring-border"/>
           </template>
-          <span v-else-if="userInitials"
-                class="w-11 h-11 rounded-full bg-accent-bg ring-2 ring-border flex items-center justify-center text-sm font-bold text-primary">
-           {{ userInitials }}
-          </span>
           <template v-else>
-            <div class="w-11 h-11 rounded-full bg-accent-bg ring-2 ring-border flex items-center justify-center text-xl text-primary">
+            <div 
+              class="w-11 h-11 rounded-full ring-2 ring-border flex items-center justify-center"
+              :style="{ backgroundColor: formStore.iconColor?.background || 'rgb(var(--color-primary))' }"
+            >
+              <i class="ti ti-user text-white text-xl"></i>
+            </div>
+          </template>
               <i class="ti ti-user"></i>
             </div>
           </template>

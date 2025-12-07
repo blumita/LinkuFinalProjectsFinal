@@ -115,12 +115,12 @@ export const useDeepLink = () => {
     },
     // اپلیکیشن‌های ایرانی
     eitaa: {
-      ios: (username) => `eitaa://resolve?domain=${username.replace(/^@/, '')}`,
+      ios: (username) => `https://eitaa.com/${username.replace(/^@/, '')}`, // iOS: نسخه وب
       android: (username) => `eitaa://resolve?domain=${username.replace(/^@/, '')}`,
       web: (username) => `https://eitaa.com/${username.replace(/^@/, '')}`
     },
     rubika: {
-      ios: (username) => `rubika://l.rubika.ir/${username.replace(/^@/, '')}`,
+      ios: (username) => `https://rubika.ir/${username.replace(/^@/, '')}`, // iOS: نسخه وب
       android: (username) => `intent://l.rubika.ir/${username.replace(/^@/, '')}#Intent;package=ir.resaneh1.iptv;scheme=https;end`,
       web: (username) => `https://rubika.ir/${username.replace(/^@/, '')}`
     },
@@ -136,12 +136,11 @@ export const useDeepLink = () => {
     },
     aparat: {
       ios: (username) => {
-        // اگر username با v/ شروع شده، ویدیو است
+        // iOS: نسخه وب (اپ iOS ندارد)
         if (username.startsWith('v/')) {
-          return `aparat://video/${username.replace('v/', '')}`
+          return `https://aparat.com/v/${username.replace('v/', '')}`
         }
-        // در غیر این صورت، چنل است
-        return `aparat://channel/${username.replace(/^@/, '')}`
+        return `https://aparat.com/${username.replace(/^@/, '')}`
       },
       android: (username) => {
         if (username.startsWith('v/')) {
@@ -243,9 +242,80 @@ export const useDeepLink = () => {
   }
 
   /**
+   * Extract username/identifier from full URL
+   * @param {string} value - The URL or username
+   * @param {string} action - The platform action
+   * @returns {string} - The extracted username/identifier
+   */
+  const extractIdentifier = (value, action) => {
+    if (!value) return ''
+    
+    // اگر value فقط username است (بدون protocol)، همون رو برگردان
+    if (!/^https?:\/\//i.test(value)) {
+      return value.replace(/^[@+]/, '').trim()
+    }
+    
+    // Parse کردن URL برای استخراج username
+    try {
+      const url = new URL(value)
+      const pathname = url.pathname
+      
+      // تلگرام: https://t.me/username → username
+      if (action === 'telegram' && (url.hostname === 't.me' || url.hostname === 'telegram.me')) {
+        return pathname.replace(/^\//, '').split('/')[0]
+      }
+      
+      // ایتا: https://eitaa.com/username → username
+      if (action === 'eitaa' && url.hostname.includes('eitaa.com')) {
+        return pathname.replace(/^\//, '').split('/')[0]
+      }
+      
+      // یوتیوب: https://youtube.com/@channel یا https://youtube.com/c/channel
+      if (action === 'youtube' && url.hostname.includes('youtube.com')) {
+        const parts = pathname.split('/').filter(p => p)
+        if (parts[0] === 'c' || parts[0] === 'channel') {
+          return parts[1] || parts[0]
+        }
+        return parts[0] || pathname.replace(/^\//, '')
+      }
+      
+      // اپارات: https://aparat.com/username یا https://aparat.com/v/videoId
+      if (action === 'aparat' && url.hostname.includes('aparat.com')) {
+        return pathname.replace(/^\//, '')
+      }
+      
+      // روبیکا: https://rubika.ir/username
+      if (action === 'rubika' && url.hostname.includes('rubika.ir')) {
+        return pathname.replace(/^\//, '').split('/')[0]
+      }
+      
+      // بله: https://ble.ir/username
+      if (action === 'bale' && url.hostname.includes('ble.ir')) {
+        return pathname.replace(/^\//, '').split('/')[0]
+      }
+      
+      // آیگپ: https://igap.net/username
+      if (action === 'igap' && url.hostname.includes('igap.net')) {
+        return pathname.replace(/^\//, '').split('/')[0]
+      }
+      
+      // اینستاگرام: https://instagram.com/username
+      if (action === 'instagram' && url.hostname.includes('instagram.com')) {
+        return pathname.replace(/^\//, '').split('/')[0]
+      }
+      
+      // سایر موارد: استخراج اولین بخش از pathname
+      return pathname.replace(/^\//, '').split('/')[0]
+    } catch (e) {
+      // اگر URL نامعتبر بود، value اصلی رو برگردان
+      return value.replace(/^[@+]/, '').trim()
+    }
+  }
+
+  /**
    * Get deep link URL based on action and value
    * @param {string} action - The social media platform (e.g., 'instagram', 'linkedin')
-   * @param {string} value - The username or identifier
+   * @param {string} value - The username or identifier or full URL
    * @param {string} baseUrl - The base URL from the link data
    * @returns {string} - The appropriate deep link or web fallback URL
    */
@@ -254,30 +324,22 @@ export const useDeepLink = () => {
       return '#'
     }
 
-    // اگر value قبلاً URL کامل است، مستقیماً برگردان
-    if (/^(https?:|mailto:|tel:|facetime:|sms:|ftp:|ftps:|tg:|geo:|maps:|intent:|app:|custom:)/i.test(value)) {
-      return value
-    }
-
     const scheme = appSchemes[action]
     if (!scheme) {
       // No deep link scheme available, return web URL
       if (!baseUrl) return value
-      // Clean value از @ و + و سپس اضافه کن به baseUrl
+      // Clean value از @ و + و سپش اضافه کن به baseUrl
       const cleanValue = value.replace(/^[@+]/, '').trim()
       // اگر value با baseUrl شروع شده، مستقیماً برگردان
       if (value.includes(baseUrl)) return value
       return baseUrl + cleanValue
     }
 
-    // Clean username/value
-    const cleanValue = value.replace(/^[@+]/, '').trim()
+    // استخراج username/identifier از URL کامل یا value ساده
+    const identifier = extractIdentifier(value, action)
     
-    // Remove baseUrl prefix if it exists in value
-    let finalValue = cleanValue
-    if (baseUrl && cleanValue.startsWith(baseUrl.replace(/^https?:\/\//, ''))) {
-      finalValue = cleanValue.replace(baseUrl.replace(/^https?:\/\//, ''), '')
-    }
+    // اگر identifier خالی شد، از value اصلی استفاده کن
+    const finalValue = identifier || value.replace(/^[@+]/, '').trim()
 
     // Return appropriate URL based on platform and mobile detection
     if (!isMobile()) {

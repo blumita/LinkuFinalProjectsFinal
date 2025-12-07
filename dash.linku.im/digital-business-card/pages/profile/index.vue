@@ -34,15 +34,6 @@
                   </div>
                   <p class="text-sm text-muted-foreground font-mono" dir="ltr">{{ userPhone }}</p>
                 </div>
-
-                <!-- Edit Profile Button -->
-                <button 
-                  @click="goToEditProfile"
-                  class="w-full py-3.5 rounded-xl bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/20 font-medium transition-all flex items-center justify-center gap-2 group"
-                >
-                  <i class="ti ti-edit text-lg group-hover:rotate-12 transition-transform"></i>
-                  <span>ویرایش پروفایل</span>
-                </button>
               </div>
               <div v-else class="text-center animate-pulse">
                 <div class="w-32 h-32 mx-auto bg-muted rounded-full mb-6"></div>
@@ -337,12 +328,6 @@
               </div>
               <p class="text-sm text-muted-foreground pt-1" dir="ltr">{{ userPhone }}</p>
             </div>
-            <button 
-              @click="goToEditProfile"
-              class="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
-            >
-              <i class="ti ti-edit text-primary text-lg"></i>
-            </button>
           </div>
           <div v-else class="flex items-center gap-4 mb-6 animate-pulse">
             <div class="w-16 h-16 bg-muted rounded-full"></div>

@@ -5,7 +5,7 @@
       <div class="flex items-center justify-between px-3 py-2.5">
         <div class="flex items-center gap-3">
           <button
-            @click="goBack('/settings')"
+            @click="goBack"
             class="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-foreground hover:bg-primary/10 hover:text-primary transition-all duration-200"
           >
             <i class="ti ti-arrow-right text-lg"></i>

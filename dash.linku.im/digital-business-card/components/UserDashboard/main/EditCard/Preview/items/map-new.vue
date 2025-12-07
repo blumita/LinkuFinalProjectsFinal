@@ -62,7 +62,7 @@
         <!-- Overlay for click handling -->
         <div 
           class="absolute inset-0 bg-transparent cursor-pointer"
-          @click.stop="showMapOptions = true"
+          @click.stop="handleMapClick"
           title="کلیک برای مشاهده نقشه کامل"
         />
       </div>
@@ -122,9 +122,9 @@
         <i class="ti ti-route text-muted-foreground"></i>
       </a>
 
-      <!-- Waze - only on mobile -->
+      <!-- Waze - only on Android -->
       <a
-        v-if="isMobile"
+        v-if="isAndroid"
         :href="wazeUrl"
         target="_blank"
         rel="noopener noreferrer"
@@ -137,6 +137,25 @@
         <div class="flex-1 text-right">
           <p class="font-medium text-foreground">Waze</p>
           <p class="text-xs text-muted-foreground">مسیریابی با ویز</p>
+        </div>
+        <i class="ti ti-route text-muted-foreground"></i>
+      </a>
+
+      <!-- Balad - only on Android -->
+      <a
+        v-if="isAndroid"
+        :href="baladUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        @click="showMapOptions = false"
+        class="w-full flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted transition-colors"
+      >
+        <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+          <i class="ti ti-map-pin text-purple-600 text-xl"></i>
+        </div>
+        <div class="flex-1 text-right">
+          <p class="font-medium text-foreground">بلد</p>
+          <p class="text-xs text-muted-foreground">مسیریابی با بلد</p>
         </div>
         <i class="ti ti-route text-muted-foreground"></i>
       </a>
@@ -201,10 +220,15 @@ defineEmits(['click', 'edit', 'delete'])
 // BottomSheet state
 const showMapOptions = ref(false)
 
-// Detect mobile device
+// Detect mobile device and platform
 const isMobile = ref(false)
+const isAndroid = ref(false)
+const isIOS = ref(false)
 onMounted(() => {
-  isMobile.value = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  const ua = navigator.userAgent
+  isMobile.value = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)
+  isAndroid.value = /Android/i.test(ua)
+  isIOS.value = /iPhone|iPad|iPod/i.test(ua)
 })
 
 // Get preview colors
@@ -229,6 +253,16 @@ const neshanUrl = computed(() => {
   const lng = props.item.longitude || 51.3890
   // Neshan routing URL - works better with this format
   return `https://neshan.org/maps/@${lat},${lng},16z/directions/~/${lat},${lng}`
+})
+
+const baladUrl = computed(() => {
+  const lat = props.item.latitude || 35.6992
+  const lng = props.item.longitude || 51.3890
+  // Balad deep link for navigation
+  if (isAndroid.value) {
+    return `balad://showLocation?latitude=${lat}&longitude=${lng}`
+  }
+  return `https://balad.ir/map?latitude=${lat}&longitude=${lng}`
 })
 
 // Icon Management
@@ -259,6 +293,35 @@ async function copyCoordinates() {
     console.error('Failed to copy coordinates:', err)
   }
   showMapOptions.value = false
+}
+
+// Handle map click - Android uses native share, iOS/Desktop shows bottom sheet
+async function handleMapClick() {
+  const lat = props.item.latitude || 35.6992
+  const lng = props.item.longitude || 51.3890
+  const title = props.item.title || 'موقعیت مکانی'
+  const address = props.item.address || ''
+  
+  // Android: Use native share with geo: URI
+  if (isAndroid.value && navigator.share) {
+    const locationUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
+    
+    try {
+      await navigator.share({
+        title: title,
+        text: address ? `${title}\n${address}` : title,
+        url: locationUrl
+      })
+    } catch (err) {
+      // User cancelled or share failed, show bottom sheet as fallback
+      if (err.name !== 'AbortError') {
+        showMapOptions.value = true
+      }
+    }
+  } else {
+    // iOS/Desktop: Show bottom sheet
+    showMapOptions.value = true
+  }
 }
 </script>
 

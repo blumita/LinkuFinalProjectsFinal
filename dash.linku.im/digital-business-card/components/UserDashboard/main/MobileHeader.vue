@@ -89,10 +89,18 @@
             <!-- Avatar -->
             <div class="relative w-11 h-11 rounded-full overflow-hidden ring-2 ring-border bg-white">
               <img 
-                :src="profile.avatar || '/logo.svg'" 
+                v-if="profile.avatar"
+                :src="profile.avatar" 
                 :alt="profile.name"
                 class="w-full h-full object-cover"
               />
+              <div 
+                v-else
+                class="w-full h-full flex items-center justify-center"
+                :style="{ backgroundColor: formStore.iconColor?.background || 'rgb(var(--color-primary))' }"
+              >
+                <i class="ti ti-user text-white text-lg"></i>
+              </div>
             </div>
 
             <!-- Info -->
