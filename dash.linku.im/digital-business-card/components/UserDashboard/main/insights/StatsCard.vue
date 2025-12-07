@@ -21,7 +21,7 @@
       <div class="text-sm text-muted-foreground mb-2">{{ label }}</div>
 
       <div class="h-[60px] -mx-2">
-        <div v-if="!trend || trend.length === 0" class="flex items-center justify-center text-muted-foreground text-xs h-full">
+        <div v-if="!trend || trend.length < 2" class="flex items-center justify-center text-muted-foreground text-xs h-full">
           <i class="ti ti-chart-line text-2xl opacity-30"></i>
         </div>
         <client-only v-else>

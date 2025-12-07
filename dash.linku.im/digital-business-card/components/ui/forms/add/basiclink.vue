@@ -112,13 +112,6 @@
             {{ form.baseUrl || getPrefixForAction() }}
           </span>
           <input
-              v-if="['call','number'].includes(form.action)"
-              v-model="form.countryCode"
-              type="text"
-              placeholder="+98"
-              class="ltr inline-flex items-center px-2 rounded-l bg-muted border border-r-0 border-border text-muted-foreground text-sm w-16 text-center focus:outline-none focus:ring-2 focus:ring-primary/20"
-          />
-          <input
             v-if="isUsernameAction() && !(form.action === 'whatsapp' && form.whatsappType === 'channel')"
             v-model="form.username"
             type="text"
@@ -344,12 +337,6 @@ function handleIconUpload(event) {
 function submitForm() {
 
   let cleanValue = form.value.trim()
-  if (["call", "number"].includes(form.action)) {
-    const countryCode = form.countryCode?.trim() || '+98'
-    if (!cleanValue.startsWith('+')) {
-      cleanValue = countryCode + cleanValue.replace(/^0+/, '') // حذف صفرهای اول
-    }
-  }
 
   let value =cleanValue //form.value
 
@@ -366,7 +353,6 @@ function submitForm() {
   const result = {
     ...form,
     value,
-    countryCode: ['call','number'].includes(form.action) ? (form.countryCode?.trim() || '+98') : undefined,
     protocol: ['safari','website'].includes(form.action) ? form.protocol : undefined,
     whatsappType: form.action === 'whatsapp' ? form.whatsappType : undefined,
     description: form.showDescription ? form.description : '',
@@ -452,7 +438,7 @@ function getInputPlaceholder() {
       return 'مثال: example@email.com';
     }
     if (form.baseUrl.startsWith('sms:') || form.baseUrl.startsWith('tel:')) {
-      return 'مثال: 09123456789';
+      return 'مثال: +989123456789 یا 09123456789';
     }
     return `مثال: ${form.baseUrl}نام_کاربری`;
   }

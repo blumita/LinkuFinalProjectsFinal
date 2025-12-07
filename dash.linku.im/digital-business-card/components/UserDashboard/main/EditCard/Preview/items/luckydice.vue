@@ -187,6 +187,7 @@ const formStore = useFormStore()
 const formData = computed(() => formStore)
 
 const { sendOtpCode, verifyOtpCode } = useOtpService()
+const { $axios } = useNuxtApp()
 // دسترسی به composable
 const { getIconComponent } = useIconComponents()
 
@@ -251,9 +252,12 @@ const rollDice = async () => {
     return
   }
 
+  // اگر شماره موبایل غیرفعال باشه، مستقیماً بازی رو شروع کن
   if (props.link?.phoneRequired === false) {
     authStep.value = 'authenticated'
+    phoneNumber.value = 'guest_' + Date.now() // شماره مهمان برای تمایز
   }
+  
   // اگر احراز هویت نشده، ابتدا به مرحله وارد کردن شماره موبایل برو
   if (authStep.value === 'none') {
     authStep.value = 'phone'
@@ -328,18 +332,18 @@ const cancelAuth = () => {
   codeInputs.value = ['', '', '', '']
   countdown.value = 0
 }
-const { $axios } = useNuxtApp()
 const checkForPlay = async () => {
   try {
     const response = await $axios.get(`club/${props.link?.hash}/luckyDice/check`)
     emit('message',response.data.message || '')
     return response.status === 200
-  } catch (error) {
+  } catch (error: any) {
     if (error.response?.status === 403) {
       emit('message',error.response.data.message || '')
       return false
     }
     // در صورت خطای غیرمنتظره (مثلاً قطع اینترنت)
+    emit('message','خطا در بررسی وضعیت بازی')
     return false
   }
 }

@@ -189,6 +189,7 @@ import {useOtpService} from '~/composables/useOtpService'
 
 const { sendOtpCode, verifyOtpCode } = useOtpService()
 const { getIconComponent } = useIconComponents();
+const { $axios } = useNuxtApp()
 const emit=defineEmits('message')
 const props = defineProps({
   link: {
@@ -336,8 +337,10 @@ onMounted(() => {
 
 // احراز هویت ساده (شماره موبایل و کد تستی)
 const startAuth = () => {
+  // اگر شماره موبایل غیرفعال باشه، مستقیماً بازی رو شروع کن
   if (props.link?.phoneRequired === false) {
     authStep.value = 'authenticated'
+    phoneNumber.value = 'guest_' + Date.now() // شماره مهمان برای تمایز
     return
   }
   if (hasPlayed.value) return
@@ -404,7 +407,7 @@ const resetGame = () => {
   codeInputs.value = ['', '', '', '']
   countdown.value = 0
 }
-const { $axios } = useNuxtApp()
+
 const sendResultToBackend = async () => {
 
   try {
@@ -430,13 +433,13 @@ const checkForPlay = async () => {
     const response = await $axios.get(`club/${props.link?.hash}/luckyEgg/check`)
     emit('message',response.data.message || '')
     return response.status === 200
-  } catch (error) {
+  } catch (error: any) {
     if (error.response?.status === 403) {
       emit('message',error.response.data.message || '')
       return false
     }
     // در صورت خطای غیرمنتظره (مثلاً قطع اینترنت)
-    emit('message','خطا در بررسی وضعیت بازی:')
+    emit('message','خطا در بررسی وضعیت بازی')
     return false
   }
 }

@@ -113,7 +113,7 @@
                 class="wheel w-full h-full rounded-full border-4 relative overflow-hidden transition-transform"
                 :style="{ 
                   transform: `rotate(${rotation}deg)`,
-                  borderColor: form.iconColor?.background || '#3B82F6',
+                  borderColor: (form.iconColor?.background && form.iconColor.background !== 'transparent') ? form.iconColor.background : '#3B82F6',
                   transitionDuration: isSpinning ? '3.5s' : '0s',
                   transitionTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                   willChange: isSpinning ? 'transform' : 'auto',
@@ -154,7 +154,7 @@
                 <div 
                   class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full z-10 border-4 shadow-lg flex items-center justify-center"
                   :style="{
-                    backgroundColor: form.iconColor?.background || '#3B82F6',
+                    backgroundColor: (form.iconColor?.background && form.iconColor.background !== 'transparent') ? form.iconColor.background : '#3B82F6',
                     borderColor: '#ffffff'
                   }"
                 >
@@ -306,6 +306,8 @@ export default defineComponent({
     const form = useFormStore()
     const formData = computed(() => form)
     const { sendOtpCode, verifyOtpCode } = useOtpService()
+    const { $axios } = useNuxtApp()
+    const axios = $axios as AxiosInstance
     // دسترسی به composable
     const { getIconComponent } = useIconComponents()
 
@@ -370,7 +372,11 @@ export default defineComponent({
     ]
 
     const wheelItems = computed(() => {
-      const baseColor = form.iconColor?.background || '#3B82F6';
+      // اگر رنگ انتخاب نشده یا transparent باشه، از آبی استفاده کن
+      let baseColor = form.iconColor?.background || '#3B82F6';
+      if (baseColor === 'transparent' || baseColor === '') {
+        baseColor = '#3B82F6';
+      }
       // رنگ‌ها از استور گرفته می‌شوند
       return [
         { name: 'پوچ', color: adjustOpacity(baseColor, 0.3) },
@@ -411,10 +417,12 @@ export default defineComponent({
       if (hasSpun.value) {
         // اگر قبلاً شرکت کرده، هیچ کاری نکن
         return
-
       }
+      
+      // اگر شماره موبایل غیرفعال باشه، مستقیماً بازی رو شروع کن
       if (props.link?.phoneRequired === false) {
         authStep.value = 'authenticated'
+        phoneNumber.value = 'guest_' + Date.now() // شماره مهمان برای تمایز
         return
       }
       
@@ -755,19 +763,17 @@ export default defineComponent({
       }
     }
     const checkForPlay = async () => {
-      const {$axios} = useNuxtApp()
-      const axios = $axios as AxiosInstance
       try {
         const response = await axios.get(`club/${props.link?.hash}/luckyWheel/check`)
         emit('message',response.data.message || '')
         return response.status === 200
-      } catch (error) {
+      } catch (error: any) {
         if (error.response?.status === 403) {
           emit('message',error.response.data.message || '')
           return false
         }
         // در صورت خطای غیرمنتظره (مثلاً قطع اینترنت)
-        emit('message','خطا در بررسی وضعیت بازی:')
+        emit('message','خطا در بررسی وضعیت بازی')
         return false
       }
     }
