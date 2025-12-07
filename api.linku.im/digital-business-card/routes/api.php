@@ -369,14 +369,14 @@ Route::middleware(['auth:sanctum','log.activity'])
     // Push Subscription Management
     Route::post('/push-subscription', [PushSubscriptionController::class, 'store'])
         ->name('user.push-subscription.store');
-    
+
     Route::delete('/push-subscription', [PushSubscriptionController::class, 'destroy'])
         ->name('user.push-subscription.destroy');
 
     // Role & Permission - User Routes
     Route::get('/menu', [RoleController::class, 'getUserMenuTree'])
         ->name('user.menu');
-    
+
     Route::post('/check-permission', [RoleController::class, 'checkPermission'])
         ->name('user.check-permission');
 
@@ -392,7 +392,7 @@ Route::middleware(['auth:sanctum','log.activity'])
             ->name('notify.readAll');
 
     });
-    
+
     // Push Subscription Routes for regular users
     Route::post('/push-subscription', [PushSubscriptionController::class, 'storeUserSubscription'])
         ->name('user.push-subscription.store');
@@ -440,19 +440,19 @@ Route::middleware(['auth:sanctum','log.activity'])
         Route::prefix('roles')->group(function () {
             Route::get('/', [RoleController::class, 'index'])
                 ->name('admin.roles.index');
-            
+
             Route::post('/', [RoleController::class, 'store'])
                 ->name('admin.roles.store');
-            
+
             Route::get('/{id}', [RoleController::class, 'show'])
                 ->name('admin.roles.show');
-            
+
             Route::put('/{id}', [RoleController::class, 'update'])
                 ->name('admin.roles.update');
-            
+
             Route::delete('/{id}', [RoleController::class, 'destroy'])
                 ->name('admin.roles.destroy');
-            
+
             Route::post('/{id}/permissions', [RoleController::class, 'updatePermissions'])
                 ->name('admin.roles.permissions.update');
         });
@@ -705,13 +705,13 @@ Route::middleware(['auth:sanctum','log.activity'])
                 ->name('backup.export.cards');
             Route::get('/export/users', [BackupController::class, 'exportUsers'])
                 ->name('backup.export.users');
-            
+
             // Import endpoints
             Route::post('/import/cards', [BackupController::class, 'importCards'])
                 ->name('backup.import.cards');
             Route::post('/import/users', [BackupController::class, 'importUsers'])
                 ->name('backup.import.users');
-            
+
             // Database backup
             Route::post('/create', [BackupController::class, 'createBackup'])
                 ->name('backup.create');
@@ -719,21 +719,21 @@ Route::middleware(['auth:sanctum','log.activity'])
                 ->name('backup.download');
             Route::post('/restore', [BackupController::class, 'restoreBackup'])
                 ->name('backup.restore');
-            
+
             // Backup settings
             Route::get('/settings', [BackupController::class, 'getBackupSettings'])
                 ->name('backup.settings.get');
             Route::post('/settings', [BackupController::class, 'saveBackupSettings'])
                 ->name('backup.settings.save');
-            
+
             // Backup history
             Route::get('/history', [BackupController::class, 'getBackupHistory'])
                 ->name('backup.history');
-            
+
             // Run backup now
             Route::post('/run-now', [BackupController::class, 'runBackupNow'])
                 ->name('backup.run-now');
-            
+
             // Test connections
             Route::post('/test/github', [BackupController::class, 'testGithubConnection'])
                 ->name('backup.test.github');
@@ -851,7 +851,7 @@ Route::middleware(['auth:sanctum'])
     ->group(function () {
         Route::get('/me', [UserController::class, 'adminMe'])
             ->name('admin.me');
-        
+
         // Security Dashboard Routes
         Route::prefix('security')->group(function () {
             Route::get('/stats', [SecurityController::class, 'getSecurityStats'])
@@ -868,7 +868,7 @@ Route::middleware(['auth:sanctum'])
     ->group(function () {
         Route::get('/admin/me', [UserController::class, 'adminMe'])
             ->name('user.admin.me'); // Keep for backward compatibility
-        
+
         // Admin Management Routes
         Route::get('/admin', [UserController::class, 'admins'])
             ->name('user.admins.list');
@@ -878,7 +878,7 @@ Route::middleware(['auth:sanctum'])
             ->name('user.admins.update');
         Route::delete('/admin/{id}', [UserController::class, 'adminsDelete'])
             ->name('user.admins.delete');
-        
+
         // Push Subscription Routes
         Route::post('/admin/push-subscription', [PushSubscriptionController::class, 'store'])
             ->name('user.admin.push-subscription.store');
@@ -916,7 +916,7 @@ Route::fallback(function () {
 // Public VAPID endpoint (no authentication required) - returns only public key
 Route::get('/vapid-public-key', function() {
     $settings = \App\Models\Setting::whereIn('key', ['vapidPublicKey'])->pluck('value', 'key')->toArray();
-    
+
     return response()->json([
         'publicKey' => $settings['vapidPublicKey'] ?? config('services.vapid.public_key') ?? env('VAPID_PUBLIC_KEY', '')
     ]);

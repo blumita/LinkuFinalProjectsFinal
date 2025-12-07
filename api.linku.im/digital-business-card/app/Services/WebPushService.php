@@ -20,7 +20,7 @@ class WebPushService
                 'public_key_set' => !empty($publicKey),
                 'private_key_set' => !empty($privateKey),
             ]);
-            
+
             // یک WebPush ساده بدون VAPID بساز (فقط برای جلوگیری از crash)
             $this->webPush = new WebPush([]);
             return;
@@ -70,7 +70,7 @@ class WebPushService
 
         try {
             $pushSubscription = Subscription::create($subscription);
-            
+
             $report = $this->webPush->sendOneNotification(
                 $pushSubscription,
                 $payload
@@ -162,7 +162,7 @@ class WebPushService
 
         // ارسال تمام نوتیفیکیشن‌های صف
         \Log::info('🔄 [WebPushService] Flushing queued notifications');
-        
+
         foreach ($this->webPush->flush() as $report) {
             if ($report->isSuccess()) {
                 $successCount++;
@@ -200,7 +200,7 @@ class WebPushService
     {
         $publicKey = config('services.vapid.public_key') ?? env('VAPID_PUBLIC_KEY');
         $privateKey = config('services.vapid.private_key') ?? env('VAPID_PRIVATE_KEY');
-        
+
         return !empty($publicKey) && !empty($privateKey);
     }
 }

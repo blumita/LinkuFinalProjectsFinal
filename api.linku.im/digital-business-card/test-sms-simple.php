@@ -20,17 +20,17 @@ echo "📱 ایجاد نمونه از کلاس SMS:\n";
 try {
     $sms = new \App\Gateways\Sms\ModirPayamak();
     echo "✅ کلاس ModirPayamak با موفقیت ساخته شد\n\n";
-    
+
     // Test 3: Try sending SMS
     echo "📤 تست ارسال SMS به شماره 9030264300:\n";
     $result = $sms->send('9030264300', '1234');
-    
+
     if ($result) {
         echo "✅ ✅ ✅ SMS با موفقیت ارسال شد!\n";
     } else {
         echo "⚠️ SMS ارسال نشد (در محیط توسعه این عادی است)\n";
     }
-    
+
 } catch (\Exception $e) {
     echo "❌ خطا: " . $e->getMessage() . "\n";
     echo "📄 فایل: " . $e->getFile() . ":" . $e->getLine() . "\n";

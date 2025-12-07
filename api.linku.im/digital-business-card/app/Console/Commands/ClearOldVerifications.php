@@ -11,8 +11,7 @@ class ClearOldVerifications extends Command
 
     public function handle(): void
     {
-        $deleted = OtpCode::where('status', 'verified')
-            ->orWhere('expires_at', '<', now())
+        $deleted = OtpCode::where('expires_at', '<', now())
             ->delete();
 
         $this->info("Deleted $deleted old verification codes.");

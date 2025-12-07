@@ -62,7 +62,7 @@ class RouteServiceProvider extends ServiceProvider
                     ], 429);
                 });
         });
-        
+
         // Rate limiter برای admin login - 5 تلاش در 15 دقیقه
         RateLimiter::for('admin.login', function ($request) {
             $key = 'admin-login:' . $request->ip();
@@ -75,7 +75,7 @@ class RouteServiceProvider extends ServiceProvider
                     ], 429);
                 });
         });
-        
+
         // Rate limiter عمومی API - 100 درخواست در دقیقه
         RateLimiter::for('api', function ($request) {
             return Limit::perMinute(100)->by($request->ip())

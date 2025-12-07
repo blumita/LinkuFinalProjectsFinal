@@ -81,8 +81,8 @@ class ModirPayamak implements OtpSenderInterface
 
             // Check for successful response based on Edge API docs
             // Success: {"data":{"message_outbox_ids":[...]},"meta":{"status":true,...}}
-            $isSuccess = $response->successful() 
-                && isset($result['meta']['status']) 
+            $isSuccess = $response->successful()
+                && isset($result['meta']['status'])
                 && $result['meta']['status'] === true;
 
             if ($isSuccess) {
@@ -129,11 +129,11 @@ class ModirPayamak implements OtpSenderInterface
                 'error' => $e->getMessage(),
                 'phone' => $fullPhone,
             ]);
-            
+
             if (env('APP_ENV') !== 'production') {
                 return false;
             }
-            
+
             throw new CustomException('خطا در اتصال به سرویس پیامک. لطفاً دوباره تلاش کنید.', 503);
         } catch (Exception $e) {
             $message = $e->getMessage();
@@ -158,27 +158,27 @@ class ModirPayamak implements OtpSenderInterface
     {
         // Remove any non-digit characters except +
         $digits = preg_replace('/[^0-9]/', '', $phone);
-        
+
         // If starts with 9 and is 10 digits (like 9xxxxxxxxx)
         if (strlen($digits) === 10 && str_starts_with($digits, '9')) {
             return '+98' . $digits;
         }
-        
+
         // If starts with 09 and is 11 digits
         if (strlen($digits) === 11 && str_starts_with($digits, '09')) {
             return '+98' . substr($digits, 1);
         }
-        
+
         // If already has 98 prefix (12 digits)
         if (strlen($digits) === 12 && str_starts_with($digits, '98')) {
             return '+' . $digits;
         }
-        
+
         // If already starts with +
         if (str_starts_with($phone, '+')) {
             return $phone;
         }
-        
+
         // Default: prepend +98
         return '+98' . $digits;
     }

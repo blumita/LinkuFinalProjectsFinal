@@ -75,10 +75,10 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
     });
 
     console.log('Service Worker registered successfully:', registration);
-    
+
     // منتظر می‌مانیم تا Service Worker فعال شود
     await navigator.serviceWorker.ready;
-    
+
     return registration;
   } catch (error) {
     console.error('Service Worker registration failed:', error);
@@ -92,10 +92,10 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
 export async function createPushSubscription(): Promise<PushSubscription | null> {
   try {
     const registration = await navigator.serviceWorker.ready;
-    
+
     // بررسی subscription موجود
     let subscription = await registration.pushManager.getSubscription();
-    
+
     if (subscription) {
       console.log('Push subscription already exists:', subscription);
       return subscription;
@@ -103,10 +103,10 @@ export async function createPushSubscription(): Promise<PushSubscription | null>
 
     // دریافت VAPID key از API
     const vapidKey = await fetchVapidKey()
-    
+
     // ایجاد subscription جدید
     const convertedVapidKey = urlBase64ToUint8Array(vapidKey);
-    
+
     subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: convertedVapidKey
@@ -114,7 +114,7 @@ export async function createPushSubscription(): Promise<PushSubscription | null>
 
     console.log('Push subscription created:', subscription);
     return subscription;
-    
+
   } catch (error) {
     console.error('Failed to create push subscription:', error);
     throw error;
@@ -141,13 +141,13 @@ export async function unsubscribeFromPush(): Promise<boolean> {
   try {
     const registration = await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.getSubscription();
-    
+
     if (subscription) {
       await subscription.unsubscribe();
       console.log('Push subscription cancelled');
       return true;
     }
-    
+
     return false;
   } catch (error) {
     console.error('Failed to unsubscribe:', error);
@@ -161,10 +161,10 @@ export async function unsubscribeFromPush(): Promise<boolean> {
 export async function sendSubscriptionToServer(subscription: PushSubscription): Promise<boolean> {
   try {
     const subscriptionJson = subscription.toJSON();
-    
+
     // No localStorage - just log it
     console.log('Subscription to send:', subscriptionJson);
-    
+
     return true;
   } catch (error) {
     console.error('Failed to send subscription to server:', error);
@@ -213,7 +213,7 @@ export async function initializePushNotifications(): Promise<{
 
     // 5. ایجاد Subscription
     const subscription = await createPushSubscription();
-    
+
     if (!subscription) {
       return {
         success: false,
@@ -249,7 +249,7 @@ export async function showTestNotification(): Promise<void> {
 
   if (Notification.permission === 'granted') {
     const registration = await navigator.serviceWorker.ready;
-    
+
     await registration.showNotification('نوتیفیکیشن تست', {
       body: 'اگر این پیام را می‌بینید، نوتیفیکیشن‌ها کار می‌کنند!',
       icon: '/favicon.ico',
