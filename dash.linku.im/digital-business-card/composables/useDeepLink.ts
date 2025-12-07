@@ -113,11 +113,6 @@ export const useDeepLink = () => {
       android: (username) => `intent://pinterest.com/${username}#Intent;package=com.pinterest;scheme=https;end`,
       web: (username) => `https://pinterest.com/${username}`
     },
-    spotify: {
-      ios: (username) => `spotify:user:${username}`,
-      android: (username) => `intent://open.spotify.com/user/${username}#Intent;package=com.spotify.music;scheme=https;end`,
-      web: (username) => `https://open.spotify.com/user/${username}`
-    },
     // اپلیکیشن‌های ایرانی
     eitaa: {
       ios: (username) => `eitaa://profile/${username}`,

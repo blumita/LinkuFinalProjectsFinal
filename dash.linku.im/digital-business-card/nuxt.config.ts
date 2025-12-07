@@ -184,7 +184,17 @@ export default defineNuxtConfig({
     },
     build: {
       chunkSizeWarningLimit: 1500,
+      // بهینه‌سازی برای سرورهای با RAM محدود
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: true,
+          drop_debugger: true
+        }
+      },
       rollupOptions: {
+        // کاهش استفاده از CPU/RAM
+        maxParallelFileOps: 2,
         output: {
           manualChunks: undefined // غیرفعال کردن برای جلوگیری از خطای exports
         }
