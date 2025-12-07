@@ -39,8 +39,8 @@ class OtpService
                 ->where('expires_at', '<=', now())
                 ->delete();
 
-            // اجازه ارسال مجدد اگر کمتر از 10 ثانیه به انقضا مانده
-            if ($this->otpCodeExist($phone, 10)) {
+            // اجازه ارسال مجدد اگر کمتر از 30 ثانیه به انقضا مانده (قبلاً 10 بود)
+            if ($this->otpCodeExist($phone, 30)) {
                 // دریافت زمان باقیمانده برای اطلاع فرونت
                 $remainingSeconds = $this->getRemainingSeconds($phone);
                 
