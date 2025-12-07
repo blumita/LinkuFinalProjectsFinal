@@ -15,12 +15,15 @@ return [
     */
     'driver' => env('OTP_SMS_DRIVER', 'modirpayamak'),
 
-    'key' => env('SMS_PATTERN_CODE'),
-    'api_key' => env('SMS_API_KEY'), // API Key for new IPPanel Edge API
+    // IPPanel Edge API Configuration
+    'key' => env('SMS_PATTERN_CODE', 'g36m6fr6ozz0e4j'),
+    'api_key' => env('SMS_API_KEY', 'YTA4NDUxYzAtZDMzOC00ZTc3LWIxZjAtZWIzODI2MmI5ZDVhNzQ4YzNiMjVjYTYxYjkxMTIyOGI3MTdhNmUyMDViYmY='),
     'sender' => env('SMS_SENDER', '+983000505'), // E.164 format
-    'otp_variable' => env('SMS_OTP_VARIABLE', 'verification-code'),
-    'username' => env('SMS_USERNAME'),
-    'password' => env('SMS_PASSWORD'),
+    'otp_variable' => env('SMS_OTP_VARIABLE', 'linku-code'),
+    
+    // Legacy fields (for backward compatibility)
+    'username' => env('SMS_USERNAME', ''),
+    'password' => env('SMS_PASSWORD', ''),
 
     'drivers' => [
         /*'farazpayamak' => [
