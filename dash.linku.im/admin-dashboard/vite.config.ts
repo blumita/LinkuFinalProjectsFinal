@@ -21,7 +21,7 @@ export default defineConfig({
         drop_console: true,
         drop_debugger: true
       }
-    },
+    } as any,
     rollupOptions: {
       // کاهش استفاده از CPU/RAM
       maxParallelFileOps: 2,
