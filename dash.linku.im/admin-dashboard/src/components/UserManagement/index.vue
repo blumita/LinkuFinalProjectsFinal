@@ -1079,11 +1079,12 @@ const confirmUpgrade = async () => {
   isUpgrading.value = true
   
   try {
+    const token = sessionStorage.getItem('adminToken') || ''
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/admin/upgrade-subscription`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${userStore.token}`
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
         userId: selectedUpgradeUser.value.id,
