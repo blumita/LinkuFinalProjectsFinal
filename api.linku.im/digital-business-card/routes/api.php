@@ -495,6 +495,9 @@ Route::middleware(['auth:sanctum','log.activity'])
         Route::get('/userList', [UserController::class, 'userList'])
             ->name('admin.userList');
 
+        Route::post('/upgrade-subscription', [UserController::class, 'upgradeSubscription'])
+            ->name('admin.upgradeSubscription');
+
         Route::get('/reports', [ReportController::class, 'reports'])
             ->name('admin.reports');
         Route::patch('/reports/toggleStatus/{id}', [ReportController::class, 'toggleStatus'])

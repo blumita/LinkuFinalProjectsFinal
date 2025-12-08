@@ -150,14 +150,27 @@ class CardController extends Controller
      */
     public function createDefaultCard(Request $request): JsonResponse
     {
-
         $user = $request->user();
+
+        // Count how many cards the user already has
+        $cardCount = $user->cards()->count();
+
+        // Check card creation limits based on user type
+        if ($user->is_pro) {
+            // Pro users can create up to 5 cards
+            if ($cardCount >= 5) {
+                return $this->fail(__('messages.not-allowed_pro'), 403);
+            }
+        } else {
+            // Free users can only create 1 card
+            if ($cardCount > 0) {
+                return $this->fail(__('messages.not-allowed_free'), 403);
+            }
+        }
 
         $card = $this->userService->createDefaultProfile($user);
 
         return $this->ok('__.messages.create_default_card', new CardResource($card), 200);
-
-
     }
 
     /**

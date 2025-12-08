@@ -383,8 +383,21 @@ export const useDeepLink = () => {
     if (!value) return '#'
 
     if (whatsappType === 'channel') {
-      // Channel link - use as is
-      return value.startsWith('http') ? value : `https://${value}`
+      // Channel link - use as is, properly handle all WhatsApp link formats
+      let cleanValue = value.trim()
+      
+      // If already has protocol, use as is
+      if (/^https?:\/\//i.test(cleanValue)) {
+        return cleanValue
+      }
+      
+      // If starts with whatsapp.com or chat.whatsapp.com, add https
+      if (/^(chat\.)?whatsapp\.com/i.test(cleanValue)) {
+        return `https://${cleanValue}`
+      }
+      
+      // Otherwise add https protocol
+      return `https://${cleanValue}`
     }
 
     // Phone number - use deep linking

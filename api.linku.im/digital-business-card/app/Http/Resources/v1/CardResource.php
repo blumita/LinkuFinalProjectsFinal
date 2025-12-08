@@ -29,17 +29,17 @@ class CardResource extends JsonResource
             'themeColor'=>$this->theme_color,
             'iconColor'=>$this->icon_color,
             'matchThemeColor'=>$this->match_theme_color,
-            'removeBranding' => $this->creator->remove_branding,
+            'removeBranding' => $this->creator?->remove_branding ?? false,
             'views' => $this->views->count(),
             'isActive'=>$this->is_active,
             'url'=>env('APP_URL').'/profile/'.$this->slug,
 
             //User card data
-            'userName'=>$this->user->name,
-            'location'=>$this->user->location,
-            'job'=>$this->user->job,
-            'company'=>$this->user->company,
-            'bio'=>$this->user->bio,
+            'userName'=>$this->user?->name,
+            'location'=>$this->user?->location,
+            'job'=>$this->user?->job,
+            'company'=>$this->user?->company,
+            'bio'=>$this->user?->bio,
 
             //Links data list
             'leadCaptureMode' => $this->lead_capture_mode,

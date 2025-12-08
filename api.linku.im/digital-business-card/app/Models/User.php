@@ -31,6 +31,9 @@ class User extends Authenticatable
         'last_name',
         'phone',
         'is_pro',
+        'subscription_type',
+        'subscription_end_date',
+        'subscription_months',
         'location',
         'country_code',
         'referral_code',
@@ -43,6 +46,7 @@ class User extends Authenticatable
     ];
      protected $casts = [
          'remove_branding' => 'boolean',
+         'subscription_end_date' => 'date',
      ];
 
     /**

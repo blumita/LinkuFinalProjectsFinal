@@ -35,6 +35,9 @@ class UserResource extends JsonResource
             'status'=>$this->status,
             'username' => $this->user_name,
             'isPro' => (bool) $this->is_pro,
+            'subscriptionType' => $this->subscription_type ?? 'free',
+            'subscriptionEndDate' => $this->subscription_end_date?->format('Y-m-d'),
+            'subscriptionMonths' => $this->subscription_months ?? 0,
             'email' => $this->email,
             'phone'=>$this->phone,
             'countryCode'=>$this->country_code,
@@ -47,7 +50,11 @@ class UserResource extends JsonResource
             'location' => $this->location,
             'avatar' => media_path(optional($this->avatar)->path),
             'cardsDataList' => CardResource::collection($this->cards),
+            'cardCount' => $this->cards()->count(),
+            'profileImage' => media_path(optional($this->avatar)->path),
+            'profileUrl' => $defaultCard ? config('app.url') . '/' . $defaultCard->url : null,
             'createdAt' => $this->created_at->format('Y-m-d'),
+            'lastLogin' => $this->updated_at->format('Y-m-d'),
             'updatedAt' => $this->updated_at,
         ];
     }

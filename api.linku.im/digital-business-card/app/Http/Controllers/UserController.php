@@ -9,6 +9,7 @@ use App\Models\Admin;
 use App\Models\User;
 use App\Services\UserService;
 use App\Traits\HasApiResponses;
+use Carbon\Carbon;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -328,6 +329,40 @@ class UserController
         $users=User::all();
 
         return $this->ok('',UserResource::collection($users));
+    }
+
+    public function upgradeSubscription(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'userId' => 'required|integer|exists:users,id',
+            'months' => 'required|integer|min:1|max:24'
+        ]);
+
+        $user = User::findOrFail($validated['userId']);
+        
+        // Calculate new subscription end date
+        $currentEndDate = $user->subscription_end_date 
+            ? Carbon::parse($user->subscription_end_date)
+            : Carbon::now();
+        
+        // If current subscription is expired, start from now
+        if ($currentEndDate->isPast()) {
+            $currentEndDate = Carbon::now();
+        }
+        
+        $newEndDate = $currentEndDate->addMonths($validated['months']);
+        
+        // Update user subscription
+        $user->subscription_type = 'premium';
+        $user->subscription_end_date = $newEndDate;
+        $user->subscription_months = ($user->subscription_months ?? 0) + $validated['months'];
+        $user->save();
+        
+        return $this->ok('اشتراک با موفقیت ارتقا یافت', [
+            'user' => new UserResource($user),
+            'new_end_date' => $newEndDate->toDateString(),
+            'added_months' => $validated['months']
+        ]);
     }
 
 }

@@ -123,7 +123,7 @@
             v-else-if="form.action === 'whatsapp' && form.whatsappType === 'channel'"
             v-model="form.value"
             type="url"
-            placeholder="مثال: https://whatsapp.com/channel/0029VaeW5Uk..."
+            placeholder="مثال: https://chat.whatsapp.com/ABC123xyz یا https://whatsapp.com/channel/..."
             class="w-full px-4 py-3 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary ltr"
           />
           <input

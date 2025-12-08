@@ -265,6 +265,13 @@
                   <i class="ti ti-check text-sm" v-else></i>
                 </button>
 
+                <!-- Manual Upgrade Button -->
+                <button @click.stop="openUpgradeModal(user)"
+                        class="w-full sm:w-auto px-3 py-2 bg-gradient-to-r from-purple-100 to-purple-200 text-purple-700 rounded-lg hover:from-purple-200 hover:to-purple-300 transition-all duration-300 text-sm font-medium"
+                        title="ارتقای دستی">
+                  <i class="ti ti-crown text-sm"></i>
+                </button>
+
                 <!-- Delete Button -->
                 <button
                     :disabled="true"
@@ -584,6 +591,120 @@
       </div>
     </div>
   </div>
+
+  <!-- Manual Upgrade Modal -->
+  <div v-if="showUpgradeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <!-- Modal Header -->
+      <div class="p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-500 to-purple-600">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <i class="ti ti-crown text-white text-xl"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white">ارتقای دستی اشتراک</h3>
+              <p class="text-sm text-white/80 mt-0.5">{{ selectedUpgradeUser?.name }}</p>
+            </div>
+          </div>
+          <button @click="closeUpgradeModal" class="text-white/80 hover:text-white transition-colors">
+            <i class="ti ti-x text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 space-y-4">
+        <!-- User Info -->
+        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+          <div class="flex items-center gap-3 mb-3">
+            <img v-if="selectedUpgradeUser?.profileImage" 
+                 :src="selectedUpgradeUser.profileImage" 
+                 class="w-12 h-12 rounded-full object-cover"
+                 alt="Profile">
+            <div v-else class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+              <i class="ti ti-user text-white text-xl"></i>
+            </div>
+            <div class="flex-1">
+              <p class="font-medium text-gray-900 dark:text-white">{{ selectedUpgradeUser?.name }}</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">{{ selectedUpgradeUser?.phone }}</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-600 dark:text-gray-400">وضعیت فعلی:</span>
+            <span :class="[
+              'px-3 py-1 rounded-full font-medium',
+              selectedUpgradeUser?.subscriptionType === 'premium' 
+                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'
+                : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+            ]">
+              {{ selectedUpgradeUser?.subscriptionType === 'premium' ? 'پرمیوم' : 'رایگان' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Duration Selection -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <i class="ti ti-calendar text-purple-500 ml-1"></i>
+            مدت زمان اشتراک
+          </label>
+          <div class="grid grid-cols-2 gap-3">
+            <button
+              v-for="duration in upgradeDurations"
+              :key="duration.value"
+              @click="selectedDuration = duration.value"
+              :class="[
+                'p-4 rounded-lg border-2 transition-all duration-200 text-center',
+                selectedDuration === duration.value
+                  ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                  : 'border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-600'
+              ]"
+            >
+              <i :class="['ti', duration.icon, 'text-2xl mb-2', selectedDuration === duration.value ? 'text-purple-600' : 'text-gray-400']"></i>
+              <p :class="['font-bold text-lg', selectedDuration === duration.value ? 'text-purple-600 dark:text-purple-400' : 'text-gray-700 dark:text-gray-300']">
+                {{ duration.label }}
+              </p>
+              <p :class="['text-xs mt-1', selectedDuration === duration.value ? 'text-purple-500' : 'text-gray-500']">
+                {{ duration.months }} ماه
+              </p>
+            </button>
+          </div>
+        </div>
+
+        <!-- Note -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+          <div class="flex gap-2">
+            <i class="ti ti-info-circle text-blue-500 flex-shrink-0 mt-0.5"></i>
+            <p class="text-sm text-blue-700 dark:text-blue-300">
+              با تایید، اشتراک کاربر به مدت 
+              <strong>{{ upgradeDurations.find(d => d.value === selectedDuration)?.months }} ماه</strong> 
+              فعال می‌شود.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-6 border-t border-gray-200 dark:border-gray-700 flex gap-3">
+        <button 
+          @click="closeUpgradeModal"
+          class="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
+        >
+          انصراف
+        </button>
+        <button 
+          @click="confirmUpgrade"
+          :disabled="!selectedDuration || isUpgrading"
+          class="flex-1 px-4 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          <i v-if="isUpgrading" class="ti ti-loader animate-spin"></i>
+          <i v-else class="ti ti-check"></i>
+          {{ isUpgrading ? 'در حال پردازش...' : 'تایید ارتقا' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -658,6 +779,20 @@ const userCards = ref<Array<{
   views: number
   createdAt: string
 }>>([])
+
+// Upgrade modal state
+const showUpgradeModal = ref(false)
+const selectedUpgradeUser = ref<User | null>(null)
+const selectedDuration = ref<string>('')
+const isUpgrading = ref(false)
+
+const upgradeDurations = [
+  { value: '1', label: '۱ ماه', months: 1, icon: 'ti-calendar-event' },
+  { value: '3', label: '۳ ماه', months: 3, icon: 'ti-calendar-stats' },
+  { value: '6', label: '۶ ماه', months: 6, icon: 'ti-calendar-plus' },
+  { value: '12', label: '۱ سال', months: 12, icon: 'ti-crown' }
+]
+
 const userStore = useUserStore()
 const users = computed(() => userStore.profiles)
 // Computed properties
@@ -923,6 +1058,55 @@ const formatDate = (date: string | null | undefined): string => {
 const normalizePersianDigits = (str: string): string => {
   return str.replace(/[۰-۹]/g, d => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))
 }
+
+// Upgrade functions
+const openUpgradeModal = (user: User) => {
+  selectedUpgradeUser.value = user
+  selectedDuration.value = ''
+  showUpgradeModal.value = true
+}
+
+const closeUpgradeModal = () => {
+  showUpgradeModal.value = false
+  selectedUpgradeUser.value = null
+  selectedDuration.value = ''
+  isUpgrading.value = false
+}
+
+const confirmUpgrade = async () => {
+  if (!selectedUpgradeUser.value || !selectedDuration.value) return
+  
+  isUpgrading.value = true
+  
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/admin/upgrade-subscription`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${userStore.token}`
+      },
+      body: JSON.stringify({
+        userId: selectedUpgradeUser.value.id,
+        months: parseInt(selectedDuration.value)
+      })
+    })
+
+    if (!response.ok) throw new Error('Upgrade failed')
+
+    await showSuccess('ارتقا موفق', `اشتراک ${selectedUpgradeUser.value.name} برای ${selectedDuration.value} ماه فعال شد`)
+    
+    // Refresh user list
+    await userStore.fetchProfiles()
+    
+    closeUpgradeModal()
+  } catch (error) {
+    console.error('Upgrade error:', error)
+    await showSuccess('خطا', 'ارتقا ناموفق بود. لطفا دوباره تلاش کنید')
+  } finally {
+    isUpgrading.value = false
+  }
+}
+
 onMounted(async () => {
   await userStore.fetchProfiles()
 })
