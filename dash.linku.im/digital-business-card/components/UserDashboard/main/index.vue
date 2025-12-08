@@ -148,14 +148,13 @@ function handleAddCardClick() {
   const isPro = userStore.user.isPro
   const cardCount = userStore.cards.length
 
-  if (isPro && cardCount <= 5) {
-    navigateTo('/dashboard/add-card')
+  // کاربر رایگان: فقط 1 کارت - کاربر پرو: حداکثر 5 کارت
+  if (!isPro && cardCount >= 1) {
+    showInfoToast('کاربران رایگان فقط می‌توانند یک کارت ایجاد کنند. برای ساخت کارت‌های بیشتر به اشتراک Pro نیاز دارید', 'ti-lock')
+  } else if (isPro && cardCount >= 5) {
+    showInfoToast('شما به حداکثر تعداد مجاز کارت (5 کارت) رسیده‌اید', 'ti-alert-circle')
   } else {
-    if (cardCount === 5) {
-      showInfoToast('شما به حداکثر تعداد مجاز کارت رسیده‌اید', 'ti-lock')
-    } else {
-      showInfoToast('برای ساخت کارت جدید نیاز به اشتراک Pro دارید', 'ti-lock')
-    }
+    navigateTo('/dashboard/add-card')
   }
 }
 

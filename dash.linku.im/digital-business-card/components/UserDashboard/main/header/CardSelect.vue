@@ -217,8 +217,21 @@ const selectCard = async (card: any) => {
 }
 
 const goToAddCard = async () => {
-  menuOpen.value = false
-  await navigateTo('/dashboard/add-card')
+  const userStore = useUserStore()
+  const isPro = userStore.user?.isPro || false
+  const cardCount = userStore.cards?.length || 0
+
+  // کاربر رایگان: فقط 1 کارت - کاربر پرو: حداکثر 5 کارت
+  if (!isPro && cardCount >= 1) {
+    showInfoToast('کاربران رایگان فقط می‌توانند یک کارت ایجاد کنند. برای ساخت کارت‌های بیشتر به اشتراک Pro نیاز دارید', 'ti-lock')
+    menuOpen.value = false
+  } else if (isPro && cardCount >= 5) {
+    showInfoToast('شما به حداکثر تعداد مجاز کارت (5 کارت) رسیده‌اید', 'ti-alert-circle')
+    menuOpen.value = false
+  } else {
+    menuOpen.value = false
+    await navigateTo('/dashboard/add-card')
+  }
 }
 
 const handleClickOutside = (e: MouseEvent) => {

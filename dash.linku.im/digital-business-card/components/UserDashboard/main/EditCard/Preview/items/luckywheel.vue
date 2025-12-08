@@ -75,9 +75,9 @@
       <template #default>
         <div class="flex-1 !overflow-y-auto h-full text-center relative" :class="result ? 'h-full' : 'p-4'">
 
-          <!-- فرم احراز هویت -->
+          <!-- فرم احراز هویت - فقط اگر phoneRequired فعال باشه -->
           <AuthForm
-            v-if="authStep === 'phone' || authStep === 'code'"
+            v-if="(authStep === 'phone' || authStep === 'code') && link?.phoneRequired !== false"
             game-icon="🎰"
             game-title="گردونه شانس"
             :auth-step="authStep"
@@ -104,18 +104,19 @@
           </div>
 
           <!-- نمایش گردونه -->
-          <div v-else class="flex flex-col items-center justify-center py-6 px-4 text-center h-full">
+          <div v-else-if="authStep === 'authenticated' || link?.phoneRequired === false" class="flex flex-col items-center justify-center py-6 px-4 text-center h-full">
             
             <!-- گردونه - فقط اگر نتیجه نداشته باشیم نمایش داده شود -->
-            <div v-if="!result" class="relative w-full max-w-[280px] aspect-square mb-8 mx-auto">
+            <div v-if="!result" class="relative w-full max-w-[320px] aspect-square mb-8 mx-auto">
               <div
                 ref="wheelEl"
-                class="wheel w-full h-full rounded-full border-4 relative overflow-hidden transition-transform"
+                class="wheel w-full h-full rounded-full relative overflow-hidden transition-transform shadow-2xl"
                 :style="{ 
                   transform: `rotate(${rotation}deg)`,
-                  borderColor: (form.iconColor?.background && form.iconColor.background !== 'transparent') ? form.iconColor.background : '#3B82F6',
-                  transitionDuration: isSpinning ? '3.5s' : '0s',
-                  transitionTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                  border: `8px solid ${form.iconColor?.background || '#3B82F6'}`,
+                  boxShadow: `0 20px 50px rgba(0, 0, 0, 0.3), inset 0 0 20px ${adjustOpacity(form.iconColor?.background || '#3B82F6', 0.3)}`,
+                  transitionDuration: isSpinning ? '4s' : '0s',
+                  transitionTimingFunction: 'cubic-bezier(0.17, 0.67, 0.12, 0.99)',
                   willChange: isSpinning ? 'transform' : 'auto',
                   backfaceVisibility: 'hidden',
                   perspective: '1000px'
@@ -128,23 +129,25 @@
                   :style="{
                     transform: `rotate(${index * segmentAngle}deg)`,
                     backgroundColor: prize.color,
-                    color: isDark(prize.color) ? '#fff' : '#222'
+                    color: isDark(prize.color) ? '#fff' : '#1F2937',
+                    borderRight: '1px solid rgba(255, 255, 255, 0.2)'
                   }"
                 >
                   <div
                     class="absolute font-bold text-sm text-center flex flex-col items-center justify-center"
                     :style="{
                       transform: `rotate(${segmentAngle / 2}deg)`,
-                      left: '65%',
-                      top: '15px',
-                      transformOrigin: '0 60px',
-                      width: '60px',
-                      marginLeft: '-25px',
-                      color: isDark(prize.color) ? '#fff' : '#222'
+                      left: '60%',
+                      top: '20px',
+                      transformOrigin: '0 70px',
+                      width: '70px',
+                      marginLeft: '-30px',
+                      color: isDark(prize.color) ? '#fff' : '#1F2937',
+                      textShadow: isDark(prize.color) ? '0 1px 3px rgba(0,0,0,0.3)' : '0 1px 2px rgba(255,255,255,0.8)'
                     }"
                   >
-                    <div class="text-lg">{{ prize.name.split(' ')[0] }}</div>
-                    <div class="text-xs font-medium mt-1 leading-tight">
+                    <div class="text-base font-extrabold">{{ prize.name.split(' ')[0] }}</div>
+                    <div class="text-xs font-semibold mt-0.5 leading-tight">
                       {{ prize.name.split(' ').slice(1).join(' ') }}
                     </div>
                   </div>
@@ -152,44 +155,36 @@
 
                 <!-- دایره مرکزی -->
                 <div 
-                  class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full z-10 border-4 shadow-lg flex items-center justify-center"
-                  :style="{
-                    backgroundColor: (form.iconColor?.background && form.iconColor.background !== 'transparent') ? form.iconColor.background : '#3B82F6',
-                    borderColor: '#ffffff'
+                  class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full z-10 shadow-2xl flex items-center justify-center"
+                  :style="{ 
+                    background: `linear-gradient(135deg, ${form.iconColor?.background || '#3B82F6'} 0%, ${adjustOpacity(form.iconColor?.background || '#3B82F6', 0.7)} 100%)`,
+                    border: '4px solid #fff'
                   }"
                 >
-                  <div class="text-white text-2xl font-bold">●</div>
+                  <div class="text-3xl">🎰</div>
                 </div>
               </div>
 
               <!-- پوینتر لوکیشن -->
-              <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-30">
+              <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 z-30">
                 <div class="relative">
                   <!-- علامت لوکیشن -->
-                  <div class="relative flex flex-col items-center">
+                  <div class="relative flex flex-col items-center filter drop-shadow-xl">
                     <!-- دایره بالایی -->
                     <div 
-                      class="w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center"
-                      style="background-color: #FF8C00;"
+                      class="w-8 h-8 rounded-full border-3 flex items-center justify-center"
+                      style="background: linear-gradient(135deg, #FF6B6B 0%, #FF4444 100%); border: 3px solid #fff; box-shadow: 0 4px 12px rgba(255, 68, 68, 0.5);"
                     >
-                      <div class="w-2 h-2 bg-white rounded-full"></div>
+                      <div class="w-2.5 h-2.5 bg-white rounded-full"></div>
                     </div>
                     
                     <!-- قسمت مثلثی (نوک) -->
-                    <div 
-                      class="relative -mt-1"
-                    >
+                    <div class="relative -mt-1.5">
                       <div 
-                        class="w-0 h-0 border-l-[8px] border-r-[8px] border-t-[12px] border-l-transparent border-r-transparent"
-                        style="border-top-color: #FF8C00; filter: drop-shadow(0 2px 4px rgba(255,140,0,0.4));"
+                        class="w-0 h-0 border-l-[10px] border-r-[10px] border-t-[16px] border-l-transparent border-r-transparent"
+                        style="border-top-color: #FF4444; filter: drop-shadow(0 3px 6px rgba(255, 68, 68, 0.5));"
                       ></div>
                     </div>
-                    
-                    <!-- سایه کل -->
-                    <div 
-                      class="absolute top-1 left-1 w-6 h-6 rounded-full opacity-20"
-                      style="background-color: #FF8C00; filter: blur(2px);"
-                    ></div>
                   </div>
                 </div>
               </div>
@@ -198,11 +193,15 @@
             <!-- دکمه چرخش - فقط اگر نتیجه نداشته باشیم -->
             <button
               v-if="!result"
-              @click="authStep === 'authenticated' ? spinWheel() : startAuth()"
+              @click="authStep === 'authenticated' || link?.phoneRequired === false ? spinWheel() : startAuth()"
               :disabled="isSpinning || hasSpun"
-              class="px-8 py-3 rounded-xl font-bold text-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105 bg-black text-white hover:bg-gray-800"
+              class="px-10 py-4 rounded-2xl font-bold text-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl hover:shadow-3xl transform hover:scale-105 active:scale-95 text-white relative overflow-hidden"
+              :style="{ background: `linear-gradient(135deg, ${form.iconColor?.background || '#3B82F6'} 0%, ${adjustOpacity(form.iconColor?.background || '#3B82F6', 0.8)} 100%)` }"
             >
-              {{ isSpinning ? 'در حال چرخش...' : (authStep === 'authenticated' ? 'بچرخون!' : 'شروع بازی') }}
+              <span class="relative z-10">
+                {{ isSpinning ? '🎰 در حال چرخش...' : (authStep === 'authenticated' || link?.phoneRequired === false ? '🎯 بچرخون!' : '🎮 شروع بازی') }}
+              </span>
+              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 hover:opacity-20 transition-opacity duration-500"></div>
             </button>
             
             <!-- نمایش نتیجه - جایگزین گردونه -->
@@ -377,15 +376,15 @@ export default defineComponent({
       if (baseColor === 'transparent' || baseColor === '') {
         baseColor = '#3B82F6';
       }
-      // رنگ‌ها از استور گرفته می‌شوند
-      return [
-        { name: 'پوچ', color: adjustOpacity(baseColor, 0.3) },
-        { name: 'جایزه ویژه', color: adjustOpacity(baseColor, 0.9) },
-        { name: 'جایزه طلایی', color: adjustOpacity(baseColor, 0.7) },
-        { name: 'جایزه نقره‌ای', color: adjustOpacity(baseColor, 0.8) },
-        { name: 'جایزه برنزی', color: adjustOpacity(baseColor, 0.5) },
-        { name: 'جایزه ممتاز', color: adjustOpacity(baseColor, 0.6) }
-      ];
+      
+      // استفاده از prizes داینامیک از لینک
+      const prizes = props.link?.prizes || ['پوچ', 'جایزه ویژه', 'جایزه طلایی', 'جایزه نقره‌ای', 'جایزه برنزی', 'جایزه ممتاز'];
+      
+      // رنگ‌های متناوب با opacity‌های مختلف از baseColor
+      return prizes.map((prize, index) => ({
+        name: prize,
+        color: adjustOpacity(baseColor, 0.3 + (index * 0.1))
+      }));
     })
 
     // بررسی وضعیت کاربر از localStorage
@@ -767,6 +766,8 @@ export default defineComponent({
       }
     }
     const checkForPlay = async () => {
+      const {$axios} = useNuxtApp()
+      const axios = $axios as AxiosInstance
       try {
         const response = await axios.get(`club/${props.link?.hash}/luckyWheel/check`)
         emit('message',response.data.message || '')

@@ -383,13 +383,18 @@ const selectProfileForSharing = (profile: CardItem) => {
 const addNewProfile = () => {
   showProfileSelector.value = false
   
-  if (!isPro.value) {
+  const cardCount = availableProfiles.value.length
+  
+  // کاربر رایگان: فقط 1 کارت
+  if (!isPro.value && cardCount >= 1) {
+    showToastMessage('کاربران رایگان فقط می‌توانند یک کارت ایجاد کنند', 'warning')
     router.push('/dashboard/checkout')
     return
   }
   
-  if (availableProfiles.value.length >= 5) {
-    showToastMessage('حداکثر 5 پروفایل مجاز است', 'warning')
+  // کاربر پرو: حداکثر 5 کارت
+  if (isPro.value && cardCount >= 5) {
+    showToastMessage('شما به حداکثر تعداد مجاز کارت (5 کارت) رسیده‌اید', 'warning')
     return
   }
   

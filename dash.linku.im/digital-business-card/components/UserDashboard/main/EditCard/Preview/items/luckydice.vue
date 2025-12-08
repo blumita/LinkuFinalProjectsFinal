@@ -73,9 +73,9 @@
       </template>
       <template #default>
         <div class="flex-1 items-center h-full overflow-y-auto p-4 text-center">
-          <!-- فرم احراز هویت -->
+          <!-- فرم احراز هویت - فقط اگر phoneRequired فعال باشه -->
           <AuthForm
-            v-if="authStep === 'phone' || authStep === 'code'"
+            v-if="(authStep === 'phone' || authStep === 'code') && link?.phoneRequired !== false"
             game-icon="🎲"
             game-title="تاس شانس"
             :auth-step="authStep"
@@ -88,7 +88,7 @@
           />
 
           <!-- بازی تاس (حالت اولیه و بعد از احراز هویت) -->
-          <div v-else class="flex flex-col items-center justify-center py-4 px-4 text-center">
+          <div v-else-if="authStep === 'authenticated' || link?.phoneRequired === false" class="flex flex-col items-center justify-center py-4 px-4 text-center">
             <div class="w-full flex flex-col items-center py-8 px-4 text-center">
           <div class="dice mb-4 flex items-center justify-center gap-4 h-full">
             <ol
@@ -117,11 +117,13 @@
 
           <!-- دکمه -->
           <button
-            class="bg-black text-white px-6 py-2 rounded-full font-bold hover:bg-gray-800 transition flex items-center gap-2"
+            class="px-8 py-3 rounded-2xl font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105 active:scale-95 text-white relative overflow-hidden flex items-center justify-center gap-2"
+            :style="{ background: `linear-gradient(135deg, ${formStore.iconColor?.background || '#8B5CF6'} 0%, ${adjustOpacity(formStore.iconColor?.background || '#8B5CF6', 0.8)} 100%)` }"
             @click="rollDice"
           >
-            <i class="ti ti-dice text-lg"></i>
-            امتحان شانس!
+            <i class="ti ti-dice text-xl"></i>
+            <span>🎲 امتحان شانس!</span>
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 hover:opacity-20 transition-opacity duration-500"></div>
           </button>
 
           <!-- نمایش نتیجه و کد قرعه‌کشی -->
@@ -245,6 +247,14 @@ const rollSound = new Audio('/sounds/roll.mp3')
 const rewards = ref([])
 
 const getDots = n => Array.from({ length: n }, (_, i) => i + 1)
+
+const adjustOpacity = (hex, opacity) => {
+  if (!hex || !hex.startsWith('#')) return hex
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`
+}
 
 const rollDice = async () => {
   // اگر شماره موبایل غیرفعال باشه، مستقیماً بازی رو شروع کن

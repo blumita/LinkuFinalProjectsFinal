@@ -144,7 +144,7 @@
             <h3 class="text-lg font-semibold text-foreground mb-2">پروفایلی یافت نشد</h3>
             <p class="text-sm text-muted-foreground mb-4">ابتدا یک پروفایل ایجاد کنید</p>
             <button
-              @click="navigateTo('/dashboard/add-card')"
+              @click="handleAddCardClick"
               class="px-6 py-3 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors"
             >
               ایجاد پروفایل جدید
@@ -225,6 +225,23 @@ const copyProfileLink = async () => {
     document.body.removeChild(ta)
     copied.value = true
     setTimeout(() => (copied.value = false), 2000)
+  }
+}
+
+// Add card with limit check
+const handleAddCardClick = () => {
+  const isPro = userStore.user?.isPro || false
+  const cardCount = userStore.cards?.length || 0
+
+  // کاربر رایگان: فقط 1 کارت - کاربر پرو: حداکثر 5 کارت
+  if (!isPro && cardCount >= 1) {
+    // نمایش toast برای کاربر رایگان
+    alert('کاربران رایگان فقط می‌توانند یک کارت ایجاد کنند. برای ساخت کارت‌های بیشتر به اشتراک Pro نیاز دارید')
+  } else if (isPro && cardCount >= 5) {
+    // نمایش toast برای کاربر پرو
+    alert('شما به حداکثر تعداد مجاز کارت (5 کارت) رسیده‌اید')
+  } else {
+    navigateTo('/dashboard/add-card')
   }
 }
 

@@ -75,9 +75,9 @@
         <div class="flex-1 overflow-y-auto p-4 text-center">
           <div class="flex flex-col items-center justify-center py-4 px-4 text-center">
 
-            <!-- فرم احراز هویت -->
+            <!-- فرم احراز هویت - فقط اگر phoneRequired فعال باشه -->
             <AuthForm
-              v-if="authStep === 'phone' || authStep === 'code'"
+              v-if="(authStep === 'phone' || authStep === 'code') && link?.phoneRequired !== false"
               game-icon="🥚"
               game-title="تخم‌مرغ شانس"
               :auth-step="authStep"
@@ -88,7 +88,7 @@
               @submit-code="submitCode"
               @cancel-auth="cancelAuth"
             />            <!-- نمایش تخم‌مرغ و دکمه امتحان شانس فقط اگر نتیجه وجود ندارد و احراز هویت شده -->
-            <template v-else-if="!result && authStep === 'authenticated'">
+            <template v-else-if="!result && (authStep === 'authenticated' || link?.phoneRequired === false)">
               <div class="mb-4 relative w-40 h-52">
                 <EggIcon
                   :variant="eggVariant"
@@ -104,11 +104,13 @@
                 {{ link.description || 'روی تخم‌مرغ بزن یا گوشی را تکان بده و شانس خودت را امتحان کن!' }}
               </div>
               <button
-                class="bg-orange-500 text-white px-6 py-2 rounded-full font-bold shadow hover:bg-orange-600 transition"
+                class="px-8 py-3 rounded-2xl font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105 active:scale-95 text-white relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
+                :style="{ background: `linear-gradient(135deg, ${formStore.iconColor?.background || '#FB923C'} 0%, ${adjustOpacity(formStore.iconColor?.background || '#FB923C', 0.8)} 100%)` }"
                 @click="handleEggClick"
                 :disabled="hasPlayed"
               >
-                امتحان شانس!
+                <span class="relative z-10">🥚 امتحان شانس!</span>
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 hover:opacity-20 transition-opacity duration-500"></div>
               </button>
             </template>
 
@@ -127,10 +129,12 @@
                 {{ link.description || 'برای شرکت در بازی، ابتدا احراز هویت کنید' }}
               </div>
               <button
-                class="bg-black text-white px-6 py-3 rounded-xl font-bold shadow hover:bg-gray-800 transition"
+                class="px-8 py-3 rounded-2xl font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105 active:scale-95 text-white relative overflow-hidden"
+                :style="{ background: `linear-gradient(135deg, ${formStore.iconColor?.background || '#FB923C'} 0%, ${adjustOpacity(formStore.iconColor?.background || '#FB923C', 0.8)} 100%)` }"
                 @click="startAuth"
               >
-                شروع بازی
+                <span class="relative z-10">🎮 شروع بازی</span>
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 hover:opacity-20 transition-opacity duration-500"></div>
               </button>
             </template>
 
@@ -242,6 +246,14 @@ const iconComponent = computed(() => {
   if (!iconData.value) return null;
   return getIconComponent(iconData.value);
 });
+
+const adjustOpacity = (hex, opacity) => {
+  if (!hex || !hex.startsWith('#')) return hex
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`
+}
 
 // Computed برای variant تخم‌مرغ
 const eggVariant = computed(() => {
