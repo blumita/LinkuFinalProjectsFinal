@@ -85,6 +85,39 @@
     </div>
   </div>
   
+  <!-- مودال تایید غیرفعال‌سازی -->
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="showConfirmModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="showConfirmModal = false"></div>
+        <div class="relative bg-background border border-border rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+          <div class="text-center mb-4">
+            <div class="w-16 h-16 mx-auto mb-4 bg-destructive/10 rounded-full flex items-center justify-center">
+              <i class="ti ti-alert-triangle text-destructive text-3xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-foreground mb-2">غیرفعال‌سازی محصول</h3>
+            <p class="text-sm text-muted-foreground mb-1">آیا مطمئن هستید که می‌خواهید این محصول را غیرفعال کنید؟</p>
+            <p class="text-xs font-semibold text-foreground mt-2">{{ selectedCard?.name }}</p>
+          </div>
+          <div class="flex gap-2">
+            <button
+              @click="showConfirmModal = false"
+              class="flex-1 py-3 rounded-xl border-2 border-border text-foreground font-medium hover:bg-muted transition-colors"
+            >
+              انصراف
+            </button>
+            <button
+              @click="proceedDeactivate"
+              class="flex-1 py-3 rounded-xl bg-destructive text-white font-medium hover:bg-destructive/90 transition-colors"
+            >
+              غیرفعال کن
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+  
   <InfoToast :visible="showToast" :message="toastMessage" :icon="toastIcon"/>
 </template>
 
@@ -111,6 +144,8 @@ const showInfoToast = (message, icon = 'ti-lock') => {
 // States
 const activatedCards = ref([])
 const loadingActivated = ref(true)
+const showConfirmModal = ref(false)
+const selectedCard = ref(null)
 
 // Navigation
 const { goBack: goBackSafe } = useSafeNavigation()
@@ -141,7 +176,17 @@ async function activatedDevice() {
   }
 }
 
-async function deactivateDevice(cardId) {
+function confirmDeactivate(card) {
+  selectedCard.value = card
+  showConfirmModal.value = true
+}
+
+async function proceedDeactivate() {
+  if (!selectedCard.value) return
+  
+  showConfirmModal.value = false
+  const cardId = selectedCard.value.card_id
+  
   try {
     const response = await $axios.post(`v1/cards/${cardId}/deactivateDevice`)
     if (response?.data?.success) {
@@ -154,6 +199,8 @@ async function deactivateDevice(cardId) {
     }
   } catch (e) {
     showInfoToast('خطا در غیرفعال‌سازی', 'ti-alert-triangle')
+  } finally {
+    selectedCard.value = null
   }
 }
 
@@ -165,5 +212,20 @@ onMounted(async () => {
 <style scoped>
 .safe-area-bottom {
   padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.2s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-from > div:last-child,
+.modal-leave-to > div:last-child {
+  transform: scale(0.95);
 }
 </style>

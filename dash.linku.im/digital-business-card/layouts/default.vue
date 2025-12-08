@@ -117,7 +117,7 @@ const getPageConfig = (routePath: string) => {
   const configs = {
     // صفحه فعال‌سازی کارت (باید قبل از /dashboard باشه)
     '/dashboard/activate': {
-      title: 'فعال‌سازی کارت',
+      title: 'فعال‌سازی محصول',
       showBack: true,
       userName: userStore.user?.name,
       showSearch: false,

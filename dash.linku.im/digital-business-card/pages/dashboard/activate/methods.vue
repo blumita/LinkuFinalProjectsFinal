@@ -530,6 +530,16 @@ function handleQRCode(data) {
     license.value = licenseCode.toLowerCase()
     closeQRScanner()
     showInfoToast('کد لایسنس شناسایی شد!', 'ti-check')
+    
+    // اگر پروفایل انتخاب نشده، باتم شیت رو باز کن
+    if (!profileSelected.value && profiles.value.length > 1) {
+      setTimeout(() => {
+        showProfileSheet.value = true
+      }, 500) // تاخیر کوتاه برای نمایش toast
+    } else if (!profileSelected.value && profiles.value.length === 1) {
+      // اگر فقط یک پروفایل هست، خودکار انتخابش کن
+      profileSelected.value = profiles.value[0]
+    }
   } else {
     closeQRScanner()
     showInfoToast('QR کد معتبر نیست', 'ti-alert-triangle')

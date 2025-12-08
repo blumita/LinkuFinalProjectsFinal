@@ -1,23 +1,7 @@
 <template>
   <div class="min-h-screen bg-background flex flex-col">
-    <!-- Header ثابت -->
-    <div class="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border">
-      <div class="flex items-center h-14 px-2 lg:px-6 max-w-4xl mx-auto">
-        <button
-          @click="handleBack"
-          class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-accent transition-colors"
-        >
-          <i class="ti ti-arrow-right text-xl text-foreground"></i>
-        </button>
-        <h1 class="flex-1 text-base lg:text-lg font-semibold text-foreground text-center">
-          {{ pageTitle }}
-        </h1>
-        <div class="w-10"></div>
-      </div>
-    </div>
-
     <!-- محتوا -->
-    <div class="flex-1 pt-16 px-2 lg:px-6 max-w-4xl mx-auto w-full pb-8">
+    <div class="flex-1 px-2 lg:px-6 max-w-4xl mx-auto w-full pb-8">
       
       <!-- توضیح -->
       <p class="text-sm text-muted-foreground text-center mb-4 lg:mb-6">
@@ -82,10 +66,11 @@
                 <p class="text-[10px] lg:text-xs text-muted-foreground">{{ card.activatedAt }}</p>
               </div>
               <button
-                @click="deactivateDevice(card.card_id)"
-                class="text-[10px] lg:text-xs text-destructive bg-destructive/10 px-2 lg:px-3 py-1 lg:py-1.5 rounded-lg hover:bg-destructive/20 transition-colors"
+                @click="confirmDeactivate(card)"
+                class="text-[10px] lg:text-xs text-green-600 bg-green-500/10 px-2 lg:px-3 py-1 lg:py-1.5 rounded-lg hover:bg-green-500/20 transition-colors flex items-center gap-1"
               >
-                غیرفعال
+                <i class="ti ti-circle-check text-xs"></i>
+                <span>فعال شده</span>
               </button>
             </div>
           </div>
@@ -175,6 +160,39 @@
         </div>
       </Transition>
     </Teleport>
+
+    <!-- مودال تایید غیرفعال‌سازی -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showConfirmModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="showConfirmModal = false"></div>
+          <div class="relative bg-background border border-border rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+            <div class="text-center mb-4">
+              <div class="w-16 h-16 mx-auto mb-4 bg-destructive/10 rounded-full flex items-center justify-center">
+                <i class="ti ti-alert-triangle text-destructive text-3xl"></i>
+              </div>
+              <h3 class="text-lg font-bold text-foreground mb-2">غیرفعال‌سازی محصول</h3>
+              <p class="text-sm text-muted-foreground mb-1">آیا مطمئن هستید که می‌خواهید این محصول را غیرفعال کنید؟</p>
+              <p class="text-xs font-semibold text-foreground mt-2">{{ selectedCardToDeactivate?.name }}</p>
+            </div>
+            <div class="flex gap-2">
+              <button
+                @click="showConfirmModal = false"
+                class="flex-1 py-3 rounded-xl border-2 border-border text-foreground font-medium hover:bg-muted transition-colors"
+              >
+                انصراف
+              </button>
+              <button
+                @click="proceedDeactivate"
+                class="flex-1 py-3 rounded-xl bg-destructive text-white font-medium hover:bg-destructive/90 transition-colors"
+              >
+                غیرفعال کن
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
   
   <InfoToast :visible="showToast" :message="toastMessage" :icon="toastIcon"/>
@@ -184,7 +202,6 @@
 import {ref, onMounted, computed} from 'vue'
 import {useNuxtApp, useRouter} from "nuxt/app";
 import InfoToast from "~/components/UserDashboard/modals/InfoToast.vue";
-import {useSafeNavigation} from '~/composables/useSafeNavigation'
 
 const router = useRouter()
 const devices = ref([])
@@ -196,7 +213,6 @@ const profiles = computed(() => formStore.cards.map(card => ({
   role: card.job || 'کاربر'
 })))
 const {$axios} = useNuxtApp()
-const { goBack: safeGoBack } = useSafeNavigation()
 
 // Toast
 const showToast = ref(false)
@@ -215,25 +231,14 @@ const loadingActivated = ref(true)
 const loadingDevices = ref(true)
 const selectedDevice = ref(null)
 const showProfileSheet = ref(false)
-
-// Page title
-const pageTitle = computed(() => 'فعال‌سازی محصول')
-
-// Navigation
-function handleBack() {
-  if (showProfileSheet.value) {
-    showProfileSheet.value = false
-    selectedDevice.value = null
-  } else {
-    goBack()
-  }
-}
-
-function goBack() {
-  safeGoBack('/dashboard')
-}
+const showConfirmModal = ref(false)
+const selectedCardToDeactivate = ref(null)
 
 // Device & Profile Selection
+function cancelProfileSelection() {
+  showProfileSheet.value = false
+  selectedDevice.value = null
+}
 function selectDevice(device) {
   selectedDevice.value = device
   
@@ -274,7 +279,17 @@ async function fetchDevices() {
   }
 }
 
-async function deactivateDevice(cardId) {
+function confirmDeactivate(card) {
+  selectedCardToDeactivate.value = card
+  showConfirmModal.value = true
+}
+
+async function proceedDeactivate() {
+  if (!selectedCardToDeactivate.value) return
+  
+  showConfirmModal.value = false
+  const cardId = selectedCardToDeactivate.value.card_id
+  
   try {
     const response = await $axios.post(`v1/cards/${cardId}/deactivateDevice`)
     if (response?.data?.success) {
@@ -283,10 +298,12 @@ async function deactivateDevice(cardId) {
         card => Number(card.card_id) !== Number(cardId)
       )
     } else {
-      showInfoToast(response.data?.message || 'خطا', 'ti-alert-triangle')
+      showInfoToast(response.data?.message || 'خطا در غیرفعال‌سازی', 'ti-alert-triangle')
     }
   } catch (e) {
     showInfoToast('خطا در غیرفعال‌سازی', 'ti-alert-triangle')
+  } finally {
+    selectedCardToDeactivate.value = null
   }
 }
 
@@ -314,6 +331,21 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.2s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-from > div:last-child,
+.modal-leave-to > div:last-child {
+  transform: scale(0.95);
+}
+
 .sheet-enter-active,
 .sheet-leave-active {
   transition: all 0.3s ease;
