@@ -181,6 +181,8 @@ Route::middleware(['auth:sanctum','log.activity'])
                 ->name('cards.update');
             Route::put('/delete', [CardController::class, 'destroy'])
                 ->name('cards.delete');
+            Route::put('/toggle-active', [CardController::class, 'toggleActive'])
+                ->name('cards.toggle-active');
 
             // Attach a user to the specified card
             Route::post('/user', [CardUserController::class, 'store'])

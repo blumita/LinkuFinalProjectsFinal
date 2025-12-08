@@ -185,6 +185,23 @@ class CardController extends Controller
         //
     }
 
+    /**
+     * Toggle card active status
+     */
+    public function toggleActive(Request $request, Card $card): JsonResponse
+    {
+        $this->authorize('update', $card);
+        
+        $card->is_active = !$card->is_active;
+        $card->save();
+        
+        $message = $card->is_active 
+            ? __('messages.card_activated') 
+            : __('messages.card_deactivated');
+        
+        return $this->ok($message, new CardResource($card), 200);
+    }
+
     //---------------------------------- CardViews -----------------------------
     //--------------------------------------------------------------------------
     public function recordView(Request $request, $slug): JsonResponse

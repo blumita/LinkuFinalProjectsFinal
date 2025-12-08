@@ -1,5 +1,6 @@
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-8">
+  <div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-8">
     <!-- کارت‌ها -->
     <div
         v-for="card in filteredCards"
@@ -19,6 +20,22 @@
           >
           </div>
         </ClientOnly>
+        
+        <!-- Badge وضعیت کارت -->
+        <div class="absolute top-3 right-3 z-10">
+          <button
+            @click.stop="toggleCardStatus(card)"
+            :class="[
+              'px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 transition-all shadow-md',
+              card.isActive 
+                ? 'bg-green-500 text-white hover:bg-green-600' 
+                : 'bg-gray-400 text-white hover:bg-gray-500'
+            ]"
+          >
+            <i :class="card.isActive ? 'ti ti-circle-check' : 'ti ti-circle-x'"></i>
+            {{ card.isActive ? 'فعال' : 'غیرفعال' }}
+          </button>
+        </div>
       </div>
 
       <!-- آواتار و بج -->
@@ -101,6 +118,64 @@
       <p class="mt-2 font-medium text-gray-500">ساخت کارت جدید</p>
     </div>
   </div>
+  
+  <!-- Modal تایید تغییر وضعیت -->
+  <Teleport to="body">
+    <div
+      v-if="showConfirmModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      @click.self="showConfirmModal = false"
+    >
+      <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+        <div class="flex items-center gap-3 mb-4">
+          <div :class="[
+            'w-12 h-12 rounded-full flex items-center justify-center',
+            confirmModalData.newStatus ? 'bg-green-100' : 'bg-red-100'
+          ]">
+            <i :class="[
+              'text-2xl',
+              confirmModalData.newStatus ? 'ti ti-circle-check text-green-600' : 'ti ti-circle-x text-red-600'
+            ]"></i>
+          </div>
+          <h3 class="text-lg font-bold text-gray-800">
+            {{ confirmModalData.newStatus ? 'فعال‌سازی کارت' : 'غیرفعال‌سازی کارت' }}
+          </h3>
+        </div>
+        
+        <p class="text-gray-600 mb-2">
+          {{ confirmModalData.newStatus 
+            ? 'آیا از فعال‌سازی این کارت مطمئن هستید؟' 
+            : 'آیا از غیرفعال‌سازی این کارت مطمئن هستید؟'
+          }}
+        </p>
+        
+        <p v-if="!confirmModalData.newStatus" class="text-sm text-red-600 mb-6">
+          ⚠️ توجه: کارت غیرفعال برای دیگران قابل مشاهده نخواهد بود.
+        </p>
+        
+        <div class="flex gap-3">
+          <button
+            @click="showConfirmModal = false"
+            class="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition"
+          >
+            انصراف
+          </button>
+          <button
+            @click="confirmToggleStatus"
+            :class="[
+              'flex-1 px-4 py-2.5 rounded-xl font-medium transition text-white',
+              confirmModalData.newStatus 
+                ? 'bg-green-600 hover:bg-green-700' 
+                : 'bg-red-600 hover:bg-red-700'
+            ]"
+          >
+            {{ confirmModalData.newStatus ? 'فعال کن' : 'غیرفعال کن' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </Teleport>
+  </div>
   <InfoToast :visible="showToast" :message="toastMessage" :icon="toastIcon"/>
 </template>
 
@@ -128,6 +203,8 @@ const props = defineProps({
 const formStore = useFormStore()
 const router = useRouter()
 const loadingCardId = ref(null)
+const showConfirmModal = ref(false)
+const confirmModalData = ref({ card: null, newStatus: false })
 // داده نمونه (تست) کارت‌ها
 
 const cards = computed(() => formStore.cards)
@@ -158,6 +235,32 @@ function handleAddCardClick() {
   }
 }
 
+
+async function toggleCardStatus(card) {
+  const newStatus = !card.isActive
+  confirmModalData.value = { card, newStatus }
+  showConfirmModal.value = true
+}
+
+async function confirmToggleStatus() {
+  const { card, newStatus } = confirmModalData.value
+  showConfirmModal.value = false
+  
+  try {
+    const { $axios } = useNuxtApp()
+    await $axios.put(`cards/${card.id}/toggle-active`)
+    
+    // بروزرسانی وضعیت کارت در لیست
+    card.isActive = newStatus
+    
+    showInfoToast(
+      newStatus ? 'کارت با موفقیت فعال شد' : 'کارت با موفقیت غیرفعال شد', 
+      newStatus ? 'ti-circle-check' : 'ti-circle-x'
+    )
+  } catch (error) {
+    showInfoToast('خطا در تغییر وضعیت کارت', 'ti-alert-circle')
+  }
+}
 
 async function editCard(id,slug) {
 

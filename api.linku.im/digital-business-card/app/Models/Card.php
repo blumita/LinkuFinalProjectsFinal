@@ -23,6 +23,7 @@ class Card extends Model
         'layout_mode',
         'single_link',
         'is_default',
+        'is_active',
         'lead_capture_mode',
         'match_theme_color',
         'creator_id',
@@ -32,7 +33,8 @@ class Card extends Model
         'single_link' => 'boolean',
         'lead_capture_mode' => 'boolean',
         'match_theme_color' => 'boolean',
-        'is_default'=>'boolean'
+        'is_default'=>'boolean',
+        'is_active'=>'boolean'
     ];
     //
     protected static function boot(): void

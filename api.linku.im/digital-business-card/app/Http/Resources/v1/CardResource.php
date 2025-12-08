@@ -31,7 +31,7 @@ class CardResource extends JsonResource
             'matchThemeColor'=>$this->match_theme_color,
             'removeBranding' => $this->creator->remove_branding,
             'views' => $this->views->count(),
-            'isActive'=>true,//TODO:add field to card
+            'isActive'=>$this->is_active,
             'url'=>env('APP_URL').'/profile/'.$this->slug,
 
             //User card data
