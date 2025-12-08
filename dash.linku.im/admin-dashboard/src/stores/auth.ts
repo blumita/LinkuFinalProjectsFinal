@@ -10,12 +10,17 @@ const apiClient = axios.create({
     }
 })
 
+// In-memory fallback storage when sessionStorage is not available
+let memoryToken = ''
+let memoryUser: any = null
+
 // Safe storage helpers with fallback
 const getStoredToken = (): string => {
     try {
         return sessionStorage.getItem('adminToken') || ''
     } catch {
-        return ''
+        // Fallback to memory storage
+        return memoryToken || ''
     }
 }
 
@@ -27,7 +32,9 @@ const setStoredToken = (token: string): void => {
             sessionStorage.removeItem('adminToken')
         }
     } catch (e) {
-        console.warn('Could not save token:', e)
+        console.warn('sessionStorage not available, using memory storage')
+        // Fallback to memory storage
+        memoryToken = token
     }
 }
 
@@ -36,7 +43,10 @@ const clearStoredToken = (): void => {
         sessionStorage.removeItem('adminToken')
         sessionStorage.removeItem('adminUser')
     } catch (e) {
-        console.warn('Could not clear token:', e)
+        console.warn('sessionStorage not available, clearing memory storage')
+        // Fallback to memory storage
+        memoryToken = ''
+        memoryUser = null
     }
 }
 
@@ -45,7 +55,8 @@ const getStoredUser = (): any => {
         const user = sessionStorage.getItem('adminUser')
         return user ? JSON.parse(user) : null
     } catch {
-        return null
+        // Fallback to memory storage
+        return memoryUser || null
     }
 }
 
@@ -57,7 +68,9 @@ const setStoredUser = (user: any): void => {
             sessionStorage.removeItem('adminUser')
         }
     } catch (e) {
-        console.warn('Could not save user:', e)
+        console.warn('sessionStorage not available, using memory storage')
+        // Fallback to memory storage
+        memoryUser = user
     }
 }
 
