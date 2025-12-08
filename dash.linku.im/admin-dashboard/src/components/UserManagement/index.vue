@@ -1080,7 +1080,8 @@ const confirmUpgrade = async () => {
   
   try {
     const token = sessionStorage.getItem('adminToken') || ''
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/user/admin/upgrade-subscription`, {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.linku.im/api'
+    const response = await fetch(`${baseUrl}/user/admin/upgrade-subscription`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
