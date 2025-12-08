@@ -599,7 +599,7 @@ const sendNotification = async () => {
 
 const fetchUsers = async () => {
   try {
-    const { data } = await axios.get('/user/admin')
+    const { data } = await axios.get('/user/admin/users')
     allUsers.value = data.data
   } catch (error) {
     console.error('Error fetching users:', error)
