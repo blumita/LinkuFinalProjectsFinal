@@ -49,12 +49,21 @@ export default {
                         headers: error.config?.headers
                     })
                     
-                    console.warn('Token expired or invalid, logging out...')
-                    authStore.logout()
+                    // Only logout if it's an auth-related endpoint (login, me, etc.)
+                    // Don't logout for data fetch errors (like userList, profiles)
+                    const authEndpoints = ['/admin/login', '/admin/me', '/admin/refresh']
+                    const isAuthEndpoint = authEndpoints.some(endpoint => error.config?.url?.includes(endpoint))
                     
-                    // Redirect to login
-                    if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-                        window.location.href = '/login'
+                    if (isAuthEndpoint) {
+                        console.warn('Auth token invalid, logging out...')
+                        authStore.logout()
+                        
+                        // Redirect to login
+                        if (typeof window !== 'undefined' && !window.location.pathname.includes('/auth/login')) {
+                            window.location.href = '/auth/login'
+                        }
+                    } else {
+                        console.warn('API returned 401 but not logging out (non-auth endpoint)')
                     }
                 }
                 
