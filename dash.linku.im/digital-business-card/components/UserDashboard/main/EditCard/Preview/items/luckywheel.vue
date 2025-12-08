@@ -107,7 +107,7 @@
           <div v-else class="flex flex-col items-center justify-center py-6 px-4 text-center h-full">
             
             <!-- گردونه - فقط اگر نتیجه نداشته باشیم نمایش داده شود -->
-            <div v-if="!result" class="relative w-72 h-72 mb-8 mx-auto">
+            <div v-if="!result" class="relative w-full max-w-[280px] aspect-square mb-8 mx-auto">
               <div
                 ref="wheelEl"
                 class="wheel w-full h-full rounded-full border-4 relative overflow-hidden transition-transform"
@@ -607,10 +607,14 @@ export default defineComponent({
     const segmentAngle = computed(() => 360 / wheelItems.value.length)
 
     async function spinWheel() {
-      const canPlay = await checkForPlay()
-      if (!canPlay) {
-        return
+      // اگر شماره موبایل غیرفعاله، نیازی به checkForPlay نیست
+      if (props.link?.phoneRequired !== false) {
+        const canPlay = await checkForPlay()
+        if (!canPlay) {
+          return
+        }
       }
+      
       if (isSpinning.value || hasSpun.value || authStep.value !== 'authenticated') return
 
       isSpinning.value = true

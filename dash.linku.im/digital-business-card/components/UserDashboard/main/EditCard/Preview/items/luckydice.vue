@@ -247,15 +247,15 @@ const rewards = ref([])
 const getDots = n => Array.from({ length: n }, (_, i) => i + 1)
 
 const rollDice = async () => {
-  const canPlay = await checkForPlay()
-  if (!canPlay) {
-    return
-  }
-
   // اگر شماره موبایل غیرفعال باشه، مستقیماً بازی رو شروع کن
   if (props.link?.phoneRequired === false) {
     authStep.value = 'authenticated'
     phoneNumber.value = 'guest_' + Date.now() // شماره مهمان برای تمایز
+  } else {
+    const canPlay = await checkForPlay()
+    if (!canPlay) {
+      return
+    }
   }
   
   // اگر احراز هویت نشده، ابتدا به مرحله وارد کردن شماره موبایل برو

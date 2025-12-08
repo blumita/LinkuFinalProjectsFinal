@@ -274,9 +274,12 @@ const playSound = (soundPath) => {
 
 // منطق دو مرحله‌ای شکستن تخم‌مرغ
 const tryLuck = async () => {
-  const canPlay = await checkForPlay(props.link.hash)
-  if (!canPlay) {
-    return
+  // اگر شماره موبایل غیرفعاله، نیازی به checkForPlay نیست
+  if (props.link?.phoneRequired !== false) {
+    const canPlay = await checkForPlay(props.link.hash)
+    if (!canPlay) {
+      return
+    }
   }
 
   if (isShaking.value || hasPlayed.value) return
