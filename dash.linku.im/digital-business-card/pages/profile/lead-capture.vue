@@ -68,6 +68,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { computed } from 'vue'
 import TabLeadCapture from '~/components/UserDashboard/main/EditCard/tabs/TabLeadCapture.vue'
 import { useFormStore } from '~/stores/form'
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
+const { goBack } = useSafeNavigation()
 
 definePageMeta({
   middleware: 'require-activated',
@@ -84,7 +86,7 @@ const cardId = computed(() => {
 })
 
 const goBack = () => {
-  router.back()
+  goBack('/dashboard')
 }
 
 // تابع ذخیره که از کامپوننت فرزند صدا میزنه

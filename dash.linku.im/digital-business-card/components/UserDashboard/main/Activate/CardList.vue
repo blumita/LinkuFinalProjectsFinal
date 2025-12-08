@@ -1,7 +1,23 @@
 <template>
   <div class="min-h-screen bg-background flex flex-col">
+    <!-- Header ثابت -->
+    <div class="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border">
+      <div class="flex items-center h-14 px-2 lg:px-6 max-w-4xl mx-auto">
+        <button
+          @click="goBack"
+          class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-accent transition-colors"
+        >
+          <i class="ti ti-arrow-right text-xl text-foreground"></i>
+        </button>
+        <h1 class="flex-1 text-base lg:text-lg font-semibold text-foreground text-center">
+          فعال‌سازی محصول
+        </h1>
+        <div class="w-10"></div>
+      </div>
+    </div>
+
     <!-- محتوا -->
-    <div class="flex-1 px-2 lg:px-6 max-w-4xl mx-auto w-full pb-8">
+    <div class="flex-1 pt-16 px-2 lg:px-6 max-w-4xl mx-auto w-full pb-8">
       
       <!-- توضیح -->
       <p class="text-sm text-muted-foreground text-center mb-4 lg:mb-6">
@@ -195,7 +211,7 @@
     </Teleport>
   </div>
   
-  <InfoToast :visible="showToast" :message="toastMessage" :icon="toastIcon"/>
+  <InfoToast :visible="showToast" :title="toastMessage" :icon="toastIcon"/>
 </template>
 
 <script setup>
@@ -213,6 +229,11 @@ const profiles = computed(() => formStore.cards.map(card => ({
   role: card.job || 'کاربر'
 })))
 const {$axios} = useNuxtApp()
+
+// Navigation
+function goBack() {
+  router.push('/dashboard')
+}
 
 // Toast
 const showToast = ref(false)

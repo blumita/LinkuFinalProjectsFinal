@@ -77,17 +77,10 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
 
-const router = useRouter()
+const { goBack } = useSafeNavigation()
 
-const goBack = () => {
-  if (window.history.length > 2) {
-    router.back()
-  } else {
-    router.push('/')
-  }
-}
 
 // Set page title
 useHead({

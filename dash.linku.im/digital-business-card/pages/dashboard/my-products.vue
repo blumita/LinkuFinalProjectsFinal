@@ -118,7 +118,7 @@
     </Transition>
   </Teleport>
   
-  <InfoToast :visible="showToast" :message="toastMessage" :icon="toastIcon"/>
+  <InfoToast :visible="showToast" :title="toastMessage" :icon="toastIcon"/>
 </template>
 
 <script setup>

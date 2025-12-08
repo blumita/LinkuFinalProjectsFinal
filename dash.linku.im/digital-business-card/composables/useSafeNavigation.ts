@@ -4,11 +4,9 @@
  */
 
 import { useRouter } from 'vue-router'
-import { useNuxtApp } from 'nuxt/app'
 
 export const useSafeNavigation = () => {
   const router = useRouter()
-  const nuxtApp = useNuxtApp()
 
   /**
    * تشخیص حالت PWA Standalone
@@ -22,11 +20,19 @@ export const useSafeNavigation = () => {
   }
 
   /**
-   * تشخیص عمق history
+   * بررسی آیا صفحه قبلی داریم
+   * استفاده از document.referrer و window.history
    */
   const hasHistory = (): boolean => {
     if (typeof window === 'undefined') return false
-    return window.history.length > 2
+    
+    // چک کردن اینکه آیا از داخل سایت خودمون اومدیم
+    const referrer = document.referrer
+    const currentOrigin = window.location.origin
+    
+    // اگر referrer از سایت خودمون باشه یا history بیشتر از 1 باشه
+    return (referrer.startsWith(currentOrigin) && referrer !== window.location.href) || 
+           window.history.length > 1
   }
 
   /**
@@ -34,22 +40,36 @@ export const useSafeNavigation = () => {
    * @param fallbackPath مسیر پیش‌فرض در صورت نبود history
    */
   const goBack = (fallbackPath: string = '/dashboard'): void => {
-    if (typeof window === 'undefined') return
-
-    // 1. سعی در استفاده از PWA plugin (اگر موجود باشد)
-    if ((nuxtApp.$pwa as any)?.safeNavigateBack) {
-      (nuxtApp.$pwa as any).safeNavigateBack(fallbackPath)
+    if (typeof window === 'undefined') {
+      router.push(fallbackPath)
       return
     }
 
-    // 2. اگر history داریم، برگرد (در هر حالتی: PWA یا Browser)
+    // اگر history داریم، برگرد
     if (hasHistory()) {
-      router.back()
-      return
+      // استفاده از تایم‌اوت برای جلوگیری از مشکلات race condition
+      try {
+        router.back()
+        
+        // اگر بعد از 300ms هنوز چیزی نشد، به fallback برو
+        const timeout = setTimeout(() => {
+          if (window.location.pathname === router.currentRoute.value.path) {
+            router.push(fallbackPath)
+          }
+        }, 300)
+        
+        // پاکسازی تایم‌اوت بعد از navigation موفق
+        router.afterEach(() => {
+          clearTimeout(timeout)
+        })
+      } catch (error) {
+        // در صورت خطا، مستقیم به fallback برو
+        router.push(fallbackPath)
+      }
+    } else {
+      // در غیر این صورت به fallback برو
+      router.push(fallbackPath)
     }
-
-    // 3. در غیر این صورت به fallback برو
-    router.push(fallbackPath)
   }
 
   /**

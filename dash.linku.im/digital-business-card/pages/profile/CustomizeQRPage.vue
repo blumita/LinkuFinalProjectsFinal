@@ -4,7 +4,7 @@
     <div class="fixed top-0 left-0 right-0 z-40 bg-card border-b border-border">
       <div class="flex items-center justify-between h-14 px-4">
         <button
-          @click="$router.back()"
+          @click="goBack('/dashboard')"
           class="flex items-center justify-center w-10 h-10 rounded-lg text-foreground hover:bg-accent transition-colors"
         >
           <i class="ti ti-arrow-right text-xl"></i>
@@ -371,6 +371,8 @@ import QRCode from 'qrcode'
 import ImageCropperModal from '~/components/UserDashboard/modals/ImageCropperModal.vue'
 import { useUserStore } from '~/stores/user'
 import { useFormStore } from '~/stores/form'
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
+const { goBack } = useSafeNavigation()
 
 // Hide bottom navigation on this page
 definePageMeta({
@@ -752,7 +754,7 @@ const saveQRSettings = async () => {
       showSuccessToast.value = true
       setTimeout(() => {
         showSuccessToast.value = false
-        router.back()
+        goBack('/dashboard')
       }, 1500)
     } else {
       throw new Error(apiResponse.data.message || 'خطا در ذخیره')

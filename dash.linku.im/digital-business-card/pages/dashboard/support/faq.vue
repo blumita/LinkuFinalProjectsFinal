@@ -3,7 +3,7 @@
     <!-- Mobile Header -->
     <div class="fixed top-0 left-0 right-0 z-50 bg-card border-b border-border">
       <div class="flex items-center justify-between px-4 h-16">
-        <button @click="$router.back()" class="p-2 hover:bg-secondary rounded-lg transition-colors">
+        <button @click="goBack('/dashboard/support')" class="p-2 hover:bg-secondary rounded-lg transition-colors">
           <i class="ti ti-arrow-right text-primary text-xl"></i>
         </button>
         <h1 class="text-lg font-bold text-foreground">سوالات متداول</h1>
@@ -79,6 +79,8 @@
 import { ref, onMounted } from 'vue'
 import { useNuxtApp } from '#app'
 import type { AxiosInstance } from 'axios'
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
+const { goBack } = useSafeNavigation()
 
 definePageMeta({
   layout: 'default'

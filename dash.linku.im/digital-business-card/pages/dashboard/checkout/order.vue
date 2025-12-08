@@ -38,7 +38,7 @@
     <div class="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm">
       <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-16">
-          <button @click="$router.back()" class="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
+          <button @click="goBack('/dashboard')" class="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
             <i class="ti ti-arrow-right text-xl"></i>
             <span class="text-sm font-medium">بازگشت</span>
           </button>
@@ -727,6 +727,8 @@
 <script setup lang="ts">
 import { usePlanStore } from '~/stores/plan'
 import { useToast } from '~/composables/useToast'
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
+const { goBack } = useSafeNavigation()
 
 definePageMeta({
   layout: 'default',

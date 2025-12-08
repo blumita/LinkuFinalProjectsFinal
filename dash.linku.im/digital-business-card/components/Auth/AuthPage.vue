@@ -2,7 +2,7 @@
   <div class="h-screen bg-background transition-colors duration-300 relative flex flex-col overflow-hidden">
       <template v-if="step === 'phone'">
         <!-- Fixed Header -->
-        <div class="flex-shrink-0 bg-background border-b border-border">
+        <div class="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border">
           <div class="flex items-center h-16 px-4">
             <!-- Logo -->
             <div class="flex items-center gap-2">
@@ -23,7 +23,7 @@
         </div>
 
         <!-- Centered Content -->
-        <div class="flex-1 flex items-center justify-center">
+        <div class="flex-1 flex items-center justify-center pt-16">
           <div class="w-full max-w-md px-4">
             <p class="text-muted-foreground text-sm text-center mb-8">لطفاً کشور را انتخاب و سپس شماره رو وارد کنید</p>
 
@@ -193,7 +193,7 @@
       <!-- OTP Step -->
       <template v-else-if="step === 'otp'">
         <!-- Fixed Header -->
-        <div class="flex-shrink-0 bg-background border-b border-border">
+        <div class="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border">
           <div class="flex items-center h-16 px-4">
             <!-- Logo -->
             <div class="flex items-center gap-2">
@@ -222,7 +222,7 @@
         </div>
 
         <!-- Centered Content -->
-        <div class="flex-1 flex items-center justify-center">
+        <div class="flex-1 flex items-center justify-center pt-16">
           <div class="w-full max-w-md px-4">
             <p v-if="authMethod === 'phone'" class="text-sm text-muted-foreground text-center mb-4">لطفا کد ارسال شده به شماره موبایل
               {{ toPersianDigits(displayPhone) }} را وارد

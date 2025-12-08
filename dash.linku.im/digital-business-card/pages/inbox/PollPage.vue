@@ -4,7 +4,7 @@
     <div class="fixed top-0 left-0 right-0 z-40 bg-card border-b border-border">
       <div class="flex items-center h-14 lg:h-16 px-4 lg:px-6">
         <button
-          @click="router.back()"
+          @click="goBack('/inbox')"
           class="flex items-center justify-center w-10 h-10 rounded-lg text-foreground hover:bg-muted transition-colors"
         >
           <i class="ti ti-arrow-right text-xl"></i>
@@ -112,6 +112,8 @@ import { useRouter } from 'vue-router'
 import { useFormStore } from '~/stores/form'
 import { useNuxtApp } from 'nuxt/app'
 import type { AxiosInstance } from 'axios'
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
+const { goBack } = useSafeNavigation()
 
 const router = useRouter()
 const formStore = useFormStore()

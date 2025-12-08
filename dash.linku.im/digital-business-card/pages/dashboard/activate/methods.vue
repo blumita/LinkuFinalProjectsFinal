@@ -311,7 +311,7 @@
     </Teleport>
   </div>
   
-  <InfoToast :visible="showToast" :message="toastMessage" :icon="toastIcon"/>
+  <InfoToast :visible="showToast" :title="toastMessage" :icon="toastIcon"/>
 </template>
 
 <script setup>
@@ -400,6 +400,13 @@ function goToDashboard() {
 function selectProfile(profile) {
   profileSelected.value = profile
   showProfileSheet.value = false
+  
+  // اگر کد لایسنس از قبل اسکن شده، باتم شیت فعالسازی رو باز کن
+  if (license.value) {
+    setTimeout(() => {
+      showLicenseSheet.value = true
+    }, 300)
+  }
 }
 
 // Open license sheet with proper event handling
@@ -531,7 +538,7 @@ function handleQRCode(data) {
     closeQRScanner()
     showInfoToast('کد لایسنس شناسایی شد!', 'ti-check')
     
-    // اگر پروفایل انتخاب نشده، باتم شیت رو باز کن
+    // اگر پروفایل انتخاب نشده، اول باتم شیت انتخاب پروفایل رو باز کن
     if (!profileSelected.value && profiles.value.length > 1) {
       setTimeout(() => {
         showProfileSheet.value = true
@@ -539,6 +546,15 @@ function handleQRCode(data) {
     } else if (!profileSelected.value && profiles.value.length === 1) {
       // اگر فقط یک پروفایل هست، خودکار انتخابش کن
       profileSelected.value = profiles.value[0]
+      // بعد باتم شیت فعالسازی رو باز کن
+      setTimeout(() => {
+        showLicenseSheet.value = true
+      }, 500)
+    } else if (profileSelected.value) {
+      // اگر پروفایل قبلا انتخاب شده، مستقیم باتم شیت فعالسازی رو باز کن
+      setTimeout(() => {
+        showLicenseSheet.value = true
+      }, 500)
     }
   } else {
     closeQRScanner()

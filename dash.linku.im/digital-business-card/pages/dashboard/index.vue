@@ -253,19 +253,31 @@ onMounted(async () => {
   }
   
   if (authStore.isAuthenticated) {
-    await userStore.fetchUser()
-    formStore.cards = userStore.cards
-    
-    // Fetch inbox message counts for badge
-    await fetchCounts()
-    
-    // درخواست دسترسی‌های PWA (دوربین، لوکیشن، NFC، نوتیفیکیشن)
-    const { $permissions } = useNuxtApp()
-    if ($permissions) {
-      $permissions.requestAfterLogin()
+    // نمایش داده‌های کش شده (اگر وجود داشته باشد) برای سرعت بیشتر
+    if (userStore.user) {
+      formStore.cards = userStore.cards
+      loading.value = false
     }
+    
+    // همه درخواست‌ها به صورت موازی (Promise.all به جای await های پشت سر هم)
+    Promise.all([
+      userStore.fetchUser().then(() => {
+        formStore.cards = userStore.cards
+      }),
+      fetchCounts(),
+      // درخواست دسترسی‌های PWA به صورت غیرهمزمان (بدون await)
+      (async () => {
+        const { $permissions } = useNuxtApp()
+        if ($permissions) {
+          $permissions.requestAfterLogin()
+        }
+      })()
+    ]).finally(() => {
+      loading.value = false
+    })
+  } else {
+    loading.value = false
   }
-  loading.value = false
 })
 </script>
 

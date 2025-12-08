@@ -4,7 +4,7 @@
     <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-4">
       <div class="flex items-center gap-3">
         <button
-          @click="$router.back()"
+          @click="goBack('/dashboard/notifications')"
           class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,6 +143,9 @@
 </template>
 
 <script setup lang="ts">
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
+const { goBack } = useSafeNavigation()
+
 interface Notification {
   id: number
   title: string

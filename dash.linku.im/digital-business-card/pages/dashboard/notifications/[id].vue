@@ -4,7 +4,7 @@
     <div class="fixed top-0 left-0 right-0 z-40 bg-card border-b border-border">
       <div class="flex items-center h-14 px-4">
         <button
-          @click="$router.back()"
+          @click="goBack('/dashboard/notifications')"
           class="flex items-center justify-center w-10 h-10 rounded-lg text-foreground hover:bg-accent transition-colors"
         >
           <i class="ti ti-arrow-right text-xl"></i>
@@ -135,7 +135,7 @@
         <h3 class="text-xl font-semibold text-foreground mb-2">اطلاعیه یافت نشد</h3>
         <p class="text-muted-foreground mb-6">این اطلاعیه حذف شده یا وجود ندارد</p>
         <button
-          @click="$router.back()"
+          @click="goBack('/dashboard/notifications')"
           class="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 transition-colors"
         >
           بازگشت به لیست اطلاعیه‌ها
@@ -150,6 +150,8 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useNotificationStore } from '~/stores/notification'
 import type { Notification } from '~/types/notification'
+import { useSafeNavigation } from '~/composables/useSafeNavigation'
+const { goBack } = useSafeNavigation()
 
 const route = useRoute()
 const router = useRouter()
