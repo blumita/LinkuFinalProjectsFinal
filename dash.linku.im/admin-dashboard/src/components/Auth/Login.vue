@@ -358,7 +358,13 @@ const sendEmailOTP = async () => {
     }
   } catch (error: any) {
     const message = error.response?.data?.message || 'خطایی در ارسال کد رخ داد'
-    showInfoToast(message, 'ti-alert-triangle')
+    if (error.response?.status === 429) {
+      showInfoToast('درخواست‌های زیاد! لطفا چند دقیقه صبر کنید', 'ti-alert-triangle')
+      countdown.value = 120 // 2 minutes wait
+      startTimer()
+    } else {
+      showInfoToast(message, 'ti-alert-triangle')
+    }
   } finally {
     isLoading.value = false
   }
@@ -386,7 +392,13 @@ const sendPhoneOTP = async () => {
     }
   } catch (error: any) {
     const message = error.response?.data?.message || 'خطایی در ارسال کد رخ داد'
-    showInfoToast(message, 'ti-alert-triangle')
+    if (error.response?.status === 429) {
+      showInfoToast('درخواست‌های زیاد! لطفا چند دقیقه صبر کنید', 'ti-alert-triangle')
+      countdown.value = 120 // 2 minutes wait
+      startTimer()
+    } else {
+      showInfoToast(message, 'ti-alert-triangle')
+    }
   } finally {
     isLoading.value = false
   }
@@ -568,6 +580,11 @@ const verifyOtpCode = async () => {
 }
 
 const resendCode = async () => {
+  // Prevent multiple rapid clicks
+  if (isLoading.value || countdown.value > 0) {
+    return
+  }
+  
   if (inputType.value === 'email') {
     await sendEmailOTP()
   } else if (inputType.value === 'phone') {
