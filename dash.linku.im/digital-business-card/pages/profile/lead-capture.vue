@@ -85,10 +85,6 @@ const cardId = computed(() => {
   return route.query.id || route.query.cardId || formStore.defaultCard?.id
 })
 
-const goBack = () => {
-  goBack('/dashboard')
-}
-
 // تابع ذخیره که از کامپوننت فرزند صدا میزنه
 const handleSave = () => {
   const saveEvent = new CustomEvent('lead-capture-save')
