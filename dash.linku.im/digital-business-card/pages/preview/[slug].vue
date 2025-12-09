@@ -1033,9 +1033,17 @@ const iconBg = computed(() => {
   return color
 })
 
+const isWhiteTheme = computed(() => {
+  const bg = formData?.themeColor?.background
+  return bg === '#ffffff' || bg === '#fff' || bg === 'rgb(255, 255, 255)' || bg === '#FFFFFF'
+})
+
 const backgroundWithOpacity = computed(() => {
   if (isDarkTheme.value) {
-    return '#ffffff' // پس‌زمینه سفید برای تم مشکی
+    return '#f5f5f5' // پس‌زمینه خاکستری خیلی روشن برای تم مشکی (ایکون‌ها دیده بشن)
+  }
+  if (isWhiteTheme.value) {
+    return '#f9f9f9' // پس‌زمینه خاکستری خیلی خیلی کمرنگ برای تم سفید
   }
   // برای رنگ‌های دیگه از رنگ کمرنگ‌شده استفاده کن
   return getLighterColor(iconColor.value, 0.95) // 95% روشن‌تر

@@ -76,7 +76,7 @@
       'rounded-xl w-full',
       sanitizedLink.action === 'contactcard' && (isListMode || sanitizedLink.description)
         ? 'flex items-center gap-4 backdrop-blur p-2 ' + (formData?.layout === 'left' ? 'text-left' : 'text-right') + (isDarkTheme ? ' bg-white/[0.02]' : isLightTheme ? ' bg-black/[0.02]' : ' bg-gradient-to-br from-white/60 via-white/30 to-white/10 border border-white/20')
-        : 'flex flex-col items-center justify-center p-4 text-center' + (isDarkTheme ? ' backdrop-blur bg-white/[0.02]' : isLightTheme ? ' backdrop-blur bg-black/[0.02]' : ' bg-gradient-to-br from-white/60 via-white/30 to-white/10 backdrop-blur border')
+        : 'text-center p-2 flex flex-col items-center justify-center transition hover:shadow-md backdrop-blur' + (isDarkTheme ? ' bg-white/[0.02]' : isLightTheme ? ' bg-black/[0.02]' : ' bg-gradient-to-br from-white/60 via-white/30 to-white/10 border border-white/20')
     ]"
   >
     <!-- اگر contactcard هست -->
@@ -130,34 +130,36 @@
         </div>
       </template>
 
-      <!-- حالت عادی بدون description -->
+      <!-- حالت عادی بدون description - مثل لینک‌های دیگر -->
       <template v-else>
-        <div class="flex flex-col items-center">
-          <div 
-            class="w-12 h-12 rounded-xl flex items-center justify-center mb-2 cursor-pointer hover:opacity-80 transition-opacity"
-            :style="{ 
-              backgroundColor: iconColor && iconColor !== 'transparent' ? iconColor : '#f3f4f6'
-            }"
-            @click="downloadVCard"
-            title="کلیک کنید برای ذخیره در مخاطبین"
-          >
-            <img
-              v-if="sanitizedLink?.customIcon"
-              :src="sanitizedLink.customIcon"
-              class="w-full h-full object-contain"
-              alt="custom icon"
-            />
-            <component
-              v-else
-              :is="iconComponent"
-              :size="24"
-              v-bind="iconColor && iconColor !== 'transparent' ? { color: iconColor, filled: isIconFilled } : {}"
-            />
-          </div>
-          <div class="font-bold text-sm sm:text-base text-gray-800 leading-snug"
-               :class="isDarkTheme ? 'text-white' : 'text-gray-800'">
-            {{ sanitizedLink.title || sanitizedLink.name || 'کارت تماس' }}
-          </div>
+        <div
+          class="w-16 h-16 rounded-xl flex items-center justify-center mb-2 cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
+          :style="{ 
+            backgroundColor: iconColor && iconColor !== 'transparent' ? iconColor : (isDarkTheme || isLightTheme ? 'transparent' : '#f3f4f6')
+          }"
+          @click="downloadVCard"
+          title="کلیک کنید برای ذخیره در مخاطبین"
+        >
+          <img
+            v-if="sanitizedLink?.customIcon"
+            :src="sanitizedLink.customIcon"
+            class="w-full h-full object-contain"
+            alt="custom icon"
+          />
+          <component
+            v-else
+            :is="iconComponent"
+            :size="24"
+            v-bind="iconColor && iconColor !== 'transparent' ? { color: iconColor, filled: isIconFilled } : {}"
+          />
+        </div>
+        <div
+          :class="[
+            'font-bold text-xs leading-snug text-center break-words w-full',
+            isDarkTheme ? 'text-white' : 'text-gray-800'
+          ]"
+        >
+          {{ sanitizedLink.title || sanitizedLink.name || 'کارت تماس' }}
         </div>
       </template>
     </template>
