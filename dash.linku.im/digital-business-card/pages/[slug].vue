@@ -1067,18 +1067,6 @@ import { nextTick } from 'vue'
 
 const enableBlueTick=ref(false)
 
-// متدهای باز/بسته کردن modal ها
-const toggleOptionsMenu = (event) => {
-  event?.stopPropagation()
-  showOptionsMenu.value = !showOptionsMenu.value
-}
-
-const openShareModal = (event) => {
-  event?.stopPropagation()
-  showShareModal.value = true
-  showOptionsMenu.value = false
-}
-
 const openReportModal = (event) => {
   event?.stopPropagation()
   showReportModal.value = true
