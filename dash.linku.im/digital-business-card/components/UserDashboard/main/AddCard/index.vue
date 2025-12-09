@@ -623,7 +623,7 @@ async function saveChanges() {
     
     console.log('Payload:', payload)
     
-    const response = await axios.post('/cards', payload)
+    const response = await axios.post('/v1/cards', payload)
     
     console.log('Response:', response)
     

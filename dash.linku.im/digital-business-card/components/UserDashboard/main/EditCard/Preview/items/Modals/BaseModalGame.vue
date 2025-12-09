@@ -157,15 +157,18 @@ function closeModal() {
         'bottom-0 left-0 right-0',
       ]"
       :style="{
-        touchAction: 'manipulation',
+        touchAction: 'none',
         WebkitOverflowScrolling: 'touch',
         overscrollBehavior: 'none',
         height: props.maxHeight,
         maxHeight: props.maxHeight
       }"
       @click.stop
+      @touchmove.stop
     >
-      <slot name="header" />
+      <div class="flex-shrink-0">
+        <slot name="header" />
+      </div>
       <div 
         class="flex-1 overflow-y-auto"
         :style="{
@@ -176,7 +179,9 @@ function closeModal() {
       >
         <slot />
       </div>
-      <slot name="footer" />
+      <div class="flex-shrink-0">
+        <slot name="footer" />
+      </div>
     </div>
   </transition>
 </template>
