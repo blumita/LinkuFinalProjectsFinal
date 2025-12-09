@@ -1040,10 +1040,10 @@ const isWhiteTheme = computed(() => {
 
 const backgroundWithOpacity = computed(() => {
   if (isDarkTheme.value) {
-    return '#f5f5f5' // پس‌زمینه خاکستری خیلی روشن برای تم مشکی (ایکون‌ها دیده بشن)
+    return '#000000' // رنگ مشکی اصلی - استثنا، کمرنگ نمی‌شود
   }
   if (isWhiteTheme.value) {
-    return '#f9f9f9' // پس‌زمینه خاکستری خیلی خیلی کمرنگ برای تم سفید
+    return '#ffffff' // رنگ سفید اصلی - استثنا، کمرنگ نمی‌شود
   }
   // برای رنگ‌های دیگه از رنگ کمرنگ‌شده استفاده کن
   return getLighterColor(iconColor.value, 0.95) // 95% روشن‌تر

@@ -85,7 +85,7 @@
       <template v-if="isListMode || sanitizedLink.description">
         <!-- آیکون -->
         <div
-          :class="'w-13 h-13 flex-shrink-0 rounded-xl flex items-center justify-center overflow-hidden cursor-pointer hover:opacity-80 transition-opacity'"
+          :class="'w-16 h-16 flex-shrink-0 rounded-xl flex items-center justify-center overflow-hidden cursor-pointer hover:opacity-80 transition-opacity'"
           :style="{ 
             backgroundColor: iconColor && iconColor !== 'transparent' ? iconColor : (isDarkTheme || isLightTheme ? 'transparent' : '#f3f4f6')
           }"
@@ -101,7 +101,7 @@
           <component
             v-else
             :is="iconComponent"
-            :size="20"
+            :size="24"
             v-bind="iconColor && iconColor !== 'transparent' ? { color: iconColor, filled: isIconFilled } : {}"
           />
         </div>

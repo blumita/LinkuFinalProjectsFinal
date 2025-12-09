@@ -209,7 +209,7 @@
                   {{ formData?.name }}
                   <span :class="formData?.layout === 'left' ? 'ml-2' : 'mr-2'">
 
-                  <i v-if="enableBlueTick" class="ti ti-rosette-discount-check text-blue-500"/>
+                  <i v-if="enableBlueTick" class="ti ti-rosette-discount-check-filled text-blue-500"/>
                 </span>
                 </div>
               </div>
@@ -734,6 +734,19 @@ const toggleOptionsMenu = (event) => {
   showOptionsMenu.value = !showOptionsMenu.value
 }
 
+// Close options menu when clicking outside
+const closeOptionsMenu = () => {
+  showOptionsMenu.value = false
+}
+
+onMounted(() => {
+  document.addEventListener('click', closeOptionsMenu)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeOptionsMenu)
+})
+
 // Computed properties for theme colors
 const isDarkTheme = computed(() => {
   const bg = formData?.themeColor?.background
@@ -763,10 +776,10 @@ const isWhiteTheme = computed(() => {
 
 const backgroundWithOpacity = computed(() => {
   if (isDarkTheme.value) {
-    return '#f5f5f5' // پس‌زمینه خاکستری خیلی روشن برای تم مشکی (ایکون‌ها دیده بشن)
+    return '#000000' // رنگ مشکی اصلی - استثنا، کمرنگ نمی‌شود
   }
   if (isWhiteTheme.value) {
-    return '#f9f9f9' // پس‌زمینه خاکستری خیلی خیلی کمرنگ برای تم سفید
+    return '#ffffff' // رنگ سفید اصلی - استثنا، کمرنگ نمی‌شود
   }
   // برای رنگ‌های دیگه از رنگ کمرنگ‌شده استفاده کن
   return getLighterColor(iconColor.value, 0.95) // 95% روشن‌تر
