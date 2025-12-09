@@ -101,7 +101,7 @@
                 :style="{ borderColor: iconColor }"
             >
               <button
-                  @click.stop="showShareModal = true; showOptionsMenu = false"
+                  @click.stop="handleShareClick"
                   type="button"
                   class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium"
                   :style="{ color: iconColor }"
@@ -110,7 +110,7 @@
                 اشتراک‌گذاری
               </button>
               <button
-                  @click.stop="showReportModal = true; showOptionsMenu = false"
+                  @click.stop="handleReportClick"
                   type="button"
                   class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium"
                   :style="{ color: iconColor }"
@@ -730,12 +730,34 @@ const reportType = ref('')
 const reportDescription = ref('')
 
 const toggleOptionsMenu = (event) => {
+  console.log('🔘 toggleOptionsMenu clicked', event)
+  console.log('📊 showOptionsMenu before:', showOptionsMenu.value)
   event?.stopPropagation()
   showOptionsMenu.value = !showOptionsMenu.value
+  console.log('📊 showOptionsMenu after:', showOptionsMenu.value)
+}
+
+// Handle share button click
+const handleShareClick = (event) => {
+  console.log('📤 Share button clicked', event)
+  event?.stopPropagation()
+  showShareModal.value = true
+  showOptionsMenu.value = false
+  console.log('📊 showShareModal:', showShareModal.value)
+}
+
+// Handle report button click
+const handleReportClick = (event) => {
+  console.log('🚩 Report button clicked', event)
+  event?.stopPropagation()
+  showReportModal.value = true
+  showOptionsMenu.value = false
+  console.log('📊 showReportModal:', showReportModal.value)
 }
 
 // Close options menu when clicking outside
-const closeOptionsMenu = () => {
+const closeOptionsMenu = (event) => {
+  console.log('❌ closeOptionsMenu called', event?.target)
   showOptionsMenu.value = false
 }
 

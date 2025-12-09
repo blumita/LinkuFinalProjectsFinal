@@ -42,7 +42,7 @@
                 }"
             >
               <button
-                  @click.stop="showShareModal = true; showOptionsMenu = false"
+                  @click.stop="handleShareClick"
                   type="button"
                   class="w-full text-right px-4 py-3 hover:opacity-90 flex items-center gap-3 transition-all duration-200 font-medium"
                   :style="{
@@ -53,7 +53,7 @@
                 اشتراک‌گذاری
               </button>
               <button
-                  @click.stop="showReportModal = true; showOptionsMenu = false"
+                  @click.stop="handleReportClick"
                   type="button"
                   class="w-full text-right px-4 py-3 hover:opacity-90 flex items-center gap-3 transition-all duration-200 font-medium"
                   :style="{
@@ -1009,6 +1009,24 @@ const showOptionsMenu = ref(false)
 const showShareModal = ref(false)
 const reportType = ref('')
 const reportDescription = ref('')
+
+// Handle share button click
+const handleShareClick = (event) => {
+  console.log('📤 Share button clicked in preview', event)
+  event?.stopPropagation()
+  showShareModal.value = true
+  showOptionsMenu.value = false
+  console.log('📊 showShareModal:', showShareModal.value)
+}
+
+// Handle report button click
+const handleReportClick = (event) => {
+  console.log('🚩 Report button clicked in preview', event)
+  event?.stopPropagation()
+  showReportModal.value = true
+  showOptionsMenu.value = false
+  console.log('📊 showReportModal:', showReportModal.value)
+}
 
 // Computed properties for theme colors
 const isDarkTheme = computed(() => {
