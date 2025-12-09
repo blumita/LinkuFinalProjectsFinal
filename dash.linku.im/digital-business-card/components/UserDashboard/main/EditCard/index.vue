@@ -174,19 +174,20 @@
               <p class="text-sm text-muted-foreground">فعال‌سازی فرم برای جمع‌آوری اطلاعات بازدیدکنندگان</p>
             </div>
             
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-4">
               <!-- دکمه ویرایش فرمساز (دسکتاپ و موبایل) -->
               <button
                 @click.prevent.stop="goToLeadCapture"
                 type="button"
-                class="px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                class="px-4 py-2.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl text-sm font-medium transition-colors flex items-center gap-2 whitespace-nowrap"
               >
                 <i class="ti ti-edit text-base"></i>
                 <span class="hidden sm:inline">ویرایش فرم</span>
+                <span class="sm:hidden">ویرایش</span>
               </button>
               
               <!-- سوئیچ فعال/غیرفعال -->
-              <label class="relative inline-flex items-center cursor-pointer">
+              <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
                 <input 
                   type="checkbox" 
                   v-model="form.isLeadCaptureEnabled"
