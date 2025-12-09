@@ -1067,13 +1067,6 @@ import { nextTick } from 'vue'
 
 const enableBlueTick=ref(false)
 
-// Report Modal State (removed duplicate useToast declaration - already declared at line 708)
-const showReportModal = ref(false)
-const showOptionsMenu = ref(false)
-const showShareModal = ref(false)
-const reportType = ref('')
-const reportDescription = ref('')
-
 // متدهای باز/بسته کردن modal ها
 const toggleOptionsMenu = (event) => {
   event?.stopPropagation()
