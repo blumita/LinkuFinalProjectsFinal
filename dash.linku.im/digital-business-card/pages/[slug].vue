@@ -94,30 +94,28 @@
             </button>
 
             <!-- منوی کشویی -->
-            <Teleport to="body">
-              <div
-                  v-if="showOptionsMenu"
-                  @click.stop
-                  class="fixed top-20 left-4 bg-white rounded-xl shadow-2xl py-2 min-w-[160px] z-[9999] border-2 border-gray-200"
+            <div
+                v-show="showOptionsMenu"
+                @click.stop
+                class="absolute top-12 ltr:right-0 rtl:left-0 bg-white rounded-xl shadow-2xl py-2 min-w-[160px] z-30 border-2 border-gray-200"
+            >
+              <button
+                  @click="handleShareClick"
+                  type="button"
+                  class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium text-gray-800"
               >
-                <button
-                    @click="handleShareClick"
-                    type="button"
-                    class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium text-gray-800"
-                >
-                  <i class="ti ti-share text-lg"></i>
-                  اشتراک‌گذاری
-                </button>
-                <button
-                    @click="handleReportClick"
-                    type="button"
-                    class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium text-gray-800"
-                >
-                  <i class="ti ti-flag text-lg"></i>
-                  گزارش محتوا
-                </button>
-              </div>
-            </Teleport>
+                <i class="ti ti-share text-lg"></i>
+                اشتراک‌گذاری
+              </button>
+              <button
+                  @click="handleReportClick"
+                  type="button"
+                  class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium text-gray-800"
+              >
+                <i class="ti ti-flag text-lg"></i>
+                گزارش محتوا
+              </button>
+            </div>
           </div>
 
           <!-- گرادینت برای فید کردن پایین عکس - فقط در حالت پورتریت -->
@@ -357,11 +355,10 @@
           >
             <template v-if="formData.saveContact">
               <button
-                  class="w-full py-3 rounded-full font-semibold text-center flex items-center justify-center gap-2 transition-all hover:opacity-90 border"
+                  class="w-full py-3 rounded-full font-semibold text-center flex items-center justify-center gap-2 transition-all hover:opacity-90"
                   :style="{
-                backgroundColor: !formData?.themeColor?.background || formData?.themeColor?.background === '#ffffff' || formData?.themeColor?.background === '#fff' ? '#ffffff' : iconBg,
-                color: !formData?.themeColor?.background || formData?.themeColor?.background === '#ffffff' || formData?.themeColor?.background === '#fff' ? '#000000' : (isLightColor(iconBg) ? '#000000' : '#ffffff'),
-                borderColor: !formData?.themeColor?.background || formData?.themeColor?.background === '#ffffff' || formData?.themeColor?.background === '#fff' ? '#e5e7eb' : 'transparent',
+                backgroundColor: !formData?.themeColor?.background || formData?.themeColor?.background === 'transparent' ? '#000000' : iconBg,
+                color: !formData?.themeColor?.background || formData?.themeColor?.background === 'transparent' ? '#ffffff' : (isLightColor(iconBg) ? '#000000' : '#ffffff'),
                 boxShadow: `0 2px 6px ${iconShadow}`
               }"
                   @click="downloadVCard"
@@ -782,8 +779,8 @@ const iconColor = computed(() => {
 const iconText = computed(() => {
   const bg = formData?.themeColor?.background
   
-  // اگر تم بدون رنگ (سفید یا خالی) باشه، متن مشکی
-  if (!bg || bg === '#ffffff' || bg === '#fff' || bg === 'white' || bg === 'rgb(255, 255, 255)' || bg === '#FFFFFF') {
+  // اگر تم transparent یا بدون رنگ باشه، متن مشکی
+  if (!bg || bg === 'transparent' || bg === '#ffffff' || bg === '#fff' || bg === 'white' || bg === 'rgb(255, 255, 255)' || bg === '#FFFFFF') {
     return '#000000'
   }
   
