@@ -113,8 +113,8 @@
                 class="wheel w-full h-full rounded-full relative overflow-hidden transition-transform shadow-2xl"
                 :style="{ 
                   transform: `rotate(${rotation}deg)`,
-                  border: `8px solid ${form.iconColor?.background || '#3B82F6'}`,
-                  boxShadow: `0 20px 50px rgba(0, 0, 0, 0.3), inset 0 0 20px ${adjustOpacity(form.iconColor?.background || '#3B82F6', 0.3)}`,
+                  border: `8px solid ${form.iconColor?.background && form.iconColor?.background !== 'transparent' ? form.iconColor?.background : '#3B82F6'}`,
+                  boxShadow: `0 20px 50px rgba(0, 0, 0, 0.3), inset 0 0 20px ${adjustOpacity((form.iconColor?.background && form.iconColor?.background !== 'transparent' ? form.iconColor?.background : '#3B82F6'), 0.3)}`,
                   transitionDuration: isSpinning ? '4s' : '0s',
                   transitionTimingFunction: 'cubic-bezier(0.17, 0.67, 0.12, 0.99)',
                   willChange: isSpinning ? 'transform' : 'auto',
@@ -157,7 +157,7 @@
                 <div 
                   class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full z-10 shadow-2xl flex items-center justify-center"
                   :style="{ 
-                    background: `linear-gradient(135deg, ${form.iconColor?.background || '#3B82F6'} 0%, ${adjustOpacity(form.iconColor?.background || '#3B82F6', 0.7)} 100%)`,
+                    background: `linear-gradient(135deg, ${form.iconColor?.background && form.iconColor?.background !== 'transparent' ? form.iconColor?.background : '#3B82F6'} 0%, ${adjustOpacity((form.iconColor?.background && form.iconColor?.background !== 'transparent' ? form.iconColor?.background : '#3B82F6'), 0.7)} 100%)`,
                     border: '4px solid #fff'
                   }"
                 >
@@ -196,7 +196,7 @@
               @click="authStep === 'authenticated' || link?.phoneRequired === false ? spinWheel() : startAuth()"
               :disabled="isSpinning || hasSpun"
               class="px-10 py-4 rounded-2xl font-bold text-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl hover:shadow-3xl transform hover:scale-105 active:scale-95 text-white relative overflow-hidden"
-              :style="{ background: `linear-gradient(135deg, ${form.iconColor?.background || '#3B82F6'} 0%, ${adjustOpacity(form.iconColor?.background || '#3B82F6', 0.8)} 100%)` }"
+              :style="{ background: `linear-gradient(135deg, ${form.iconColor?.background && form.iconColor?.background !== 'transparent' ? form.iconColor?.background : '#3B82F6'} 0%, ${adjustOpacity((form.iconColor?.background && form.iconColor?.background !== 'transparent' ? form.iconColor?.background : '#3B82F6'), 0.8)} 100%)` }"
             >
               <span class="relative z-10">
                 {{ isSpinning ? '🎰 در حال چرخش...' : (authStep === 'authenticated' || link?.phoneRequired === false ? '🎯 بچرخون!' : '🎮 شروع بازی') }}
@@ -779,15 +779,23 @@ export default defineComponent({
       const axios = $axios as AxiosInstance
       try {
         const response = await axios.get(`club/${props.link?.hash}/luckyWheel/check`)
-        emit('message',response.data.message || '')
+        // در حالت پیش‌نمایش، پیغام را نمایش نده
+        if (!props.isPreview) {
+          emit('message', response.data.message || '')
+        }
         return response.status === 200
       } catch (error: any) {
+        // در حالت پیش‌نمایش، به صورت پیش‌فرض اجازه بازی را بده
+        if (props.isPreview) {
+          return true
+        }
+        
         if (error.response?.status === 403) {
-          emit('message',error.response.data.message || '')
+          emit('message', error.response.data.message || '')
           return false
         }
-        // در صورت خطای غیرمنتظره (مثلاً قطع اینترنت)
-        emit('message','خطا در بررسی وضعیت بازی')
+        // در صورت خطای غیرمنتظره
+        emit('message', 'خطا در بررسی وضعیت بازی')
         return false
       }
     }
