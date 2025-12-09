@@ -299,7 +299,8 @@ export default defineComponent({
     isDarkTheme: { type: Boolean, default: false },
     isLightTheme: { type: Boolean, default: false },
     isBackgroundDark: { type: Boolean, default: false },
-    formData: { type: Object, required: false, default: () => ({}) }
+    formData: { type: Object, required: false, default: () => ({}) },
+    isPreview: { type: Boolean, default: false }
   },
 
   setup(props, { emit }) {
