@@ -61,10 +61,10 @@
         class="w-full h-screen flex flex-col overflow-hidden relative scrollbar-hide"
         :dir="formData?.layout === 'left' ? 'ltr' : 'rtl'"
     >
-      <!-- پس‌زمینه سفید ساده - بدون تم -->
+      <!-- پس‌زمینه با رنگ تم (مشکی=سفید، بقیه=8% opacity) -->
       <div
-          class="absolute inset-0 w-full h-full pointer-events-none bg-white"
-          style="z-index: 0;"
+          class="absolute inset-0 w-full h-full pointer-events-none"
+          :style="`background-color: ${backgroundWithOpacity}; z-index: 0;`"
       />
       
       <!-- محتوای اصلی -->
@@ -82,12 +82,13 @@
                 :style="`background-image: url('${formData.coverImage}')`"
             ></div>
           </template>
-          <!-- منوی سه نقطه در گوشه بالا - ساده بدون تم -->
+          <!-- منوی سه نقطه در گوشه بالا -->
           <div class="absolute top-4 ltr:right-4 rtl:left-4 z-20">
             <button
                 @click.stop="toggleOptionsMenu($event)"
                 type="button"
-                class="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-700 hover:bg-white transition-all duration-300 shadow-lg border border-gray-200/50"
+                class="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 shadow-lg border border-gray-200/50"
+                :style="{ color: iconColor }"
             >
               <i class="ti ti-dots-vertical text-lg"></i>
             </button>
@@ -96,12 +97,14 @@
             <div
                 v-show="showOptionsMenu"
                 @click.stop
-                class="absolute top-12 ltr:right-0 rtl:left-0 bg-white rounded-xl shadow-2xl py-2 min-w-[160px] z-30 border-2 border-gray-200"
+                class="absolute top-12 ltr:right-0 rtl:left-0 bg-white rounded-xl shadow-2xl py-2 min-w-[160px] z-30 border-2"
+                :style="{ borderColor: iconColor }"
             >
               <button
                   @click.stop="showShareModal = true; showOptionsMenu = false"
                   type="button"
-                  class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium text-gray-700"
+                  class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium"
+                  :style="{ color: iconColor }"
               >
                 <i class="ti ti-share text-lg"></i>
                 اشتراک‌گذاری
@@ -109,13 +112,25 @@
               <button
                   @click.stop="showReportModal = true; showOptionsMenu = false"
                   type="button"
-                  class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium text-gray-700"
+                  class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium"
+                  :style="{ color: iconColor }"
               >
                 <i class="ti ti-flag text-lg"></i>
                 گزارش محتوا
               </button>
             </div>
           </div>
+
+          <!-- گرادینت برای فید کردن پایین عکس - فقط در حالت پورتریت -->
+          <div
+              v-if="formData?.layout === 'portrait'"
+              class="absolute inset-0"
+              :style="{
+            background: `linear-gradient(to bottom,
+              transparent 60%,
+              ${getLighterColor(formData?.themeColor?.background ?? '#ffffff')} 100%)`
+          }"
+          />
 
           <!-- آواتار و لوگو - موقعیت بر اساس layout -->
           <div
@@ -719,6 +734,48 @@ const toggleOptionsMenu = (event) => {
   showOptionsMenu.value = !showOptionsMenu.value
 }
 
+// Computed properties for theme colors
+const isDarkTheme = computed(() => {
+  const bg = formData?.themeColor?.background
+  return bg === '#000000' || bg === '#000' || bg === 'rgb(0, 0, 0)'
+})
+
+const iconColor = computed(() => {
+  return formData?.themeColor?.background || '#3b82f6'
+})
+
+const iconText = computed(() => {
+  return isDarkTheme.value ? '#ffffff' : '#000000'
+})
+
+const iconBg = computed(() => {
+  if (isDarkTheme.value) {
+    return '#ffffff'
+  }
+  const color = iconColor.value
+  return color
+})
+
+const backgroundWithOpacity = computed(() => {
+  if (isDarkTheme.value) {
+    return '#ffffff' // پس‌زمینه سفید فقط برای تم مشکی
+  }
+  // برای رنگ‌های دیگه از رنگ کمرنگ‌شده استفاده کن
+  return getLighterColor(iconColor.value, 0.95) // 95% روشن‌تر
+})
+
+const getLighterColor = (color, amount = 0.95) => {
+  if (!color) return '#ffffff'
+  color = color.replace('#', '')
+  let r = parseInt(color.substring(0, 2), 16)
+  let g = parseInt(color.substring(2, 4), 16)
+  let b = parseInt(color.substring(4, 6), 16)
+  r = Math.round(r + (255 - r) * amount)
+  g = Math.round(g + (255 - g) * amount)
+  b = Math.round(b + (255 - b) * amount)
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
+}
+
 // SEO and Meta Configuration
 const isLoading = ref(true)
 const isCardActivated = ref(true) // پیش‌فرض فعال است
@@ -1266,16 +1323,6 @@ const randomBanner = computed(() => {
 
 // ایکون پیش‌فرض user
 const defaultUserIcon = '/icons/user.svg'
-
-const iconBg = computed(() => {
-  return !formData.iconColor?.background || formData.iconColor.background === 'transparent'
-      ? '#000000'
-      : formData.iconColor.background;
-});
-
-const iconText = computed(() => isDarkTheme.value ? '#ffffff' : '#000000');
-const iconColor = computed(() => isDarkTheme.value ? '#fff' : '#222');
-
 
 const iconShadow = computed(() => {
   const rgba = hexToRgba(iconBg.value, 0.4);

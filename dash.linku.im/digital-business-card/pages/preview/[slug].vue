@@ -1034,12 +1034,11 @@ const iconBg = computed(() => {
 })
 
 const backgroundWithOpacity = computed(() => {
-  const color = iconColor.value
   if (isDarkTheme.value) {
     return '#ffffff' // پس‌زمینه سفید برای تم مشکی
   }
-  // برای رنگ‌های دیگه با opacity 8%
-  return color + '14' // 14 در hex معادل 8% opacity است
+  // برای رنگ‌های دیگه از رنگ کمرنگ‌شده استفاده کن
+  return getLighterColor(iconColor.value, 0.95) // 95% روشن‌تر
 })
 
 const getLighterColor = (color, amount = 0.95) => {
@@ -1247,16 +1246,6 @@ const randomBanner = computed(() => {
 
 // ایکون پیش‌فرض user
 const defaultUserIcon = '/icons/user.svg'
-
-const iconBg = computed(() => {
-  return !formData.iconColor?.background || formData.iconColor.background === 'transparent'
-      ? '#000000'
-      : formData.iconColor.background;
-});
-
-const iconText = computed(() => isDarkTheme.value ? '#ffffff' : '#000000');
-const iconColor = computed(() => isDarkTheme.value ? '#fff' : '#222');
-
 
 const iconShadow = computed(() => {
   const rgba = hexToRgba(iconBg.value, 0.4);
