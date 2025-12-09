@@ -1067,9 +1067,7 @@ import { nextTick } from 'vue'
 
 const enableBlueTick=ref(false)
 
-const {success, error, info} = useToast();
-
-// Report Modal State
+// Report Modal State (removed duplicate useToast declaration - already declared at line 708)
 const showReportModal = ref(false)
 const showOptionsMenu = ref(false)
 const showShareModal = ref(false)
