@@ -61,10 +61,10 @@
         class="w-full h-screen flex flex-col overflow-hidden relative scrollbar-hide"
         :dir="formData?.layout === 'left' ? 'ltr' : 'rtl'"
     >
-      <!-- پس‌زمینه سفید -->
+      <!-- پس‌زمینه با رنگ تم -->
       <div
           class="absolute inset-0 w-full h-full pointer-events-none"
-          :style="`background-color: ${formData?.themeColor?.background || '#ffffff'}; z-index: 0; opacity: 0.03;`"
+          :style="`background-color: ${backgroundWithOpacity}; z-index: 0;`"
       />
       
       <!-- محتوای اصلی -->
@@ -85,32 +85,37 @@
           <!-- منوی سه نقطه در گوشه بالا -->
           <div class="absolute top-4 ltr:right-4 rtl:left-4 z-20">
             <button
-                @click="toggleOptionsMenu"
+                @click.stop="toggleOptionsMenu($event)"
                 type="button"
-                class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-all duration-300 border border-gray-200"
+                class="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 shadow-lg border border-gray-200/50"
+                :style="{ color: iconColor }"
             >
-              <i class="ti ti-dots-vertical text-sm"></i>
+              <i class="ti ti-dots-vertical text-lg"></i>
             </button>
 
             <!-- منوی کشویی -->
             <div
-                v-if="showOptionsMenu"
-                class="absolute top-12 ltr:right-0 rtl:left-0 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 min-w-[160px] z-30"
+                v-show="showOptionsMenu"
+                @click.stop
+                class="absolute top-12 ltr:right-0 rtl:left-0 bg-white rounded-xl shadow-2xl py-2 min-w-[160px] z-30 border-2"
+                :style="{ borderColor: iconColor }"
             >
               <button
-                  @click="openShareModal($event)"
+                  @click.stop="showShareModal = true; showOptionsMenu = false"
                   type="button"
-                  class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-all duration-200"
+                  class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium"
+                  :style="{ color: iconColor }"
               >
-                <i class="ti ti-share text-gray-600"></i>
+                <i class="ti ti-share text-lg"></i>
                 اشتراک‌گذاری
               </button>
               <button
-                  @click="openReportModal($event)"
+                  @click.stop="showReportModal = true; showOptionsMenu = false"
                   type="button"
-                  class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-all duration-200"
+                  class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium"
+                  :style="{ color: iconColor }"
               >
-                <i class="ti ti-flag text-gray-600"></i>
+                <i class="ti ti-flag text-lg"></i>
                 گزارش محتوا
               </button>
             </div>
@@ -724,8 +729,56 @@ const showReportModal = ref(false)
 const reportType = ref('')
 const reportDescription = ref('')
 
-const toggleOptionsMenu = () => {
+const toggleOptionsMenu = (event) => {
+  event?.stopPropagation()
   showOptionsMenu.value = !showOptionsMenu.value
+}
+
+// Computed properties for theme colors
+const isDarkTheme = computed(() => {
+  const bg = formData?.themeColor?.background
+  return bg === '#000000' || bg === '#000' || bg === 'rgb(0, 0, 0)'
+})
+
+const iconColor = computed(() => {
+  return formData?.themeColor?.background || '#3b82f6'
+})
+
+const iconText = computed(() => {
+  return isDarkTheme.value ? '#ffffff' : '#000000'
+})
+
+const iconBg = computed(() => {
+  if (isDarkTheme.value) {
+    return '#ffffff'
+  }
+  // برای رنگ‌های دیگه، همون رنگ ایکون با opacity کم
+  const color = iconColor.value
+  return color
+})
+
+const backgroundWithOpacity = computed(() => {
+  const color = iconColor.value
+  if (isDarkTheme.value) {
+    return '#ffffff' // پس‌زمینه سفید برای تم مشکی
+  }
+  // برای رنگ‌های دیگه با opacity 8%
+  return color + '14' // 14 در hex معادل 8% opacity است
+})
+
+const getLighterColor = (color, amount = 0.95) => {
+  if (!color) return '#ffffff'
+  // حذف # اگر وجود داشت
+  color = color.replace('#', '')
+  // تبدیل به RGB
+  let r = parseInt(color.substring(0, 2), 16)
+  let g = parseInt(color.substring(2, 4), 16)
+  let b = parseInt(color.substring(4, 6), 16)
+  // روشن کردن رنگ
+  r = Math.round(r + (255 - r) * amount)
+  g = Math.round(g + (255 - g) * amount)
+  b = Math.round(b + (255 - b) * amount)
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
 }
 
 // SEO and Meta Configuration

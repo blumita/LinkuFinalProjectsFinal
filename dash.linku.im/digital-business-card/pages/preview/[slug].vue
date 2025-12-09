@@ -10,10 +10,10 @@
         class="w-full h-screen flex flex-col overflow-hidden relative scrollbar-hide"
         :dir="formData?.layout === 'left' ? 'ltr' : 'rtl'"
     >
-      <!-- پس‌زمینه سفید -->
+      <!-- پس‌زمینه با رنگ تم -->
       <div
           class="absolute inset-0 w-full h-full pointer-events-none"
-          style="background-color: #ffffff; z-index: 0;"
+          :style="`background-color: ${backgroundWithOpacity}; z-index: 0;`"
       />
       
       <!-- هدر ثابت -->
@@ -1009,6 +1009,53 @@ const showOptionsMenu = ref(false)
 const showShareModal = ref(false)
 const reportType = ref('')
 const reportDescription = ref('')
+
+// Computed properties for theme colors
+const isDarkTheme = computed(() => {
+  const bg = formData?.themeColor?.background
+  return bg === '#000000' || bg === '#000' || bg === 'rgb(0, 0, 0)'
+})
+
+const iconColor = computed(() => {
+  return formData?.themeColor?.background || '#3b82f6'
+})
+
+const iconText = computed(() => {
+  return isDarkTheme.value ? '#ffffff' : '#000000'
+})
+
+const iconBg = computed(() => {
+  if (isDarkTheme.value) {
+    return '#ffffff'
+  }
+  // برای رنگ‌های دیگه، همون رنگ ایکون با opacity کم
+  const color = iconColor.value
+  return color
+})
+
+const backgroundWithOpacity = computed(() => {
+  const color = iconColor.value
+  if (isDarkTheme.value) {
+    return '#ffffff' // پس‌زمینه سفید برای تم مشکی
+  }
+  // برای رنگ‌های دیگه با opacity 8%
+  return color + '14' // 14 در hex معادل 8% opacity است
+})
+
+const getLighterColor = (color, amount = 0.95) => {
+  if (!color) return '#ffffff'
+  // حذف # اگر وجود داشت
+  color = color.replace('#', '')
+  // تبدیل به RGB
+  let r = parseInt(color.substring(0, 2), 16)
+  let g = parseInt(color.substring(2, 4), 16)
+  let b = parseInt(color.substring(4, 6), 16)
+  // روشن کردن رنگ
+  r = Math.round(r + (255 - r) * amount)
+  g = Math.round(g + (255 - g) * amount)
+  b = Math.round(b + (255 - b) * amount)
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
+}
 
 // Close options menu when clicking outside
 onMounted(async () => {
