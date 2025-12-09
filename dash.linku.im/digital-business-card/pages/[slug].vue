@@ -1346,56 +1346,6 @@ function hexToRgba(hex, alpha) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-// تبدیل رنگ به نسخه مناسب برای پس‌زمینه
-function getLighterColor(color) {
-  if (!color || color === 'transparent') return 'rgba(255, 255, 255, 0.05)';
-
-  let r, g, b;
-
-  // اگر رنگ hex باشد
-  if (color.startsWith('#')) {
-    const hex = color.slice(1);
-    r = parseInt(hex.slice(0, 2), 16);
-    g = parseInt(hex.slice(2, 4), 16);
-    b = parseInt(hex.slice(4, 6), 16);
-  }
-  // اگر رنگ rgb یا rgba باشد
-  else if (color.startsWith('rgb')) {
-    const rgbMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/);
-    if (rgbMatch) {
-      [, r, g, b] = rgbMatch.map(Number);
-    } else {
-      return 'rgba(255, 255, 255, 0.05)';
-    }
-  }
-  else {
-    return 'rgba(255, 255, 255, 0.05)';
-  }
-
-  // محاسبه brightness برای تشخیص رنگ تیره یا روشن
-  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-  
-  // اگر رنگ کاملاً مشکی است (#000000) یا بسیار تیره
-  if (color === '#000000' || brightness < 30) {
-    return `rgba(${r}, ${g}, ${b}, 0.92)`;
-  }
-  // اگر رنگ تیره است
-  else if (brightness < 100) {
-    return `rgba(${r}, ${g}, ${b}, 0.85)`;
-  }
-  // اگر رنگ متوسط است
-  else if (brightness < 150) {
-    return `rgba(${r}, ${g}, ${b}, 0.3)`;
-  }
-  // اگر رنگ روشن است، کمرنگ‌تر کن
-  else {
-    const lighterR = Math.min(255, r + Math.floor((255 - r) * 0.7));
-    const lighterG = Math.min(255, g + Math.floor((255 - g) * 0.7));
-    const lighterB = Math.min(255, b + Math.floor((255 - b) * 0.7));
-    return `rgba(${lighterR}, ${lighterG}, ${lighterB}, 0.8)`;
-  }
-}
-
 // تشخیص حالت list mode برای هر آیتم
 function getIsListMode(item) {
   const isPortrait = formData.layout === 'portrait'
