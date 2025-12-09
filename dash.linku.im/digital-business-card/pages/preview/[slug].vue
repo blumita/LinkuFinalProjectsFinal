@@ -35,19 +35,12 @@
             <div
                 v-show="showOptionsMenu"
                 @click.stop
-                class="absolute top-12 ltr:right-0 rtl:left-0 bg-white rounded-xl shadow-2xl border py-2 min-w-[160px] z-30"
-                :style="{
-                  borderColor: formData?.themeColor?.background || '#3b82f6',
-                  borderWidth: '2px'
-                }"
+                class="absolute top-12 ltr:right-0 rtl:left-0 bg-white rounded-xl shadow-2xl border-2 border-gray-200 py-2 min-w-[160px] z-30"
             >
               <button
                   @click.stop="handleShareClick"
                   type="button"
-                  class="w-full text-right px-4 py-3 hover:opacity-90 flex items-center gap-3 transition-all duration-200 font-medium"
-                  :style="{
-                    color: formData?.themeColor?.background || '#3b82f6'
-                  }"
+                  class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium text-gray-800"
               >
                 <i class="ti ti-share text-lg"></i>
                 اشتراک‌گذاری
@@ -55,10 +48,7 @@
               <button
                   @click.stop="handleReportClick"
                   type="button"
-                  class="w-full text-right px-4 py-3 hover:opacity-90 flex items-center gap-3 transition-all duration-200 font-medium"
-                  :style="{
-                    color: formData?.themeColor?.background || '#3b82f6'
-                  }"
+                  class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium text-gray-800"
               >
                 <i class="ti ti-flag text-lg"></i>
                 گزارش محتوا
@@ -1039,7 +1029,16 @@ const iconColor = computed(() => {
 })
 
 const iconText = computed(() => {
-  return isDarkTheme.value ? '#ffffff' : '#000000'
+  // برای تم‌های تیره (مثل مشکی، آبی تیره، سبز تیره) متن سفید باشه
+  if (isDarkTheme.value) {
+    return '#ffffff'
+  }
+  // برای تم‌های روشن (سفید، زرد، نارنجی روشن) متن مشکی باشه
+  if (isWhiteTheme.value || isLightColor(iconColor.value)) {
+    return '#000000'
+  }
+  // برای بقیه تم‌ها (رنگی متوسط) سفید باشه
+  return '#ffffff'
 })
 
 const iconBg = computed(() => {
@@ -1088,6 +1087,21 @@ const getLighterColor = (color, amount = 0.7) => {
   g = Math.round(g + (255 - g) * amount)
   b = Math.round(b + (255 - b) * amount)
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
+}
+
+// تشخیص رنگ‌های روشن (برای انتخاب رنگ متن)
+const isLightColor = (color) => {
+  if (!color) return false
+  // حذف # اگر وجود داشت
+  color = color.replace('#', '')
+  // تبدیل به RGB
+  const r = parseInt(color.substring(0, 2), 16)
+  const g = parseInt(color.substring(2, 4), 16)
+  const b = parseInt(color.substring(4, 6), 16)
+  // محاسبه luminance
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+  // اگر luminance بیشتر از 0.6 باشه، رنگ روشنه
+  return luminance > 0.6
 }
 
 // Close options menu when clicking outside
