@@ -340,28 +340,14 @@ class UserController
 
         $user = User::findOrFail($validated['userId']);
         
-        // Calculate new subscription end date
-        $currentEndDate = $user->subscription_end_date 
-            ? Carbon::parse($user->subscription_end_date)
-            : Carbon::now();
-        
-        // If current subscription is expired, start from now
-        if ($currentEndDate->isPast()) {
-            $currentEndDate = Carbon::now();
-        }
-        
-        $newEndDate = $currentEndDate->addMonths($validated['months']);
-        
-        // Update user subscription
-        $user->subscription_type = 'premium';
-        $user->subscription_end_date = $newEndDate;
-        $user->subscription_months = ($user->subscription_months ?? 0) + $validated['months'];
+        // Set user to premium (is_pro = 1)
+        $user->is_pro = 1;
         $user->save();
         
         return $this->ok('اشتراک با موفقیت ارتقا یافت', [
             'user' => new UserResource($user),
-            'new_end_date' => $newEndDate->toDateString(),
-            'added_months' => $validated['months']
+            'is_pro' => true,
+            'months' => $validated['months']
         ]);
     }
 
