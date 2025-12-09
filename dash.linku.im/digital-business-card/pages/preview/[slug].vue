@@ -1215,8 +1215,6 @@ onUnmounted(() => {
   window.removeEventListener('store-restored', handleStoreRestored)
 })
 
-
-const isDarkTheme = computed(() => formData.themeColor?.background === '#000000');
 const isLightTheme = computed(() => formData.themeColor?.background === '#ffffff' || formData.themeColor?.background === '#FFFFFF');
 
 // تشخیص تاریک بودن رنگ بر اساس luminance
