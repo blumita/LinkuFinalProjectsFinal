@@ -94,28 +94,30 @@
             </button>
 
             <!-- منوی کشویی -->
-            <div
-                v-show="showOptionsMenu"
-                @click.stop
-                class="absolute top-12 ltr:right-0 rtl:left-0 bg-white rounded-xl shadow-2xl py-2 min-w-[160px] z-30 border-2 border-gray-200"
-            >
-              <button
-                  @click.stop="handleShareClick"
-                  type="button"
-                  class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium text-gray-800"
+            <Teleport to="body">
+              <div
+                  v-if="showOptionsMenu"
+                  @click.stop
+                  class="fixed top-20 left-4 bg-white rounded-xl shadow-2xl py-2 min-w-[160px] z-[9999] border-2 border-gray-200"
               >
-                <i class="ti ti-share text-lg"></i>
-                اشتراک‌گذاری
-              </button>
-              <button
-                  @click.stop="handleReportClick"
-                  type="button"
-                  class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium text-gray-800"
-              >
-                <i class="ti ti-flag text-lg"></i>
-                گزارش محتوا
-              </button>
-            </div>
+                <button
+                    @click="handleShareClick"
+                    type="button"
+                    class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium text-gray-800"
+                >
+                  <i class="ti ti-share text-lg"></i>
+                  اشتراک‌گذاری
+                </button>
+                <button
+                    @click="handleReportClick"
+                    type="button"
+                    class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium text-gray-800"
+                >
+                  <i class="ti ti-flag text-lg"></i>
+                  گزارش محتوا
+                </button>
+              </div>
+            </Teleport>
           </div>
 
           <!-- گرادینت برای فید کردن پایین عکس - فقط در حالت پورتریت -->
@@ -355,10 +357,11 @@
           >
             <template v-if="formData.saveContact">
               <button
-                  class="w-full py-3 rounded-full font-semibold text-center flex items-center justify-center gap-2 transition-all hover:opacity-90"
+                  class="w-full py-3 rounded-full font-semibold text-center flex items-center justify-center gap-2 transition-all hover:opacity-90 border"
                   :style="{
-                backgroundColor: iconBg,
-                color: isLightColor(iconBg) ? '#000000' : '#ffffff',
+                backgroundColor: !formData?.themeColor?.background || formData?.themeColor?.background === '#ffffff' || formData?.themeColor?.background === '#fff' ? '#ffffff' : iconBg,
+                color: !formData?.themeColor?.background || formData?.themeColor?.background === '#ffffff' || formData?.themeColor?.background === '#fff' ? '#000000' : (isLightColor(iconBg) ? '#000000' : '#ffffff'),
+                borderColor: !formData?.themeColor?.background || formData?.themeColor?.background === '#ffffff' || formData?.themeColor?.background === '#fff' ? '#e5e7eb' : 'transparent',
                 boxShadow: `0 2px 6px ${iconShadow}`
               }"
                   @click="downloadVCard"
@@ -777,14 +780,23 @@ const iconColor = computed(() => {
 })
 
 const iconText = computed(() => {
+  const bg = formData?.themeColor?.background
+  
+  // اگر تم بدون رنگ (سفید یا خالی) باشه، متن مشکی
+  if (!bg || bg === '#ffffff' || bg === '#fff' || bg === 'white' || bg === 'rgb(255, 255, 255)' || bg === '#FFFFFF') {
+    return '#000000'
+  }
+  
   // برای تم‌های تیره (مثل مشکی، آبی تیره، سبز تیره) متن سفید باشه
   if (isDarkTheme.value) {
     return '#ffffff'
   }
-  // برای تم‌های روشن (سفید، زرد، نارنجی روشن) متن مشکی باشه
-  if (isWhiteTheme.value || isLightColor(iconColor.value)) {
+  
+  // برای تم‌های روشن (زرد، نارنجی روشن) متن مشکی باشه
+  if (isLightColor(iconColor.value)) {
     return '#000000'
   }
+  
   // برای بقیه تم‌ها (رنگی متوسط) سفید باشه
   return '#ffffff'
 })
