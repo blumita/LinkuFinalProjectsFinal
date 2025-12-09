@@ -7,14 +7,8 @@ export default defineNuxtPlugin(() => {
     const results: Record<string, string> = {}
     
     try {
-      // 1. دسترسی دوربین
-      try {
-        const cameraStream = await navigator.mediaDevices.getUserMedia({ video: true })
-        cameraStream.getTracks().forEach(track => track.stop())
-        results.camera = 'granted'
-      } catch (e) {
-        results.camera = 'denied'
-      }
+      // 1. دسترسی دوربین - حذف شد، فقط در QR Scanner درخواست می‌شود
+      // دوربین فقط در صفحه QR Scanner درخواست می‌شود تا از اختلال در تجربه کاربری جلوگیری شود
 
       // 2. دسترسی لوکیشن
       try {

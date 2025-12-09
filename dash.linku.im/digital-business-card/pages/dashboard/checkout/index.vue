@@ -670,6 +670,10 @@ const getIconColorClass = (index: number) => {
 
 // Initialize - load data in parallel without showing skeleton to avoid hydration issues
 onMounted(async () => {
+  console.log('💳 Checkout page mounted')
+  console.log('👤 Current user before fetch:', userStore.user)
+  console.log('👑 isPro before fetch:', userStore.user?.isPro)
+  
   try {
     // بارگذاری همزمان همه داده‌ها برای سرعت بیشتر
     await Promise.all([
@@ -678,6 +682,11 @@ onMounted(async () => {
       planStore.fetchPlans(),
       fetchFeatures()
     ])
+    
+    console.log('✅ Data loaded in checkout')
+    console.log('👤 User after fetch:', userStore.user)
+    console.log('👑 isPro after fetch:', userStore.user?.isPro)
+    console.log('📊 Subscription status:', currentSubscription.value)
   } catch (error) {
     console.error('Error loading checkout data:', error)
   }

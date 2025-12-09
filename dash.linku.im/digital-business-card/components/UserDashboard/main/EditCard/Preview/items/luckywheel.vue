@@ -298,12 +298,14 @@ export default defineComponent({
     isListMode: { type: Boolean, default: false },
     isDarkTheme: { type: Boolean, default: false },
     isLightTheme: { type: Boolean, default: false },
-    isBackgroundDark: { type: Boolean, default: false }
+    isBackgroundDark: { type: Boolean, default: false },
+    formData: { type: Object, required: false, default: () => ({}) }
   },
 
   setup(props, { emit }) {
     const form = useFormStore()
-    const formData = computed(() => form)
+    // استفاده از formData که از prop میاد، و اگر نبود از store
+    const formData = computed(() => props.formData && Object.keys(props.formData).length > 0 ? props.formData : form)
     const { sendOtpCode, verifyOtpCode } = useOtpService()
     const { $axios } = useNuxtApp()
     const axios = $axios as AxiosInstance

@@ -68,7 +68,7 @@
       />
       
       <!-- محتوای اصلی -->
-      <div class="relative z-10 flex-1 pb-8 overflow-auto scrollbar-hide">
+      <div class="relative z-10 flex-1 pb-8 overflow-auto scrollbar-hide" style="will-change: scroll-position; -webkit-overflow-scrolling: touch; transform: translateZ(0);">
         <!-- کاور -->
         <div
             :class="[
@@ -209,7 +209,7 @@
                   {{ formData?.name }}
                   <span :class="formData?.layout === 'left' ? 'ml-2' : 'mr-2'">
 
-                  <i v-if="enableBlueTick" class="ti ti-rosette-discount-check-filled text-blue-500"/>
+                  <i v-if="enableBlueTick" class="ti ti-rosette-discount-check-filled" :style="{ color: isDarkTheme ? '#ffffff' : isWhiteTheme ? '#000000' : iconColor }"/>
                 </span>
                 </div>
               </div>
@@ -251,7 +251,7 @@
               ]"
                   :style="{ color: iconText }"
               >
-                <i class="ti ti-briefcase text-sm" :style="{ color: iconColor }"/>
+                <i class="ti ti-briefcase text-sm" :style="{ color: iconText }"/>
                 {{ formData.job }}
               </div>
             </template>
@@ -278,7 +278,7 @@
               ]"
                   :style="{ color: iconText }"
               >
-                <i class="ti ti-building text-sm" :style="{ color: iconColor }"/>
+                <i class="ti ti-building text-sm" :style="{ color: iconText }"/>
                 {{ formData.company }}
               </div>
             </template>
@@ -305,7 +305,7 @@
               ]"
                   :style="{ color: iconText }"
               >
-                <i class="ti ti-map-pin text-sm" :style="{ color: iconColor }"/>
+                <i class="ti ti-map-pin text-sm" :style="{ color: iconText }"/>
                 {{ formData?.location }}
               </div>
             </template>
@@ -789,11 +789,11 @@ const backgroundWithOpacity = computed(() => {
   if (isWhiteTheme.value) {
     return '#ffffff' // رنگ سفید اصلی - استثنا، کمرنگ نمی‌شود
   }
-  // برای رنگ‌های دیگه از رنگ کمرنگ‌شده استفاده کن
-  return getLighterColor(iconColor.value, 0.95) // 95% روشن‌تر
+  // برای رنگ‌های دیگه از رنگ کمرنگ‌شده استفاده کن با 70% تا بیشتر با رنگ ایکون مچ بشه
+  return getLighterColor(iconColor.value, 0.7) // 70% روشن‌تر
 })
 
-const getLighterColor = (color, amount = 0.95) => {
+const getLighterColor = (color, amount = 0.7) => {
   if (!color) return '#ffffff'
   color = color.replace('#', '')
   let r = parseInt(color.substring(0, 2), 16)

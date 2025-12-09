@@ -133,7 +133,7 @@
       <!-- حالت عادی بدون description - مثل لینک‌های دیگر -->
       <template v-else>
         <div
-          class="w-16 h-16 rounded-xl flex items-center justify-center mb-2 cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
+          class="w-13 h-13 rounded-xl flex items-center justify-center mb-2 cursor-pointer hover:opacity-80 transition-opacity overflow-hidden"
           :style="{ 
             backgroundColor: iconColor && iconColor !== 'transparent' ? iconColor : (isDarkTheme || isLightTheme ? 'transparent' : '#f3f4f6')
           }"
@@ -149,7 +149,7 @@
           <component
             v-else
             :is="iconComponent"
-            :size="24"
+            :size="20"
             v-bind="iconColor && iconColor !== 'transparent' ? { color: iconColor, filled: isIconFilled } : {}"
           />
         </div>

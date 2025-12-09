@@ -247,14 +247,21 @@ const handleAddCardClick = () => {
 
 // بارگذاری اطلاعات کاربر
 onMounted(async () => {
+  console.log('📱 Dashboard mounted - Checking auth...')
+  console.log('🔑 Auth token exists:', !!authStore.token)
+  console.log('👤 User data exists:', !!userStore.user?.id)
+  
   // فقط اگر token توی store نیست، hydrate کن
   if (!authStore.token) {
     authStore.hydrateToken()
+    console.log('🔄 Token hydrated:', !!authStore.token)
   }
   
   if (authStore.isAuthenticated) {
     // نمایش داده‌های کش شده (اگر وجود داشته باشد) برای سرعت بیشتر
     if (userStore.user) {
+      console.log('📦 Using cached user data')
+      console.log('👑 Cached isPro:', userStore.user?.isPro)
       formStore.cards = userStore.cards
       loading.value = false
     }
@@ -262,20 +269,19 @@ onMounted(async () => {
     // همه درخواست‌ها به صورت موازی (Promise.all به جای await های پشت سر هم)
     Promise.all([
       userStore.fetchUser().then(() => {
+        console.log('✅ User fetched in dashboard')
+        console.log('👑 Dashboard isPro computed:', isPro.value)
+        console.log('📊 User object:', userStore.user)
         formStore.cards = userStore.cards
       }),
       fetchCounts(),
-      // درخواست دسترسی‌های PWA به صورت غیرهمزمان (بدون await)
-      (async () => {
-        const { $permissions } = useNuxtApp()
-        if ($permissions) {
-          $permissions.requestAfterLogin()
-        }
-      })()
+      // درخواست دسترسی‌های PWA حذف شد - دوربین فقط در QR Scanner درخواست می‌شود
+      // سایر دسترسی‌ها (نوتیفیکیشن، لوکیشن) در جاهای مربوطه درخواست می‌شوند
     ]).finally(() => {
       loading.value = false
     })
   } else {
+    console.log('❌ Not authenticated - redirecting')
     loading.value = false
   }
 })

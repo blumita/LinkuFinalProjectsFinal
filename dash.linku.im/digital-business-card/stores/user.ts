@@ -51,13 +51,23 @@ export const useUserStore = defineStore('userStore', {
 
                 const {data} = await axios.get('/user')
                 
+                // دیباگ: چک کنیم بکند isPro رو برمیگردونه یا نه
+                console.log('🔍 User data from backend:', data.data)
+                console.log('👑 isPro status:', data.data?.isPro)
+                console.log('📊 Full user object:', JSON.stringify(data.data, null, 2))
+                
                 this.user = data.data
                 this.cards = this.user?.cardsDataList || []
                 /*this.activeCard = this.cards.find((c:CardItem) => c.isDefault) || null*/
                 formStore.cards = this.cards
 
                 this.fetched = true
+                
+                // دیباگ: بعد از ست کردن هم چک کنیم
+                console.log('✅ User store updated. isPro:', this.user?.isPro)
+                console.log('✅ isUserPro getter:', this.isUserPro)
             } catch (error) {
+                console.error('❌ Error fetching user:', error)
                 const router = useRouter()
                 this.fetched = true
                 await router.push('/auth/login')

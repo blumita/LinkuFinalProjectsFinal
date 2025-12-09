@@ -232,7 +232,7 @@
               ]"
                   :style="{ color: iconText }"
               >
-                <i class="ti ti-building text-sm" :style="{ color: iconColor }"/>
+                <i class="ti ti-building text-sm" :style="{ color: iconText }"/>
                 {{ formData.company }}
               </div>
             </template>
@@ -259,7 +259,7 @@
               ]"
                   :style="{ color: iconText }"
               >
-                <i class="ti ti-map-pin text-sm" :style="{ color: iconColor }"/>
+                <i class="ti ti-map-pin text-sm" :style="{ color: iconText }"/>
                 {{ formData?.location }}
               </div>
             </template>
@@ -1053,11 +1053,11 @@ const backgroundWithOpacity = computed(() => {
   if (isWhiteTheme.value) {
     return '#ffffff' // رنگ سفید اصلی - استثنا، کمرنگ نمی‌شود
   }
-  // برای رنگ‌های دیگه از رنگ کمرنگ‌شده استفاده کن
-  return getLighterColor(iconColor.value, 0.95) // 95% روشن‌تر
+  // برای رنگ‌های دیگه از رنگ کمرنگ‌شده استفاده کن با 70% تا بیشتر با رنگ ایکون مچ بشه
+  return getLighterColor(iconColor.value, 0.7) // 70% روشن‌تر
 })
 
-const getLighterColor = (color, amount = 0.95) => {
+const getLighterColor = (color, amount = 0.7) => {
   if (!color) return '#ffffff'
   // حذف # اگر وجود داشت
   color = color.replace('#', '')

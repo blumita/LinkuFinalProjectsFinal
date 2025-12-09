@@ -430,7 +430,8 @@ watch(() => form.layout, (newLayout) => {
 
 // برگشت به داشبورد
 const goBack = () => {
-  safeNavigateTo('/dashboard')
+  // استفاده از safeGoBack برای برگشت به صفحه قبل
+  safeGoBack()
 }
 
 // وضعیت ذخیره
@@ -598,20 +599,33 @@ async function saveChanges() {
     const nuxtApp = useNuxtApp()
     const axios = nuxtApp.$axios
     
-    const payload = {
-      name: form.name,
-      bio: form.bio,
-      location: form.location,
-      profileImage: form.profileImage,
-      coverImage: form.coverImage,
-      logoImage: form.logoImage,
-      layout: form.layout,
-      themeColor: form.themeColor ? JSON.stringify(form.themeColor) : null,
-      iconColor: form.iconColor ? JSON.stringify(form.iconColor) : null,
-      links: form.links ? JSON.stringify(form.links) : null,
+    // فقط نام اجباریه
+    if (!form.name || form.name.trim() === '') {
+      showInfoToast('لطفاً نام را وارد کنید', 'ti-alert-triangle')
+      isSaving.value = false
+      return
     }
     
+    const payload = {
+      name: form.name,
+    }
+    
+    // فیلدهای اختیاری فقط اگر مقدار داشتن
+    if (form.bio) payload.bio = form.bio
+    if (form.location) payload.location = form.location
+    if (form.profileImage) payload.profileImage = form.profileImage
+    if (form.coverImage) payload.coverImage = form.coverImage
+    if (form.logoImage) payload.logoImage = form.logoImage
+    if (form.layout) payload.layout = form.layout
+    if (form.themeColor) payload.themeColor = JSON.stringify(form.themeColor)
+    if (form.iconColor) payload.iconColor = JSON.stringify(form.iconColor)
+    if (form.links && form.links.length > 0) payload.links = JSON.stringify(form.links)
+    
+    console.log('Payload:', payload)
+    
     const response = await axios.post('/card/store', payload)
+    
+    console.log('Response:', response)
     
     if (response.data.success) {
       showInfoToast('کارت با موفقیت ایجاد شد', 'ti-check')
@@ -619,11 +633,14 @@ async function saveChanges() {
         safeNavigateTo('/dashboard')
       }, 1500)
     } else {
+      console.error('Server returned error:', response.data)
       showInfoToast(response.data.message || 'خطا در ایجاد کارت', 'ti-alert-triangle')
     }
   } catch (error) {
     console.error('Error creating card:', error)
-    showInfoToast('خطا در ایجاد کارت', 'ti-alert-triangle')
+    console.error('Error response:', error.response?.data)
+    const errorMessage = error.response?.data?.message || error.message || 'خطا در ایجاد کارت'
+    showInfoToast(errorMessage, 'ti-alert-triangle')
   } finally {
     isSaving.value = false
   }
