@@ -55,6 +55,7 @@
         v-show="modelValue"
         :class="['fixed inset-0 bg-black/50', zIndex]"
         @click="handleBackdropClick"
+        style="touch-action: none;"
       >
         <Transition
           enter-active-class="transition-all duration-300 ease-out"
@@ -76,6 +77,7 @@
             ]"
             :style="bottomSheetStyle"
             @click.stop
+            @touchmove.stop
           >
             <div v-if="!closable" class="flex justify-center pt-2 pb-1 lg:hidden">
               <div class="w-10 h-1 bg-muted-foreground/30 rounded-full"></div>
