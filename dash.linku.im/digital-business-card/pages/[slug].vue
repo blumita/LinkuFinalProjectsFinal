@@ -700,6 +700,9 @@ import UiBottomSheet from '~/components/ui/BottomSheet.vue';
 import {useAsyncData, useNuxtApp} from "nuxt/app";
 import InfoToast from "~/components/UserDashboard/modals/InfoToast.vue";
 import SkeletonProfile from "~/components/ui/SkeletonProfile.vue";
+
+const { success, error, info } = useToast()
+
 const showToast = ref(false)
 const toastMessage = ref('')
 const toastIcon = ref('ti-alert-triangle') // یا 'ti-lock', 'ti-check', هر چی خواستی
@@ -710,6 +713,18 @@ const showInfoToast = (message, icon = 'ti-lock') => {
   showToast.value = true
   setTimeout(() => showToast.value = false, 3000) // بعد از ۳ ثانیه بسته می‌شه
 }
+
+// Share and Report Modal States
+const showOptionsMenu = ref(false)
+const showShareModal = ref(false)
+const showReportModal = ref(false)
+const reportType = ref('')
+const reportDescription = ref('')
+
+const toggleOptionsMenu = () => {
+  showOptionsMenu.value = !showOptionsMenu.value
+}
+
 // SEO and Meta Configuration
 const isLoading = ref(true)
 const isCardActivated = ref(true) // پیش‌فرض فعال است

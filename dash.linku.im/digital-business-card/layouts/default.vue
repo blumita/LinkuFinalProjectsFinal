@@ -267,6 +267,20 @@ const getPageConfig = (routePath: string) => {
       showAddCard: false,
       showCardSelect: false,
       showStateSelect: false
+    },
+
+    // صفحه پروفایل
+    '/profile': {
+      title: 'پروفایل',
+      showBack: true,
+      userName: userStore.user?.name,
+      showSearch: false,
+      showMore: false,
+      showNotifications: false,
+      showShare: false,
+      showAddCard: false,
+      showCardSelect: false,
+      showStateSelect: false
     }
   }
 
