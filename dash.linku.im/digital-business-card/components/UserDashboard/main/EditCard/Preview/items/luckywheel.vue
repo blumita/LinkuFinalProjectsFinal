@@ -389,6 +389,13 @@ export default defineComponent({
 
     // بررسی وضعیت کاربر از localStorage
     onMounted(() => {
+      // اگر شماره موبایل غیراجباری باشه، مستقیماً authenticated کن
+      if (props.link?.phoneRequired === false) {
+        authStep.value = 'authenticated'
+        phoneNumber.value = 'guest_' + Date.now()
+        return
+      }
+      
       const savedData = localStorage.getItem('luckywheel_user_data')
       if (savedData) {
         const userData = JSON.parse(savedData)

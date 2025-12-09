@@ -203,6 +203,7 @@
                 formData.layout === 'left' ? 'justify-start' :
                 'justify-start' // default
               ]"
+                  :style="{ color: iconText }"
               >
                 <i class="ti ti-briefcase text-sm" :style="{ color: iconColor }"/>
                 {{ formData.job }}
@@ -211,7 +212,7 @@
             <div
                 v-else
                 :class="[
-              'text-sm mt-4 text-black flex items-center gap-1',
+              'text-sm mt-4 flex items-center gap-1',
               formData.layout === 'center' ? 'justify-center' :
               formData.layout === 'portrait' ? 'justify-start' :
               formData.layout === 'left' ? 'justify-start' :
@@ -229,6 +230,7 @@
                 formData.layout === 'left' ? 'justify-start' :
                 'justify-start' // default
               ]"
+                  :style="{ color: iconText }"
               >
                 <i class="ti ti-building text-sm" :style="{ color: iconColor }"/>
                 {{ formData.company }}
@@ -237,7 +239,7 @@
             <div
                 v-else
                 :class="[
-              'text-sm text-black flex items-center gap-1',
+              'text-sm flex items-center gap-1',
               formData.layout === 'center' ? 'justify-center' :
               formData.layout === 'portrait' ? 'justify-start' :
               formData.layout === 'left' ? 'justify-start' :
@@ -255,6 +257,7 @@
                 formData.layout === 'left' ? 'justify-start' :
                 'justify-start' // default
               ]"
+                  :style="{ color: iconText }"
               >
                 <i class="ti ti-map-pin text-sm" :style="{ color: iconColor }"/>
                 {{ formData?.location }}
@@ -263,7 +266,7 @@
             <div
                 v-else
                 :class="[
-              'text-sm text-black flex items-center gap-1',
+              'text-sm flex items-center gap-1',
               formData.layout === 'center' ? 'justify-center' :
               formData.layout === 'portrait' ? 'justify-start' :
               formData.layout === 'left' ? 'justify-start' :
@@ -280,7 +283,7 @@
                 formData.layout === 'portrait' ? 'text-justify' :
                 'text-justify'
               ]"
-                  style="overflow: hidden; display: -webkit-box; -webkit-line-clamp: 10; -webkit-box-orient: vertical; line-clamp: 10; white-space: pre-line;"
+                  :style="`overflow: hidden; display: -webkit-box; -webkit-line-clamp: 10; -webkit-box-orient: vertical; line-clamp: 10; white-space: pre-line; color: ${iconText};`"
               >
                 {{ formData.bio }}
               </div>
@@ -288,7 +291,7 @@
             <template v-else>
               <div
                   :class="[
-                'text-xs text-black',
+                'text-xs',
                 formData.layout === 'center' ? 'text-center' :
                 formData.layout === 'portrait' ? 'text-justify' :
                 'text-justify'
