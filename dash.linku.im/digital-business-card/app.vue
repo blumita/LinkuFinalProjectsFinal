@@ -108,6 +108,7 @@ onMounted(() => {
 /* Force RTL */
 html {
   direction: rtl !important;
+  background-color: white !important;
 }
 
 /* Prevent zoom on input focus */
