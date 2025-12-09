@@ -381,7 +381,7 @@ export default defineComponent({
       const prizes = props.link?.prizes || ['پوچ', 'جایزه ویژه', 'جایزه طلایی', 'جایزه نقره‌ای', 'جایزه برنزی', 'جایزه ممتاز'];
       
       // رنگ‌های متناوب با opacity‌های مختلف از baseColor
-      return prizes.map((prize, index) => ({
+      return prizes.map((prize: string, index: number) => ({
         name: prize,
         color: adjustOpacity(baseColor, 0.3 + (index * 0.1))
       }));
@@ -779,7 +779,7 @@ export default defineComponent({
         const response = await axios.get(`club/${props.link?.hash}/luckyWheel/check`)
         emit('message',response.data.message || '')
         return response.status === 200
-      } catch (error) {
+      } catch (error: any) {
         if (error.response?.status === 403) {
           emit('message',error.response.data.message || '')
           return false

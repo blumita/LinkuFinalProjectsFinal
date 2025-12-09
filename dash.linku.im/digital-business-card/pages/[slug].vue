@@ -774,6 +774,14 @@ const isWhiteTheme = computed(() => {
   return bg === '#ffffff' || bg === '#fff' || bg === 'rgb(255, 255, 255)' || bg === '#FFFFFF'
 })
 
+const isLightTheme = computed(() => {
+  return isWhiteTheme.value
+})
+
+const isBackgroundDark = computed(() => {
+  return isDarkTheme.value
+})
+
 const backgroundWithOpacity = computed(() => {
   if (isDarkTheme.value) {
     return '#000000' // رنگ مشکی اصلی - استثنا، کمرنگ نمی‌شود
@@ -1312,8 +1320,6 @@ onUnmounted(() => {
   }
 })
 
-const isLightTheme = computed(() => formData.themeColor?.background === '#ffffff' || formData.themeColor?.background === '#FFFFFF');
-
 // تشخیص تاریک بودن رنگ بر اساس luminance
 function isColorDark(hex) {
   if (!hex || hex === 'transparent') return false;
@@ -1324,8 +1330,6 @@ function isColorDark(hex) {
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   return luminance < 0.5;
 }
-
-const isBackgroundDark = computed(() => isColorDark(formData.themeColor?.background));
 
 // انتخاب بنر تصادفی بر اساس رنگ ایکون
 const randomBanner = computed(() => {
@@ -1362,7 +1366,7 @@ function hexToRgba(hex, alpha) {
 // تشخیص حالت list mode برای هر آیتم
 function getIsListMode(item) {
   const isPortrait = formData.layout === 'portrait'
-  const isSpecialAction = ['poll', 'expandabletext', 'questionbox', 'textsection', 'workhours', 'map', 'file', 'embeddedvideo', 'image', 'video', 'audio', 'document'].includes(item.action)
+  const isSpecialAction = ['poll', 'expandabletext', 'questionbox', 'textsection', 'workhours', 'map', 'file', 'embeddedvideo', 'image', 'video', 'audio', 'document', 'luckywheel', 'luckydice', 'luckyegg'].includes(item.action)
   // فقط بر اساس فلگ showDescription تصمیم می‌گیریم، نه محتوای description
   const hasDescriptionEnabled = item.showDescription === true
   
