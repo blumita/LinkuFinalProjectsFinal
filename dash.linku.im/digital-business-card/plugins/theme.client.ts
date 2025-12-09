@@ -68,44 +68,17 @@ export default defineNuxtPlugin((nuxtApp) => {
     
     // تابع اعمال dark/light mode
     const applyTheme = (isDark: boolean) => {
-      if (isDark) {
-        document.documentElement.classList.add('dark')
-      } else {
-        document.documentElement.classList.remove('dark')
-      }
-      // آپدیت status bar
-      updateStatusBarColor(isDark)
+      // غیرفعال: همیشه لایت مود باشه، به تنظیمات سیستم توجه نکنیم
+      document.documentElement.classList.remove('dark')
+      // آپدیت status bar برای لایت مود
+      updateStatusBarColor(false)
     }
 
-    // اگر کاربر قبلاً mode انتخاب کرده، از اون استفاده کن
-    if (savedThemeMode && savedThemeMode !== 'system') {
-      applyTheme(savedThemeMode === 'dark')
-    } else {
-      // در غیر این صورت از تنظیمات سیستم استفاده کن (system mode)
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      applyTheme(prefersDark)
-      // اگر mode ذخیره نشده بود، system رو ذخیره می‌کنیم
-      if (!savedThemeMode) {
-        localStorage.setItem('theme-mode', 'system')
-      }
-    }
+    // همیشه لایت مود رو اعمال کن
+    applyTheme(false)
 
-    // گوش دادن به تغییرات سیستم (اگر کاربر تنظیمات سیستم رو عوض کنه)
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = (e: MediaQueryListEvent) => {
-      // فقط اگر کاربر دستی انتخاب نکرده باشه یا system mode باشه
-      const currentMode = localStorage.getItem('theme-mode')
-      if (!currentMode || currentMode === 'system') {
-        applyTheme(e.matches)
-      }
-    }
-
-    // پشتیبانی از addEventListener و addListener (برای مرورگرهای قدیمی)
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handleChange)
-    } else if (mediaQuery.addListener) {
-      mediaQuery.addListener(handleChange)
-    }
+    // غیرفعال: به تغییرات تنظیمات سیستم توجه نمی‌کنیم
+    // همیشه لایت مود باقی می‌مونه
     
     // MutationObserver برای زمانی که کلاس dark دستی تغییر می‌کنه (از صفحه تنظیمات)
     const observer = new MutationObserver((mutations) => {

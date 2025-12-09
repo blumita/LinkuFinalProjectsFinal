@@ -109,19 +109,8 @@ export default defineNuxtConfig({
                 document.documentElement.classList.add('theme-' + savedThemeColor);
                 
                 // اعمال dark/light mode
-                if (savedThemeMode === 'dark') {
-                  document.documentElement.classList.add('dark');
-                } else if (savedThemeMode === 'light') {
-                  document.documentElement.classList.remove('dark');
-                } else {
-                  // system mode
-                  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  if (prefersDark) {
-                    document.documentElement.classList.add('dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                  }
-                }
+                // غیرفعال: همیشه لایت مود باشه
+                document.documentElement.classList.remove('dark');
               } catch (e) {}
             })();
           `,
