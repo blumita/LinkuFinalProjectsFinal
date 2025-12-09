@@ -1,47 +1,52 @@
 <template>
   <div class="flex flex-col">
-    <!-- 🔹 تب‌ها و دکمه ذخیره -->
-    <div class="flex flex-col sm:flex-row gap-4 mb-6 p-2">
-      <!-- تب‌ها -->
-      <div class="grid grid-cols-2 gap-4 flex-1">
-        <template v-for="(group, groupIndex) in tabGroups" :key="groupIndex">
-          <div class="contents">
-            <button
-                v-for="tab in group.items"
-                :key="tab.id"
-                class="flex items-center gap-1.5 px-3 py-3 rounded-md transition-all text-sm w-full justify-center"
-                :class="{
-                'bg-black text-white shadow-sm': activeTab === tab.id,
-                'text-gray-700 hover:bg-gray-100 bg-white': activeTab !== tab.id,
-                'opacity-50 cursor-not-allowed': !canAccessTab(tab.id)
-              }"
-                :disabled="!canAccessTab(tab.id)"
-                @click="changeTab(tab.id)"
-            >
-              <i :class="tab.icon" class="text-base"/>
-              <span>{{ tab.label }}</span>
-            </button>
-          </div>
-        </template>
+    <!-- 🔹 هدر موبایل -->
+    <div class="fixed top-0 left-0 right-0 w-full bg-background/95 backdrop-blur-lg border-b border-border z-[100] block lg:hidden">
+      <div class="flex items-center justify-between w-full p-4">
+        <div class="flex items-center gap-3">
+          <button @click="goBack" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-accent transition-colors">
+            <i class="ti ti-arrow-right text-xl text-foreground"></i>
+          </button>
+          <h1 class="text-lg font-semibold text-foreground">ایجاد کارت جدید</h1>
+        </div>
       </div>
-
     </div>
 
     <!-- 🔹 محتوای اصلی -->
-    <div class="w-full grid grid-cols-1 lg:grid-cols-6 gap-4">
+    <div class="w-full grid grid-cols-1 lg:grid-cols-6 gap-4 lg:pt-6 pb-24 lg:pb-6">
       <!-- فرم و تنظیمات -->
-      <div class="lg:col-span-4">
+      <div class="lg:col-span-4 min-h-0 px-1 lg:px-0">
+        <!-- تب‌های About و Links -->
+        <div class="flex gap-3 mb-6">
+          <button
+            v-for="tab in tabGroups[0].items"
+            :key="tab.id"
+            @click="changeTab(tab.id)"
+            :disabled="!canAccessTab(tab.id)"
+            class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl transition-all text-sm font-medium"
+            :class="{
+              'bg-primary text-primary-foreground shadow-sm': activeTab === tab.id,
+              'bg-card text-foreground hover:bg-muted border border-border': activeTab !== tab.id,
+              'opacity-50 cursor-not-allowed': !canAccessTab(tab.id)
+            }"
+          >
+            <i :class="tab.icon" class="text-base"></i>
+            <span>{{ tab.label }}</span>
+          </button>
+        </div>
+
         <component
-            :is="currentTabComponent"
-            v-model:form="formStore"
-            :is-add-mode="true"
-            @update:settings="updateQrSettings"
-            @open-preview="showPreviewMobile = true"
-            @go-to-next-step="changeTab('links',$event)"
-            class="bg-white p-4 rounded-lg mb-16"
+          :is="currentTabComponent"
+          v-model:form="formStore"
+          :is-add-mode="true"
+          @update:settings="updateQrSettings"
+          @open-preview="showPreviewMobile = true"
+          @go-to-next-step="changeTab('links',$event)"
+          class="bg-card p-4 sm:p-6 rounded-xl border border-border"
         />
       </div>
 
+      
       <!-- پیش‌نمایش دسکتاپ -->
       <div class="lg:col-span-2 space-y-4 sticky z-0 top-16 h-fit w-full hidden lg:block">
         <div class="flex justify-center">
@@ -58,19 +63,15 @@
 
               <!-- محتوای preview با iframe واقعی -->
               <div class="absolute inset-2 rounded-[32px] overflow-hidden bg-white">
-                <!-- Loading spinner -->
-
-
-                <!-- iframe واقعی -->
                 <ClientOnly>
                   <iframe
-                      ref="iframeRef"
-                      :key="`iframe-${iframeKey}`"
-                      :src="previewUrl"
-                      class="w-full h-full border-0 rounded-[28px] overflow-hidden"
-                      sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
-                      loading="lazy"
-                      @load="onIframeLoad"
+                    ref="iframeRef"
+                    :key="`iframe-${iframeKey}`"
+                    :src="previewUrl"
+                    class="w-full h-full border-0 rounded-[28px] overflow-hidden"
+                    sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
+                    loading="lazy"
+                    @load="onIframeLoad"
                   />
                   <template #fallback>
                     <div class="w-full h-full bg-gray-100 rounded-[28px] flex items-center justify-center">
@@ -87,55 +88,54 @@
 
     <!-- 🔹 پیش‌نمایش موبایل -->
     <transition
-        enter-active-class="transform transition ease-in-out duration-300"
-        enter-from-class="translate-y-full"
-        enter-to-class="translate-y-0"
-        leave-active-class="transform transition ease-in-out duration-300"
-        leave-from-class="translate-y-0"
-        leave-to-class="translate-y-full"
+      enter-active-class="transform transition ease-in-out duration-300"
+      enter-from-class="translate-y-full"
+      enter-to-class="translate-y-0"
+      leave-active-class="transform transition ease-in-out duration-300"
+      leave-from-class="translate-y-0"
+      leave-to-class="translate-y-full"
     >
       <div
-          v-if="showPreviewMobile"
-          class="fixed inset-0 z-50 flex items-end lg:hidden"
-          @click.self="showPreviewMobile = false"
+        v-if="showPreviewMobile"
+        class="fixed inset-0 z-50 flex items-end lg:hidden"
+        @click.self="showPreviewMobile = false"
       >
-        <div class="bg-white w-full h-full rounded-t-2xl p-4 overflow-y-auto shadow-xl flex flex-col">
+        <div class="bg-card w-full h-full rounded-t-2xl p-4 overflow-y-auto shadow-xl flex flex-col border-t border-border">
           <div class="flex justify-between items-center mb-4 flex-shrink-0">
-            <h2 class="text-base font-semibold">پیش‌نمایش</h2>
+            <h2 class="text-base font-semibold text-foreground">پیش‌نمایش</h2>
             <button
-                @click="showPreviewMobile = false"
-                class="text-gray-400 hover:text-black"
+              @click="showPreviewMobile = false"
+              class="text-muted-foreground hover:text-foreground transition-colors"
             >
-              <i class="ti ti-x"/>
+              <i class="ti ti-x text-xl"></i>
             </button>
           </div>
 
-          <div class="w-full" style="height: calc(100vh - 120px);">
-            <div class="w-full h-full relative overflow-hidden rounded-lg">
-              <!-- Loading spinner برای موبایل -->
+          <div class="w-full flex-1" style="min-height: 600px;">
+            <div class="w-full h-full relative overflow-hidden rounded-xl border border-border">
               <div
-                  v-if="isIframeLoading"
-                  class="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-lg z-10"
+                v-if="isIframeLoading"
+                class="absolute inset-0 flex items-center justify-center bg-muted rounded-xl z-10"
               >
                 <div class="flex flex-col items-center space-y-2">
-                  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                  <span class="text-sm text-gray-600">در حال بارگذاری...</span>
+                  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <span class="text-sm text-muted-foreground">در حال بارگذاری...</span>
                 </div>
               </div>
 
               <ClientOnly>
                 <iframe
-                    ref="iframeRef"
-                    :key="`iframe-mobile-${iframeKey}`"
-                    :src="previewUrl"
-                    class="w-full h-full border-0 rounded-lg overflow-hidden"
-                    sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
-                    loading="lazy"
-                    @load="onIframeLoad"
+                  ref="iframeRef"
+                  :key="`iframe-mobile-${iframeKey}`"
+                  :src="previewUrl"
+                  class="w-full h-full border-0 rounded-xl overflow-hidden"
+                  sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
+                  loading="lazy"
+                  @load="onIframeLoad"
                 />
                 <template #fallback>
-                  <div class="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
-                    <div class="text-gray-500">در حال بارگذاری...</div>
+                  <div class="w-full h-full bg-muted rounded-xl flex items-center justify-center">
+                    <div class="text-muted-foreground">در حال بارگذاری...</div>
                   </div>
                 </template>
               </ClientOnly>
@@ -151,9 +151,13 @@
 <script setup>
 import {ref, computed, watch, onMounted, onUnmounted} from 'vue'
 import {useFormStore} from '~/stores/form'
+import {useSafeNavigation} from '~/composables/useSafeNavigation'
 import TabAbout from './tabs/TabAbout.vue'
 import TabLinks from './tabs/TabLinks.vue'
 import InfoToast from "~/components/UserDashboard/modals/InfoToast.vue";
+
+const { safeNavigateTo } = useSafeNavigation()
+
 // استفاده از form store
 const formStore = useFormStore()
 const showToast = ref(false)
@@ -165,6 +169,12 @@ const showInfoToast = (message, icon = 'ti-lock') => {
   showToast.value = true
   setTimeout(() => showToast.value = false, 3000) // بعد از ۳ ثانیه بسته می‌شه
 }
+
+// برگشت به داشبورد
+const goBack = () => {
+  safeNavigateTo('/dashboard')
+}
+
 // تب فعال - شروع با About
 const activeTab = ref('about')
 
