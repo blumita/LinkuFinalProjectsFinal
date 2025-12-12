@@ -320,7 +320,38 @@ class CardController extends Controller
                 ], 200);
             }
 
+            // آخرین تلاش: شاید slug در انتهای qr_link باشد (مثل linku.im/profile/xxx/MD)
+            $cardVisitBySlugEnd = \App\Models\CardVisit::where('qr_link', 'LIKE', '%/profile/' . $slug . '/%')
+                ->orWhere('qr_link', 'LIKE', '%/' . $slug)
+                ->first();
+            
+            if ($cardVisitBySlugEnd) {
+                return $this->ok('کارت یافت شد', [
+                    'isActivated' => false,
+                    'cardVisitId' => $cardVisitBySlugEnd->id,
+                    'ownerName' => $cardVisitBySlugEnd->owner_name,
+                    'cardType' => $cardVisitBySlugEnd->card_type,
+                    'status' => $cardVisitBySlugEnd->status ?? 'pending',
+                    'message' => 'این کارت هنوز فعال‌سازی نشده است'
+                ], 200);
+            }
+
             return $this->fail('کارت یافت نشد.', 404);
+        }
+
+        // اگر کارت پیدا شد ولی پروفایل خالی است (کارت فیزیکی جدید)
+        // بررسی می‌کنیم که آیا کاربر پروفایل رو پر کرده یا نه
+        $hasProfile = $card->user_name || $card->bio || $card->job || $card->company;
+        if (!$hasProfile && $card->user_id === 1) {
+            // کارت به ادمین پیش‌فرض وصله و پروفایل خالیه = غیرفعال
+            return $this->ok('کارت یافت شد', [
+                'isActivated' => false,
+                'cardId' => $card->id,
+                'slug' => $card->slug,
+                'cardName' => $card->card_name,
+                'status' => 'pending',
+                'message' => 'این کارت هنوز توسط صاحب آن فعال‌سازی نشده است'
+            ], 200);
         }
 
         return $this->ok('کارت یافت شد', new CardResource($card), 200);
