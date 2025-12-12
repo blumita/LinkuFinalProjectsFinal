@@ -799,16 +799,16 @@ watch(isBottomSheetOpen, (newValue) => {
               <div class="flex items-center justify-between mb-0.5">
                 <div class="flex items-center gap-1.5">
                   <h3 class="text-sm font-semibold text-primary">
-                    {{ userName }}
+                    {{ profile.name || profile.userName || 'بدون نام' }}
                   </h3>
-                  <!-- تیک آبی فقط برای کاربر Pro -->
+                  <!-- تیک آبی فقط برای کاربر Pro و پروفایل پیش‌فرض -->
                   <i 
-                    v-if="isPro"
+                    v-if="isPro && profile.isDefault"
                     class="ti ti-rosette-discount-check-filled text-primary text-lg"
                   />
                 </div>
                 <span 
-                  v-if="selectedSharingProfile?.id === profile.id"
+                  v-if="profile.isDefault"
                   class="text-xs bg-secondary text-primary border border-border px-2 py-0.5 rounded-full font-medium flex items-center gap-1"
                 >
                   <i class="ti ti-check text-xs"></i>
@@ -818,8 +818,8 @@ watch(isBottomSheetOpen, (newValue) => {
               
               <!-- Additional Info -->
               <div class="flex flex-wrap items-center gap-1.5 text-xs text-foreground">
-                <span v-if="userUserName" class="font-medium">
-                  @{{ userUserName }}
+                <span v-if="profile.slug" class="font-medium">
+                  @{{ profile.slug }}
                 </span>
               </div>
             </div>

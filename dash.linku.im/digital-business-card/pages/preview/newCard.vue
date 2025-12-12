@@ -300,31 +300,17 @@
             'px-6'
           ]"
           >
-            <template v-if="formData?.saveContact">
-              <button
-                  class="w-full py-3 rounded-full font-semibold text-center flex items-center justify-center gap-2"
-                  :style="{
-                backgroundColor: iconBg,
-                color: iconBg === '#ffffff' || iconBg === '#FFFFFF' ? '#000000' : '#ffffff',
-                boxShadow: `0 2px 6px ${iconShadow}`
-              }"
-                  @click="downloadVCard"
-              >
-
-                <i class="ti ti-download"/>
-                {{ formData?.saveContact }}
-              </button>
-            </template>
             <button
-                v-else
-                disabled
-                class="w-full py-3 rounded-full text-center font-bold text-gray-400 bg-gray-200 flex items-center justify-center gap-2 cursor-not-allowed"
+                class="w-full py-3 rounded-full font-semibold text-center flex items-center justify-center gap-2"
+                :style="{
+              backgroundColor: iconBg,
+              color: iconBg === '#ffffff' || iconBg === '#FFFFFF' ? '#000000' : '#ffffff',
+              boxShadow: `0 2px 6px ${iconShadow}`
+            }"
+                @click="downloadVCard"
             >
-              <!-- آیکون placeholder -->
-              <div class="w-5 h-5 bg-gray-300 rounded-full animate-pulse"></div>
-
-              <!-- متن placeholder -->
-              <div class="h-4 w-32 bg-gray-300 rounded animate-pulse"></div>
+              <i class="ti ti-download"/>
+              {{ formData?.saveContact || 'ذخیره مخاطب' }}
             </button>
           </div>
 
@@ -708,6 +694,7 @@ const handleReportClick = (event) => {
 // Computed properties for theme colors
 const isDarkTheme = computed(() => {
   const bg = formData?.themeColor?.background
+  if (!bg) return false // پیش‌فرض: روشن
   return bg === '#000000' || bg === '#000' || bg === 'rgb(0, 0, 0)'
 })
 
@@ -715,13 +702,23 @@ const iconColor = computed(() => {
   return formData?.themeColor?.background || '#3b82f6'
 })
 
+const isWhiteTheme = computed(() => {
+  const bg = formData?.themeColor?.background
+  // اگر رنگی تنظیم نشده، پیش‌فرض سفید هست
+  if (!bg) return true
+  return bg === '#ffffff' || bg === '#fff' || bg === 'rgb(255, 255, 255)' || bg === '#FFFFFF'
+})
+
 const iconText = computed(() => {
+  // برای تم تاریک (مشکی) متن سفید
   if (isDarkTheme.value) {
     return '#ffffff'
   }
-  if (isWhiteTheme.value || isLightColor(iconColor.value)) {
+  // برای تم سفید یا بدون رنگ (پیش‌فرض) یا رنگ‌های روشن، متن مشکی
+  if (isWhiteTheme.value || !formData?.themeColor?.background || isLightColor(formData?.themeColor?.background)) {
     return '#000000'
   }
+  // برای رنگ‌های تیره، متن سفید
   return '#ffffff'
 })
 
@@ -729,13 +726,8 @@ const iconBg = computed(() => {
   if (isDarkTheme.value) {
     return '#ffffff'
   }
-  const color = iconColor.value
-  return color
-})
-
-const isWhiteTheme = computed(() => {
-  const bg = formData?.themeColor?.background
-  return bg === '#ffffff' || bg === '#fff' || bg === 'rgb(255, 255, 255)' || bg === '#FFFFFF'
+  // اگر رنگی نیست، آبی پیش‌فرض
+  return formData?.themeColor?.background || '#3b82f6'
 })
 
 const isLightTheme = computed(() => {
@@ -750,7 +742,8 @@ const backgroundWithOpacity = computed(() => {
   if (isDarkTheme.value) {
     return '#000000'
   }
-  if (isWhiteTheme.value) {
+  // اگر رنگی تنظیم نشده یا سفید هست، سفید برگردون
+  if (isWhiteTheme.value || !formData?.themeColor?.background) {
     return '#ffffff'
   }
   return getLighterColor(iconColor.value, 0.7)
