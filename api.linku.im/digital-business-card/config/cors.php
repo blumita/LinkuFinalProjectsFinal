@@ -15,9 +15,7 @@ return [
     |
     */
 
-    'paths' => env('APP_ENV') === 'local' 
-        ? []  // در محیط local از index.php استفاده میشه
-        : ['api/*', 'v1/*', 'sanctum/csrf-cookie', 'login', 'logout', 'user/*'],
+    'paths' => ['api/*', 'v1/*', 'sanctum/csrf-cookie', 'login', 'logout', 'user/*', 'cards/*'],
 
     'allowed_methods' => ['*'],
 
