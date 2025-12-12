@@ -343,6 +343,17 @@ class CardController extends Controller
         ]);
 
         try {
+            // گرفتن اطلاعات محصول برای کد محصول
+            $productUnit = \App\Models\ProductUnit::with('product')->find($validated['product_unit_id']);
+            if (!$productUnit || !$productUnit->product) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'محصول یافت نشد'
+                ], 404);
+            }
+            
+            $productCode = $productUnit->product->code; // SD, MC, SC
+            
             $maxCardNumber = Card::max('card_number');
             $nextCardNumber = $maxCardNumber ? $maxCardNumber + 1 : 1;
             
@@ -353,11 +364,11 @@ class CardController extends Controller
                 'card_number' => $nextCardNumber,
                 'theme_color' => '#ffffff',
                 'icon_color' => '#000000',
-                'is_active' => true,
+                'is_active' => true, // کارت فیزیکی قابل نمایش است، فقط باید کاربر پروفایل رو پر کنه
             ]);
 
-            // ایجاد CardVisit برای نمایش در لیست ادمین
-            $cardUrl = 'https://linku.im/' . $card->slug . '/model-1';
+            // ایجاد CardVisit برای نمایش در لیست ادمین با فرمت صحیح
+            $cardUrl = 'https://linku.im/profile/' . $card->slug . '/' . $productCode;
             \App\Models\CardVisit::create([
                 'qr_link' => $cardUrl,
                 'owner_name' => $validated['card_name'],
