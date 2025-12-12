@@ -113,7 +113,6 @@
                 v-model="manualForm.license" 
                 type="text" 
                 required 
-                pattern="[a-zA-Z0-9_-]+"
                 placeholder="مثال: byli6oxl" 
                 class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 transition-colors font-mono" 
               />
