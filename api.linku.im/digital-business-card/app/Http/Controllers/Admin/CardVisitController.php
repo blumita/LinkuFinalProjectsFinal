@@ -97,6 +97,7 @@ class CardVisitController extends Controller
             $nextCardNumber = $maxCardNumber ? $maxCardNumber + 1 : 1;
             
             $card = \App\Models\Card::create([
+                'user_id' => auth()->id() ?? 1,
                 'slug' => $validated['slug'],
                 'card_name' => $validated['card_name'],
                 'card_number' => $nextCardNumber,
