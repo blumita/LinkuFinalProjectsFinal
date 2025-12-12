@@ -61,11 +61,11 @@ class CardService
     {
 
         $card->user()->create([
-            'name' => $data['name'],
-            'location' => $data['location'],
-            'job' => $data['job'],
-            'company' => $data['company'],
-            'bio' => $data['bio']
+            'name' => $data['name'] ?? null,
+            'location' => $data['location'] ?? null,
+            'job' => $data['job'] ?? null,
+            'company' => $data['company'] ?? null,
+            'bio' => $data['bio'] ?? null
         ]);
     }
 
