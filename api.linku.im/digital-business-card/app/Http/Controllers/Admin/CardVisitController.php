@@ -118,7 +118,10 @@ class CardVisitController extends Controller
             \Log::error('Manual card creation error: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString()
             ]);
-            return $this->error('خطا در ایجاد لایسنس: ' . $e->getMessage(), [], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در ایجاد لایسنس: ' . $e->getMessage()
+            ], 500);
         }
     }
 }
