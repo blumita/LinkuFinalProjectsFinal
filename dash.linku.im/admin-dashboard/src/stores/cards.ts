@@ -161,6 +161,25 @@ export const useCardsStore = defineStore('card', () => {
         }
     }
 
+    // ➕ ایجاد کارت خودکار (slug تصادفی)
+    const createAutoCard = async (payload: { product_unit_id: string }) => {
+        try {
+            const res = await axios.post('v1/cards/auto', payload)
+            if (res.data?.success !== false && res.status === 201) {
+                await fetchCards()
+                return { success: true, data: res.data.data }
+            }
+            return { success: false, message: res.data?.message || 'خطا در ایجاد کارت' }
+        } catch (err: any) {
+            console.error('❌ خطا در ایجاد کارت خودکار:', err)
+            let errorMessage = 'خطا در ایجاد کارت'
+            if (err.response?.data?.message) {
+                errorMessage = err.response.data.message
+            }
+            return { success: false, message: errorMessage }
+        }
+    }
+
     // ✅ فیلترها و computed
     const activeCards = () => cards.value.filter(c => c.status === 'active')
     const inactiveCards = () => cards.value.filter(c => c.status === 'inactive')
@@ -190,5 +209,6 @@ export const useCardsStore = defineStore('card', () => {
         updateCard,
         createCard,
         createManualCard,
+        createAutoCard,
     }
 })

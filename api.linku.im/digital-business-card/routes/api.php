@@ -160,6 +160,9 @@ Route::middleware(['auth:sanctum','log.activity'])
         Route::post('/createDefaultCard', [CardController::class, 'createDefaultCard'])
             ->name('cards.createDefaultCard');
 
+        Route::post('/auto', [CardController::class, 'createAuto'])
+            ->name('cards.createAuto');
+
         Route::post('/manual', [CardController::class, 'createManual'])
             ->name('cards.createManual');
 

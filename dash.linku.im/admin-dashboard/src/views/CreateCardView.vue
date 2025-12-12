@@ -217,12 +217,10 @@ const createCard = async () => {
     isCreating.value = true
     formError.value = ''
     try {
-      const selectedProduct = products.value.find((p: any) => String(p.id) === String(cardForm.value.productUnitId))
-      const response = await cardStore.createCard({
-        card_name: selectedProduct?.name || 'کارت جدید',
+      const response = await cardStore.createAutoCard({
         product_unit_id: cardForm.value.productUnitId
       })
-      if (response.success || response) {
+      if (response.success) {
         await showSuccess('موفق!', 'کارت با موفقیت ایجاد شد')
         await router.push({ name: 'cards' })
       } else {

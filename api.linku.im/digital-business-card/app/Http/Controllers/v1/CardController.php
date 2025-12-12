@@ -327,6 +327,81 @@ class CardController extends Controller
     }
 
     /**
+     * ایجاد کارت خودکار با slug تصادفی (فقط ادمین)
+     */
+    public function createAuto(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'product_unit_id' => 'required|integer',
+        ], [
+            'product_unit_id.required' => 'محصول الزامی است',
+        ]);
+
+        try {
+            // گرفتن اطلاعات محصول
+            $cardProduct = \App\Models\CardProduct::find($validated['product_unit_id']);
+            if (!$cardProduct) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'محصول یافت نشد'
+                ], 404);
+            }
+
+            $productCode = $cardProduct->code;
+            $productName = $cardProduct->name;
+
+            // تولید slug تصادفی یکتا
+            do {
+                $slug = \Illuminate\Support\Str::random(8);
+            } while (Card::where('slug', $slug)->exists());
+
+            // ایجاد ProductUnit جدید
+            $productUnit = \App\Models\ProductUnit::create([
+                'serial_number' => 'AUTO-' . $slug,
+                'card_product_id' => $cardProduct->id,
+            ]);
+
+            $maxCardNumber = Card::max('card_number');
+            $nextCardNumber = $maxCardNumber ? $maxCardNumber + 1 : 1;
+
+            $card = Card::create([
+                'user_id' => auth()->id() ?? 1,
+                'slug' => $slug,
+                'card_name' => $productName,
+                'card_number' => $nextCardNumber,
+                'theme_color' => '#ffffff',
+                'icon_color' => '#000000',
+                'is_active' => true,
+            ]);
+
+            // ایجاد CardVisit
+            $cardUrl = 'https://linku.im/profile/' . $card->slug . '/' . $productCode;
+            \App\Models\CardVisit::create([
+                'qr_link' => $cardUrl,
+                'owner_name' => $productName,
+                'status' => 'active',
+                'mobile' => '',
+                'card_type' => 1,
+                'product_unit_id' => $productUnit->id,
+            ]);
+
+            return $this->ok(
+                'کارت با موفقیت ایجاد شد.',
+                new CardResource($card),
+                201
+            );
+        } catch (\Exception $e) {
+            Log::error('Auto card creation error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در ایجاد کارت: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * ایجاد کارت دستی برای لایسنس‌های چاپ شده (فقط ادمین)
      */
     public function createManual(Request $request): JsonResponse
