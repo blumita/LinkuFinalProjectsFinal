@@ -393,4 +393,27 @@ class CardController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * بررسی وجود لایسنس (برای چک تکراری نبودن)
+     */
+    public function checkLicenseExists(string $slug): JsonResponse
+    {
+        // بررسی فرمت slug
+        if (!preg_match('/^[a-zA-Z0-9-_]+$/', $slug)) {
+            return response()->json([
+                'success' => false,
+                'exists' => false,
+                'message' => 'فرمت لایسنس نامعتبر است'
+            ], 400);
+        }
+
+        $exists = Card::where('slug', $slug)->exists();
+        
+        return response()->json([
+            'success' => true,
+            'exists' => $exists,
+            'message' => $exists ? 'این لایسنس قبلاً ثبت شده است' : 'این لایسنس قابل استفاده است'
+        ]);
+    }
 }

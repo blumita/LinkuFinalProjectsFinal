@@ -309,7 +309,7 @@
       <!-- Modern Cards Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
-          v-for="(card, index) in paginatedCards"
+          v-for="card in paginatedCards"
           :key="card.id"
           class="bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-700 group"
         >
@@ -357,10 +357,10 @@
                   <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">لینک پروفایل</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <a 
-                    :href="card.qrLink" 
+                  <a
+                    :href="card.qrLink"
                     target="_blank"
-                    class="flex-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 truncate block" 
+                    class="flex-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 truncate block"
                     :title="card.qrLink"
                   >
                     {{ card.qrLink }}
@@ -1017,7 +1017,6 @@ const route = useRoute()
 // Search & Filter State
 const licenseSearch = ref('')
 const profileIdSearch = ref('')
-const foundCard = ref<null | Card>(null)
 const searchQuery = ref('')
 const statusFilter = ref('')
 const usedFilter = ref('')
@@ -1102,19 +1101,19 @@ const inactiveCardsCount = computed(() => {
 })
 
 const filteredCards = computed(() => {
-  let result = cards.value.filter(card => {
+  const result = cards.value.filter(card => {
     // Extract license ID from URL
     const urlParts = card.qrLink.split('/')
     const licenseId = urlParts[urlParts.length - 2] || ''
-    
+
     // License ID search
-    const matchesLicense = !licenseSearch.value || 
+    const matchesLicense = !licenseSearch.value ||
                           licenseId.toLowerCase().includes(licenseSearch.value.toLowerCase())
-    
+
     // Profile ID search (same as license for now, but kept separate for future)
     const matchesProfileId = !profileIdSearch.value ||
                             licenseId.toLowerCase().includes(profileIdSearch.value.toLowerCase())
-    
+
     // General search
     const matchesSearch = !searchQuery.value ||
                          card.ownerName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
@@ -1165,22 +1164,6 @@ const endItem = computed(() => {
   return Math.min(currentPage.value * itemsPerPage.value, filteredCards.value.length)
 })
 
-const visiblePages = computed(() => {
-  const pages = []
-  const maxVisible = 5
-  let start = Math.max(1, currentPage.value - Math.floor(maxVisible / 2))
-  const end = Math.min(totalPages.value, start + maxVisible - 1)
-
-  if (end - start + 1 < maxVisible) {
-    start = Math.max(1, end - maxVisible + 1)
-  }
-
-  for (let i = start; i <= end; i++) {
-    pages.push(i)
-  }
-  return pages
-})
-
 // Methods
 
 const toggleStatusDropdown = () => {
@@ -1216,15 +1199,6 @@ const getUsedLabel = (used: string) => {
     case 'unused': return 'استفاده نشده'
     default: return 'همه وضعیت‌ها'
   }
-}
-
-const getInitials = (name: string) => {
-  return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
-}
-
-// تابع محاسبه شماره ردیف کارت (از 1 شروع می‌شود و با صفحه‌بندی هماهنگ است)
-const getCardRowNumber = (index: number) => {
-  return startItem.value + index
 }
 
 const goToPage = (page: number) => {
@@ -1392,7 +1366,7 @@ const generateQRCodeDataUrl = async (url: string): Promise<string> => {
 const downloadBulkQRCodes = async () => {
   const from = Math.max(1, bulkDownloadFrom.value)
   const to = Math.min(bulkDownloadTo.value, filteredCards.value.length)
-  
+
   if (from > to || to < 1) {
     successMessage.value = 'محدوده انتخابی نامعتبر است'
     showSuccessMessage.value = true
@@ -1411,19 +1385,19 @@ const downloadBulkQRCodes = async () => {
     for (let i = 0; i < total; i++) {
       const card = cardsToDownload[i]
       const cardNumber = from + i // شماره کارت از محدوده انتخابی
-      
+
       // استخراج شناسه لایسنس و مدل کارت از لینک QR
       const licenseId = card.qrLink.split('/').slice(-2, -1)[0] || card.id
       const cardModel = card.qrLink.split('/').pop() || 'unknown'
-      
+
       // نام فایل: شماره_شناسه‌لایسنس_مدل.png
       const fileName = `${cardNumber}_${licenseId}_${cardModel}.png`
-      
+
       bulkDownloadStatus.value = `در حال ایجاد QR کد ${i + 1} از ${total}...`
 
       // تولید QR کد
       const qrDataUrl = await generateQRCodeDataUrl(card.qrLink)
-      
+
       // تبدیل Data URL به blob و اضافه به ZIP
       const base64Data = qrDataUrl.split(',')[1]
       zip.file(fileName, base64Data, { base64: true })
@@ -1437,7 +1411,7 @@ const downloadBulkQRCodes = async () => {
 
     // ایجاد و دانلود فایل ZIP
     const zipBlob = await zip.generateAsync({ type: 'blob' })
-    
+
     const downloadLink = document.createElement('a')
     downloadLink.href = URL.createObjectURL(zipBlob)
     downloadLink.download = `qr-codes-${from}-to-${to}.zip`
@@ -1472,7 +1446,7 @@ const downloadBulkQRCodes = async () => {
 const exportToExcel = () => {
   const from = Math.max(1, excelExportFrom.value)
   const to = Math.min(excelExportTo.value, filteredCards.value.length)
-  
+
   if (from > to || to < 1) {
     successMessage.value = 'محدوده انتخابی نامعتبر است'
     showSuccessMessage.value = true
@@ -1480,7 +1454,7 @@ const exportToExcel = () => {
   }
 
   const cardsToExport = filteredCards.value.slice(from - 1, to)
-  
+
   if (cardsToExport.length === 0) {
     successMessage.value = 'هیچ کارتی برای خروجی وجود ندارد'
     showSuccessMessage.value = true
@@ -1495,9 +1469,9 @@ const exportToExcel = () => {
     const licenseId = card.qrLink.split('/').slice(-2, -1)[0] || ''
     const cardModel = card.qrLink.split('/').pop() || ''
     const rowNum = from + index
-    
-    const row: Record<string, any> = {}
-    
+
+    const row: Record<string, string | number | boolean> = {}
+
     if (excelExportColumns.value.rowNumber) row['ردیف'] = rowNum
     if (excelExportColumns.value.licenseId) row['شناسه لایسنس'] = licenseId
     if (excelExportColumns.value.cardModel) row['مدل کارت'] = cardModel
@@ -1507,7 +1481,7 @@ const exportToExcel = () => {
     if (excelExportColumns.value.ownerName) row['نام صاحب کارت'] = card.ownerName
     if (excelExportColumns.value.mobile) row['شماره موبایل'] = card.mobile || ''
     if (excelExportColumns.value.createdAt) row['تاریخ ایجاد'] = card.createdAt
-    
+
     return row
   })
 
@@ -1555,13 +1529,13 @@ const handleImportFileSelect = (event: Event) => {
 
 const importCards = async () => {
   if (!importFile.value) return
-  
+
   if (importMode.value === 'replace') {
     if (!confirm('آیا از جایگزینی کامل کارت‌ها اطمینان دارید؟ همه کارت‌های موجود حذف خواهند شد!')) {
       return
     }
   }
-  
+
   try {
     isImporting.value = true
     const formData = new FormData()
@@ -1571,20 +1545,21 @@ const importCards = async () => {
     const response = await axios.post('/user/admin/backup/import/cards', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
-    
+
     showImportModal.value = false
     importFile.value = null
     successMessage.value = response.data.message || 'ورودی کارت‌ها با موفقیت انجام شد'
     showSuccessMessage.value = true
-    
+
     // Refresh cards list
     cardStore.fetchCards()
-    
+
     setTimeout(() => {
       showSuccessMessage.value = false
     }, 5000)
-  } catch (error: any) {
-    successMessage.value = error.response?.data?.message || 'خطا در ورودی کارت‌ها'
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } } }
+    successMessage.value = err.response?.data?.message || 'خطا در ورودی کارت‌ها'
     showSuccessMessage.value = true
     setTimeout(() => {
       showSuccessMessage.value = false

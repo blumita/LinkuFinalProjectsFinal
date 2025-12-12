@@ -103,21 +103,96 @@
               <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              <span>برای کارت‌های چاپ شده - لایسنس روی کارت فیزیکی نوشته شده</span>
+              <span>برای کارت‌های چاپ شده - لایسنس روی کارت فیزیکی نوشته شده یا تولید خودکار</span>
             </p>
           </div>
           <form @submit.prevent="createManualCard" class="space-y-5">
+            <!-- License Generation Toggle -->
             <div>
-              <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">شناسه لایسنس (Slug) <span class="text-red-500">*</span></label>
-              <input 
-                v-model="manualForm.license" 
-                type="text" 
-                required 
-                placeholder="مثال: byli6oxl" 
-                class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 transition-colors font-mono" 
-              />
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">فقط حروف انگلیسی، اعداد و - یا _ مجاز است (نام از محصول انتخابی گرفته می‌شود)</p>
+              <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-3">نوع تولید لایسنس</label>
+              <div class="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  @click="manualForm.isAutoGenerate = false"
+                  :class="[
+                    'flex items-center justify-center gap-2 p-4 border-2 rounded-xl transition-all duration-300',
+                    !manualForm.isAutoGenerate
+                      ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 shadow-md'
+                      : 'border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:border-orange-300'
+                  ]"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                  </svg>
+                  <span class="text-sm font-medium">دستی (خودم وارد می‌کنم)</span>
+                </button>
+                <button
+                  type="button"
+                  @click="manualForm.isAutoGenerate = true"
+                  :class="[
+                    'flex items-center justify-center gap-2 p-4 border-2 rounded-xl transition-all duration-300',
+                    manualForm.isAutoGenerate
+                      ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 shadow-md'
+                      : 'border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:border-green-300'
+                  ]"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                  <span class="text-sm font-medium">خودکار (سیستم تولید کند)</span>
+                </button>
+              </div>
             </div>
+
+            <!-- Manual License Input -->
+            <div v-if="!manualForm.isAutoGenerate">
+              <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">شناسه لایسنس (Slug) <span class="text-red-500">*</span></label>
+              <div class="flex gap-2">
+                <input 
+                  v-model="manualForm.license" 
+                  type="text" 
+                  required 
+                  placeholder="مثال: byli6oxl" 
+                  class="flex-1 px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 transition-colors font-mono" 
+                />
+                <button
+                  type="button"
+                  @click="checkLicenseExists"
+                  :disabled="isCheckingLicense || !manualForm.license.trim()"
+                  class="px-4 py-3 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-xl hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  title="بررسی تکراری نبودن"
+                >
+                  <i v-if="!isCheckingLicense" class="ti ti-search"></i>
+                  <i v-else class="ti ti-loader animate-spin"></i>
+                  <span class="hidden sm:inline">بررسی</span>
+                </button>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">فقط حروف انگلیسی، اعداد و - یا _ مجاز است</p>
+              <!-- License Check Status -->
+              <div v-if="licenseCheckStatus" class="mt-2">
+                <p v-if="licenseCheckStatus === 'available'" class="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
+                  <i class="ti ti-check"></i>
+                  این لایسنس قابل استفاده است
+                </p>
+                <p v-else-if="licenseCheckStatus === 'exists'" class="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                  <i class="ti ti-x"></i>
+                  این لایسنس قبلاً ثبت شده است
+                </p>
+                <p v-else-if="licenseCheckStatus === 'invalid'" class="text-sm text-yellow-600 dark:text-yellow-400 flex items-center gap-1">
+                  <i class="ti ti-alert-triangle"></i>
+                  فرمت لایسنس نامعتبر است
+                </p>
+              </div>
+            </div>
+
+            <!-- Auto Generate Info -->
+            <div v-else class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
+              <p class="text-green-700 dark:text-green-400 text-sm flex items-center gap-2">
+                <i class="ti ti-info-circle"></i>
+                لایسنس به صورت خودکار توسط سیستم تولید خواهد شد
+              </p>
+            </div>
+
             <div>
               <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-3">محصول <span class="text-red-500">*</span></label>
               <div class="grid grid-cols-3 gap-3">
@@ -134,7 +209,7 @@
               <p class="text-red-700 dark:text-red-400 text-sm">{{ manualError }}</p>
             </div>
             <div class="flex gap-3 pt-5 border-t border-gray-200 dark:border-slate-700">
-              <button type="submit" :disabled="isCreatingManual" class="flex-1 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:from-gray-400 disabled:to-gray-500 text-white py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-2">
+              <button type="submit" :disabled="isCreatingManual || (!manualForm.isAutoGenerate && licenseCheckStatus === 'exists')" class="flex-1 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:from-gray-400 disabled:to-gray-500 text-white py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-2">
                 <i v-if="!isCreatingManual" class="ti ti-plus"></i>
                 <i v-else class="ti ti-loader animate-spin"></i>
                 {{ isCreatingManual ? 'در حال ایجاد...' : 'ایجاد لایسنس' }}
@@ -646,10 +721,13 @@ const autoError = ref('')
 // Manual Card Form
 const manualForm = ref({
   license: '',
-  productUnitId: ''
+  productUnitId: '',
+  isAutoGenerate: false
 })
 const isCreatingManual = ref(false)
 const manualError = ref('')
+const isCheckingLicense = ref(false)
+const licenseCheckStatus = ref<'available' | 'exists' | 'invalid' | null>(null)
 
 // Old Form data
 const cardForm = reactive({
@@ -826,8 +904,73 @@ const createAutoCard = async () => {
   }
 }
 
+// Check if license exists
+const checkLicenseExists = async () => {
+  const license = manualForm.value.license.trim()
+  if (!license) {
+    licenseCheckStatus.value = null
+    return
+  }
+  
+  // بررسی فرمت لاتین
+  const slugPattern = /^[a-zA-Z0-9-_]+$/
+  if (!slugPattern.test(license)) {
+    licenseCheckStatus.value = 'invalid'
+    return
+  }
+
+  isCheckingLicense.value = true
+  try {
+    const response = await axios.get(`v1/cards/check-license/${license}`)
+    if (response.data?.exists) {
+      licenseCheckStatus.value = 'exists'
+    } else {
+      licenseCheckStatus.value = 'available'
+    }
+  } catch (error: any) {
+    // اگر 404 برگشت یعنی لایسنس موجود نیست و قابل استفاده است
+    if (error.response?.status === 404) {
+      licenseCheckStatus.value = 'available'
+    } else {
+      licenseCheckStatus.value = null
+    }
+  } finally {
+    isCheckingLicense.value = false
+  }
+}
+
 // Create Manual Card
 const createManualCard = async () => {
+  // اگر خودکار است، از تابع createAutoCard استفاده کن
+  if (manualForm.value.isAutoGenerate) {
+    if (!manualForm.value.productUnitId) {
+      manualError.value = 'لطفا محصول را انتخاب کنید'
+      return
+    }
+    isCreatingManual.value = true
+    manualError.value = ''
+    try {
+      // استفاده از API ایجاد کارت با لایسنس خودکار
+      const selectedProduct = products.value.find((p: any) => String(p.id) === String(manualForm.value.productUnitId))
+      const response = await cardStore.createCard({
+        card_name: selectedProduct?.name || 'کارت جدید',
+        product_unit_id: manualForm.value.productUnitId
+      })
+      if (response.success || response) {
+        await showSuccess('موفق!', 'لایسنس با موفقیت ایجاد شد')
+        await router.push({ name: 'cards' })
+      } else {
+        manualError.value = response.message || 'خطا در ایجاد لایسنس'
+      }
+    } catch (error: any) {
+      manualError.value = error.response?.data?.message || 'خطا در ایجاد لایسنس'
+    } finally {
+      isCreatingManual.value = false
+    }
+    return
+  }
+
+  // ایجاد دستی
   if (!manualForm.value.license.trim()) {
     manualError.value = 'لطفا شناسه لایسنس را وارد کنید'
     return
@@ -878,6 +1021,11 @@ watch(() => cardForm.qrLink, async (newLink) => {
     await generateQRCode()
   }
 }, {immediate: true})
+
+// Watch for license input changes to reset check status
+watch(() => manualForm.value.license, () => {
+  licenseCheckStatus.value = null
+})
 
 // Watch for card type changes to auto-generate new link
 /*watch(() => cardForm.cardType, () => {

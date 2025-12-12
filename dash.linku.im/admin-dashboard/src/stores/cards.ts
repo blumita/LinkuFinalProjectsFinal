@@ -140,9 +140,23 @@ export const useCardsStore = defineStore('card', () => {
             return { success: false, message: res.data?.message || 'خطا در ایجاد کارت' }
         } catch (err: any) {
             console.error('❌ خطا در ایجاد کارت دستی:', err)
+            // بررسی خطای validation Laravel
+            let errorMessage = 'خطا در ایجاد کارت دستی'
+            if (err.response?.data?.errors) {
+                // فرمت خطای validation Laravel
+                const errors = err.response.data.errors
+                const firstErrorKey = Object.keys(errors)[0]
+                if (firstErrorKey && errors[firstErrorKey]?.length > 0) {
+                    errorMessage = errors[firstErrorKey][0]
+                }
+            } else if (err.response?.data?.message) {
+                errorMessage = err.response.data.message
+            } else if (err.message) {
+                errorMessage = err.message
+            }
             return { 
                 success: false, 
-                message: err.response?.data?.message || err.message || 'خطا در ایجاد کارت دستی' 
+                message: errorMessage
             }
         }
     }

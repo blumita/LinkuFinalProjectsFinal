@@ -163,6 +163,9 @@ Route::middleware(['auth:sanctum','log.activity'])
         Route::post('/manual', [CardController::class, 'createManual'])
             ->name('cards.createManual');
 
+        Route::get('/check-license/{slug}', [CardController::class, 'checkLicenseExists'])
+            ->name('cards.checkLicense');
+
         // Create a new digital business card
         Route::post('/', [CardController::class, 'store'])
             ->name('cards.store');
