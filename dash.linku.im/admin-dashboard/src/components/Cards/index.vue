@@ -956,6 +956,24 @@
             />
           </div>
 
+          <!-- Card Model Selection -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              مدل کارت
+              <span class="text-red-500">*</span>
+            </label>
+            <select
+              v-model="manualLicenseData.cardModel"
+              class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+            >
+              <option value="model-1">مدل 1 (پیش‌فرض)</option>
+              <option value="model-2">مدل 2</option>
+              <option value="model-3">مدل 3</option>
+              <option value="model-4">مدل 4</option>
+              <option value="model-5">مدل 5</option>
+            </select>
+          </div>
+
           <!-- Error Message -->
           <div v-if="manualLicenseError" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
             <p class="text-red-700 dark:text-red-400 text-sm flex items-center gap-2">
@@ -1192,7 +1210,8 @@ const isImporting = ref(false)
 const showManualLicenseModal = ref(false)
 const manualLicenseData = ref({
   license: '',
-  cardName: ''
+  cardName: '',
+  cardModel: 'model-1'
 })
 const isCreatingManualLicense = ref(false)
 const manualLicenseError = ref('')
@@ -1229,7 +1248,8 @@ const createManualLicense = async () => {
     // Create the card via API or database
     const response = await cardStore.createManualCard({
       slug: manualLicenseData.value.license.trim(),
-      card_name: manualLicenseData.value.cardName.trim()
+      card_name: manualLicenseData.value.cardName.trim(),
+      card_model: manualLicenseData.value.cardModel
     })
 
     if (response.success) {
@@ -1239,7 +1259,8 @@ const createManualLicense = async () => {
       // Reset form
       manualLicenseData.value = {
         license: '',
-        cardName: ''
+        cardName: '',
+        cardModel: 'model-1'
       }
       
       // Close modal

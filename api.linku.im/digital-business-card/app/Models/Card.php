@@ -43,11 +43,14 @@ class Card extends Model
         parent::boot();
 
         static::creating(function ($card) {
-            do {
-                $slug = Str::random(7);
-            } while (self::where('slug', $slug)->exists());
+            // فقط اگر slug خالی باشه، رندوم بساز
+            if (empty($card->slug)) {
+                do {
+                    $slug = Str::random(7);
+                } while (self::where('slug', $slug)->exists());
 
-            $card->slug = $slug;
+                $card->slug = $slug;
+            }
         });
     }
     /*public function getRouteKeyName(): string

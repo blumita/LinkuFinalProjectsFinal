@@ -334,10 +334,13 @@ class CardController extends Controller
         $validated = $request->validate([
             'slug' => 'required|string|max:50|unique:cards,slug',
             'card_name' => 'required|string|max:255',
+            'card_model' => 'required|string|in:model-1,model-2,model-3,model-4,model-5',
         ], [
             'slug.required' => 'شناسه لایسنس الزامی است',
             'slug.unique' => 'این لایسنس قبلا ثبت شده است',
             'card_name.required' => 'نام کارت الزامی است',
+            'card_model.required' => 'مدل کارت الزامی است',
+            'card_model.in' => 'مدل کارت نامعتبر است',
         ]);
 
         try {
@@ -355,7 +358,7 @@ class CardController extends Controller
             ]);
 
             // ایجاد CardVisit برای نمایش در لیست ادمین
-            $cardUrl = 'https://linku.im/' . $card->slug . '/model-1';
+            $cardUrl = 'https://linku.im/' . $card->slug . '/' . $validated['card_model'];
             \App\Models\CardVisit::create([
                 'qr_link' => $cardUrl,
                 'owner_name' => $validated['card_name'],
