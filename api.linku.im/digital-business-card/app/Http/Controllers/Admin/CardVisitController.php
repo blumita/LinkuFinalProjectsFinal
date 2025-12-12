@@ -62,15 +62,43 @@ class CardVisitController extends Controller
 
     public function destroy(Request $request, $id): void
     {
-
-        $card = CardVisit::find($id);
-
-        $card->delete();
-
+        $cardVisit = CardVisit::find($id);
+        
+        if ($cardVisit) {
+            // حذف License و ProductUnit مرتبط
+            if ($cardVisit->product_unit_id) {
+                $productUnit = \App\Models\ProductUnit::find($cardVisit->product_unit_id);
+                if ($productUnit) {
+                    // حذف License مرتبط
+                    \App\Models\License::where('product_unit_id', $productUnit->id)->delete();
+                    // حذف ProductUnit
+                    $productUnit->delete();
+                }
+            }
+            
+            $cardVisit->delete();
+        }
     }
+    
     public function destroyCustom(Request $request): void
     {
         $ids = $request->ids;
+        
+        // گرفتن CardVisit ها قبل از حذف
+        $cardVisits = CardVisit::whereIn('id', $ids)->get();
+        
+        foreach ($cardVisits as $cardVisit) {
+            if ($cardVisit->product_unit_id) {
+                $productUnit = \App\Models\ProductUnit::find($cardVisit->product_unit_id);
+                if ($productUnit) {
+                    // حذف License مرتبط
+                    \App\Models\License::where('product_unit_id', $productUnit->id)->delete();
+                    // حذف ProductUnit
+                    $productUnit->delete();
+                }
+            }
+        }
+        
         CardVisit::whereIn('id', $ids)->delete();
     }
 

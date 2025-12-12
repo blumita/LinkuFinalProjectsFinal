@@ -270,38 +270,53 @@ class CardController extends Controller
 
     public function preview(Request $request, $slug): JsonResponse
     {
-
-
-        $card = Card::where('slug', $slug)->first();
-        $license = null;
-        $cardVisit = null;
-
-        if (!$card) {
-            $license = License::where('license_code', $slug)->first();
-            if ($license && $license->card) {
+        // اول چک می‌کنیم آیا این یک لایسنس غیرفعال است (کارت‌های جدید)
+        $license = License::where('license_code', $slug)->first();
+        if ($license) {
+            // اگر لایسنس card_id داره، یعنی فعال شده
+            if ($license->card_id && $license->card) {
                 $card = $license->card;
+                $card->load(['user', 'links', 'leads', 'leadSetting', 'qr']);
+                return $this->ok('کارت یافت شد', new CardResource($card), 200);
             }
+            // لایسنس پیدا شد ولی card_id نداره = غیرفعال
+            return $this->ok('کارت یافت شد', [
+                'isActivated' => false,
+                'licenseCode' => $slug,
+                'status' => $license->status ?? 'pending',
+                'message' => 'این کارت هنوز فعال‌سازی نشده است'
+            ], 200);
         }
 
-        // اگر با لایسنس پیدا نشد، با CardVisit چک کنیم
+        // چک Card با slug
+        $card = Card::where('slug', $slug)->first();
+
+        // اگر با slug پیدا نشد، با CardVisit چک کنیم
         if (!$card) {
             // جستجو در CardVisit بر اساس قسمتی از qr_link
-            $cardVisit = \App\Models\CardVisit::where('qr_link', 'LIKE', '%/' . $slug . '/%')->first();
+            $cardVisit = \App\Models\CardVisit::where('qr_link', 'LIKE', '%/' . $slug . '/%')
+                ->orWhere('qr_link', 'LIKE', '%/' . $slug)
+                ->first();
 
-            // اگر CardVisit پیدا شد ولی card_id ندارد یا کارت متصل نیست
-            if ($cardVisit && !$cardVisit->unit?->license?->card) {
-                // کارت هنوز فعال نشده
-                return $this->ok('کارت یافت شد', [
-                    'isActivated' => false,
-                    'cardVisitId' => $cardVisit->id,
-                    'ownerName' => $cardVisit->owner_name,
-                    'cardType' => $cardVisit->card_type,
-                    'status' => $cardVisit->status,
-                ], 200);
+            if ($cardVisit) {
+                // چک کنیم آیا این CardVisit به یک License فعال وصله
+                if ($cardVisit->unit?->license?->card) {
+                    $card = $cardVisit->unit->license->card;
+                } else {
+                    // کارت هنوز فعال نشده
+                    return $this->ok('کارت یافت شد', [
+                        'isActivated' => false,
+                        'cardVisitId' => $cardVisit->id,
+                        'ownerName' => $cardVisit->owner_name,
+                        'cardType' => $cardVisit->card_type,
+                        'status' => $cardVisit->status ?? 'pending',
+                        'message' => 'این کارت هنوز فعال‌سازی نشده است'
+                    ], 200);
+                }
             }
         }
 
-
+        // چک با username
         if (!$card) {
             $user = User::where('user_name', $slug)->first();
             if ($user && $user->cards()->exists()) {
@@ -310,40 +325,12 @@ class CardController extends Controller
         }
 
         if (!$card) {
-            // بررسی نهایی اگر این یک لایسنس غیرفعال است
-            $inactiveLicense = License::where('license_code', $slug)->first();
-            if ($inactiveLicense && !$inactiveLicense->card_id) {
-                return $this->ok('کارت یافت شد', [
-                    'isActivated' => false,
-                    'licenseCode' => $slug,
-                    'status' => $inactiveLicense->status ?? 'inactive',
-                ], 200);
-            }
-
-            // آخرین تلاش: شاید slug در انتهای qr_link باشد (مثل linku.im/profile/xxx/MD)
-            $cardVisitBySlugEnd = \App\Models\CardVisit::where('qr_link', 'LIKE', '%/profile/' . $slug . '/%')
-                ->orWhere('qr_link', 'LIKE', '%/' . $slug)
-                ->first();
-            
-            if ($cardVisitBySlugEnd) {
-                return $this->ok('کارت یافت شد', [
-                    'isActivated' => false,
-                    'cardVisitId' => $cardVisitBySlugEnd->id,
-                    'ownerName' => $cardVisitBySlugEnd->owner_name,
-                    'cardType' => $cardVisitBySlugEnd->card_type,
-                    'status' => $cardVisitBySlugEnd->status ?? 'pending',
-                    'message' => 'این کارت هنوز فعال‌سازی نشده است'
-                ], 200);
-            }
-
             return $this->fail('کارت یافت نشد.', 404);
         }
 
         // اگر کارت پیدا شد ولی پروفایل خالی است (کارت فیزیکی جدید)
-        // بررسی می‌کنیم که آیا کاربر پروفایل رو پر کرده یا نه
         $hasProfile = $card->user_name || $card->bio || $card->job || $card->company;
         if (!$hasProfile && $card->user_id === 1) {
-            // کارت به ادمین پیش‌فرض وصله و پروفایل خالیه = غیرفعال
             return $this->ok('کارت یافت شد', [
                 'isActivated' => false,
                 'cardId' => $card->id,
