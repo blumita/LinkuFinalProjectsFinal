@@ -382,10 +382,10 @@ class CardController extends Controller
             $productCode = $cardProduct->identifier ?? $cardProduct->code ?? 'CARD';
             $productName = $cardProduct->name;
 
-            // تولید slug تصادفی یکتا
+            // تولید slug تصادفی یکتا - چک در Card و License
             do {
-                $slug = \Illuminate\Support\Str::random(8);
-            } while (Card::where('slug', $slug)->exists());
+                $slug = strtolower(\Illuminate\Support\Str::random(8));
+            } while (Card::where('slug', $slug)->exists() || \App\Models\License::where('license_code', $slug)->exists());
 
             // ایجاد ProductUnit جدید
             $productUnit = \App\Models\ProductUnit::create([
@@ -394,42 +394,36 @@ class CardController extends Controller
             ]);
 
             // ایجاد License برای این ProductUnit (مهم برای سیستم فعال‌سازی)
+            // card_id خالی می‌مونه تا کاربر خودش فعال کنه
             $license = \App\Models\License::create([
                 'product_unit_id' => $productUnit->id,
-                'license_code' => $slug, // از slug به عنوان کد لایسنس استفاده می‌کنیم
+                'license_code' => $slug,
                 'status' => 'active',
+                'card_id' => null, // کاربر باید فعال کنه
                 'expires_at' => null,
             ]);
 
-            $maxCardNumber = Card::max('card_number');
-            $nextCardNumber = $maxCardNumber ? $maxCardNumber + 1 : 1;
-
-            $card = Card::create([
-                'user_id' => auth()->id() ?? 1,
-                'slug' => $slug,
-                'card_name' => $productName,
-                'card_number' => $nextCardNumber,
-                'theme_color' => '#ffffff',
-                'icon_color' => '#000000',
-                'is_active' => true,
-            ]);
-
             // ایجاد CardVisit
-            $cardUrl = 'https://linku.im/profile/' . $card->slug . '/' . $productCode;
-            \App\Models\CardVisit::create([
+            $cardUrl = 'https://linku.im/profile/' . $slug . '/' . $productCode;
+            $cardVisit = \App\Models\CardVisit::create([
                 'qr_link' => $cardUrl,
                 'owner_name' => $productName,
                 'status' => 'active',
                 'mobile' => '',
-                'card_type' => 1,
+                'card_type' => $cardProduct->id,
                 'product_unit_id' => $productUnit->id,
             ]);
 
-            return $this->ok(
-                'کارت با موفقیت ایجاد شد.',
-                new CardResource($card),
-                201
-            );
+            return response()->json([
+                'success' => true,
+                'message' => 'لایسنس با موفقیت ایجاد شد.',
+                'data' => [
+                    'license_code' => $license->license_code,
+                    'qr_link' => $cardUrl,
+                    'product' => $productName,
+                    'cardVisitId' => $cardVisit->id,
+                ]
+            ], 201);
         } catch (\Exception $e) {
             Log::error('Auto card creation error: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString()
@@ -447,14 +441,23 @@ class CardController extends Controller
     public function createManual(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'slug' => ['required', 'string', 'max:50', 'unique:cards,slug', 'regex:/^[a-zA-Z0-9-_]+$/'],
+            'slug' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z0-9-_]+$/'],
             'product_unit_id' => 'required|integer',
         ], [
             'slug.required' => 'شناسه لایسنس الزامی است',
-            'slug.unique' => 'این لایسنس قبلا ثبت شده است',
             'slug.regex' => 'شناسه فقط باید شامل حروف انگلیسی، اعداد، خط تیره و آندرلاین باشد',
             'product_unit_id.required' => 'محصول الزامی است',
         ]);
+
+        // چک تکراری نبودن در Card و License
+        $existsInCard = Card::where('slug', $validated['slug'])->exists();
+        $existsInLicense = \App\Models\License::where('license_code', $validated['slug'])->exists();
+        if ($existsInCard || $existsInLicense) {
+            return response()->json([
+                'success' => false,
+                'message' => 'این لایسنس قبلاً ثبت شده است'
+            ], 422);
+        }
 
         try {
             // گرفتن اطلاعات محصول - از CardProduct استفاده می‌کنیم چون ادمین داشبورد CardProduct انتخاب می‌کنه
@@ -477,42 +480,36 @@ class CardController extends Controller
             ]);
 
             // ایجاد License برای این ProductUnit (مهم برای سیستم فعال‌سازی)
+            // card_id خالی می‌مونه تا کاربر خودش فعال کنه
             $license = \App\Models\License::create([
                 'product_unit_id' => $productUnit->id,
                 'license_code' => $validated['slug'], // از slug به عنوان کد لایسنس استفاده می‌کنیم
                 'status' => 'active',
+                'card_id' => null, // کاربر باید فعال کنه
                 'expires_at' => null,
             ]);
 
-            $maxCardNumber = Card::max('card_number');
-            $nextCardNumber = $maxCardNumber ? $maxCardNumber + 1 : 1;
-
-            $card = Card::create([
-                'user_id' => auth()->id() ?? 1,
-                'slug' => $validated['slug'],
-                'card_name' => $productName, // نام از محصول
-                'card_number' => $nextCardNumber,
-                'theme_color' => '#ffffff',
-                'icon_color' => '#000000',
-                'is_active' => true, // کارت فیزیکی قابل نمایش است، فقط باید کاربر پروفایل رو پر کنه
-            ]);
-
             // ایجاد CardVisit برای نمایش در لیست ادمین با فرمت صحیح
-            $cardUrl = 'https://linku.im/profile/' . $card->slug . '/' . $productCode;
-            \App\Models\CardVisit::create([
+            $cardUrl = 'https://linku.im/profile/' . $validated['slug'] . '/' . $productCode;
+            $cardVisit = \App\Models\CardVisit::create([
                 'qr_link' => $cardUrl,
                 'owner_name' => $productName, // نام محصول
                 'status' => 'active',
                 'mobile' => '',
-                'card_type' => 1,
+                'card_type' => $cardProduct->id,
                 'product_unit_id' => $productUnit->id,
             ]);
 
-            return $this->ok(
-                'لایسنس با موفقیت ایجاد شد.',
-                new CardResource($card),
-                201
-            );
+            return response()->json([
+                'success' => true,
+                'message' => 'لایسنس با موفقیت ایجاد شد.',
+                'data' => [
+                    'license_code' => $license->license_code,
+                    'qr_link' => $cardUrl,
+                    'product' => $productName,
+                    'cardVisitId' => $cardVisit->id,
+                ]
+            ], 201);
         } catch (\Exception $e) {
             Log::error('Manual card creation error: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString()
