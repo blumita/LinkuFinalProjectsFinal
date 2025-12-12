@@ -393,6 +393,14 @@ class CardController extends Controller
                 'card_product_id' => $cardProduct->id,
             ]);
 
+            // ایجاد License برای این ProductUnit (مهم برای سیستم فعال‌سازی)
+            $license = \App\Models\License::create([
+                'product_unit_id' => $productUnit->id,
+                'license_code' => $slug, // از slug به عنوان کد لایسنس استفاده می‌کنیم
+                'status' => 'active',
+                'expires_at' => null,
+            ]);
+
             $maxCardNumber = Card::max('card_number');
             $nextCardNumber = $maxCardNumber ? $maxCardNumber + 1 : 1;
 
@@ -468,6 +476,14 @@ class CardController extends Controller
                 'card_product_id' => $cardProduct->id,
             ]);
 
+            // ایجاد License برای این ProductUnit (مهم برای سیستم فعال‌سازی)
+            $license = \App\Models\License::create([
+                'product_unit_id' => $productUnit->id,
+                'license_code' => $validated['slug'], // از slug به عنوان کد لایسنس استفاده می‌کنیم
+                'status' => 'active',
+                'expires_at' => null,
+            ]);
+
             $maxCardNumber = Card::max('card_number');
             $nextCardNumber = $maxCardNumber ? $maxCardNumber + 1 : 1;
 
@@ -522,7 +538,10 @@ class CardController extends Controller
             ], 400);
         }
 
-        $exists = Card::where('slug', $slug)->exists();
+        // چک کردن در Card و License
+        $existsInCard = Card::where('slug', $slug)->exists();
+        $existsInLicense = \App\Models\License::where('license_code', $slug)->exists();
+        $exists = $existsInCard || $existsInLicense;
 
         return response()->json([
             'success' => true,
