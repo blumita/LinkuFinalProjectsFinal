@@ -103,7 +103,6 @@ class CardVisitController extends Controller
                 'theme_color' => '#ffffff',
                 'icon_color' => '#000000',
                 'is_active' => true,
-                'creator_id' => auth()->id() ?? 1,
             ]);
 
             return $this->ok(
