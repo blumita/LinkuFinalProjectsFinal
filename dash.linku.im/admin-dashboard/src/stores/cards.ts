@@ -127,6 +127,25 @@ export const useCardsStore = defineStore('card', () => {
         }
     }
 
+    // ➕ ایجاد کارت دستی (برای لایسنس‌های چاپ شده)
+    const createManualCard = async (payload: { slug: string, card_name: string }) => {
+        try {
+            const res = await axios.post('user/admin/cardVisit/manual', payload)
+            if (res.data?.success) {
+                // کارت جدید رو به لیست اضافه میکنیم
+                await fetchCards()
+                return { success: true, data: res.data.data }
+            }
+            return { success: false, message: res.data?.message || 'خطا در ایجاد کارت' }
+        } catch (err: any) {
+            console.error('❌ خطا در ایجاد کارت دستی:', err)
+            return { 
+                success: false, 
+                message: err.response?.data?.message || err.message || 'خطا در ایجاد کارت دستی' 
+            }
+        }
+    }
+
     // ✅ فیلترها و computed
     const activeCards = () => cards.value.filter(c => c.status === 'active')
     const inactiveCards = () => cards.value.filter(c => c.status === 'inactive')
@@ -155,5 +174,6 @@ export const useCardsStore = defineStore('card', () => {
         deleteSelectedCards,
         updateCard,
         createCard,
+        createManualCard,
     }
 })

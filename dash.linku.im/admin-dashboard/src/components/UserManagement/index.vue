@@ -618,8 +618,8 @@
         <!-- User Info -->
         <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
           <div class="flex items-center gap-3 mb-3">
-            <img v-if="selectedUpgradeUser?.profileImage" 
-                 :src="selectedUpgradeUser.profileImage" 
+            <img v-if="selectedUpgradeUser?.profileImage"
+                 :src="selectedUpgradeUser.profileImage"
                  class="w-12 h-12 rounded-full object-cover"
                  alt="Profile">
             <div v-else class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
@@ -634,7 +634,7 @@
             <span class="text-gray-600 dark:text-gray-400">وضعیت فعلی:</span>
             <span :class="[
               'px-3 py-1 rounded-full font-medium',
-              selectedUpgradeUser?.subscriptionType === 'premium' 
+              selectedUpgradeUser?.subscriptionType === 'premium'
                 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'
                 : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
             ]">
@@ -677,8 +677,8 @@
           <div class="flex gap-2">
             <i class="ti ti-info-circle text-blue-500 flex-shrink-0 mt-0.5"></i>
             <p class="text-sm text-blue-700 dark:text-blue-300">
-              با تایید، اشتراک کاربر به مدت 
-              <strong>{{ upgradeDurations.find(d => d.value === selectedDuration)?.months }} ماه</strong> 
+              با تایید، اشتراک کاربر به مدت
+              <strong>{{ upgradeDurations.find(d => d.value === selectedDuration)?.months }} ماه</strong>
               فعال می‌شود.
             </p>
           </div>
@@ -687,13 +687,13 @@
 
       <!-- Modal Footer -->
       <div class="p-6 border-t border-gray-200 dark:border-gray-700 flex gap-3">
-        <button 
+        <button
           @click="closeUpgradeModal"
           class="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
         >
           انصراف
         </button>
-        <button 
+        <button
           @click="confirmUpgrade"
           :disabled="!selectedDuration || isUpgrading"
           class="flex-1 px-4 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
@@ -1075,9 +1075,9 @@ const closeUpgradeModal = () => {
 
 const confirmUpgrade = async () => {
   if (!selectedUpgradeUser.value || !selectedDuration.value) return
-  
+
   isUpgrading.value = true
-  
+
   try {
     const token = sessionStorage.getItem('adminToken') || ''
     const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.linku.im/api'
@@ -1096,10 +1096,10 @@ const confirmUpgrade = async () => {
     if (!response.ok) throw new Error('Upgrade failed')
 
     await showSuccess('ارتقا موفق', `اشتراک ${selectedUpgradeUser.value.name} برای ${selectedDuration.value} ماه فعال شد`)
-    
+
     // Refresh user list
     await userStore.fetchProfiles()
-    
+
     closeUpgradeModal()
   } catch (error) {
     console.error('Upgrade error:', error)

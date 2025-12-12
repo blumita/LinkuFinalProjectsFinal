@@ -26,6 +26,18 @@
         <p class="text-gray-600 dark:text-gray-400">مدیریت و نمایش کارت‌های ویزیت دیجیتال مشتریان</p>
       </div>
       <div class="flex items-center gap-3 flex-wrap">
+        <!-- Manual License Creation Button -->
+        <button
+          @click="showManualLicenseModal = true"
+          class="bg-orange-600 hover:bg-orange-700 text-white px-4 sm:px-6 py-3 rounded-xl transition-colors duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          <span class="hidden sm:inline">ایجاد لایسنس دستی</span>
+          <span class="sm:hidden">لایسنس</span>
+        </button>
+
         <!-- Import Button -->
         <button
           @click="showImportModal = true"
@@ -139,34 +151,34 @@
 
     <!-- Advanced Search & Filters -->
     <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl p-4 sm:p-6 mb-8 transition-colors duration-300">
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+        <!-- License ID Search -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">جستجو با لایسنس</label>
+          <div class="relative">
+            <input
+              v-model.trim="licenseSearch"
+              placeholder="مثال: byli6oxl"
+              class="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-300 pr-12 placeholder:text-gray-500 dark:text-gray-500"
+            />
+            <svg class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
+            </svg>
+          </div>
+        </div>
+
         <!-- Profile ID Search -->
-        <div class="lg:col-span-2">
-          <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">جستجو بر اساس شناسه پروفایل</label>
+        <div>
+          <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">جستجو با شناسه پروفایل</label>
           <div class="relative">
             <input
               v-model.trim="profileIdSearch"
-              @input="searchByProfileId"
               placeholder="مثال: 04E1F322E81490"
               class="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-300 pr-12 placeholder:text-gray-500 dark:text-gray-500"
             />
             <svg class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
             </svg>
-          </div>
-          <div v-if="foundCard" class="mt-3 p-3 bg-green-50 border border-green-100 rounded-lg">
-            <div class="font-semibold text-green-800">{{ foundCard.ownerName }}</div>
-            <div class="text-sm text-green-600">شناسه لایسنس: {{ foundCard.qrLink.split('/').slice(-2, -1)[0] }}</div>
-            <div class="text-sm text-green-600">مدل کارت: {{ foundCard.qrLink.split('/').pop() }}</div>
-            <a :href="foundCard.qrLink" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm inline-flex items-center gap-1 mt-1">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-              </svg>
-              مشاهده کارت
-            </a>
-          </div>
-          <div v-else-if="profileIdSearch" class="mt-3 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm">
-            کارتی با این شناسه پروفایل یافت نشد
           </div>
         </div>
 
@@ -177,7 +189,7 @@
             <input
               v-model="searchQuery"
               type="text"
-              placeholder="جستجو در نام یا توضیحات..."
+              placeholder="نام، توضیحات، لینک..."
               class="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-300 pr-12 placeholder:text-gray-500 dark:text-gray-500"
             >
             <svg class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,6 +197,8 @@
             </svg>
           </div>
         </div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
         <!-- Status Filter -->
         <div>
@@ -883,6 +897,113 @@
       </div>
     </div>
 
+    <!-- Manual License Creation Modal -->
+    <div
+      v-if="showManualLicenseModal"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style="backdrop-filter: blur(8px)"
+    >
+      <!-- Backdrop -->
+      <div
+        @click="showManualLicenseModal = false"
+        class="absolute inset-0 bg-black/40"
+      ></div>
+
+      <!-- Modal Content -->
+      <div
+        @click.stop
+        class="relative bg-white dark:bg-gray-800 rounded-3xl p-6 sm:p-8 max-w-lg w-full transform transition-all duration-300 scale-100 border border-gray-100 dark:border-gray-700"
+      >
+        <div class="mb-6 text-center">
+          <div class="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">ایجاد لایسنس دستی</h3>
+          <p class="text-gray-600 dark:text-gray-300">برای کارت‌های چاپ شده که در دیتابیس ثبت نشده‌اند</p>
+        </div>
+
+        <div class="space-y-4">
+          <!-- License Input -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              شناسه لایسنس (Slug)
+              <span class="text-red-500">*</span>
+            </label>
+            <input
+              v-model="manualLicenseData.license"
+              type="text"
+              placeholder="مثال: byli6oxl"
+              class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+              :class="{ 'border-red-500': manualLicenseError && !manualLicenseData.license }"
+            />
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">شناسه یکتای کارت از روی کارت فیزیکی</p>
+          </div>
+
+          <!-- Card Name Input -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              نام کارت
+              <span class="text-red-500">*</span>
+            </label>
+            <input
+              v-model="manualLicenseData.cardName"
+              type="text"
+              placeholder="مثال: مینی کارت MD"
+              class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+              :class="{ 'border-red-500': manualLicenseError && !manualLicenseData.cardName }"
+            />
+          </div>
+
+          <!-- Error Message -->
+          <div v-if="manualLicenseError" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+            <p class="text-red-700 dark:text-red-400 text-sm flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              {{ manualLicenseError }}
+            </p>
+          </div>
+
+          <!-- Info Message -->
+          <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+            <p class="text-blue-700 dark:text-blue-400 text-sm flex items-start gap-2">
+              <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>سیستم قبل از ایجاد، وجود لایسنس تکراری را بررسی می‌کند.</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-3 mt-6">
+          <button
+            @click="createManualLicense"
+            :disabled="isCreatingManualLicense"
+            class="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-3 rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2"
+          >
+            <svg v-if="!isCreatingManualLicense" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <svg v-else class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ isCreatingManualLicense ? 'در حال ایجاد...' : 'ایجاد لایسنس' }}
+          </button>
+          <button
+            @click="showManualLicenseModal = false"
+            :disabled="isCreatingManualLicense"
+            class="w-full bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 disabled:opacity-50 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-xl transition-colors font-medium border border-gray-200 dark:border-gray-600"
+          >
+            انصراف
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Import Modal -->
     <div
       v-if="showImportModal"
@@ -1013,6 +1134,7 @@ interface Card {
 const route = useRoute()
 
 // Search & Filter State
+const licenseSearch = ref('')
 const profileIdSearch = ref('')
 const foundCard = ref<null | Card>(null)
 const searchQuery = ref('')
@@ -1066,6 +1188,80 @@ const importMode = ref('append')
 const importFile = ref<File | null>(null)
 const isImporting = ref(false)
 
+// Manual License Creation State
+const showManualLicenseModal = ref(false)
+const manualLicenseData = ref({
+  license: '',
+  cardName: ''
+})
+const isCreatingManualLicense = ref(false)
+const manualLicenseError = ref('')
+
+// Manual License Creation Function
+const createManualLicense = async () => {
+  if (!manualLicenseData.value.license.trim()) {
+    manualLicenseError.value = 'لطفا شناسه لایسنس را وارد کنید'
+    return
+  }
+
+  if (!manualLicenseData.value.cardName.trim()) {
+    manualLicenseError.value = 'لطفا نام کارت را وارد کنید'
+    return
+  }
+
+  isCreatingManualLicense.value = true
+  manualLicenseError.value = ''
+
+  try {
+    // Check if license already exists in current cards
+    const licenseExists = cards.value.some(card => {
+      const urlParts = card.qrLink.split('/')
+      const existingLicense = urlParts[urlParts.length - 2] || ''
+      return existingLicense === manualLicenseData.value.license.trim()
+    })
+
+    if (licenseExists) {
+      manualLicenseError.value = 'این لایسنس قبلا ثبت شده است'
+      isCreatingManualLicense.value = false
+      return
+    }
+
+    // Create the card via API or database
+    const response = await cardStore.createManualCard({
+      slug: manualLicenseData.value.license.trim(),
+      card_name: manualLicenseData.value.cardName.trim()
+    })
+
+    if (response.success) {
+      successMessage.value = 'لایسنس با موفقیت ایجاد شد'
+      showSuccessMessage.value = true
+      
+      // Reset form
+      manualLicenseData.value = {
+        license: '',
+        cardName: ''
+      }
+      
+      // Close modal
+      showManualLicenseModal.value = false
+      
+      // Refresh cards
+      await cardStore.fetchCards()
+      
+      setTimeout(() => {
+        showSuccessMessage.value = false
+      }, 3000)
+    } else {
+      manualLicenseError.value = response.message || 'خطا در ایجاد لایسنس'
+    }
+  } catch (error: any) {
+    console.error('Error creating manual license:', error)
+    manualLicenseError.value = error.response?.data?.message || 'خطا در ایجاد لایسنس'
+  } finally {
+    isCreatingManualLicense.value = false
+  }
+}
+
 // Bulk Download Computed
 const bulkDownloadCount = computed(() => {
   const from = Math.max(1, Math.min(bulkDownloadFrom.value, filteredCards.value.length))
@@ -1100,10 +1296,25 @@ const inactiveCardsCount = computed(() => {
 
 const filteredCards = computed(() => {
   let result = cards.value.filter(card => {
-    const matchesSearch = card.ownerName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+    // Extract license ID from URL
+    const urlParts = card.qrLink.split('/')
+    const licenseId = urlParts[urlParts.length - 2] || ''
+    
+    // License ID search
+    const matchesLicense = !licenseSearch.value || 
+                          licenseId.toLowerCase().includes(licenseSearch.value.toLowerCase())
+    
+    // Profile ID search (same as license for now, but kept separate for future)
+    const matchesProfileId = !profileIdSearch.value ||
+                            licenseId.toLowerCase().includes(profileIdSearch.value.toLowerCase())
+    
+    // General search
+    const matchesSearch = !searchQuery.value ||
+                         card.ownerName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
                          card.description?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
                          card.id.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                         card.qrLink.toLowerCase().includes(searchQuery.value.toLowerCase())
+                         card.qrLink.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+                         licenseId.toLowerCase().includes(searchQuery.value.toLowerCase())
 
     const matchesStatus = !statusFilter.value || card.status === statusFilter.value
 
@@ -1111,7 +1322,7 @@ const filteredCards = computed(() => {
         ? true
         : (usedFilter.value === 'used' ? !!card.isUsed : !card.isUsed)
 
-    return matchesSearch && matchesStatus && matchesUsed
+    return matchesLicense && matchesProfileId && matchesSearch && matchesStatus && matchesUsed
   })
 
   // Sort by identifier descending (newest/highest number first)
@@ -1164,19 +1375,6 @@ const visiblePages = computed(() => {
 })
 
 // Methods
-const searchByProfileId = () => {
-  const trimmed = profileIdSearch.value.trim().toLowerCase()
-  if (!trimmed) {
-    foundCard.value = null
-    return
-  }
-  foundCard.value = cards.value.find(c => {
-    // Extract license ID from URL: https://linku.im/04E1F322E81490/pqqr
-    const parts = c.qrLink.split('/')
-    const licenseId = parts[parts.length - 2]?.toLowerCase() || ''
-    return licenseId.includes(trimmed)
-  }) || null
-}
 
 const toggleStatusDropdown = () => {
   showStatusDropdown.value = !showStatusDropdown.value

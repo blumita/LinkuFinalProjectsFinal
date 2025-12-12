@@ -73,4 +73,46 @@ class CardVisitController extends Controller
         $ids = $request->ids;
         CardVisit::whereIn('id', $ids)->delete();
     }
+
+    /**
+     * ایجاد کارت دستی برای لایسنس‌های چاپ شده
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function createManual(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'slug' => 'required|string|max:50|unique:cards,slug',
+            'card_name' => 'required|string|max:255',
+        ], [
+            'slug.required' => 'شناسه لایسنس الزامی است',
+            'slug.unique' => 'این لایسنس قبلا ثبت شده است',
+            'card_name.required' => 'نام کارت الزامی است',
+        ]);
+
+        try {
+            // ایجاد کارت با اطلاعات مینیمال
+            $card = \App\Models\Card::create([
+                'user_id' => 1, // Admin user or default user
+                'slug' => $validated['slug'],
+                'card_name' => $validated['card_name'],
+                'card_number' => \App\Models\Card::max('card_number') + 1 ?? 1,
+                'theme_color' => '#ffffff',
+                'icon_color' => '#000000',
+                'is_active' => true,
+            ]);
+
+            return $this->ok(
+                'لایسنس با موفقیت ایجاد شد.',
+                [
+                    'card' => $card,
+                    'url' => config('app.url') . '/' . $card->slug . '/model-1'
+                ],
+                201
+            );
+        } catch (\Exception $e) {
+            return $this->error('خطا در ایجاد لایسنس: ' . $e->getMessage(), [], 500);
+        }
+    }
 }

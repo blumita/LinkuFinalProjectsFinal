@@ -39,14 +39,14 @@ class CardController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        
+
         if (!$user) {
             return response()->json([
                 'success' => false,
                 'message' => 'کاربر احراز هویت نشده است'
             ], 401);
         }
-        
+
         if ($user->role === 'admin') {
             // Admin can see all business cards
             $cards = Card::all();
@@ -204,14 +204,14 @@ class CardController extends Controller
     public function toggleActive(Request $request, Card $card): JsonResponse
     {
         $this->authorize('update', $card);
-        
+
         $card->is_active = !$card->is_active;
         $card->save();
-        
-        $message = $card->is_active 
-            ? __('messages.card_activated') 
+
+        $message = $card->is_active
+            ? __('messages.card_activated')
             : __('messages.card_deactivated');
-        
+
         return $this->ok($message, new CardResource($card), 200);
     }
 
@@ -282,12 +282,12 @@ class CardController extends Controller
                 $card = $license->card;
             }
         }
-        
+
         // اگر با لایسنس پیدا نشد، با CardVisit چک کنیم
         if (!$card) {
             // جستجو در CardVisit بر اساس قسمتی از qr_link
             $cardVisit = \App\Models\CardVisit::where('qr_link', 'LIKE', '%/' . $slug . '/%')->first();
-            
+
             // اگر CardVisit پیدا شد ولی card_id ندارد یا کارت متصل نیست
             if ($cardVisit && !$cardVisit->unit?->license?->card) {
                 // کارت هنوز فعال نشده
@@ -319,7 +319,7 @@ class CardController extends Controller
                     'status' => $inactiveLicense->status ?? 'inactive',
                 ], 200);
             }
-            
+
             return $this->fail('کارت یافت نشد.', 404);
         }
 

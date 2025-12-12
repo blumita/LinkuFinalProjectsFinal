@@ -384,7 +384,7 @@ const filteredUsers = computed(() => {
   if (!userSearchQuery.value) return []
   const query = userSearchQuery.value.toLowerCase()
   return allUsers.value
-    .filter(user => 
+    .filter(user =>
       user && // بررسی اینکه user وجود داره
       !selectedUsers.value.find(u => u.id === user.id) &&
       ((user.name?.toLowerCase() || '').includes(query) ||
@@ -465,7 +465,7 @@ const removeUser = (userId: number) => {
 const handleBannerUpload = (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
-  
+
   if (file) {
     bannerFile.value = file
     const reader = new FileReader()
@@ -479,7 +479,7 @@ const handleBannerUpload = (event: Event) => {
 const handleIconUpload = (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
-  
+
   if (file) {
     iconFile.value = file
     const reader = new FileReader()
@@ -524,9 +524,9 @@ const sendNotification = async () => {
 
   try {
     const hasImages = bannerFile.value || iconFile.value
-    
+
     let response
-    
+
     if (hasImages) {
       // Use FormData for file uploads
       const formData = new FormData()
@@ -534,31 +534,31 @@ const sendNotification = async () => {
       formData.append('type', selectedType.value)
       formData.append('title', notificationData.value.title)
       formData.append('message', notificationData.value.message)
-      
+
       if (notificationData.value.actionLink) {
         formData.append('actionLink', notificationData.value.actionLink)
       }
-      
+
       if (notificationData.value.backgroundColor) {
         formData.append('backgroundColor', notificationData.value.backgroundColor)
       }
-      
+
       formData.append('isPinned', notificationData.value.isPinned ? '1' : '0')
-      
+
       if (selectedRecipients.value === 'specific') {
         selectedUsers.value.forEach((user, index) => {
           formData.append(`userIds[${index}]`, user.id.toString())
         })
       }
-      
+
       if (bannerFile.value) {
         formData.append('banner', bannerFile.value)
       }
-      
+
       if (iconFile.value) {
         formData.append('icon', iconFile.value)
       }
-      
+
       response = await axios.post('/user/admin/notifications/send', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -576,13 +576,13 @@ const sendNotification = async () => {
         backgroundColor: notificationData.value.backgroundColor || null,
         isPinned: notificationData.value.isPinned
       }
-      
+
       response = await axios.post('/user/admin/notifications/send', payload)
     }
 
     sentCount.value = response.data.sentCount || 0
     showSuccessToast.value = true
-    
+
     setTimeout(() => {
       showSuccessToast.value = false
     }, 4000)

@@ -122,15 +122,15 @@ export const useAuthStore = defineStore('auth', {
                 this.logout()
                 return false
             }
-            
+
             // اگر در حال verify است، منتظر بمان
             if (this.isVerifying) {
                 await new Promise(resolve => setTimeout(resolve, 100))
                 return this.isVerified
             }
-            
+
             this.isVerifying = true
-            
+
             try {
                 const response = await apiClient.get('/user/admin/me', {
                     headers: {
@@ -138,12 +138,12 @@ export const useAuthStore = defineStore('auth', {
                     },
                     timeout: 10000 // 10 ثانیه timeout
                 })
-                
+
                 console.log('Admin me response:', response.data)
-                
+
                 // Backend returns: { success, message, data: { ...user } }
                 const userData = response.data.data || response.data
-                
+
                 if (userData && userData.role === 'admin') {
                     this.user = userData
                     setStoredUser(userData)

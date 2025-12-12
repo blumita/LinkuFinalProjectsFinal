@@ -52,20 +52,20 @@ class UserController
     {
         // Try to get the authenticated user via token
         $token = $request->bearerToken();
-        
+
         if (!$token) {
             return $this->fail('توکن یافت نشد.', null, 401);
         }
 
         // Find the token and get its owner (tokenable)
         $personalAccessToken = \Laravel\Sanctum\PersonalAccessToken::findToken($token);
-        
+
         if (!$personalAccessToken) {
             return $this->fail('توکن نامعتبر است.', null, 401);
         }
 
         $user = $personalAccessToken->tokenable;
-        
+
         // Check if the tokenable is an Admin model
         if (!$user || !($user instanceof \App\Models\Admin)) {
             return $this->fail('ادمین یافت نشد.', null, 401);
@@ -162,7 +162,7 @@ class UserController
 
         $admin = $this->service->addAdmin($validated);
         $admin->load('role'); // Load role relationship
-        
+
         return $this->ok('Admin created successfully', new AdminResource($admin));
     }
 
@@ -339,11 +339,11 @@ class UserController
         ]);
 
         $user = User::findOrFail($validated['userId']);
-        
+
         // Set user to premium (is_pro = 1)
         $user->is_pro = 1;
         $user->save();
-        
+
         return $this->ok('اشتراک با موفقیت ارتقا یافت', [
             'user' => new UserResource($user),
             'is_pro' => true,

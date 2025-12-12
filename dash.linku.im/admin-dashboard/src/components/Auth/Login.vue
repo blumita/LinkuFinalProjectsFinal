@@ -252,12 +252,12 @@ const validatePhone = (phone: string): boolean => {
 // تشخیص نوع ورودی
 const detectInputType = () => {
   const value = username.value.trim()
-  
+
   if (!value) {
     inputType.value = 'unknown'
     return
   }
-  
+
   if (validateEmail(value)) {
     inputType.value = 'email'
   } else if (validatePhone(value)) {
@@ -318,16 +318,16 @@ const formatPhoneNumber = (phone: string) => {
 // ارسال فرم لاگین
 const handleLoginSubmit = async () => {
   const trimmedUsername = username.value.trim()
-  
+
   if (!trimmedUsername) {
     usernameError.value = true
     showInfoToast('لطفاً اطلاعات خود را وارد کنید')
     return
   }
-  
+
   usernameError.value = false
   detectInputType()
-  
+
   if (inputType.value === 'email') {
     await sendEmailOTP()
   } else if (inputType.value === 'phone') {
@@ -343,12 +343,12 @@ const handleLoginSubmit = async () => {
 // ارسال OTP ایمیل
 const sendEmailOTP = async () => {
   isLoading.value = true
-  
+
   try {
     const response = await axios.post('/auth/admin/sendOtpEmail', {
       email: username.value.trim().toLowerCase()
     })
-    
+
     if (response.data && response.data.success === true) {
       step.value = 'otp'
       startTimer()
@@ -373,16 +373,16 @@ const sendEmailOTP = async () => {
 // ارسال OTP موبایل
 const sendPhoneOTP = async () => {
   isLoading.value = true
-  
+
   try {
     const cleanedPhone = username.value.replace(/\D/g, '')
     const normalizedPhone = cleanedPhone.startsWith('0') ? cleanedPhone.slice(1) : cleanedPhone
-    
+
     const response = await axios.post('/auth/admin/sendOtpSms', {
       phone: normalizedPhone,
       countryCode: '+98'
     })
-    
+
     if (response.data && response.data.success === true) {
       step.value = 'otp'
       startTimer()
@@ -411,16 +411,16 @@ const loginWithPassword = async () => {
     showInfoToast('لطفاً رمز عبور خود را وارد کنید', 'ti-lock')
     return
   }
-  
+
   passwordError.value = false
   isLoading.value = true
-  
+
   try {
     const response = await axios.post('/auth/admin/directLogin', {
       username: username.value.trim(),
       password: password.value
     })
-    
+
     if (response.data?.success && response.data?.token) {
       authStore.setToken(response.data.token)
       // Verify token to set user data
@@ -499,7 +499,7 @@ const handlePaste = (event: ClipboardEvent) => {
   const pastedData = event.clipboardData?.getData('text') || ''
   const digits = pastedData.replace(/\D/g, '').slice(0, 4)
   const container = otpContainer.value
-  
+
   digits.split('').forEach((digit, index) => {
     if (index < otp.value.length) {
       otp.value[index] = digit
@@ -517,7 +517,7 @@ const handlePaste = (event: ClipboardEvent) => {
 
 const verifyOtpCode = async () => {
   const fullCode = otp.value.join('')
-  
+
   if (fullCode.length !== 4) {
     return
   }
@@ -526,7 +526,7 @@ const verifyOtpCode = async () => {
 
   try {
     let response
-    
+
     if (inputType.value === 'email') {
       response = await axios.post('/auth/admin/verifyOtpEmail', {
         email: username.value.trim().toLowerCase(),
@@ -535,7 +535,7 @@ const verifyOtpCode = async () => {
     } else if (inputType.value === 'phone') {
       const cleanedPhone = username.value.replace(/\D/g, '')
       const normalizedPhone = cleanedPhone.startsWith('0') ? cleanedPhone.slice(1) : cleanedPhone
-      
+
       response = await axios.post('/auth/admin/verifyOtpSms', {
         phone: normalizedPhone,
         countryCode: '+98',
@@ -584,7 +584,7 @@ const resendCode = async () => {
   if (isLoading.value || countdown.value > 0) {
     return
   }
-  
+
   if (inputType.value === 'email') {
     await sendEmailOTP()
   } else if (inputType.value === 'phone') {

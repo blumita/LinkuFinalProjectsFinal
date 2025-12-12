@@ -532,6 +532,9 @@ Route::middleware(['auth:sanctum','log.activity'])
             Route::post('/', [CardVisitController::class, 'store'])
                 ->name('cardVisit.store');
 
+            Route::post('/manual', [CardVisitController::class, 'createManual'])
+                ->name('cardVisit.createManual');
+
             Route::put('/{id}', [CardVisitController::class, 'update'])
                 ->name('cardVisit.update');
 
