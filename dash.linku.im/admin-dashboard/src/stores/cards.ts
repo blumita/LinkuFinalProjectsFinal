@@ -130,7 +130,7 @@ export const useCardsStore = defineStore('card', () => {
     // ➕ ایجاد کارت دستی (برای لایسنس‌های چاپ شده)
     const createManualCard = async (payload: { slug: string, card_name: string }) => {
         try {
-            const res = await axios.post('user/admin/cardVisit/manual', payload)
+            const res = await axios.post('v1/cards/manual', payload)
             if (res.data?.success) {
                 // کارت جدید رو به لیست اضافه میکنیم
                 await fetchCards()

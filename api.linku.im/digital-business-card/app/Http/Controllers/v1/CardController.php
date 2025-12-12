@@ -325,4 +325,58 @@ class CardController extends Controller
 
         return $this->ok('کارت یافت شد', new CardResource($card), 200);
     }
+
+    /**
+     * ایجاد کارت دستی برای لایسنس‌های چاپ شده (فقط ادمین)
+     */
+    public function createManual(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'slug' => 'required|string|max:50|unique:cards,slug',
+            'card_name' => 'required|string|max:255',
+        ], [
+            'slug.required' => 'شناسه لایسنس الزامی است',
+            'slug.unique' => 'این لایسنس قبلا ثبت شده است',
+            'card_name.required' => 'نام کارت الزامی است',
+        ]);
+
+        try {
+            $maxCardNumber = Card::max('card_number');
+            $nextCardNumber = $maxCardNumber ? $maxCardNumber + 1 : 1;
+            
+            $card = Card::create([
+                'user_id' => auth()->id() ?? 1,
+                'slug' => $validated['slug'],
+                'card_name' => $validated['card_name'],
+                'card_number' => $nextCardNumber,
+                'theme_color' => '#ffffff',
+                'icon_color' => '#000000',
+                'is_active' => true,
+            ]);
+
+            // ایجاد CardVisit برای نمایش در لیست ادمین
+            $cardUrl = 'https://linku.im/' . $card->slug . '/model-1';
+            \App\Models\CardVisit::create([
+                'qr_link' => $cardUrl,
+                'owner_name' => $validated['card_name'],
+                'status' => 'active',
+                'mobile' => '',
+                'card_type' => 1,
+            ]);
+
+            return $this->ok(
+                'لایسنس با موفقیت ایجاد شد.',
+                new CardResource($card),
+                201
+            );
+        } catch (\Exception $e) {
+            Log::error('Manual card creation error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در ایجاد لایسنس: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
