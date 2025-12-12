@@ -18,10 +18,132 @@
         </div>
       </div>
 
-      <!-- Form Card -->
-      <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-5 sm:p-6 transition-colors duration-300">
-        <!-- Bulk Card Creation -->
-        <div v-if="activeTab === 'bulk'">
+      <!-- Tabs -->
+      <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden">
+        <div class="flex border-b border-gray-200 dark:border-slate-700">
+          <button
+            @click="activeTab = 'auto'"
+            :class="[
+              'flex-1 py-4 px-6 text-sm font-semibold transition-all duration-200',
+              activeTab === 'auto'
+                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-b-2 border-blue-600'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700'
+            ]"
+          >
+            <div class="flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+              ایجاد خودکار
+            </div>
+          </button>
+          <button
+            @click="activeTab = 'manual'"
+            :class="[
+              'flex-1 py-4 px-6 text-sm font-semibold transition-all duration-200',
+              activeTab === 'manual'
+                ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border-b-2 border-orange-600'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700'
+            ]"
+          >
+            <div class="flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+              </svg>
+              ایجاد دستی
+            </div>
+          </button>
+        </div>
+
+        <!-- Auto Tab -->
+        <div v-if="activeTab === 'auto'" class="p-6">
+          <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6">
+            <p class="text-blue-700 dark:text-blue-400 text-sm flex items-start gap-2">
+              <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>لایسنس به صورت خودکار تولید می‌شود</span>
+            </p>
+          </div>
+          <form @submit.prevent="createAutoCard" class="space-y-5">
+            <div>
+              <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">نام کارت <span class="text-red-500">*</span></label>
+              <input v-model="autoForm.cardName" type="text" required placeholder="مثال: کارت من" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 transition-colors" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-3">محصول <span class="text-red-500">*</span></label>
+              <div class="grid grid-cols-3 gap-3">
+                <div v-for="product in products" :key="product.id" @click="autoForm.productUnitId = product.id" :class="['relative cursor-pointer rounded-lg border-2 p-4 transition-all', autoForm.productUnitId === product.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-md' : 'border-gray-200 dark:border-slate-600']">
+                  <div class="text-center">
+                    <img :src="product.image" :alt="product.name" class="w-12 h-12 mx-auto mb-2 object-contain" />
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ product.name }}</h3>
+                  </div>
+                  <div v-if="autoForm.productUnitId === product.id" class="absolute -top-1 -left-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center"><i class="ti ti-check text-white text-xs"></i></div>
+                </div>
+              </div>
+            </div>
+            <div v-if="autoError" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+              <p class="text-red-700 dark:text-red-400 text-sm">{{ autoError }}</p>
+            </div>
+            <div class="flex gap-3 pt-5 border-t border-gray-200 dark:border-slate-700">
+              <button type="submit" :disabled="isCreatingAuto" class="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-2">
+                <i v-if="!isCreatingAuto" class="ti ti-plus"></i>
+                <i v-else class="ti ti-loader animate-spin"></i>
+                {{ isCreatingAuto ? 'در حال ایجاد...' : 'ایجاد کارت' }}
+              </button>
+              <router-link :to="{ name: 'cards' }" class="px-6 py-3 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium flex items-center justify-center gap-2"><i class="ti ti-x"></i>انصراف</router-link>
+            </div>
+          </form>
+        </div>
+
+        <!-- Manual Tab -->
+        <div v-if="activeTab === 'manual'" class="p-6">
+          <div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl p-4 mb-6">
+            <p class="text-orange-700 dark:text-orange-400 text-sm flex items-start gap-2">
+              <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>برای کارت‌های چاپ شده - لایسنس روی کارت فیزیکی نوشته شده</span>
+            </p>
+          </div>
+          <form @submit.prevent="createManualCard" class="space-y-5">
+            <div>
+              <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">شناسه لایسنس (Slug) <span class="text-red-500">*</span></label>
+              <input v-model="manualForm.license" type="text" required placeholder="مثال: byli6oxl" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 transition-colors font-mono" />
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">شناسه یکتای کارت از روی کارت فیزیکی</p>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">نام کارت <span class="text-red-500">*</span></label>
+              <input v-model="manualForm.cardName" type="text" required placeholder="مثال: مینی کارت MD" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 transition-colors" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-3">محصول <span class="text-red-500">*</span></label>
+              <div class="grid grid-cols-3 gap-3">
+                <div v-for="product in products" :key="product.id" @click="manualForm.productUnitId = product.id" :class="['relative cursor-pointer rounded-lg border-2 p-4 transition-all', manualForm.productUnitId === product.id ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20 shadow-md' : 'border-gray-200 dark:border-slate-600']">
+                  <div class="text-center">
+                    <img :src="product.image" :alt="product.name" class="w-12 h-12 mx-auto mb-2 object-contain" />
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ product.name }}</h3>
+                  </div>
+                  <div v-if="manualForm.productUnitId === product.id" class="absolute -top-1 -left-1 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center"><i class="ti ti-check text-white text-xs"></i></div>
+                </div>
+              </div>
+            </div>
+            <div v-if="manualError" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+              <p class="text-red-700 dark:text-red-400 text-sm">{{ manualError }}</p>
+            </div>
+            <div class="flex gap-3 pt-5 border-t border-gray-200 dark:border-slate-700">
+              <button type="submit" :disabled="isCreatingManual" class="flex-1 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:from-gray-400 disabled:to-gray-500 text-white py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-2">
+                <i v-if="!isCreatingManual" class="ti ti-plus"></i>
+                <i v-else class="ti ti-loader animate-spin"></i>
+                {{ isCreatingManual ? 'در حال ایجاد...' : 'ایجاد لایسنس' }}
+              </button>
+              <router-link :to="{ name: 'cards' }" class="px-6 py-3 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium flex items-center justify-center gap-2"><i class="ti ti-x"></i>انصراف</router-link>
+            </div>
+          </form>
+        </div>
+
+        <!-- Old Bulk Tab - Hidden -->
+        <div v-if="activeTab === 'bulk'" style="display:none">
           <form @submit.prevent="createBulkCards" class="space-y-5">
               <!-- Card Type Selection -->
               <div>
@@ -506,10 +628,29 @@ const isBulkSaving = ref(false)
 const router = useRouter()
 const {showSuccess, showError} = useAlert()
 
-const activeTab = ref<'single' | 'bulk'>('bulk')
+const activeTab = ref<'auto' | 'manual' | 'bulk'>('auto')
 const productStore = useProductStore();
+const cardStore = useCardsStore()
 const products = computed(()=>productStore.products);
-// Form data
+
+// Auto Card Form
+const autoForm = ref({
+  cardName: '',
+  productUnitId: ''
+})
+const isCreatingAuto = ref(false)
+const autoError = ref('')
+
+// Manual Card Form
+const manualForm = ref({
+  license: '',
+  cardName: '',
+  productUnitId: ''
+})
+const isCreatingManual = ref(false)
+const manualError = ref('')
+
+// Old Form data
 const cardForm = reactive({
   ownerName: '',
   qrLink: '',
@@ -605,7 +746,6 @@ const downloadQRCode = async () => {
     await showError('خطا در دانلود', 'متاسفانه امکان دانلود کد QR وجود ندارد')
   }
 }
-const cardStore = useCardsStore()
 // Save single card
 const saveCard = async () => {
   if (!cardForm.ownerName || cardForm.ownerName.trim().length < 3) {
@@ -652,6 +792,71 @@ const createBulkCards = async () => {
     console.error('Error creating bulk cards:', error)
   }finally{
     isBulkSaving.value = false
+  }
+}
+
+// Create Auto Card
+const createAutoCard = async () => {
+  if (!autoForm.value.cardName.trim()) {
+    autoError.value = 'لطفا نام کارت را وارد کنید'
+    return
+  }
+  if (!autoForm.value.productUnitId) {
+    autoError.value = 'لطفا محصول را انتخاب کنید'
+    return
+  }
+  isCreatingAuto.value = true
+  autoError.value = ''
+  try {
+    const response = await cardStore.createCard({
+      card_name: autoForm.value.cardName.trim(),
+      product_unit_id: autoForm.value.productUnitId
+    })
+    if (response.success || response) {
+      await showSuccess('موفق!', 'کارت با موفقیت ایجاد شد')
+      await router.push({ name: 'cards' })
+    } else {
+      autoError.value = response.message || 'خطا در ایجاد کارت'
+    }
+  } catch (error: any) {
+    autoError.value = error.response?.data?.message || 'خطا در ایجاد کارت'
+  } finally {
+    isCreatingAuto.value = false
+  }
+}
+
+// Create Manual Card
+const createManualCard = async () => {
+  if (!manualForm.value.license.trim()) {
+    manualError.value = 'لطفا شناسه لایسنس را وارد کنید'
+    return
+  }
+  if (!manualForm.value.cardName.trim()) {
+    manualError.value = 'لطفا نام کارت را وارد کنید'
+    return
+  }
+  if (!manualForm.value.productUnitId) {
+    manualError.value = 'لطفا محصول را انتخاب کنید'
+    return
+  }
+  isCreatingManual.value = true
+  manualError.value = ''
+  try {
+    const response = await cardStore.createManualCard({
+      slug: manualForm.value.license.trim(),
+      card_name: manualForm.value.cardName.trim(),
+      product_unit_id: manualForm.value.productUnitId
+    })
+    if (response.success) {
+      await showSuccess('موفق!', 'لایسنس با موفقیت ایجاد شد')
+      await router.push({ name: 'cards' })
+    } else {
+      manualError.value = response.message || 'خطا در ایجاد لایسنس'
+    }
+  } catch (error: any) {
+    manualError.value = error.response?.data?.message || 'خطا در ایجاد لایسنس'
+  } finally {
+    isCreatingManual.value = false
   }
 }
 
