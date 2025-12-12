@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 class Card extends Model
 {
     protected $fillable = [
+        'user_id',
         'card_user_id',
         'slug',
         'card_name',
