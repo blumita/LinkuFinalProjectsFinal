@@ -154,8 +154,8 @@ export const useCardsStore = defineStore('card', () => {
             } else if (err.message) {
                 errorMessage = err.message
             }
-            return { 
-                success: false, 
+            return {
+                success: false,
                 message: errorMessage
             }
         }

@@ -71,11 +71,11 @@
             <div v-if="!cardForm.isAutoGenerate">
               <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">شناسه لایسنس (Slug) <span class="text-red-500">*</span></label>
               <div class="flex gap-2">
-                <input 
-                  v-model="cardForm.license" 
-                  type="text" 
-                  placeholder="مثال: byli6oxl" 
-                  class="flex-1 px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 transition-colors font-mono" 
+                <input
+                  v-model="cardForm.license"
+                  type="text"
+                  placeholder="مثال: byli6oxl"
+                  class="flex-1 px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 transition-colors font-mono"
                 />
                 <button
                   type="button"
@@ -177,7 +177,7 @@ const checkLicenseExists = async () => {
     licenseCheckStatus.value = null
     return
   }
-  
+
   // بررسی فرمت لاتین
   const slugPattern = /^[a-zA-Z0-9-_]+$/
   if (!slugPattern.test(license)) {

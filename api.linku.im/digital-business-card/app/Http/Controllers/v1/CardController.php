@@ -347,7 +347,8 @@ class CardController extends Controller
                 ], 404);
             }
 
-            $productCode = $cardProduct->code;
+            // استفاده از identifier (مثل MD, SD) - اگر code خالی بود از identifier استفاده کن
+            $productCode = $cardProduct->identifier ?? $cardProduct->code ?? 'CARD';
             $productName = $cardProduct->name;
 
             // تولید slug تصادفی یکتا
@@ -426,7 +427,8 @@ class CardController extends Controller
                 ], 404);
             }
 
-            $productCode = $cardProduct->code; // SD, MC, SC
+            // استفاده از identifier (مثل MD, SD) - اگر code خالی بود از identifier استفاده کن
+            $productCode = $cardProduct->identifier ?? $cardProduct->code ?? 'CARD';
             $productName = $cardProduct->name; // نام محصول برای card_name
 
             // ایجاد یک ProductUnit جدید برای این کارت دستی
@@ -490,7 +492,7 @@ class CardController extends Controller
         }
 
         $exists = Card::where('slug', $slug)->exists();
-        
+
         return response()->json([
             'success' => true,
             'exists' => $exists,
