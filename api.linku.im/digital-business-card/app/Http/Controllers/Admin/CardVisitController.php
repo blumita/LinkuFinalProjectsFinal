@@ -63,7 +63,7 @@ class CardVisitController extends Controller
     public function destroy(Request $request, $id): void
     {
         $cardVisit = CardVisit::find($id);
-        
+
         if ($cardVisit) {
             // حذف License و ProductUnit مرتبط
             if ($cardVisit->product_unit_id) {
@@ -75,18 +75,18 @@ class CardVisitController extends Controller
                     $productUnit->delete();
                 }
             }
-            
+
             $cardVisit->delete();
         }
     }
-    
+
     public function destroyCustom(Request $request): void
     {
         $ids = $request->ids;
-        
+
         // گرفتن CardVisit ها قبل از حذف
         $cardVisits = CardVisit::whereIn('id', $ids)->get();
-        
+
         foreach ($cardVisits as $cardVisit) {
             if ($cardVisit->product_unit_id) {
                 $productUnit = \App\Models\ProductUnit::find($cardVisit->product_unit_id);
@@ -98,13 +98,13 @@ class CardVisitController extends Controller
                 }
             }
         }
-        
+
         CardVisit::whereIn('id', $ids)->delete();
     }
 
     /**
      * ایجاد کارت دستی برای لایسنس‌های چاپ شده
-     * 
+     *
      * @param Request $request
      * @return JsonResponse
      */
@@ -123,7 +123,7 @@ class CardVisitController extends Controller
             // ایجاد کارت با اطلاعات مینیمال
             $maxCardNumber = \App\Models\Card::max('card_number');
             $nextCardNumber = $maxCardNumber ? $maxCardNumber + 1 : 1;
-            
+
             $card = \App\Models\Card::create([
                 'user_id' => auth()->id() ?? 1,
                 'slug' => $validated['slug'],

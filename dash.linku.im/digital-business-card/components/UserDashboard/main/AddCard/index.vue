@@ -607,6 +607,7 @@ async function saveChanges() {
     }
     
     const payload = {
+      cardName: form.name || 'کارت جدید', // cardName required by backend
       name: form.name,
     }
     

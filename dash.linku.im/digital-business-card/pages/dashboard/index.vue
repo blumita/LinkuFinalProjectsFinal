@@ -35,33 +35,27 @@
       <!-- Profile Cards Container -->
       <div class="w-full max-w-xs mx-auto px-4 lg:px-0">
           <!-- Loading State -->
-          <div v-if="loading" class="text-center animate-pulse">
+          <div v-if="loading" class="text-center">
             <div class="bg-card rounded-[22px] overflow-hidden shadow-[0_10px_30px_-10px_rgba(0,0,0,0.25)] border border-border">
               <!-- Banner Skeleton -->
-              <div class="h-28 bg-muted"></div>
+              <div class="h-28 bg-muted animate-pulse"></div>
 
               <!-- Content Skeleton -->
               <div class="relative px-4 pb-5 -mt-8">
                 <!-- Avatar Skeleton -->
                 <div class="relative w-fit mx-auto">
-                  <div class="w-24 h-24 rounded-full bg-muted ring-4 ring-card shadow-md"></div>
-                  <!-- Chain icon skeleton -->
-                  <div class="absolute -right-2 bottom-1 h-6 w-6 rounded-full bg-muted shadow border border-border"></div>
+                  <div class="w-24 h-24 rounded-full bg-muted ring-4 ring-card shadow-md animate-pulse"></div>
                 </div>
 
-                <!-- Info Skeleton -->
-                <div class="text-center mt-3 mb-4 space-y-2">
-                  <div class="flex items-center justify-center gap-1">
-                    <div class="h-5 w-32 bg-muted rounded"></div>
-                    <div class="w-5 h-5 bg-muted rounded-full"></div>
-                  </div>
-                  <div class="h-3 w-24 bg-muted-foreground/20 rounded mx-auto"></div>
+                <!-- Loading Text -->
+                <div class="text-center mt-4 mb-4">
+                  <p class="text-sm text-muted-foreground">در حال بارگذاری پروفایل...</p>
                 </div>
 
                 <!-- Actions Skeleton -->
                 <div class="grid gap-2.5">
-                  <div class="w-full h-14 rounded-2xl bg-muted"></div>
-                  <div class="w-full h-14 rounded-2xl bg-muted"></div>
+                  <div class="w-full h-14 rounded-2xl bg-muted animate-pulse"></div>
+                  <div class="w-full h-14 rounded-2xl bg-muted animate-pulse"></div>
                 </div>
               </div>
             </div>
@@ -116,7 +110,7 @@
                     <h3 class="text-[15px] font-extrabold text-foreground">{{ activeCard.name && activeCard.name !== 'کارت پیش فرض' ? activeCard.name : userName }}</h3>
                     <i v-if="isPro" class="ti ti-rosette-discount-check-filled text-primary text-xl"></i>
                   </div>
-                  <p class="text-[12px] text-muted-foreground mt-1">{{ activeCard.bio || 'پروفایل شما' }}</p>
+                  <p class="text-[12px] text-muted-foreground mt-1 line-clamp-1">{{ truncateBio(activeCard.bio) || 'پروفایل شما' }}</p>
                 </div>
 
                 <!-- Actions -->
@@ -207,6 +201,13 @@ const activeCard = computed(() => formStore.defaultCard || formStore.cards?.[0] 
 // Message counts for inbox badge
 const { fetchCounts } = useMessageCounts()
 
+// کوتاه کردن bio با ... 
+const truncateBio = (bio, maxLength = 50) => {
+  if (!bio) return null
+  if (bio.length <= maxLength) return bio
+  return bio.substring(0, maxLength) + '...'
+}
+
 // Copy profile link
 const copyProfileLink = async () => {
   const link = `${window.location.origin}/${userUserName.value}`
@@ -259,7 +260,7 @@ onMounted(async () => {
   
   if (authStore.isAuthenticated) {
     // نمایش داده‌های کش شده (اگر وجود داشته باشد) برای سرعت بیشتر
-    if (userStore.user) {
+    if (userStore.user && userStore.cards?.length > 0) {
       console.log('📦 Using cached user data')
       console.log('👑 Cached isPro:', userStore.user?.isPro)
       formStore.cards = userStore.cards
