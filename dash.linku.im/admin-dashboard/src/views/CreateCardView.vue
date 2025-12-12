@@ -109,12 +109,15 @@
           <form @submit.prevent="createManualCard" class="space-y-5">
             <div>
               <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">شناسه لایسنس (Slug) <span class="text-red-500">*</span></label>
-              <input v-model="manualForm.license" type="text" required placeholder="مثال: byli6oxl" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 transition-colors font-mono" />
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">شناسه یکتای کارت از روی کارت فیزیکی</p>
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">نام کارت <span class="text-red-500">*</span></label>
-              <input v-model="manualForm.cardName" type="text" required placeholder="مثال: مینی کارت MD" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 transition-colors" />
+              <input 
+                v-model="manualForm.license" 
+                type="text" 
+                required 
+                pattern="[a-zA-Z0-9-_]+"
+                placeholder="مثال: byli6oxl" 
+                class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 transition-colors font-mono" 
+              />
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">فقط حروف انگلیسی، اعداد و - یا _ مجاز است (نام از محصول انتخابی گرفته می‌شود)</p>
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-3">محصول <span class="text-red-500">*</span></label>
@@ -644,7 +647,6 @@ const autoError = ref('')
 // Manual Card Form
 const manualForm = ref({
   license: '',
-  cardName: '',
   productUnitId: ''
 })
 const isCreatingManual = ref(false)
@@ -831,8 +833,10 @@ const createManualCard = async () => {
     manualError.value = 'لطفا شناسه لایسنس را وارد کنید'
     return
   }
-  if (!manualForm.value.cardName.trim()) {
-    manualError.value = 'لطفا نام کارت را وارد کنید'
+  // بررسی فرمت لاتین
+  const slugPattern = /^[a-zA-Z0-9-_]+$/
+  if (!slugPattern.test(manualForm.value.license.trim())) {
+    manualError.value = 'شناسه فقط باید شامل حروف انگلیسی، اعداد و - یا _ باشد'
     return
   }
   if (!manualForm.value.productUnitId) {
@@ -844,7 +848,6 @@ const createManualCard = async () => {
   try {
     const response = await cardStore.createManualCard({
       slug: manualForm.value.license.trim(),
-      card_name: manualForm.value.cardName.trim(),
       product_unit_id: manualForm.value.productUnitId
     })
     if (response.success) {

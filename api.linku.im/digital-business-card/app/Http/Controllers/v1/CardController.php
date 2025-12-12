@@ -14,6 +14,7 @@ use App\Services\CardService;
 use App\Services\UserService;
 use App\Traits\HasApiResponses;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -332,13 +333,12 @@ class CardController extends Controller
     public function createManual(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'slug' => 'required|string|max:50|unique:cards,slug',
-            'card_name' => 'required|string|max:255',
+            'slug' => ['required', 'string', 'max:50', 'unique:cards,slug', 'regex:/^[a-zA-Z0-9-_]+$/'],
             'product_unit_id' => 'required|integer',
         ], [
             'slug.required' => 'شناسه لایسنس الزامی است',
             'slug.unique' => 'این لایسنس قبلا ثبت شده است',
-            'card_name.required' => 'نام کارت الزامی است',
+            'slug.regex' => 'شناسه فقط باید شامل حروف انگلیسی، اعداد، خط تیره و آندرلاین باشد',
             'product_unit_id.required' => 'محصول الزامی است',
         ]);
 
@@ -353,6 +353,7 @@ class CardController extends Controller
             }
             
             $productCode = $productUnit->product->code; // SD, MC, SC
+            $productName = $productUnit->product->name; // نام محصول برای card_name
             
             $maxCardNumber = Card::max('card_number');
             $nextCardNumber = $maxCardNumber ? $maxCardNumber + 1 : 1;
@@ -360,7 +361,7 @@ class CardController extends Controller
             $card = Card::create([
                 'user_id' => auth()->id() ?? 1,
                 'slug' => $validated['slug'],
-                'card_name' => $validated['card_name'],
+                'card_name' => $productName, // نام از محصول
                 'card_number' => $nextCardNumber,
                 'theme_color' => '#ffffff',
                 'icon_color' => '#000000',
@@ -371,7 +372,7 @@ class CardController extends Controller
             $cardUrl = 'https://linku.im/profile/' . $card->slug . '/' . $productCode;
             \App\Models\CardVisit::create([
                 'qr_link' => $cardUrl,
-                'owner_name' => $validated['card_name'],
+                'owner_name' => $productName, // نام محصول
                 'status' => 'active',
                 'mobile' => '',
                 'card_type' => 1,

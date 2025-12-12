@@ -128,7 +128,7 @@ export const useCardsStore = defineStore('card', () => {
     }
 
     // ➕ ایجاد کارت دستی (برای لایسنس‌های چاپ شده)
-    const createManualCard = async (payload: { slug: string, card_name: string, product_unit_id: string }) => {
+    const createManualCard = async (payload: { slug: string, product_unit_id: string }) => {
         try {
             const res = await axios.post('v1/cards/manual', payload)
             // Laravel response format: { success: true, message: '...', data: {...} }
