@@ -680,6 +680,7 @@ const route = useRoute();
 const cardId = route.query.cardId
 const slug = route.params.slug
 const isDefault = route.query.isDefault
+const isNewCardPreview = slug === 'newCard' // برای پیش‌نمایش کارت جدید
 // Generate dynamic meta tags based on form data
 const {$axios} = useNuxtApp()
 const runtimeConfig = useRuntimeConfig()
@@ -688,8 +689,12 @@ const runtimeConfig = useRuntimeConfig()
 const apiBase = runtimeConfig.public.apiBase || 'https://api.linku.im'
 const urlPrefix = `${apiBase}/api/cards`
 
-// ✅ واکشی اطلاعات کارت
+// ✅ واکشی اطلاعات کارت - فقط اگر کارت جدید نباشد
 const { data: card } = await useAsyncData('card', async () => {
+  // برای پیش‌نمایش کارت جدید از API نمی‌خونیم
+  if (isNewCardPreview) {
+    return { data: null }
+  }
   return await $fetch(`${urlPrefix}/${slug}/preview`, {method: 'GET'})
 })
 
@@ -1139,6 +1144,12 @@ onMounted(async () => {
   onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside)
   })
+
+  // برای پیش‌نمایش کارت جدید فقط از postMessage استفاده میکنیم
+  if (slug === 'newCard') {
+    isLoading.value = false
+    return
+  }
 
   if (!isDefault) {
     try {
