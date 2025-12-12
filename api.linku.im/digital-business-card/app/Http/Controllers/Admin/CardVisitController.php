@@ -93,25 +93,31 @@ class CardVisitController extends Controller
 
         try {
             // ایجاد کارت با اطلاعات مینیمال
+            $maxCardNumber = \App\Models\Card::max('card_number');
+            $nextCardNumber = $maxCardNumber ? $maxCardNumber + 1 : 1;
+            
             $card = \App\Models\Card::create([
-                'user_id' => 1, // Admin user or default user
                 'slug' => $validated['slug'],
                 'card_name' => $validated['card_name'],
-                'card_number' => \App\Models\Card::max('card_number') + 1 ?? 1,
+                'card_number' => $nextCardNumber,
                 'theme_color' => '#ffffff',
                 'icon_color' => '#000000',
                 'is_active' => true,
+                'creator_id' => auth()->id() ?? 1,
             ]);
 
             return $this->ok(
                 'لایسنس با موفقیت ایجاد شد.',
                 [
                     'card' => $card,
-                    'url' => config('app.url') . '/' . $card->slug . '/model-1'
+                    'url' => 'https://linku.im/' . $card->slug . '/model-1'
                 ],
                 201
             );
         } catch (\Exception $e) {
+            \Log::error('Manual card creation error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
             return $this->error('خطا در ایجاد لایسنس: ' . $e->getMessage(), [], 500);
         }
     }
