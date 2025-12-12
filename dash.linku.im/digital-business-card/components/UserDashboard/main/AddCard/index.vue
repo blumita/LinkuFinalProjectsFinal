@@ -361,6 +361,7 @@
 import {ref, computed, watch, onMounted, onUnmounted} from 'vue'
 import {useSafeFormStore} from '~/composables/useSafeFormStore'
 import {useSafeNavigation} from '~/composables/useSafeNavigation'
+import {useUserStore} from '~/stores/user'
 import TabAbout from '@/components/UserDashboard/main/EditCard/tabs/TabAbout.vue'
 import AddLinkModal from '@/components/UserDashboard/modals/AddLinkModal.vue'
 import LayoutSelector from '../EditCard/components/LayoutSelector.vue'
@@ -374,6 +375,7 @@ import * as EditForms from '@/components/ui/forms/edit'
 // Stores
 const formStore = useSafeFormStore()
 const form = useFormStore()
+const userStore = useUserStore()
 const { goBack: safeGoBack, safeNavigateTo } = useSafeNavigation()
 
 // حالت drag & drop
@@ -630,6 +632,10 @@ async function saveChanges() {
     
     if (response.data.success) {
       showInfoToast('کارت با موفقیت ایجاد شد', 'ti-check')
+      
+      // ✅ به‌روزرسانی userStore برای نمایش کارت جدید در داشبورد
+      await userStore.fetchUser()
+      
       setTimeout(() => {
         safeNavigateTo('/dashboard')
       }, 1500)

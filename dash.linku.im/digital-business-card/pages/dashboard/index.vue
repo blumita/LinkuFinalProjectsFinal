@@ -108,7 +108,7 @@
                 <div class="text-center mt-3 mb-4">
                   <div class="flex items-center justify-center gap-1">
                     <h3 class="text-[15px] font-extrabold text-foreground">{{ activeCard.name && activeCard.name !== 'کارت پیش فرض' ? activeCard.name : userName }}</h3>
-                    <i v-if="isPro" class="ti ti-rosette-discount-check-filled text-primary text-xl"></i>
+                    <i v-if="isPro && activeCard?.isDefault" class="ti ti-rosette-discount-check-filled text-primary text-xl"></i>
                   </div>
                   <p class="text-[12px] text-muted-foreground mt-1 line-clamp-1">{{ truncateBio(activeCard.bio) || 'پروفایل شما' }}</p>
                 </div>
