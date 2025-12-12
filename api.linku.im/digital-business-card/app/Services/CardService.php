@@ -26,8 +26,8 @@ class CardService
 
             $cardData = [
                 'card_name' => $data['cardName'],
-                'layout_mode' => $data['layout'],
-                'save_contact' => $data['saveContact'],
+                'layout_mode' => $data['layout'] ?? 'right',
+                'save_contact' => $data['saveContact'] ?? null,
                 'is_default' => $isDefault,
             ];
 
