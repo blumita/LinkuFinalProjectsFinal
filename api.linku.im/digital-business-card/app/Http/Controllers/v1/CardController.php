@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class CardController extends Controller
@@ -351,13 +350,13 @@ class CardController extends Controller
                     'message' => 'محصول یافت نشد'
                 ], 404);
             }
-            
+
             $productCode = $productUnit->product->code; // SD, MC, SC
             $productName = $productUnit->product->name; // نام محصول برای card_name
-            
+
             $maxCardNumber = Card::max('card_number');
             $nextCardNumber = $maxCardNumber ? $maxCardNumber + 1 : 1;
-            
+
             $card = Card::create([
                 'user_id' => auth()->id() ?? 1,
                 'slug' => $validated['slug'],
