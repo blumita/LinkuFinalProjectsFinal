@@ -131,7 +131,8 @@ export const useCardsStore = defineStore('card', () => {
     const createManualCard = async (payload: { slug: string, card_name: string }) => {
         try {
             const res = await axios.post('v1/cards/manual', payload)
-            if (res.data?.success) {
+            // Laravel response format: { success: true, message: '...', data: {...} }
+            if (res.data?.success !== false && res.status === 201) {
                 // کارت جدید رو به لیست اضافه میکنیم
                 await fetchCards()
                 return { success: true, data: res.data.data }
