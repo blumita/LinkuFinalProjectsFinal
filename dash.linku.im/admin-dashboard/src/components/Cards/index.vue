@@ -26,18 +26,6 @@
         <p class="text-gray-600 dark:text-gray-400">مدیریت و نمایش کارت‌های ویزیت دیجیتال مشتریان</p>
       </div>
       <div class="flex items-center gap-3 flex-wrap">
-        <!-- Manual License Creation Button -->
-        <button
-          @click="showManualLicenseModal = true"
-          class="bg-orange-600 hover:bg-orange-700 text-white px-4 sm:px-6 py-3 rounded-xl transition-colors duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          <span class="hidden sm:inline">ایجاد لایسنس دستی</span>
-          <span class="sm:hidden">لایسنس</span>
-        </button>
-
         <!-- Import Button -->
         <button
           @click="showImportModal = true"
@@ -91,16 +79,16 @@
           </button>
         </div>
 
-        <router-link
-          :to="{ name: 'create-card' }"
+        <button
+          @click="showCreateCardModal = true"
           class="bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-3 rounded-xl transition-colors duration-300 flex items-center gap-2 shadow-lg hover:shadow-xl"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
           </svg>
-          <span class="hidden sm:inline">افزودن کارت جدید</span>
+          <span class="hidden sm:inline">ایجاد کارت</span>
           <span class="sm:hidden">جدید</span>
-        </router-link>
+        </button>
       </div>
     </div>
 
@@ -897,9 +885,226 @@
       </div>
     </div>
 
-    <!-- Manual License Creation Modal -->
+    <!-- Create Card Modal (with Tabs) -->
     <div
-      v-if="showManualLicenseModal"
+      v-if="showCreateCardModal"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style="backdrop-filter: blur(8px)"
+    >
+      <!-- Backdrop -->
+      <div
+        @click="showCreateCardModal = false"
+        class="absolute inset-0 bg-black/40"
+      ></div>
+
+      <!-- Modal Content -->
+      <div
+        @click.stop
+        class="relative bg-white dark:bg-gray-800 rounded-3xl p-6 sm:p-8 max-w-2xl w-full transform transition-all duration-300 scale-100 border border-gray-100 dark:border-gray-700 max-h-[90vh] overflow-y-auto"
+      >
+        <div class="mb-6 text-center">
+          <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">ایجاد کارت جدید</h3>
+          <p class="text-gray-600 dark:text-gray-300">نوع ایجاد کارت را انتخاب کنید</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex gap-2 mb-6 border-b border-gray-200 dark:border-gray-700">
+          <button
+            @click="createCardTab = 'auto'"
+            :class="[
+              'flex-1 py-3 px-4 text-sm font-medium transition-colors rounded-t-lg',
+              createCardTab === 'auto'
+                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-b-2 border-blue-600'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+            ]"
+          >
+            ایجاد خودکار
+          </button>
+          <button
+            @click="createCardTab = 'manual'"
+            :class="[
+              'flex-1 py-3 px-4 text-sm font-medium transition-colors rounded-t-lg',
+              createCardTab === 'manual'
+                ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border-b-2 border-orange-600'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+            ]"
+          >
+            ایجاد دستی
+          </button>
+        </div>
+
+        <!-- Auto Create Tab Content -->
+        <div v-if="createCardTab === 'auto'" class="space-y-4">
+          <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-4">
+            <p class="text-blue-700 dark:text-blue-400 text-sm flex items-start gap-2">
+              <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>در حالت خودکار، لایسنس به صورت رندوم تولید می‌شود.</span>
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              نام کارت
+              <span class="text-red-500">*</span>
+            </label>
+            <input
+              v-model="autoCardData.cardName"
+              type="text"
+              placeholder="مثال: کارت ویزیت من"
+              class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              محصول
+              <span class="text-red-500">*</span>
+            </label>
+            <select
+              v-model="autoCardData.productUnitId"
+              class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            >
+              <option value="">محصول را انتخاب کنید</option>
+              <option value="1">مینی کارت</option>
+              <option value="2">کارت استاندارد</option>
+              <option value="3">کارت برچسبی</option>
+            </select>
+          </div>
+
+          <div v-if="createCardError" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+            <p class="text-red-700 dark:text-red-400 text-sm flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              {{ createCardError }}
+            </p>
+          </div>
+
+          <div class="space-y-3 mt-6">
+            <button
+              @click="createAutoCard"
+              :disabled="isCreatingCard"
+              class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-3 rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2"
+            >
+              <svg v-if="!isCreatingCard" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              <svg v-else class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {{ isCreatingCard ? 'در حال ایجاد...' : 'ایجاد کارت' }}
+            </button>
+            <button
+              @click="showCreateCardModal = false"
+              :disabled="isCreatingCard"
+              class="w-full bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 disabled:opacity-50 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-xl transition-colors font-medium border border-gray-200 dark:border-gray-600"
+            >
+              انصراف
+            </button>
+          </div>
+        </div>
+
+        <!-- Manual Create Tab Content -->
+        <div v-if="createCardTab === 'manual'" class="space-y-4">
+          <div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl p-4 mb-4">
+            <p class="text-orange-700 dark:text-orange-400 text-sm flex items-start gap-2">
+              <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>برای کارت‌های چاپ شده که لایسنس آن‌ها روی کارت فیزیکی نوشته شده است.</span>
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              شناسه لایسنس (Slug)
+              <span class="text-red-500">*</span>
+            </label>
+            <input
+              v-model="manualLicenseData.license"
+              type="text"
+              placeholder="مثال: byli6oxl"
+              class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+            />
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">شناسه یکتای کارت از روی کارت فیزیکی</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              نام کارت
+              <span class="text-red-500">*</span>
+            </label>
+            <input
+              v-model="manualLicenseData.cardName"
+              type="text"
+              placeholder="مثال: مینی کارت MD"
+              class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              محصول
+              <span class="text-red-500">*</span>
+            </label>
+            <select
+              v-model="manualLicenseData.productUnitId"
+              class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+            >
+              <option value="">محصول را انتخاب کنید</option>
+              <option value="1">مینی کارت</option>
+              <option value="2">کارت استاندارد</option>
+              <option value="3">کارت برچسبی</option>
+            </select>
+          </div>
+
+          <div v-if="manualLicenseError" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+            <p class="text-red-700 dark:text-red-400 text-sm flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              {{ manualLicenseError }}
+            </p>
+          </div>
+
+          <div class="space-y-3 mt-6">
+            <button
+              @click="createManualLicense"
+              :disabled="isCreatingManualLicense"
+              class="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-6 py-3 rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2"
+            >
+              <svg v-if="!isCreatingManualLicense" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <svg v-else class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {{ isCreatingManualLicense ? 'در حال ایجاد...' : 'ایجاد لایسنس' }}
+            </button>
+            <button
+              @click="showCreateCardModal = false"
+              :disabled="isCreatingManualLicense"
+              class="w-full bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 disabled:opacity-50 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-xl transition-colors font-medium border border-gray-200 dark:border-gray-600"
+            >
+              انصراف
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manual License Creation Modal (Keep for backward compatibility but hidden) -->
+    <div
+      v-if="false"
       class="fixed inset-0 z-50 flex items-center justify-center p-4"
       style="backdrop-filter: blur(8px)"
     >
@@ -1206,15 +1411,74 @@ const importMode = ref('append')
 const importFile = ref<File | null>(null)
 const isImporting = ref(false)
 
+// Create Card Modal State
+const showCreateCardModal = ref(false)
+const createCardTab = ref<'auto' | 'manual'>('auto')
+const isCreatingCard = ref(false)
+const createCardError = ref('')
+
+// Auto Card Creation
+const autoCardData = ref({
+  cardName: '',
+  productUnitId: ''
+})
+
 // Manual License Creation State
 const showManualLicenseModal = ref(false)
 const manualLicenseData = ref({
   license: '',
   cardName: '',
-  cardModel: 'model-1'
+  productUnitId: ''
 })
 const isCreatingManualLicense = ref(false)
 const manualLicenseError = ref('')
+
+// Auto Card Creation Function
+const createAutoCard = async () => {
+  if (!autoCardData.value.cardName.trim()) {
+    createCardError.value = 'لطفا نام کارت را وارد کنید'
+    return
+  }
+
+  if (!autoCardData.value.productUnitId) {
+    createCardError.value = 'لطفا محصول را انتخاب کنید'
+    return
+  }
+
+  isCreatingCard.value = true
+  createCardError.value = ''
+
+  try {
+    const response = await cardStore.createCard({
+      card_name: autoCardData.value.cardName.trim(),
+      product_unit_id: autoCardData.value.productUnitId
+    })
+
+    if (response.success || response) {
+      successMessage.value = 'کارت با موفقیت ایجاد شد'
+      showSuccessMessage.value = true
+      
+      autoCardData.value = {
+        cardName: '',
+        productUnitId: ''
+      }
+      
+      showCreateCardModal.value = false
+      await cardStore.fetchCards()
+      
+      setTimeout(() => {
+        showSuccessMessage.value = false
+      }, 3000)
+    } else {
+      createCardError.value = response.message || 'خطا در ایجاد کارت'
+    }
+  } catch (error: any) {
+    console.error('Error creating auto card:', error)
+    createCardError.value = error.response?.data?.message || 'خطا در ایجاد کارت'
+  } finally {
+    isCreatingCard.value = false
+  }
+}
 
 // Manual License Creation Function
 const createManualLicense = async () => {
@@ -1245,11 +1509,17 @@ const createManualLicense = async () => {
       return
     }
 
+    if (!manualLicenseData.value.productUnitId) {
+      manualLicenseError.value = 'لطفا محصول را انتخاب کنید'
+      isCreatingManualLicense.value = false
+      return
+    }
+
     // Create the card via API or database
     const response = await cardStore.createManualCard({
       slug: manualLicenseData.value.license.trim(),
       card_name: manualLicenseData.value.cardName.trim(),
-      card_model: manualLicenseData.value.cardModel
+      product_unit_id: manualLicenseData.value.productUnitId
     })
 
     if (response.success) {
@@ -1260,11 +1530,11 @@ const createManualLicense = async () => {
       manualLicenseData.value = {
         license: '',
         cardName: '',
-        cardModel: 'model-1'
+        productUnitId: ''
       }
       
       // Close modal
-      showManualLicenseModal.value = false
+      showCreateCardModal.value = false
       
       // Refresh cards
       await cardStore.fetchCards()
