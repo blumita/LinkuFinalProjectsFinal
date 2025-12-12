@@ -658,7 +658,6 @@ const previewUrl = computed(() => {
   if (typeof window === 'undefined') return 'about:blank'
   const params = new URLSearchParams()
   params.set('t', Date.now().toString())
-  params.set('isDefault', '1')
   return `${window.location.origin}/preview/newCard?${params.toString()}`
 })
 
