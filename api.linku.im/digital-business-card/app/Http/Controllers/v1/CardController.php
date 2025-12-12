@@ -342,17 +342,23 @@ class CardController extends Controller
         ]);
 
         try {
-            // گرفتن اطلاعات محصول برای کد محصول
-            $productUnit = \App\Models\ProductUnit::with('product')->find($validated['product_unit_id']);
-            if (!$productUnit || !$productUnit->product) {
+            // گرفتن اطلاعات محصول - از CardProduct استفاده می‌کنیم چون ادمین داشبورد CardProduct انتخاب می‌کنه
+            $cardProduct = \App\Models\CardProduct::find($validated['product_unit_id']);
+            if (!$cardProduct) {
                 return response()->json([
                     'success' => false,
                     'message' => 'محصول یافت نشد'
                 ], 404);
             }
 
-            $productCode = $productUnit->product->code; // SD, MC, SC
-            $productName = $productUnit->product->name; // نام محصول برای card_name
+            $productCode = $cardProduct->code; // SD, MC, SC
+            $productName = $cardProduct->name; // نام محصول برای card_name
+
+            // ایجاد یک ProductUnit جدید برای این کارت دستی
+            $productUnit = \App\Models\ProductUnit::create([
+                'serial_number' => 'MANUAL-' . $validated['slug'],
+                'card_product_id' => $cardProduct->id,
+            ]);
 
             $maxCardNumber = Card::max('card_number');
             $nextCardNumber = $maxCardNumber ? $maxCardNumber + 1 : 1;
@@ -375,7 +381,7 @@ class CardController extends Controller
                 'status' => 'active',
                 'mobile' => '',
                 'card_type' => 1,
-                'product_unit_id' => $validated['product_unit_id'],
+                'product_unit_id' => $productUnit->id,
             ]);
 
             return $this->ok(
