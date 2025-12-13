@@ -60,6 +60,9 @@ export const useUserStore = defineStore('userStore', {
                 this.cards = this.user?.cardsDataList || []
                 /*this.activeCard = this.cards.find((c:CardItem) => c.isDefault) || null*/
                 formStore.cards = this.cards
+                
+                // بازیابی پروفایل فعال از localStorage
+                formStore.restoreActiveProfile()
 
                 this.fetched = true
                 

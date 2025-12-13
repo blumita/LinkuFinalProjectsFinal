@@ -67,30 +67,33 @@
       </button>
     </div>
 
-    <!-- یوزرنیم -->
+    <!-- آدرس پروفایل فعال (slug کارت) -->
     <div>
-      <label class="text-sm font-medium text-primary mb-1 block">آدرس پروفایل</label>
+      <label class="text-sm font-medium text-primary mb-1 block flex items-center gap-2">
+        <span>آدرس پروفایل فعال</span>
+        <span v-if="activeCard?.name" class="text-xs text-primary opacity-60">({{ activeCard.name }})</span>
+      </label>
       <div class="flex items-center border border-border rounded-lg bg-primary px-4 py-3 ltr relative">
         <span class="text-primary opacity-60">linku.im/</span>
         <input
             type="text"
             class="bg-transparent flex-1 focus:outline-none text-primary"
-            v-model="form.username"
-            placeholder="username"
-            @input="validateUsername"
+            v-model="form.slug"
+            placeholder="slug"
+            @input="validateSlug"
             maxlength="7"
         />
-        <div v-if="usernameStatus" class="absolute ltr:left-4 rtl:right-4 top-1/2 -translate-y-1/2">
-          <i v-if="usernameStatus === 'available'" class="ti ti-check text-green-600 text-xl"></i>
-          <i v-else-if="usernameStatus === 'taken'" class="ti ti-x text-red-500 text-xl"></i>
-          <i v-else-if="usernameStatus === 'checking'" class="ti ti-loader-2 text-primary animate-spin text-xl"></i>
+        <div v-if="slugStatus" class="absolute ltr:left-4 rtl:right-4 top-1/2 -translate-y-1/2">
+          <i v-if="slugStatus === 'available'" class="ti ti-check text-green-600 text-xl"></i>
+          <i v-else-if="slugStatus === 'taken'" class="ti ti-x text-red-500 text-xl"></i>
+          <i v-else-if="slugStatus === 'checking'" class="ti ti-loader-2 text-primary animate-spin text-xl"></i>
         </div>
       </div>
-      <p v-if="invalidUsername" class="text-xs text-red-600 mt-1">
-        نام کاربری باید حداقل ۳ کاراکتر و حداکثر ۷ کاراکتر و فقط شامل حروف انگلیسی و عدد باشد.
+      <p v-if="invalidSlug" class="text-xs text-red-600 mt-1">
+        آدرس پروفایل باید حداقل ۳ کاراکتر و حداکثر ۷ کاراکتر و فقط شامل حروف انگلیسی و عدد باشد.
       </p>
-      <p v-if="usernameStatus === 'taken'" class="text-xs text-red-600 mt-1">
-        این نام کاربری قبلاً ثبت شده است.
+      <p v-if="slugStatus === 'taken'" class="text-xs text-red-600 mt-1">
+        این آدرس قبلاً ثبت شده است.
       </p>
     </div>
 
@@ -272,6 +275,7 @@
 <script>
 import InfoToast from "~/components/UserDashboard/modals/InfoToast.vue";
 import {useUserStore} from "~/stores/user.js";
+import {useFormStore} from "~/stores/form";
 
 export default {
   name: "AccountSettings",
@@ -280,6 +284,7 @@ export default {
     return {
       form: {
         username: "",
+        slug: "", // slug کارت فعال
         email: "",
         phone: "",
         countryCode:'',
@@ -287,9 +292,12 @@ export default {
       },
       originalForm: {},
       invalidUsername: false,
+      invalidSlug: false,
       phoneError: "",
       usernameStatus: null,
+      slugStatus: null,
       debounceTimer: null,
+      slugDebounceTimer: null,
       showPhoneModal: false,
       showUpgradeModal: false,
       otp: ["", "", "", ""],
@@ -314,8 +322,19 @@ export default {
           //this.form.email = user.email || '';
           this.form.phone = user.phone || '';
           this.form.countryCode=user.countryCode||'';
-          this.originalForm = {...this.form};
           this.form.removeBranding = !!user.removeBranding;
+          this.originalForm = {...this.form};
+        },
+        {immediate: true}
+    );
+    // Watch برای slug کارت فعال
+    watch(
+        () => this.formStore.defaultCard,
+        (card) => {
+          if (card) {
+            this.form.slug = card.slug || '';
+            this.originalForm.slug = card.slug || '';
+          }
         },
         {immediate: true}
     );
@@ -324,12 +343,19 @@ export default {
     userStore() {
       return useUserStore();
     },
+    formStore() {
+      return useFormStore();
+    },
+    activeCard() {
+      return this.formStore.defaultCard;
+    },
     isProUser() {
       return this.userStore.user?.isPro;
     },
     hasChanges() {
       return (
           this.form.username !== this.originalForm.username ||
+          this.form.slug !== this.originalForm.slug ||
           this.form.email !== this.originalForm.email ||
           this.form.phone !== this.originalForm.phone ||
           this.form.removeBranding !== this.originalForm.removeBranding
@@ -386,6 +412,47 @@ export default {
         }
       }, 500);
     },
+    validateSlug() {
+      const {$axios} = useNuxtApp();
+      this.form.slug = this.form.slug.replace(/[^\x00-\x7F]/g, "").toLowerCase();
+
+      // محدود کردن به 7 کاراکتر
+      if (this.form.slug.length > 7) {
+        this.form.slug = this.form.slug.slice(0, 7);
+      }
+
+      clearTimeout(this.slugDebounceTimer);
+      const slug = this.form.slug.trim();
+
+      // تغییر validation: حداقل 3 و حداکثر 7 کاراکتر
+      this.invalidSlug = !/^[a-zA-Z0-9]{3,7}$/.test(slug);
+
+      if (this.invalidSlug) {
+        this.slugStatus = null;
+        return;
+      }
+      
+      // اگر slug تغییر نکرده
+      if (slug === this.originalForm.slug) {
+        this.slugStatus = null;
+        return;
+      }
+      
+      this.slugStatus = 'checking';
+      // debounce برای جلوگیری از درخواست‌های مکرر
+      this.slugDebounceTimer = setTimeout(async () => {
+        try {
+          const response = await $axios.get('cards/checkSlug', {
+            params: {slug}
+          });
+
+          // سرور پاسخ داده: available = true یا false
+          this.slugStatus = response.data.available ? 'available' : 'taken';
+        } catch (error) {
+          this.slugStatus = 'error';
+        }
+      }, 500);
+    },
     handlePhoneInput(event) {
       const cleaned = event.target.value.replace(/[^\d۰-۹]/g, '');
       const english = cleaned.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
@@ -408,12 +475,15 @@ export default {
     cancelChanges() {
       this.form = {...this.originalForm};
       this.usernameStatus = null;
+      this.slugStatus = null;
       this.invalidUsername = false;
+      this.invalidSlug = false;
       this.isPhoneVerified = false;
     },
     async saveChanges() {
       const {$axios} = useNuxtApp()
       try {
+        // 1. ذخیره تنظیمات کاربر
         const payload = {
           username: this.form.username,
           email: this.form.email,
@@ -426,10 +496,19 @@ export default {
         payload.removeBranding = this.form.removeBranding;
 
         const response = await $axios.put('user/update', payload);
+        
+        // 2. اگر slug تغییر کرده، کارت رو هم آپدیت کن
+        if (this.form.slug !== this.originalForm.slug && this.activeCard) {
+          await $axios.put(`cards/${this.activeCard.id}/update`, {
+            slug: this.form.slug
+          });
+        }
 
         this.originalForm = {...this.form};
         this.usernameStatus = null;
+        this.slugStatus = null;
         this.invalidUsername = false;
+        this.invalidSlug = false;
         this.phoneError = "";
 
         this.showInfoToast(response.data.message, 'ti-check');

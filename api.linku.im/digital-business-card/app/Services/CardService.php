@@ -128,6 +128,7 @@ class CardService
 
             $card->update([
                 'card_name' => $data['cardName'] ?? $card->card_name,
+                'slug' => $data['slug'] ?? $card->slug,
                 'layout_mode' => $data['layout'] ?? $card->layout_mode,
                 'save_contact' => $data['saveContact'] ?? $card->save_contact,
                 'theme_color' => $data['themeColor'] ?? $card->theme_color,

@@ -282,6 +282,26 @@ export const useFormStore = defineStore('form', {
         },
         setDefaultCard(id: any) {
             this.cards = this.cards.map(c => ({...c, isDefault: c.id === id}))
+            // ذخیره پروفایل فعال در localStorage
+            safeStorage.setItem('activeProfileId', String(id))
+        },
+        // بازیابی پروفایل فعال از localStorage
+        restoreActiveProfile() {
+            const savedId = safeStorage.getItem('activeProfileId')
+            if (savedId && this.cards.length > 0) {
+                const cardExists = this.cards.find(c => String(c.id) === savedId)
+                if (cardExists) {
+                    this.setDefaultCard(savedId)
+                    this.setAboutFrom(savedId)
+                    return
+                }
+            }
+            // اگر ذخیره نشده یا کارت وجود نداشت، اولین کارت رو فعال کن
+            const firstCard = this.cards[0]
+            if (firstCard) {
+                this.setDefaultCard(firstCard.id)
+                this.setAboutFrom(firstCard.id)
+            }
         },
         setAboutFrom(cardId: string) {
             // Set selectedCardId regardless of whether card is found

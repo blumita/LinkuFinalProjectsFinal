@@ -84,6 +84,31 @@ class CardController extends Controller
         return $this->ok(__('messages.card_fetched'), $data, 200);
     }
 
+    /**
+     * Check if a slug is available
+     */
+    public function checkSlug(Request $request): JsonResponse
+    {
+        $slug = $request->query('slug');
+        
+        if (!$slug) {
+            return $this->ok('', ['available' => false]);
+        }
+        
+        // چک کنیم که slug قبلاً استفاده نشده
+        $exists = Card::where('slug', $slug)->exists();
+        
+        // همچنین چک می‌کنیم که با license_code یا user_name تداخل نداشته باشه
+        if (!$exists) {
+            $exists = License::where('license_code', $slug)->exists();
+        }
+        if (!$exists) {
+            $exists = User::where('user_name', $slug)->exists();
+        }
+        
+        return $this->ok('', ['available' => !$exists]);
+    }
+
     public function hasBlueTick($slug): JsonResponse
     {
         $card = Card::where('slug', $slug)->first();

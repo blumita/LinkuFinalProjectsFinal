@@ -25,6 +25,7 @@ class CardUpdateRequest extends BaseFormRequest
         return [
             //
             'cardName' => ['sometimes', 'string'],
+            'slug' => ['sometimes', 'string', 'min:3', 'max:7', 'regex:/^[a-zA-Z0-9]+$/', 'unique:cards,slug,' . $this->route('card')?->id],
             'layout'=>['nullable', 'string'],
             //'profileImage' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048', // حداکثر 2MB
             //'coverImage' => 'required|image|mimes:jpeg,png,jpg,webp|max:4096',  // 4MB
