@@ -98,23 +98,27 @@ function closeModal() {
   <!-- مودال -->
   <transition
     appear
-    enter-active-class="transition-transform duration-300 ease-in-out"
-    leave-active-class="transition-transform duration-300 ease-in-out"
-    enter-from-class="translate-y-full"
-    enter-to-class="translate-y-0"
-    leave-from-class="translate-y-0"
-    leave-to-class="translate-y-full"
+    enter-active-class="transition-all duration-300 ease-out"
+    leave-active-class="transition-all duration-200 ease-in"
+    :enter-from-class="isMobile ? 'translate-y-full' : 'opacity-0 scale-95'"
+    :enter-to-class="isMobile ? 'translate-y-0' : 'opacity-100 scale-100'"
+    :leave-from-class="isMobile ? 'translate-y-0' : 'opacity-100 scale-100'"
+    :leave-to-class="isMobile ? 'translate-y-full' : 'opacity-0 scale-95'"
   >
     <div
       v-if="props.modelValue"
       :class="[
-        'fixed flex flex-col text-sm text-gray-800  h-screen min-h-96 max-h-[60vh] bg-white overflow-hidden',
+        'fixed flex flex-col text-sm text-gray-800 bg-white overflow-hidden',
+        'max-h-[80vh]',
         zIndex,
         width,
         height,
         rounded,
-        rtl ? 'rtl:right-0 ltr:left-0' : 'left-0',
-        'bottom-0',
+        // موبایل: پایین صفحه
+        'bottom-0 left-0 right-0',
+        // دسکتاپ: وسط صفحه
+        'lg:bottom-auto lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2',
+        'lg:max-w-lg lg:rounded-2xl lg:shadow-2xl',
       ]"
       @click.stop
     >
