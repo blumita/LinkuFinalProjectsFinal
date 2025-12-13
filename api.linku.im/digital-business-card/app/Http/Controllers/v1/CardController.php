@@ -145,7 +145,7 @@ class CardController extends Controller
         $user = $request->user();
         
         // Check if the card belongs to the user
-        if ($card->creator_id !== $user->id) {
+        if ($card->user_id !== $user->id) {
             return $this->fail('این کارت متعلق به شما نیست.', 403);
         }
         
