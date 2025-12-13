@@ -27,14 +27,15 @@
             v-show="modelValue"
             ref="bottomSheetRef"
             :class="[
-              'fixed inset-0 bg-background text-foreground flex flex-col',
+              'fixed bg-background text-foreground flex flex-col',
+              'inset-0',
               'lg:inset-auto lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2',
               'lg:w-full lg:max-w-4xl lg:max-h-[80vh] lg:rounded-2xl lg:shadow-2xl lg:border lg:border-border',
               zIndex
             ]"
             @click.stop
           >
-            <div class="overflow-y-auto flex-1 scrollbar-hidden">
+            <div class="overflow-y-auto flex-1 scrollbar-hidden overscroll-contain">
               <slot />
             </div>
           </div>
@@ -68,16 +69,15 @@
           <div
             v-show="modelValue"
             ref="bottomSheetRef"
-            class="fixed left-0 right-0 bg-background text-foreground flex flex-col rounded-t-2xl shadow-xl border border-border"
+            class="fixed bg-background text-foreground flex flex-col shadow-xl border border-border"
             :class="[
-              'bottom-0 max-h-[90vh]',
-              'lg:rounded-2xl lg:left-1/2 lg:right-auto lg:bottom-auto lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 lg:w-full lg:max-h-[80vh]', 
+              'bottom-0 left-0 right-0 max-h-[90vh] rounded-t-2xl',
+              'lg:rounded-2xl lg:left-1/2 lg:right-auto lg:bottom-auto lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 lg:w-full lg:max-h-[85vh]', 
               desktopWidthClass, 
               zIndex
             ]"
             :style="bottomSheetStyle"
             @click.stop
-            @touchmove.stop
           >
             <div v-if="!closable" class="flex justify-center pt-2 pb-1 lg:hidden">
               <div class="w-10 h-1 bg-muted-foreground/30 rounded-full"></div>
@@ -92,7 +92,7 @@
               </button>
             </div>
 
-            <div class="overflow-y-auto flex-1 scrollbar-hidden" :style="contentStyle">
+            <div class="overflow-y-auto flex-1 scrollbar-hidden overscroll-contain" :style="contentStyle">
               <slot />
             </div>
           </div>
@@ -129,7 +129,7 @@ const props = withDefaults(defineProps<{
   closable: true,
   closeOnBackdrop: true,
   closeOnEscape: true,
-  zIndex: 'z-[9999]',
+  zIndex: 'z-[99999]',
   desktopCentered: false,
   heightClass: '',
   contentPadding: '',

@@ -698,6 +698,39 @@ const { data: card } = await useAsyncData('card', async () => {
   return await $fetch(`${urlPrefix}/${slug}/preview`, {method: 'GET'})
 })
 
+// ✅ Listen for form data updates from parent (EditCard iframe)
+if (process.client) {
+  const handleMessage = (event) => {
+    // بررسی origin برای امنیت
+    if (event.origin !== window.location.origin) return
+    
+    if (event.data?.type === 'FORM_DATA_UPDATE' && event.data?.data) {
+      // به‌روزرسانی formData با داده‌های دریافتی از iframe parent
+      const newData = event.data.data
+      Object.keys(newData).forEach(key => {
+        if (formData[key] !== undefined) {
+          formData[key] = newData[key]
+        }
+      })
+      isLoading.value = false
+    }
+  }
+  
+  window.addEventListener('message', handleMessage)
+  
+  onUnmounted(() => {
+    window.removeEventListener('message', handleMessage)
+  })
+  
+  // اگر در حالت preview هستیم، اطلاع دهیم که آماده دریافت داده هستیم
+  setTimeout(() => {
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'IFRAME_READY' }, window.location.origin)
+    }
+    isLoading.value = false
+  }, 100)
+}
+
 const generateMetaTags = () => {
   const data = card.value?.data || {}
 

@@ -342,7 +342,10 @@ class CardController extends Controller
         // اگر با slug پیدا نشد، با CardVisit چک کنیم
         if (!$card) {
             // جستجو در CardVisit بر اساس قسمتی از qr_link
-            $cardVisit = \App\Models\CardVisit::where('qr_link', 'LIKE', '%/' . $slug . '/%')
+            // فرمت معمول: https://linku.im/profile/SLUG/MODEL
+            $cardVisit = \App\Models\CardVisit::where('qr_link', 'LIKE', '%/profile/' . $slug . '/%')
+                ->orWhere('qr_link', 'LIKE', '%/profile/' . $slug)
+                ->orWhere('qr_link', 'LIKE', '%/' . $slug . '/%')
                 ->orWhere('qr_link', 'LIKE', '%/' . $slug)
                 ->first();
 
@@ -351,12 +354,13 @@ class CardController extends Controller
                 if ($cardVisit->unit?->license?->card) {
                     $card = $cardVisit->unit->license->card;
                 } else {
-                    // کارت هنوز فعال نشده
+                    // کارت هنوز فعال نشده - اطلاعات CardVisit رو برگردون
                     return $this->ok('کارت یافت شد', [
                         'isActivated' => false,
                         'cardVisitId' => $cardVisit->id,
                         'ownerName' => $cardVisit->owner_name,
                         'cardType' => $cardVisit->card_type,
+                        'qrLink' => $cardVisit->qr_link,
                         'status' => $cardVisit->status ?? 'pending',
                         'message' => 'این کارت هنوز فعال‌سازی نشده است'
                     ], 200);
