@@ -22,8 +22,82 @@
       <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden">
         <div class="p-6">
           <form @submit.prevent="createCard" class="space-y-5">
-            <!-- License Generation Toggle -->
+            <!-- Card Creation Mode Toggle -->
             <div>
+              <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-3">حالت ایجاد کارت</label>
+              <div class="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  @click="cardForm.isBulkMode = false"
+                  :class="[
+                    'flex items-center justify-center gap-2 p-4 border-2 rounded-xl transition-all duration-300',
+                    !cardForm.isBulkMode
+                      ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 shadow-md'
+                      : 'border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:border-purple-300'
+                  ]"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                  </svg>
+                  <span class="text-sm font-medium">ایجاد تک کارت</span>
+                </button>
+                <button
+                  type="button"
+                  @click="cardForm.isBulkMode = true"
+                  :class="[
+                    'flex items-center justify-center gap-2 p-4 border-2 rounded-xl transition-all duration-300',
+                    cardForm.isBulkMode
+                      ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 shadow-md'
+                      : 'border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:border-green-300'
+                  ]"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                  </svg>
+                  <span class="text-sm font-medium">ایجاد دسته‌جمعی</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Bulk Mode Range (Only in bulk mode) -->
+            <div v-if="cardForm.isBulkMode" class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-5 space-y-4">
+              <h3 class="text-sm font-semibold text-green-800 dark:text-green-300 flex items-center gap-2">
+                <i class="ti ti-info-circle"></i>
+                محدوده شماره‌گذاری کارت‌ها
+              </h3>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">از شماره <span class="text-red-500">*</span></label>
+                  <input
+                    v-model.number="cardForm.bulkStart"
+                    type="number"
+                    min="1"
+                    placeholder="مثال: 1"
+                    class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500 transition-colors"
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">تا شماره <span class="text-red-500">*</span></label>
+                  <input
+                    v-model.number="cardForm.bulkEnd"
+                    type="number"
+                    min="1"
+                    placeholder="مثال: 100"
+                    class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500 transition-colors"
+                  />
+                </div>
+              </div>
+              <div v-if="bulkCardCount > 0" class="flex items-center justify-between p-3 bg-white dark:bg-slate-700 rounded-lg border border-green-300 dark:border-green-700">
+                <span class="text-sm text-gray-700 dark:text-gray-300">تعداد کارت‌های قابل ایجاد:</span>
+                <span class="text-lg font-bold text-green-600 dark:text-green-400">{{ bulkCardCount }}</span>
+              </div>
+              <p class="text-xs text-gray-600 dark:text-gray-400">
+                کارت‌ها با slug هایی مثل <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-slate-600 rounded font-mono">c-1</code>, <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-slate-600 rounded font-mono">c-2</code>, ... ایجاد خواهند شد
+              </p>
+            </div>
+
+            <!-- License Generation Toggle (Only in single mode) -->
+            <div v-if="!cardForm.isBulkMode">
               <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-3">نوع تولید لایسنس</label>
               <div class="grid grid-cols-2 gap-3">
                 <button
@@ -59,16 +133,16 @@
               </div>
             </div>
 
-            <!-- Auto Generate Info -->
-            <div v-if="cardForm.isAutoGenerate" class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+            <!-- Auto Generate Info (Only in single mode) -->
+            <div v-if="!cardForm.isBulkMode && cardForm.isAutoGenerate" class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
               <p class="text-blue-700 dark:text-blue-400 text-sm flex items-center gap-2">
                 <i class="ti ti-info-circle"></i>
                 لایسنس به صورت خودکار توسط سیستم تولید خواهد شد
               </p>
             </div>
 
-            <!-- Manual License Input -->
-            <div v-if="!cardForm.isAutoGenerate">
+            <!-- Manual License Input (Only in single mode) -->
+            <div v-if="!cardForm.isBulkMode && !cardForm.isAutoGenerate">
               <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2">شناسه لایسنس (Slug) <span class="text-red-500">*</span></label>
               <div class="flex gap-2">
                 <input
@@ -119,16 +193,50 @@
                 </div>
               </div>
             </div>
+            <!-- Bulk Creation Progress -->
+            <div v-if="cardForm.isBulkMode && bulkProgress.isCreating" class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-5">
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">در حال ایجاد کارت‌ها...</span>
+                  <span class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ bulkProgress.current }} / {{ bulkProgress.total }}</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-slate-600 rounded-full h-3 overflow-hidden">
+                  <div
+                    class="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 transition-all duration-300 rounded-full"
+                    :style="{ width: bulkProgress.percentage + '%' }"
+                  ></div>
+                </div>
+                <p class="text-xs text-gray-600 dark:text-gray-400 text-center">{{ bulkProgress.message }}</p>
+              </div>
+            </div>
+
+            <!-- Success/Error Messages -->
             <div v-if="formError" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
               <p class="text-red-700 dark:text-red-400 text-sm">{{ formError }}</p>
             </div>
+            <div v-if="bulkProgress.successCount > 0 && !bulkProgress.isCreating" class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
+              <p class="text-green-700 dark:text-green-400 text-sm flex items-center gap-2">
+                <i class="ti ti-check"></i>
+                {{ bulkProgress.successCount }} کارت با موفقیت ایجاد شد!
+              </p>
+              <p v-if="bulkProgress.failedCount > 0" class="text-orange-600 dark:text-orange-400 text-xs mt-1">
+                {{ bulkProgress.failedCount }} کارت با خطا مواجه شد
+              </p>
+            </div>
+
             <div class="flex gap-3 pt-5 border-t border-gray-200 dark:border-slate-700">
-              <button type="submit" :disabled="isCreating || (!cardForm.isAutoGenerate && licenseCheckStatus === 'exists')" class="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-2">
-                <i v-if="!isCreating" class="ti ti-plus"></i>
+              <button 
+                type="submit" 
+                :disabled="isCreating || bulkProgress.isCreating || (!cardForm.isBulkMode && !cardForm.isAutoGenerate && licenseCheckStatus === 'exists') || (cardForm.isBulkMode && bulkCardCount <= 0)" 
+                class="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-2"
+              >
+                <i v-if="!isCreating && !bulkProgress.isCreating" class="ti ti-plus"></i>
                 <i v-else class="ti ti-loader animate-spin"></i>
-                {{ isCreating ? 'در حال ایجاد...' : 'ایجاد کارت' }}
+                {{ isCreating || bulkProgress.isCreating ? 'در حال ایجاد...' : (cardForm.isBulkMode ? `ایجاد ${bulkCardCount} کارت` : 'ایجاد کارت') }}
               </button>
-              <router-link :to="{ name: 'cards' }" class="px-6 py-3 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium flex items-center justify-center gap-2"><i class="ti ti-x"></i>انصراف</router-link>
+              <router-link :to="{ name: 'cards' }" :class="['px-6 py-3 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium flex items-center justify-center gap-2', (isCreating || bulkProgress.isCreating) && 'pointer-events-none opacity-50']">
+                <i class="ti ti-x"></i>انصراف
+              </router-link>
             </div>
           </form>
         </div>
@@ -163,12 +271,35 @@ const axios = appContext.config.globalProperties.$axios
 const cardForm = ref({
   license: '',
   productUnitId: '',
-  isAutoGenerate: true // پیش‌فرض خودکار
+  isAutoGenerate: true, // پیش‌فرض خودکار
+  isBulkMode: false, // حالت دسته‌جمعی
+  bulkStart: 1,
+  bulkEnd: 100
 })
 const isCreating = ref(false)
 const formError = ref('')
 const isCheckingLicense = ref(false)
 const licenseCheckStatus = ref<'available' | 'exists' | 'invalid' | null>(null)
+
+// Bulk Creation Progress
+const bulkProgress = ref({
+  isCreating: false,
+  current: 0,
+  total: 0,
+  successCount: 0,
+  failedCount: 0,
+  percentage: 0,
+  message: ''
+})
+
+// Computed property for bulk card count
+const bulkCardCount = computed(() => {
+  if (!cardForm.value.isBulkMode) return 0
+  const start = cardForm.value.bulkStart
+  const end = cardForm.value.bulkEnd
+  if (!start || !end || end < start) return 0
+  return end - start + 1
+})
 
 // Check if license exists
 const checkLicenseExists = async () => {
@@ -205,10 +336,16 @@ const checkLicenseExists = async () => {
   }
 }
 
-// Create Card (both auto and manual)
+// Create Card (both auto and manual and bulk)
 const createCard = async () => {
   if (!cardForm.value.productUnitId) {
     formError.value = 'لطفا محصول را انتخاب کنید'
+    return
+  }
+
+  // حالت دسته‌جمعی
+  if (cardForm.value.isBulkMode) {
+    await createBulkCards()
     return
   }
 
@@ -263,6 +400,74 @@ const createCard = async () => {
     formError.value = error.response?.data?.message || 'خطا در ایجاد کارت'
   } finally {
     isCreating.value = false
+  }
+}
+
+// Create Bulk Cards
+const createBulkCards = async () => {
+  const start = cardForm.value.bulkStart
+  const end = cardForm.value.bulkEnd
+
+  if (!start || !end || end < start) {
+    formError.value = 'لطفا محدوده صحیح وارد کنید'
+    return
+  }
+
+  const totalCards = end - start + 1
+  bulkProgress.value = {
+    isCreating: true,
+    current: 0,
+    total: totalCards,
+    successCount: 0,
+    failedCount: 0,
+    percentage: 0,
+    message: 'شروع ایجاد کارت‌ها...'
+  }
+  formError.value = ''
+
+  // ایجاد کارت‌ها یکی یکی
+  for (let i = start; i <= end; i++) {
+    bulkProgress.value.current = i - start + 1
+    bulkProgress.value.message = `در حال ایجاد کارت شماره ${i}...`
+    bulkProgress.value.percentage = Math.round((bulkProgress.value.current / totalCards) * 100)
+
+    try {
+      const slug = `c-${i}`
+      const response = await cardStore.createManualCard({
+        slug: slug,
+        product_unit_id: cardForm.value.productUnitId
+      })
+      
+      if (response.success) {
+        bulkProgress.value.successCount++
+      } else {
+        bulkProgress.value.failedCount++
+        console.error(`خطا در ایجاد کارت ${i}:`, response.message)
+      }
+    } catch (error: any) {
+      bulkProgress.value.failedCount++
+      console.error(`خطا در ایجاد کارت ${i}:`, error)
+    }
+
+    // کمی تاخیر برای جلوگیری از فشار بیش از حد به سرور (200ms)
+    await new Promise(resolve => setTimeout(resolve, 200))
+  }
+
+  bulkProgress.value.isCreating = false
+  bulkProgress.value.message = 'فرآیند ایجاد کامل شد'
+
+  // رفرش لیست کارت‌ها برای لود پیش‌نمایش
+  await cardStore.fetchCards()
+
+  if (bulkProgress.value.successCount === totalCards) {
+    await showSuccess('موفق!', `${totalCards} کارت با موفقیت ایجاد شد`)
+    setTimeout(() => {
+      router.push({ name: 'cards' })
+    }, 2000)
+  } else if (bulkProgress.value.successCount > 0) {
+    await showSuccess('تکمیل شد', `${bulkProgress.value.successCount} کارت ایجاد شد، ${bulkProgress.value.failedCount} کارت با خطا مواجه شد`)
+  } else {
+    formError.value = 'همه کارت‌ها با خطا مواجه شدند'
   }
 }
 
