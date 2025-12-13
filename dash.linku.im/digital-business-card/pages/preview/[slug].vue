@@ -24,7 +24,7 @@
                 type="button"
                 class="w-10 h-10 rounded-full flex items-center justify-center text-white transition-all duration-300 shadow-lg"
                 :style="{
-                  backgroundColor: formData?.themeColor?.background || '#3b82f6',
+                  backgroundColor: formData?.themeColor?.background || '#000000',
                   opacity: 0.95
                 }"
             >
@@ -1030,7 +1030,7 @@ const isDarkTheme = computed(() => {
 })
 
 const iconColor = computed(() => {
-  return formData?.themeColor?.background || '#3b82f6'
+  return formData?.themeColor?.background || '#000000'
 })
 
 const iconText = computed(() => {

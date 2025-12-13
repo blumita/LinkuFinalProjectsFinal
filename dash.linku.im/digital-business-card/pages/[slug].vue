@@ -773,7 +773,7 @@ const isDarkTheme = computed(() => {
 })
 
 const iconColor = computed(() => {
-  return formData?.themeColor?.background || '#3b82f6'
+  return formData?.themeColor?.background || '#000000'
 })
 
 const iconText = computed(() => {
