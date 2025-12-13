@@ -754,7 +754,14 @@ const handleReportClick = (event) => {
 
 // Close options menu when clicking outside
 const closeOptionsMenu = (event) => {
-  console.log('❌ closeOptionsMenu called', event?.target)
+  // اگر کلیک روی دکمه منو یا خود منو بود، نبند
+  const menuButton = event?.target?.closest('button[type="button"]')
+  const menuDropdown = event?.target?.closest('.absolute.top-12')
+  
+  if (menuButton?.querySelector('.ti-dots-vertical') || menuDropdown) {
+    return // کلیک روی دکمه یا منو بود، نبند
+  }
+  
   showOptionsMenu.value = false
 }
 
@@ -1417,23 +1424,24 @@ function hexToRgba(hex, alpha) {
 
 // تشخیص حالت list mode برای هر آیتم
 function getIsListMode(item) {
-  const isPortrait = formData.layout === 'portrait'
-  const isSpecialAction = ['poll', 'expandabletext', 'questionbox', 'textsection', 'workhours', 'map', 'file', 'embeddedvideo', 'image', 'video', 'audio', 'document', 'luckywheel', 'luckydice', 'luckyegg'].includes(item.action)
+  // آیتم‌های خاص که همیشه لیستی هستن
+  const isSpecialAction = ['poll', 'expandabletext', 'questionbox', 'textsection', 'workhours', 'map', 'file', 'embeddedvideo', 'image', 'video', 'audio', 'document', 'luckywheel', 'luckydice', 'luckyegg'].includes(item.action?.toLowerCase())
   // فقط بر اساس فلگ showDescription تصمیم می‌گیریم، نه محتوای description
   const hasDescriptionEnabled = item.showDescription === true
   
-  return !!(isPortrait || isSpecialAction || hasDescriptionEnabled)
+  return !!(isSpecialAction || hasDescriptionEnabled)
 }
 
 // گروه‌بندی آیتم‌ها برای جدا کردن آیتم‌های لیستی از گریدی
 const groupedItems = computed(() => {
   if (!formData.links) return []
   
-  // در حالت portrait یا center نیازی به گروه‌بندی نیست
-  if (formData.layout === 'portrait' || formData.layout === 'center') {
+  // در حالت center همه لیستی هستن
+  if (formData.layout === 'center') {
     return [{ type: 'list', items: formData.links.filter(item => item.enabled) }]
   }
   
+  // در حالت portrait و left و right، گروه‌بندی انجام بده
   const groups = []
   let currentGroup = null
   

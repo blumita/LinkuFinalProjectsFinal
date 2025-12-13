@@ -901,20 +901,22 @@ function getComponent(item) {
 }
 
 function getIsListMode(item) {
-  const isPortrait = formData?.layout === 'portrait'
-  const isSpecialAction = ['poll', 'expandabletext', 'questionbox', 'textsection', 'workhours', 'map', 'file', 'embeddedvideo', 'image', 'video', 'audio', 'document'].includes(item.action)
+  // آیتم‌های خاص که همیشه لیستی هستن
+  const isSpecialAction = ['poll', 'expandabletext', 'questionbox', 'textsection', 'workhours', 'map', 'file', 'embeddedvideo', 'image', 'video', 'audio', 'document', 'luckywheel', 'luckydice', 'luckyegg'].includes(item.action?.toLowerCase())
   const hasDescriptionEnabled = item.showDescription === true
   
-  return !!(isPortrait || isSpecialAction || hasDescriptionEnabled)
+  return !!(isSpecialAction || hasDescriptionEnabled)
 }
 
 const groupedItems = computed(() => {
   if (!formData?.links) return []
   
-  if (formData?.layout === 'portrait' || formData?.layout === 'center') {
+  // در حالت center همه لیستی هستن
+  if (formData?.layout === 'center') {
     return [{ type: 'list', items: formData.links.filter(item => item.enabled) }]
   }
   
+  // در حالت portrait و left و right، گروه‌بندی انجام بده
   const groups = []
   let currentGroup = null
   
