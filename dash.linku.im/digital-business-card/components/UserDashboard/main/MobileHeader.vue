@@ -37,7 +37,7 @@
           </div>
           <!-- نام پروفایل فعال -->
           <span class="text-base font-semibold text-foreground truncate max-w-[120px]">
-            {{ activeCard?.name || activeCard?.userName || 'انتخاب پروفایل' }}
+            {{ activeCard?.userName || activeCard?.name || activeCard?.slug || 'انتخاب پروفایل' }}
           </span>
           <i class="ti ti-chevron-down text-muted-foreground text-sm"></i>
         </button>
