@@ -1,6 +1,7 @@
 import {defineStore} from 'pinia'
 import {nextTick} from 'vue'
 import {safeStorage} from '~/utils/safeStorage'
+import {useNuxtApp} from 'nuxt/app'
 
 // Helper function برای تبدیل URL media در محیط توسعه
 // در صفحات HTTPS، URLهای HTTP را به HTTPS proxy تبدیل می‌کند
@@ -280,23 +281,30 @@ export const useFormStore = defineStore('form', {
         removeCard(id: any) {
             this.cards = this.cards.filter(c => c.id !== id)
         },
-        setDefaultCard(id: any) {
-            this.cards = this.cards.map(c => ({...c, isDefault: c.id === id}))
-            // ذخیره پروفایل فعال در localStorage
+        async setDefaultCard(id: any) {
+            this.cards = this.cards.map(c => ({...c, isDefault: String(c.id) === String(id)}))
+            // ذخیره پروفایل فعال در localStorage (backup)
             safeStorage.setItem('activeProfileId', String(id))
-        },
-        // بازیابی پروفایل فعال از localStorage
-        restoreActiveProfile() {
-            const savedId = safeStorage.getItem('activeProfileId')
-            if (savedId && this.cards.length > 0) {
-                const cardExists = this.cards.find(c => String(c.id) === savedId)
-                if (cardExists) {
-                    this.setDefaultCard(savedId)
-                    this.setAboutFrom(savedId)
-                    return
-                }
+            
+            // ذخیره در دیتابیس
+            try {
+                const { $axios } = useNuxtApp()
+                await $axios.post(`cards/setActive/${id}`)
+            } catch (error) {
+                console.error('Error saving active profile:', error)
             }
-            // اگر ذخیره نشده یا کارت وجود نداشت، اولین کارت رو فعال کن
+        },
+        // بازیابی پروفایل فعال از سرور (بر اساس is_default در دیتابیس)
+        restoreActiveProfile() {
+            // پیدا کردن کارتی که is_default=true داره (از سرور آمده)
+            const defaultCard = this.cards.find(c => c.isDefault === true)
+            if (defaultCard) {
+                this.setAboutFrom(defaultCard.id)
+                safeStorage.setItem('activeProfileId', String(defaultCard.id))
+                return
+            }
+            
+            // اگر هیچ کارتی is_default نداشت، اولین کارت رو فعال کن
             const firstCard = this.cards[0]
             if (firstCard) {
                 this.setDefaultCard(firstCard.id)

@@ -68,7 +68,7 @@
           <div
             v-show="modelValue"
             ref="bottomSheetRef"
-            class="fixed left-0 right-0 bg-white dark:bg-gray-900 text-foreground flex flex-col rounded-t-2xl shadow-xl border border-border"
+            class="fixed left-0 right-0 bg-background text-foreground flex flex-col rounded-t-2xl shadow-xl border border-border"
             :class="[
               'bottom-0 max-h-[90vh]',
               'lg:rounded-2xl lg:left-1/2 lg:right-auto lg:bottom-auto lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 lg:w-full lg:max-h-[80vh]', 

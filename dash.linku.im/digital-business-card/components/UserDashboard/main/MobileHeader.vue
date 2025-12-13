@@ -127,7 +127,7 @@
               <div class="flex items-center justify-between mb-0.5">
                 <div class="flex items-center gap-1.5">
                   <h3 class="text-sm font-semibold text-primary">
-                    {{ profile.name || profile.slug || 'بدون نام' }}
+                    {{ profile.userName || profile.name || profile.slug || 'بدون نام' }}
                   </h3>
                   <!-- تیک آبی فقط برای کاربر Pro و پروفایل پیش‌فرض -->
                   <i 

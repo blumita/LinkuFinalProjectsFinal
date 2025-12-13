@@ -491,7 +491,7 @@ const currentSubscription = computed(() => {
   // چک کنیم که دیتا لود شده
   if (!userStore.user) {
     return {
-      type: 'اشتراک ماهانه',
+      type: 'رایگان',
       status: 'expired',
       remainingDays: 0,
       expiryDate: '—'
@@ -499,25 +499,39 @@ const currentSubscription = computed(() => {
   }
   
   const isPro = userStore.user?.isPro || false
-  let daysRemaining = userStore.user?.daysRemaining || userStore.user?.days_remaining || 0
-  let endDate = userStore.user?.subscriptionEndDate || userStore.user?.subscription_end_date
+  const subscriptionType = (userStore.user as any)?.subscriptionType || 'free'
+  const subscriptionMonths = (userStore.user as any)?.subscriptionMonths || 0
+  let endDate = (userStore.user as any)?.subscriptionEndDate || userStore.user?.subscription_end_date
   
-  // اگر API روزهای باقیمانده رو نداد، از آخرین تراکنش موفق محاسبه کن
-  if (isPro && !daysRemaining && transactions.value.length > 0) {
-    const successTransaction: any = transactions.value
-      .filter((t: any) => t.status === 'success' || t.status === 'successful')
-      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
-    
-    if (successTransaction?.endDate) {
-      endDate = successTransaction.endDate
-      const end = new Date(successTransaction.endDate)
-      const now = new Date()
-      daysRemaining = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  // محاسبه روزهای باقیمانده از تاریخ انقضا
+  let daysRemaining = 0
+  if (endDate) {
+    const end = new Date(endDate)
+    const now = new Date()
+    daysRemaining = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+  }
+  
+  // اگر روزها منفی شد، یعنی منقضی شده
+  if (daysRemaining < 0) daysRemaining = 0
+  
+  // تعیین نوع اشتراک بر اساس ماه‌ها
+  let typeText = 'رایگان'
+  if (isPro) {
+    if (subscriptionMonths >= 12) {
+      typeText = 'اشتراک سالانه'
+    } else if (subscriptionMonths >= 6) {
+      typeText = 'اشتراک ۶ ماهه'
+    } else if (subscriptionMonths >= 3) {
+      typeText = 'اشتراک ۳ ماهه'
+    } else if (subscriptionMonths >= 1) {
+      typeText = 'اشتراک ماهانه'
+    } else {
+      typeText = 'اشتراک ویژه'
     }
   }
   
   return {
-    type: 'اشتراک ماهانه',
+    type: typeText,
     status: isPro ? 'active' : 'expired',
     remainingDays: Math.max(0, Math.round(daysRemaining)),
     expiryDate: endDate ? new Date(endDate).toLocaleDateString('fa-IR') : '—'

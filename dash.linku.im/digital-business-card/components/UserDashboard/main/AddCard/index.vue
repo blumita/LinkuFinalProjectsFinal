@@ -636,6 +636,13 @@ async function saveChanges() {
       // ✅ به‌روزرسانی userStore برای نمایش کارت جدید در داشبورد
       await userStore.fetchUser()
       
+      // ✅ انتخاب پروفایل جدید به عنوان پروفایل فعال
+      const newCardId = response.data.data?.id
+      if (newCardId) {
+        await form.setDefaultCard(newCardId)
+        form.setAboutFrom(newCardId)
+      }
+      
       setTimeout(() => {
         safeNavigateTo('/dashboard')
       }, 1500)

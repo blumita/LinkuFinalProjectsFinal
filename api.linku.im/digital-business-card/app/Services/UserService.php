@@ -49,7 +49,7 @@ class UserService
     public function createDefaultProfile($user): Card
     {
         $defaultData = [
-            'cardName' => 'کارت پیش فرض',
+            'cardName' => $user->name ?: 'پروفایل من',
             'layout' => 'right',
             'saveContact' => 'ذخیره مخاطب',
             'isDefault' => true,

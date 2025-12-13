@@ -137,6 +137,29 @@ class CardController extends Controller
 
     }
 
+    /**
+     * Set a card as the active profile for the user
+     */
+    public function setActiveProfile(Request $request, Card $card): JsonResponse
+    {
+        $user = $request->user();
+        
+        // Check if the card belongs to the user
+        if ($card->creator_id !== $user->id) {
+            return $this->fail('این کارت متعلق به شما نیست.', 403);
+        }
+        
+        // Set all user's cards to not default
+        $user->cards()->update(['is_default' => false]);
+        
+        // Set selected card as default
+        $card->update(['is_default' => true]);
+        
+        return $this->ok('پروفایل فعال با موفقیت تغییر کرد.', [
+            'activeCardId' => $card->id
+        ]);
+    }
+
 
     /**
      * Store a newly created resource in storage.

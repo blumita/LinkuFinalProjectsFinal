@@ -15,7 +15,7 @@
           <i class="ti ti-user text-xl text-gray-400" />
         </span>
         <span class="truncate font-medium hidden md:block text-gray-700">
-          {{ selectedCard?.name || selectedCard?.userName || 'کارت من' }}
+          {{ selectedCard?.userName || selectedCard?.name || 'پروفایل من' }}
         </span>
         <span
           v-if="selectedCard?.id === form.defaultCard?.id"
@@ -44,8 +44,8 @@
             class="w-8 h-8 rounded-full object-cover"
           />
           <div>
-            <p class="font-medium text-gray-700">{{ selectedCard.name || selectedCard.slug || 'کارت من' }}</p>
-            <p class="text-xs text-gray-500">{{ selectedCard.description }}</p>
+            <p class="font-medium text-gray-700">{{ selectedCard.userName || selectedCard.name || 'پروفایل من' }}</p>
+            <p class="text-xs text-gray-500">@{{ selectedCard.slug }}</p>
           </div>
         </div>
       </div>
@@ -69,7 +69,7 @@
             />
             <div class="flex-1">
               <p class="font-medium flex items-center gap-1 text-gray-700">
-                {{ card.name || card.userName || card.slug || 'بدون نام' }}
+                {{ card.userName || card.name || card.slug || 'بدون نام' }}
                 <span
                   v-if="card.id === form.defaultCard?.id"
                   class="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full"
@@ -77,7 +77,7 @@
                   فعال
                 </span>
               </p>
-              <p v-if="card.description" class="text-xs text-gray-500">{{ card.description }}</p>
+              <p v-if="card.slug" class="text-xs text-gray-500">@{{ card.slug }}</p>
             </div>
             <i v-if="card.id === selectedCard?.id" class="ti ti-check text-green-600" />
           </div>

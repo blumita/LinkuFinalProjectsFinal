@@ -172,6 +172,10 @@ Route::middleware(['auth:sanctum','log.activity'])
         Route::get('/checkSlug', [CardController::class, 'checkSlug'])
             ->name('cards.checkSlug');
 
+        // Set active profile
+        Route::post('/setActive/{card}', [CardController::class, 'setActiveProfile'])
+            ->name('cards.setActive');
+
         // Create a new digital business card
         Route::post('/', [CardController::class, 'store'])
             ->name('cards.store');
