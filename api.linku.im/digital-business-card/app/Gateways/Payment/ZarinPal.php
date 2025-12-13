@@ -61,13 +61,23 @@ class ZarinPal implements GatewayInterface
 
         $data = $response->json();
 
-        //Log::info('Zarinpal PaymentRequest', ['request' => $response->body()]);
+        Log::info('Zarinpal PaymentRequest', ['response' => $data]);
 
-        if ($data['data']['code'] != 100 || empty($data['data']['authority'])) {
-            throw new Exception('Zarinpal Payment Error: ' . $data['data']['code']);
+        // بررسی خطاهای احتمالی
+        if (!isset($data['data']) || !is_array($data['data'])) {
+            Log::error('Zarinpal Invalid Response', ['response' => $data]);
+            throw new Exception('Zarinpal Invalid Response: ' . json_encode($data));
+        }
+        
+        $code = $data['data']['code'] ?? null;
+        $authority = $data['data']['authority'] ?? null;
+        
+        if ($code != 100 || empty($authority)) {
+            $errorMessage = $data['errors']['message'] ?? ($data['data']['message'] ?? 'Unknown error');
+            Log::error('Zarinpal Payment Error', ['code' => $code, 'message' => $errorMessage]);
+            throw new Exception('Zarinpal Payment Error: ' . $errorMessage . ' (Code: ' . $code . ')');
         }
 
-        $authority = $data['data']['authority'];
         $this->redirectUrl = $this->sandbox
             ? "https://sandbox.zarinpal.com/pg/StartPay/{$authority}"
             : "https://payment.zarinpal.com/pg/StartPay/{$authority}";

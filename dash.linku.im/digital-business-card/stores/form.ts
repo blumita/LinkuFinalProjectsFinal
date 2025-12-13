@@ -289,7 +289,7 @@ export const useFormStore = defineStore('form', {
             // ذخیره در دیتابیس
             try {
                 const { $axios } = useNuxtApp()
-                await $axios.post(`cards/setActive/${id}`)
+                await $axios.post(`v1/cards/setActive/${id}`)
             } catch (error) {
                 console.error('Error saving active profile:', error)
             }
