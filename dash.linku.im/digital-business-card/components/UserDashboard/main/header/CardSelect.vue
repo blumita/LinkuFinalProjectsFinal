@@ -44,7 +44,7 @@
             class="w-8 h-8 rounded-full object-cover"
           />
           <div>
-            <p class="font-medium text-gray-700">{{ selectedCard.name }}</p>
+            <p class="font-medium text-gray-700">{{ selectedCard.name || selectedCard.slug || 'کارت من' }}</p>
             <p class="text-xs text-gray-500">{{ selectedCard.description }}</p>
           </div>
         </div>
@@ -69,7 +69,7 @@
             />
             <div class="flex-1">
               <p class="font-medium flex items-center gap-1 text-gray-700">
-                {{ card.name }}
+                {{ card.name || card.slug || 'بدون نام' }}
                 <span
                   v-if="card.isDefault"
                   class="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full"
@@ -121,7 +121,7 @@
             <i class="ti ti-user text-2xl text-gray-400" />
           </span>
           <div class="flex-1">
-            <p class="font-semibold text-base text-gray-800">{{ selectedCard.name }}</p>
+            <p class="font-semibold text-base text-gray-800">{{ selectedCard.name || selectedCard.slug || 'کارت من' }}</p>
             <p v-if="selectedCard.description" class="text-sm text-gray-500">{{ selectedCard.description }}</p>
           </div>
         </div>
@@ -148,7 +148,7 @@
               <i class="ti ti-user text-2xl text-gray-400" />
             </span>
             <div class="flex-1">
-              <p class="font-semibold text-base text-gray-800">{{ card.name }}</p>
+              <p class="font-semibold text-base text-gray-800">{{ card.name || card.slug || 'بدون نام' }}</p>
               <p v-if="card.description" class="text-sm text-gray-500">{{ card.description }}</p>
             </div>
             <i v-if="card.id === selectedCard?.id" class="ti ti-check text-green-600 text-xl" />
@@ -199,6 +199,7 @@ const toggleMenu = (e: Event) => {
 
 const selectCard = async (card: any) => {
   form.setDefaultCard(card.id)
+  form.setAboutFrom(card.id) // لود اطلاعات کارت جدید
   menuOpen.value = false
   //
   const cardId = form.defaultCard?.id

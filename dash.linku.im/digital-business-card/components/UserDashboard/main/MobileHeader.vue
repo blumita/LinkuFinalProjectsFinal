@@ -108,7 +108,7 @@
               <div class="flex items-center justify-between mb-0.5">
                 <div class="flex items-center gap-1.5">
                   <h3 class="text-sm font-semibold text-primary">
-                    {{ profile.name || profile.userName || 'بدون نام' }}
+                    {{ profile.name || profile.slug || 'بدون نام' }}
                   </h3>
                   <!-- تیک آبی فقط برای کاربر Pro و پروفایل پیش‌فرض -->
                   <i 
@@ -319,6 +319,7 @@ const goBack = () => {
 // Select profile
 const selectProfile = (profile) => {
   formStore.setDefaultCard(profile.id)
+  formStore.setAboutFrom(profile.id) // لود اطلاعات کارت جدید
   showProfileSelector.value = false
 }
 
