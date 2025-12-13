@@ -15,13 +15,13 @@
           <i class="ti ti-user text-xl text-gray-400" />
         </span>
         <span class="truncate font-medium hidden md:block text-gray-700">
-          {{ selectedCard?.name || 'کارت من' }}
+          {{ selectedCard?.name || selectedCard?.userName || 'کارت من' }}
         </span>
         <span
-          v-if="selectedCard?.isDefault"
+          v-if="selectedCard?.id === form.defaultCard?.id"
           class="text-xs font-semibold bg-gray-100 text-black px-2 py-0.5 rounded-full hidden md:inline"
         >
-          پیش‌فرض
+          فعال
         </span>
       </div>
       <i class="ti ti-chevron-down text-xs" />
@@ -69,12 +69,12 @@
             />
             <div class="flex-1">
               <p class="font-medium flex items-center gap-1 text-gray-700">
-                {{ card.name || card.slug || 'بدون نام' }}
+                {{ card.name || card.userName || card.slug || 'بدون نام' }}
                 <span
-                  v-if="card.isDefault"
+                  v-if="card.id === form.defaultCard?.id"
                   class="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full"
                 >
-                  پیش‌فرض
+                  فعال
                 </span>
               </p>
               <p v-if="card.description" class="text-xs text-gray-500">{{ card.description }}</p>

@@ -19,7 +19,26 @@
           @click="showProfileSelector = true"
           class="flex items-center gap-2 transition-all duration-200 hover:bg-muted rounded-lg px-2 py-1"
         >
-          <span class="text-lg font-semibold text-foreground">پروفایل‌ها</span>
+          <!-- آواتار پروفایل فعال -->
+          <div class="w-8 h-8 rounded-full overflow-hidden ring-2 ring-border bg-muted flex-shrink-0">
+            <img 
+              v-if="activeCard?.avatar"
+              :src="activeCard.avatar" 
+              :alt="activeCard?.name"
+              class="w-full h-full object-cover"
+            />
+            <div 
+              v-else
+              class="w-full h-full flex items-center justify-center"
+              :style="{ backgroundColor: formStore.iconColor?.background || 'rgb(var(--color-primary))' }"
+            >
+              <i class="ti ti-user text-white text-sm"></i>
+            </div>
+          </div>
+          <!-- نام پروفایل فعال -->
+          <span class="text-base font-semibold text-foreground truncate max-w-[120px]">
+            {{ activeCard?.name || activeCard?.userName || 'انتخاب پروفایل' }}
+          </span>
           <i class="ti ti-chevron-down text-muted-foreground text-sm"></i>
         </button>
       </ClientOnly>
@@ -117,11 +136,11 @@
                   />
                 </div>
                 <span 
-                  v-if="profile.isDefault"
+                  v-if="profile.id === activeCard?.id"
                   class="text-xs bg-secondary text-primary border border-border px-2 py-0.5 rounded-full font-medium flex items-center gap-1"
                 >
                   <i class="ti ti-check text-xs"></i>
-                  پیش‌فرض
+                  فعال
                 </span>
               </div>
               

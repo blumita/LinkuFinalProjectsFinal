@@ -321,8 +321,9 @@
             <div class="flex-1 text-right">
               <div class="flex items-center gap-2">
                 <h2 class="text-xl font-bold text-foreground">{{ userName }}</h2>
+                <!-- تیک آبی فقط برای کاربر Pro و پروفایل پیش‌فرض -->
                 <i 
-                  v-if="isPro"
+                  v-if="isPro && formStore.defaultCard?.isDefault"
                   class="ti ti-rosette-discount-check-filled text-primary text-xl"
                 />
               </div>

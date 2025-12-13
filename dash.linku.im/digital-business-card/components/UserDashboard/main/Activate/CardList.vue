@@ -111,7 +111,7 @@
           <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="cancelProfileSelection"></div>
           
           <!-- Sheet -->
-          <div class="absolute bottom-0 left-0 right-0 bg-background rounded-t-3xl max-h-[80vh] overflow-hidden lg:bottom-auto lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-2xl lg:max-w-md lg:w-full">
+          <div class="absolute bottom-0 left-0 right-0 bg-background rounded-t-3xl max-h-[80vh] overflow-hidden lg:bottom-auto lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-2xl lg:max-w-md lg:w-full lg:max-h-[90vh] lg:shadow-2xl">
             <!-- Handle -->
             <div class="lg:hidden flex justify-center py-3">
               <div class="w-10 h-1 bg-muted-foreground/30 rounded-full"></div>
@@ -274,12 +274,14 @@ function selectDevice(device) {
 }
 
 function selectProfile(profile) {
-  profileSelected.value = profile
+  // اول مودال رو ببند
   showProfileSheet.value = false
   
-  // برو به صفحه فعال‌سازی
-  const deviceParam = encodeURIComponent(JSON.stringify(selectedDevice.value))
-  router.push(`/dashboard/activate/methods?device=${deviceParam}&profile=${profile.id}`)
+  // بعد با تاخیر کوتاه redirect کن تا انیمیشن بسته شدن مودال کامل بشه
+  setTimeout(() => {
+    const deviceParam = encodeURIComponent(JSON.stringify(selectedDevice.value))
+    router.push(`/dashboard/activate/methods?device=${deviceParam}&profile=${profile.id}`)
+  }, 150)
 }
 
 // API calls
