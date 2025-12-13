@@ -339,15 +339,23 @@ class UserController
         ]);
 
         $user = User::findOrFail($validated['userId']);
+        $months = $validated['months'];
 
-        // Set user to premium (is_pro = 1)
-        $user->is_pro = 1;
+        // Set user to premium with subscription details
+        $user->is_pro = true;
+        $user->subscription_type = 'premium';
+        $user->subscription_months = $months;
+        
+        // Calculate subscription end date from now
+        $user->subscription_end_date = now()->addMonths($months);
+        
         $user->save();
 
         return $this->ok('اشتراک با موفقیت ارتقا یافت', [
             'user' => new UserResource($user),
             'is_pro' => true,
-            'months' => $validated['months']
+            'months' => $months,
+            'subscription_end_date' => $user->subscription_end_date->format('Y-m-d')
         ]);
     }
 
