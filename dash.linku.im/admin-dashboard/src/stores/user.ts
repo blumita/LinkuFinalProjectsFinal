@@ -94,40 +94,15 @@ export const useUserStore = defineStore('userStore', () => {
 
     const fetchProfiles = async () => {
         try {
-            // اول یه درخواست برای گرفتن اطلاعات pagination
-            const { data: firstPage } = await axios.get('/user/admin/profiles', {
-                params: { page: 1, per_page: 100 }
-            })
-
-            const pagination = firstPage.data.pagination
-            const totalPages = pagination?.last_page || 1
-            
-            // گرفتن همه صفحات
-            let allProfiles = firstPage.data.data || []
-            
-            // اگه بیشتر از یه صفحه داریم، بقیه رو هم بگیر
-            if (totalPages > 1) {
-                const promises = []
-                for (let page = 2; page <= totalPages; page++) {
-                    promises.push(
-                        axios.get('/user/admin/profiles', {
-                            params: { page, per_page: 100 }
-                        })
-                    )
-                }
-                const responses = await Promise.all(promises)
-                for (const res of responses) {
-                    allProfiles = [...allProfiles, ...(res.data.data.data || [])]
-                }
-            }
+            const { data } = await axios.get('/user/admin/profiles')
 
             // اضافه کردن cardCount به هر پروفایل
-            profiles.value = allProfiles.map((profile: any) => ({
+            profiles.value = (data.data || []).map((profile: any) => ({
                 ...profile,
                 cardCount: profile.cards ? profile.cards.length : 0,
             }))
 
-            console.log('cc', profiles.value.length, 'profiles loaded')
+            console.log('✅ Loaded', profiles.value.length, 'profiles')
 
             fetched.value = true
         } catch (error) {
@@ -135,8 +110,6 @@ export const useUserStore = defineStore('userStore', () => {
             console.error('❌ خطا در دریافت پروفایل:', error)
         }
     }
-
-
     const editProfiles = async (id: number, payload: Partial<Profile>) => {
         try {
             const {data} = await axios.put(`/user/admin/profile/${id}`, payload)

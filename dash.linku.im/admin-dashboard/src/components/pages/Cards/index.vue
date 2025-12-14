@@ -663,7 +663,7 @@ const filteredCards = computed(() => {
   if (loading.value) return []
 
   const query = searchQuery.value?.toLowerCase() || ''
-  
+
   // اگر جستجو خالی باشه، فقط فیلتر وضعیت رو اعمال کن
   if (!query) {
     return cards.value.filter(card => {
