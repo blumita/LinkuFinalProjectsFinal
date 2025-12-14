@@ -49,7 +49,7 @@ class ProfileResource extends JsonResource
             'linkCount' => optional($defaultCard?->links)->count() ?? 0,
             'cardLinks' => $userLinks,
             'cards'=>CardResource::collection($this->cards),
-            'sumViews' => $this->cards->sum(fn($card) => $card->views()->count()),
+            'cardCount' => $this->cards->count(),
             'subscriptionMonths' => null,
             'subscriptionEndDate' => null,
             'status' => $this->status,

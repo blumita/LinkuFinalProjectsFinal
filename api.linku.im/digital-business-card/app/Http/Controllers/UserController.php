@@ -76,8 +76,8 @@ class UserController
 
     public function profiles(Request $request): JsonResponse
     {
-        // برای ادمین، همه پروفایل‌ها رو برمیگردونیم (بدون pagination)
-        $profiles = User::all();
+        // Eager load cards برای جلوگیری از N+1 query
+        $profiles = User::with(['cards', 'cards.links'])->get();
 
         return $this->ok('', ProfileResource::collection($profiles));
     }
