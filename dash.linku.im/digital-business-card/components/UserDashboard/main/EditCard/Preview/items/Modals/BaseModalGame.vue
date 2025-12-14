@@ -42,7 +42,7 @@ const props = defineProps({
   width: { type: String, default: 'w-full' },
   height: { type: String, default: 'h-fit' },
   rounded: { type: String, default: 'lg:rounded-2xl rounded-t-2xl overflow-hidden' },
-  zIndex: { type: String, default: 'z-[999]' },
+  zIndex: { type: String, default: 'z-[99999]' },
   rtl: { type: Boolean, default: true },
   maxHeight: { type: String, default: '70vh' }, // prop جدید برای ارتفاع
 })
@@ -133,7 +133,7 @@ function closeModal() {
     <div
       v-if="props.modelValue && inited"
       @click="closeModal"
-      class="fixed inset-0 bg-stone-900/20 z-[998]"
+      class="fixed inset-0 bg-stone-900/20 z-[99998]"
     />
   </transition>
 
@@ -151,7 +151,7 @@ function closeModal() {
       v-if="props.modelValue"
       ref="modalRef"
       :class="[
-        'fixed flex flex-col text-sm text-gray-800 w-full bg-white overflow-hidden',
+        'fixed bottom-0 flex flex-col text-sm text-gray-800 w-full bg-white overflow-hidden',
         zIndex,
         rounded,
         'bottom-0 left-0 right-0',

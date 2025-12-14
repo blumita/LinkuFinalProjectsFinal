@@ -1,16 +1,15 @@
 <template>
-  <a
-    v-if="isLinkType"
-    v-bind="$attrs"
+  <!-- Button for profile slugs - opens bottom sheet -->
+  <button
+    v-if="isLinkType && hasProfileSlug"
+    type="button"
+    @click="showSlugSheet = true"
     :class="[
       isListMode
         ? 'flex items-center gap-4 backdrop-blur rounded-xl p-2 w-full ' + (formData?.layout === 'left' ? 'text-left' : 'text-right') + (isDarkTheme ? ' bg-white/[0.02]' : isLightTheme ? ' bg-black/[0.02]' : ' bg-gradient-to-br from-white/60 via-white/30 to-white/10 border border-white/20')
         : 'rounded-xl text-center p-2 flex flex-col items-center justify-center transition hover:shadow-md backdrop-blur' + (isDarkTheme ? ' bg-white/[0.02]' : isLightTheme ? ' bg-black/[0.02]' : ' bg-gradient-to-br from-white/60 via-white/30 to-white/10 border border-white/20'),
     ]"
     :style="cardStyle"
-    :href="finalUrl || undefined"
-    :target="finalUrl ? '_blank' : undefined"
-    :rel="finalUrl ? 'noopener' : undefined"
   >
     <div :class="[
       isListMode ? 'flex-shrink-0 rounded-xl flex items-center overflow-hidden w-[54px] h-[54px]' : 'w-[54px] h-[54px] rounded-xl flex items-center justify-center mb-2 overflow-hidden',
@@ -51,14 +50,111 @@
         {{ sanitizedLink.description }}
       </div>
     </div>
+  </button>
+
+  <!-- Regular link for non-profile items -->
+  <a
+    v-else-if="isLinkType"
+    v-bind="$attrs"
+    :class="[
+      isListMode
+        ? 'flex items-center gap-4 backdrop-blur rounded-xl p-2 w-full ' + (formData?.layout === 'left' ? 'text-left' : 'text-right') + (isDarkTheme ? ' bg-white/[0.02]' : isLightTheme ? ' bg-black/[0.02]' : ' bg-gradient-to-br from-white/60 via-white/30 to-white/10 border border-white/20')
+        : 'rounded-xl text-center p-2 flex flex-col items-center justify-center transition hover:shadow-md backdrop-blur' + (isDarkTheme ? ' bg-white/[0.02]' : isLightTheme ? ' bg-black/[0.02]' : ' bg-gradient-to-br from-white/60 via-white/30 to-white/10 border border-white/20'),
+    ]"
+    :style="cardStyle"
+    :href="finalUrl || undefined"
+    :target="finalUrl ? '_blank' : undefined"
+    :rel="finalUrl ? 'noopener' : undefined"
+  >
+    <div :class="[
+      isListMode ? 'flex-shrink-0 rounded-xl flex items-center overflow-hidden w-[54px] h-[54px]' : 'w-[54px] h-[54px] rounded-xl flex items-center justify-center mb-2 overflow-hidden',
+      isDarkTheme || isLightTheme ? '' : 'bg-gray-100'
+    ]">
+      <img
+        v-if="sanitizedLink?.customIcon"
+        :src="sanitizedLink.customIcon"
+        class="w-full h-full object-contain"
+        alt="custom icon"
+      />
+      <component
+        v-else-if="iconComponent && iconData?.type === 'component'"
+        :is="iconComponent"
+        :size="50"
+        v-bind="iconColor ? { color: iconColor, filled: isIconFilled } : {}"
+      />
+      <template v-else>
+        <i class="ti ti-link text-blue-500 text-xl"></i>
+      </template>
+    </div>
+    <div :class="isListMode ? 'flex flex-col justify-center flex-1 min-w-0 ' + (formData?.layout === 'left' ? 'text-left' : 'text-right') : 'w-full text-center mt-0 flex-1 flex flex-col justify-center'">
+      <div :class="[
+        isListMode ? 'font-bold text-[14px] leading-snug break-words ' + (formData?.layout === 'left' ? 'text-left' : 'text-right') : 'font-bold text-[15px] leading-snug text-center break-words',
+        isDarkTheme ? 'text-white' : 'text-gray-800'
+      ]">
+        {{ sanitizedLink.displayName || sanitizedLink.title || sanitizedLink.name || sanitizedLink.value || sanitizedLink.id || 'بدون عنوان' }}
+      </div>
+      <div v-if="isListMode && sanitizedLink.description && sanitizedLink.description.trim()"
+           :class="[
+             'text-xs font-normal mt-1 leading-relaxed whitespace-pre-line break-words ' + (formData?.layout === 'left' ? 'text-left' : 'text-right'),
+             isDarkTheme ? 'text-gray-300' : 'text-gray-600'
+           ]"
+           >
+        {{ sanitizedLink.description }}
+      </div>
+    </div>
   </a>
+
+  <!-- Bottom Sheet for Profile Slug -->
+  <UiBottomSheet
+    v-model="showSlugSheet"
+    title="انتخاب عمل"
+    :z-index="'z-[99999]'"
+    height-class="max-h-[50vh]"
+    content-padding="p-0"
+  >
+    <div class="p-4 space-y-2">
+      <a
+        :href="finalUrl"
+        target="_blank"
+        rel="noopener"
+        @click="showSlugSheet = false"
+        class="flex items-center gap-3 p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+      >
+        <div class="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+          <i class="ti ti-external-link text-blue-600 dark:text-blue-400"></i>
+        </div>
+        <div class="flex-1">
+          <p class="font-medium text-gray-900 dark:text-white">باز کردن در {{ getSocialName }}</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">@{{ sanitizedLink.value }}</p>
+        </div>
+      </a>
+      
+      <button
+        @click="copySlug"
+        class="w-full flex items-center gap-3 p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+      >
+        <div class="w-10 h-10 bg-green-50 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+          <i :class="copied ? 'ti ti-check' : 'ti ti-copy'" class="text-green-600 dark:text-green-400"></i>
+        </div>
+        <div class="flex-1 text-right">
+          <p class="font-medium text-gray-900 dark:text-white">{{ copied ? 'کپی شد!' : 'کپی آیدی' }}</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">@{{ sanitizedLink.value }}</p>
+        </div>
+      </button>
+    </div>
+  </UiBottomSheet>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useFormStore } from '~/stores/form'
 import { useIconComponents } from '@/composables/useIconComponentsMap'
 import { useDeepLink } from '@/composables/useDeepLink'
+import UiBottomSheet from '~/components/ui/BottomSheet.vue'
+
+// State for bottom sheet
+const showSlugSheet = ref(false)
+const copied = ref(false)
 
 const props = defineProps({
   link: { type: Object, required: true },
@@ -231,4 +327,71 @@ const isListMode = computed(() => {
   // اگر هیچ کدام تعریف نشده، پیش‌فرض true (حالت لیست)
   return true
 })
+
+// Check if this is a profile slug (social media with username)
+const hasProfileSlug = computed(() => {
+  const profileActions = [
+    'instagram', 'telegram', 'twitter', 'x', 'tiktok', 'linkedin',
+    'facebook', 'youtube', 'aparat', 'virgool', 'threads',
+    'rubika', 'eitaa', 'bale', 'igap', 'discord', 'twitch',
+    'snapchat', 'pinterest', 'clubhouse', 'github', 'medium'
+  ]
+  return profileActions.includes(props.link.action) && props.link.value
+})
+
+// Get social media name in Persian
+const getSocialName = computed(() => {
+  const names = {
+    instagram: 'اینستاگرام',
+    telegram: 'تلگرام',
+    twitter: 'توییتر',
+    x: 'ایکس',
+    tiktok: 'تیک‌تاک',
+    linkedin: 'لینکدین',
+    facebook: 'فیسبوک',
+    youtube: 'یوتیوب',
+    aparat: 'آپارات',
+    virgool: 'ویرگول',
+    threads: 'ترِدز',
+    rubika: 'روبیکا',
+    eitaa: 'ایتا',
+    bale: 'بله',
+    igap: 'آی‌گپ',
+    discord: 'دیسکورد',
+    twitch: 'توییچ',
+    snapchat: 'اسنپ‌چت',
+    pinterest: 'پینترست',
+    clubhouse: 'کلاب‌هاوس',
+    github: 'گیت‌هاب',
+    medium: 'مدیوم'
+  }
+  return names[props.link.action] || props.link.action
+})
+
+// Copy slug to clipboard
+const copySlug = async () => {
+  try {
+    const textToCopy = props.link.value?.replace(/^[@+]/, '') || ''
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(textToCopy)
+    } else {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea')
+      textArea.value = textToCopy
+      textArea.style.position = 'fixed'
+      textArea.style.left = '-999999px'
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+    }
+    copied.value = true
+    setTimeout(() => {
+      copied.value = false
+      showSlugSheet.value = false
+    }, 1500)
+  } catch (err) {
+    console.error('Failed to copy:', err)
+  }
+}
 </script>

@@ -43,7 +43,7 @@ const props = defineProps({
   width: { type: String, default: 'w-full' },
   height: { type: String, default: 'h-fit' },
   rounded: { type: String, default: 'lg:rounded-2xl rounded-t-2xl overflow-hidden' },
-  zIndex: { type: String, default: 'z-[999]' },
+  zIndex: { type: String, default: 'z-[99999]' },
   rtl: { type: Boolean, default: true },
 })
 const emit = defineEmits(['update:modelValue', 'close'])
@@ -91,34 +91,30 @@ function closeModal() {
     <div
       v-if="props.modelValue && inited"
       @click="closeModal"
-      class="fixed inset-0 bg-stone-900/20 z-[998]"
+      class="fixed inset-0 bg-stone-900/20 z-[99998]"
     />
   </transition>
 
   <!-- مودال -->
   <transition
     appear
-    enter-active-class="transition-all duration-300 ease-out"
-    leave-active-class="transition-all duration-200 ease-in"
-    :enter-from-class="isMobile ? 'translate-y-full' : 'opacity-0 scale-95'"
-    :enter-to-class="isMobile ? 'translate-y-0' : 'opacity-100 scale-100'"
-    :leave-from-class="isMobile ? 'translate-y-0' : 'opacity-100 scale-100'"
-    :leave-to-class="isMobile ? 'translate-y-full' : 'opacity-0 scale-95'"
+    enter-active-class="transition-transform duration-300 ease-in-out"
+    leave-active-class="transition-transform duration-300 ease-in-out"
+    enter-from-class="translate-y-full"
+    enter-to-class="translate-y-0"
+    leave-from-class="translate-y-0"
+    leave-to-class="translate-y-full"
   >
     <div
       v-if="props.modelValue"
       :class="[
-        'fixed flex flex-col text-sm text-gray-800 bg-white overflow-hidden',
-        'max-h-[80vh]',
+        'fixed  bottom-0 flex flex-col text-sm text-gray-800  h-screen min-h-96 max-h-[60vh] bg-white overflow-hidden',
         zIndex,
         width,
         height,
         rounded,
-        // موبایل: پایین صفحه
-        'bottom-0 left-0 right-0',
-        // دسکتاپ: وسط صفحه
-        'lg:bottom-auto lg:left-1/2 lg:top-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2',
-        'lg:max-w-lg lg:rounded-2xl lg:shadow-2xl',
+        rtl ? 'rtl:right-0 ltr:left-0' : 'left-0',
+        'bottom-0',
       ]"
       @click.stop
     >
