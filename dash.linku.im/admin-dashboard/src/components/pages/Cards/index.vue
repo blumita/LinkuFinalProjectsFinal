@@ -59,47 +59,63 @@
 
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
-      <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 transition-colors duration-300">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">همه پروفایل‌ها</p>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ cards.length }}</p>
-          </div>
-          <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-            </svg>
+      <!-- Skeleton Loader for Stats -->
+      <template v-if="loading">
+        <div v-for="i in 3" :key="i" class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 transition-colors duration-300 animate-pulse">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-3"></div>
+              <div class="h-8 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+            </div>
+            <div class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
           </div>
         </div>
-      </div>
+      </template>
 
-      <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 transition-colors duration-300">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">کارت‌های فعال</p>
-            <p class="text-2xl font-bold text-green-600">{{ activeCardsCount }}</p>
-          </div>
-          <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
-            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+      <!-- Actual Stats Cards -->
+      <template v-else>
+        <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 transition-colors duration-300">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">همه پروفایل‌ها</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ totalCards }}</p>
+            </div>
+            <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 transition-colors duration-300">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">کارت‌های غیرفعال</p>
-            <p class="text-2xl font-bold text-red-600">{{ inactiveCardsCount }}</p>
-          </div>
-          <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
-            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+        <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 transition-colors duration-300">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">کارت‌های فعال</p>
+              <p class="text-2xl font-bold text-green-600">{{ activeCardsCount }}</p>
+            </div>
+            <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
           </div>
         </div>
-      </div>
+
+        <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 transition-colors duration-300">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">کارت‌های غیرفعال</p>
+              <p class="text-2xl font-bold text-red-600">{{ inactiveCardsCount }}</p>
+            </div>
+            <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </template>
     </div>
 
     <!-- Advanced Search & Filters -->
@@ -202,8 +218,24 @@
 
     <!-- Data Table -->
     <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-2xl overflow-hidden transition-colors duration-300">
+      <!-- Loading Skeleton -->
+      <template v-if="loading">
+        <div class="p-6">
+          <div class="animate-pulse space-y-4">
+            <div v-for="i in 5" :key="i" class="flex items-center gap-4 p-4 border border-gray-200 dark:border-slate-700 rounded-xl">
+              <div class="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+                <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+              </div>
+              <div class="w-20 h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </template>
+
       <!-- Mobile View -->
-      <div class="sm:hidden">
+      <div v-else class="sm:hidden">
         <div class="divide-y border-gray-200 dark:border-slate-700">
           <div
             v-for="card in paginatedCards"
@@ -307,7 +339,7 @@
       </div>
 
       <!-- Desktop View -->
-      <div class="hidden sm:block overflow-x-auto">
+      <div v-else class="hidden sm:block overflow-x-auto">
         <table class="w-full">
           <thead class="bg-gray-100 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-700">
             <tr>
@@ -556,6 +588,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import QRCode from 'qrcode'
 import { copyToClipboard as copyText } from '@/utils/clipboard'
+import { useCardsStore } from '@/stores/cards'
 
 // Types
 interface Card {
@@ -571,6 +604,9 @@ interface Card {
 defineOptions({
   name: 'CardsManagement'
 })
+
+// Store
+const cardsStore = useCardsStore()
 
 // Router
 const route = useRoute()
@@ -596,8 +632,12 @@ const successMessage = ref('')
 // Selection State
 const selectedCards = ref<string[]>([])
 
-// Sample data
-const cards = ref<Card[]>([
+// Get cards from store
+const cards = computed(() => cardsStore.cards)
+const loading = computed(() => cardsStore.loading)
+
+// Sample data - REMOVED, using store instead
+const mockCards = ref<Card[]>([
   {
     id: 'VZT001',
     ownerName: 'محمد حسین زاده',
@@ -700,6 +740,8 @@ const cards = ref<Card[]>([
 ])
 
 // Computed Properties
+const totalCards = computed(() => cards.value.length)
+
 const activeCardsCount = computed(() => {
   return cards.value.filter(card => card.status === 'active').length
 })
@@ -709,11 +751,13 @@ const inactiveCardsCount = computed(() => {
 })
 
 const filteredCards = computed(() => {
+  if (loading.value) return []
+  
   return cards.value.filter(card => {
-    const matchesSearch = card.ownerName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                         card.description.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                         card.id.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                         card.qrLink.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const matchesSearch = card.ownerName?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+                         card.description?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+                         String(card.id).toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+                         card.qrLink?.toLowerCase().includes(searchQuery.value.toLowerCase())
 
     const matchesStatus = !statusFilter.value || card.status === statusFilter.value
 
@@ -956,9 +1000,11 @@ const copyToClipboard = async (text: string) => {
 }
 
 // Close dropdown when clicking outside
-onMounted(() => {
-  // Dark mode is now handled in Header component
+onMounted(async () => {
+  // Fetch cards from API
+  await cardsStore.fetchCards()
 
+  // Dark mode is now handled in Header component
   document.addEventListener('click', (e) => {
     const target = e.target as HTMLElement
     if (!target?.closest('.relative')) {

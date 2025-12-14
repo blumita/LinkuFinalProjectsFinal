@@ -129,7 +129,23 @@
 
       <!-- Modern Users List -->
       <div class="p-2">
-        <div class="space-y-4">
+        <!-- Skeleton Loader -->
+        <div v-if="loading" class="space-y-4">
+          <div v-for="i in 5" :key="i" class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 animate-pulse">
+            <div class="flex items-start gap-4">
+              <div class="w-14 h-14 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+              </div>
+              <div class="w-20 h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actual Users -->
+        <div v-else class="space-y-4">
           <div v-for="user in paginatedUsers" :key="user.id"
                class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 group">
 
@@ -795,6 +811,8 @@ const upgradeDurations = [
 
 const userStore = useUserStore()
 const users = computed(() => userStore.profiles)
+const loading = ref(true)
+
 // Computed properties
 const filteredUsers = computed(() => {
   let filtered = [...users.value]
@@ -1110,7 +1128,11 @@ const confirmUpgrade = async () => {
 }
 
 onMounted(async () => {
-  await userStore.fetchProfiles()
+  try {
+    await userStore.fetchProfiles()
+  } finally {
+    loading.value = false
+  }
 })
 
 </script>

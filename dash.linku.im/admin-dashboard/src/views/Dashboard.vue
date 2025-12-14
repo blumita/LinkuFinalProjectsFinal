@@ -11,8 +11,22 @@
 
     <!-- آمارهای کلی -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Skeleton Loader -->
+      <template v-if="loading">
+        <div v-for="i in 4" :key="i" class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 animate-pulse">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+            <div class="text-right flex-1 ml-4">
+              <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2"></div>
+              <div class="h-8 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+            </div>
+          </div>
+          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+        </div>
+      </template>
+
       <!-- کل پروفایل‌ها -->
-      <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
+      <div v-else class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
         <div class="flex items-center justify-between mb-4">
           <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <i class="ti ti-users text-blue-600 dark:text-blue-400 text-2xl"></i>
@@ -29,7 +43,7 @@
       </div>
 
       <!-- کل محصولات -->
-      <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
+      <div v-if="!loading" class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
         <div class="flex items-center justify-between mb-4">
           <div class="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
             <i class="ti ti-package text-green-600 dark:text-green-400 text-2xl"></i>
@@ -46,7 +60,7 @@
       </div>
 
       <!-- مدیران سیستم -->
-      <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
+      <div v-if="!loading" class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
         <div class="flex items-center justify-between mb-4">
           <div class="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
             <i class="ti ti-shield-check text-purple-600 dark:text-purple-400 text-2xl"></i>
@@ -63,7 +77,7 @@
       </div>
 
       <!-- کارت‌های ایجاد شده -->
-      <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
+      <div v-if="!loading" class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-6 hover:shadow-lg transition-shadow">
         <div class="flex items-center justify-between mb-4">
           <div class="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
             <i class="ti ti-credit-card text-orange-600 dark:text-orange-400 text-2xl"></i>
@@ -233,18 +247,16 @@ defineOptions({
 })
 
 
-const cardStore=useCardsStore();
+const cardStore = useCardsStore();
 const totalCards = computed(() => cardStore.totalCards)
 const activeCards = computed(() => cardStore.activeCardsCount)
 
-const productStore=useProductStore();
+const productStore = useProductStore();
 const totalProducts = computed(() => productStore.totalProducts)
 const activeProducts = computed(() => productStore.activeProducts)
 const inactiveProducts = computed(() => productStore.inactiveProducts)
 
-
-const userStore=useUserStore();
-
+const userStore = useUserStore();
 
 const totalUsers = computed(() => userStore.totalUsers)
 const activeUsers = computed(() => userStore.activeUsers)
@@ -252,12 +264,21 @@ const adminUsers = computed(() => userStore.adminUsers)
 const suspendedUsers = computed(() => userStore.suspendedUsers)
 const inactiveUsers = computed(() => userStore.inactiveUsers)
 const totalAdmins = computed(() => userStore.adminUsers)
-const activeAdmins = computed(() =>userStore.activeAdmins)
+const activeAdmins = computed(() => userStore.activeAdmins)
 
-onMounted((async () => {
-  await userStore.fetchAllUsers()
-  await cardStore.fetchCards()
-  await productStore.fetchProducts()
-}))
+const loading = ref(true)
+
+onMounted(async () => {
+  try {
+    // Load data in parallel for better performance
+    await Promise.all([
+      userStore.fetchAllUsers(),
+      cardStore.fetchCards(),
+      productStore.fetchProducts()
+    ])
+  } finally {
+    loading.value = false
+  }
+})
 
 </script>
