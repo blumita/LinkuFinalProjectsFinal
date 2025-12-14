@@ -53,12 +53,12 @@
   </div>
 
   <!-- صفحه پروفایل عادی -->
-  <div v-else-if="!isLoading">
+  <div v-else-if="!isLoading" class="min-h-screen bg-gray-50 lg:flex lg:items-center lg:justify-center">
     <InfoToast :visible="showToast" :message="toastMessage" :icon="toastIcon"/>
 
     <!-- نمایش Layout عادی -->
     <div
-        class="w-full h-screen flex flex-col overflow-hidden relative scrollbar-hide"
+        class="w-full lg:max-w-md lg:mx-auto h-screen flex flex-col overflow-hidden relative scrollbar-hide lg:rounded-3xl lg:shadow-2xl lg:border lg:border-gray-200"
         :dir="formData?.layout === 'left' ? 'ltr' : 'rtl'"
     >
       <!-- پس‌زمینه با رنگ تم (مشکی=سفید، بقیه=8% opacity) -->
@@ -85,7 +85,7 @@
           <!-- منوی سه نقطه در گوشه بالا -->
           <div class="absolute top-4 ltr:right-4 rtl:left-4 z-20">
             <button
-                @click.stop="toggleOptionsMenu($event)"
+                @click.prevent.stop="showOptionsMenu = !showOptionsMenu"
                 type="button"
                 class="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 shadow-lg border border-gray-200/50"
                 :style="{ color: iconColor }"
@@ -100,7 +100,7 @@
                 class="absolute top-12 ltr:right-0 rtl:left-0 bg-white rounded-xl shadow-2xl py-2 min-w-[160px] z-30 border-2 border-gray-200"
             >
               <button
-                  @click="handleShareClick"
+                  @click.stop="handleShareClick"
                   type="button"
                   class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium text-gray-800"
               >
@@ -108,7 +108,7 @@
                 اشتراک‌گذاری
               </button>
               <button
-                  @click="handleReportClick"
+                  @click.stop="handleReportClick"
                   type="button"
                   class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium text-gray-800"
               >

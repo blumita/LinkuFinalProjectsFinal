@@ -1,22 +1,15 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 
-let scrollY = 0
 const setBodyOverflow = (hidden) => {
-  if (typeof document === 'undefined' || typeof window === 'undefined') return
+  if (typeof document === 'undefined') return
   
   if (hidden) {
-    scrollY = window.scrollY || 0
-    document.body.style.position = 'fixed'
-    document.body.style.width = '100%'
-    document.body.style.top = `-${scrollY}px`
     document.body.style.overflow = 'hidden'
+    document.body.style.touchAction = 'none'
   } else {
-    document.body.style.position = ''
-    document.body.style.width = ''
-    document.body.style.top = ''
     document.body.style.overflow = ''
-    window.scrollTo(0, scrollY)
+    document.body.style.touchAction = ''
   }
 }
 
