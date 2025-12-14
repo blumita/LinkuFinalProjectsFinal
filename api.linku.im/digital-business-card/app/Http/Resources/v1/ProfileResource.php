@@ -14,30 +14,6 @@ class ProfileResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-
-        $defaultCard = $this->cards->firstWhere('is_default', true);
-
-        $userLinks = $defaultCard && isset($defaultCard->links)
-            ? $defaultCard->links
-                ->filter(function ($link) {
-                    $data = json_decode($link->data, true);
-                    return isset($data['type']) && $data['type'] === 'link';
-                })
-                ->map(function ($link) {
-                    $data = json_decode($link->data, true);
-                    return [
-                        'id' => $link->id,
-                        'title' => $data['title']??'',
-                        'url' => $data['value'] ?? null,
-                        'isActive' => (bool)$link->enabled,
-                        'clicks' => $link->clicks ?? 0,
-                        'createdAt' => $link->created_at->format('Y-m-d'),
-                    ];
-                })
-                ->values()
-                ->toArray()
-            : [];
-
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -46,16 +22,11 @@ class ProfileResource extends JsonResource
             'email' => $this->email,
             'subscriptionType' => $this->is_pro ? 'premium' : 'free',
             'profileUrl' => env('CARD_URL') . '/' . $this->user_name,
-            'linkCount' => optional($defaultCard?->links)->count() ?? 0,
-            'cardLinks' => $userLinks,
-            'cards'=>CardResource::collection($this->cards),
             'cardCount' => $this->cards->count(),
-            'subscriptionMonths' => null,
-            'subscriptionEndDate' => null,
+            'linkCount' => 0,
             'status' => $this->status,
-            'createdAt' => $this->created_at->format('Y-m-d'),
-            //'lastLogin' =>$this->last_login->format('Y-m-d'),
-            'updatedAt' => $this->updated_at->format('Y-m-d'),
+            'createdAt' => $this->created_at ? $this->created_at->format('Y-m-d') : null,
+            'updatedAt' => $this->updated_at ? $this->updated_at->format('Y-m-d') : null,
         ];
     }
 }
