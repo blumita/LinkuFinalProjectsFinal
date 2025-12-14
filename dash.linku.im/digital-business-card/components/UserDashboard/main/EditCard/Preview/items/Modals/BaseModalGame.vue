@@ -52,12 +52,31 @@ const handleResize = () => {
   }
 }
 
+// Body lock برای جلوگیری از اسکرول background
+const setBodyLock = (hidden) => {
+  if (typeof document === 'undefined') return
+  
+  if (hidden) {
+    document.body.style.overflow = 'hidden'
+    document.body.style.position = 'relative'
+  } else {
+    document.body.style.overflow = ''
+    document.body.style.position = ''
+  }
+}
+
+watch(() => props.modelValue, (val) => {
+  setBodyLock(val)
+})
+
 onMounted(() => {
   handleResize()
   window.addEventListener('resize', handleResize)
   
   // تشخیص کیبورد
   const cleanupKeyboard = detectKeyboard()
+  
+  if (props.modelValue) setBodyLock(true)
   
   // cleanup keyboard detection
   onBeforeUnmount(() => {
@@ -67,6 +86,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', handleResize)
+  setBodyLock(false)
 })
 
 function closeModal() {

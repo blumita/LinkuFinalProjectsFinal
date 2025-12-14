@@ -733,13 +733,33 @@ const toggleOptionsMenu = (event) => {
   console.log('📊 showOptionsMenu after:', showOptionsMenu.value)
 }
 
-// Handle share button click
-const handleShareClick = (event) => {
+// Handle share button click - استفاده از Native Share API
+const handleShareClick = async (event) => {
   console.log('📤 Share button clicked', event)
   event?.stopPropagation()
-  showShareModal.value = true
   showOptionsMenu.value = false
-  console.log('📊 showShareModal:', showShareModal.value)
+  
+  // اگر Native Share API موجود بود (موبایل)
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: formData?.name || 'پروفایل کاربر',
+        text: `پروفایل ${formData?.name || 'کاربر'} را در لینکو مشاهده کنید`,
+        url: window.location.href
+      })
+      console.log('✅ اشتراک‌گذاری موفق')
+    } catch (err) {
+      // اگر کاربر cancel کرد یا خطا رخ داد
+      if (err.name !== 'AbortError') {
+        console.error('خطا در اشتراک‌گذاری:', err)
+        // fallback به modal
+        showShareModal.value = true
+      }
+    }
+  } else {
+    // fallback برای دسکتاپ - باز کردن modal
+    showShareModal.value = true
+  }
 }
 
 // Handle report button click
