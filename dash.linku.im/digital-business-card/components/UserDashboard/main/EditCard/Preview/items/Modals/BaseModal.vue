@@ -1,18 +1,6 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 
-const setBodyOverflow = (hidden) => {
-  if (typeof document === 'undefined') return
-  
-  if (hidden) {
-    document.body.style.overflow = 'hidden'
-    document.body.style.touchAction = 'none'
-  } else {
-    document.body.style.overflow = ''
-    document.body.style.touchAction = ''
-  }
-}
-
 const props = defineProps({
   modelValue: Boolean, // v-model:visible
   mobileSlide: { type: Boolean, default: true },
@@ -26,34 +14,19 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'close'])
 
 const isMobile = ref(false)
-const inited = ref(false)
 const handleResize = () => {
   if (typeof window !== 'undefined') {
     isMobile.value = window.innerWidth < 1024
   }
 }
 
-
-
 onMounted(() => {
   handleResize()
   window.addEventListener('resize', handleResize)
-  requestAnimationFrame(() => {
-    inited.value = true
-    // فقط زمانی که مدال واقعاً باز است و inited فعال شد، overflow را مخفی کن
-    if (props.modelValue) setBodyOverflow(true)
-  })
 })
-
-watch(() => props.modelValue, (val) => {
-  // فقط زمانی که inited فعال است، overflow را تغییر بده
-  if (inited.value) setBodyOverflow(val)
-})
-
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', handleResize)
-  setBodyOverflow(false)
 })
 
 function closeModal() {
@@ -66,9 +39,10 @@ function closeModal() {
   <!-- بک‌دراپ -->
   <transition name="fade">
     <div
-      v-if="props.modelValue && inited"
+      v-if="props.modelValue"
       @click="closeModal"
       class="fixed inset-0 bg-stone-900/20 z-[99998]"
+      style="touch-action: none;"
     />
   </transition>
 
@@ -85,24 +59,27 @@ function closeModal() {
     <div
       v-if="props.modelValue"
       :class="[
-        'fixed  bottom-0 flex flex-col text-sm text-gray-800  h-screen min-h-96 max-h-[60vh] bg-white overflow-hidden',
+        'fixed bottom-0 left-0 right-0 flex flex-col text-sm text-gray-800 max-h-[60vh] bg-white',
         zIndex,
-        width,
-        height,
         rounded,
-        rtl ? 'rtl:right-0 ltr:left-0' : 'left-0',
-        'bottom-0',
       ]"
+      style="touch-action: none; overscroll-behavior: none;"
       @click.stop
+      @touchmove.stop.prevent
     >
-      <slot name="header" />
+      <div class="flex-shrink-0">
+        <slot name="header" />
+      </div>
       <div 
         class="flex-1 overflow-y-auto"
         style="-webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain;"
+        @touchmove.stop
       >
         <slot />
       </div>
-      <slot name="footer" />
+      <div class="flex-shrink-0">
+        <slot name="footer" />
+      </div>
     </div>
   </transition>
 </template>

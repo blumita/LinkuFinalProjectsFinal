@@ -100,7 +100,7 @@
                 class="absolute top-12 ltr:right-0 rtl:left-0 bg-white rounded-xl shadow-2xl py-2 min-w-[160px] z-30 border-2 border-gray-200"
             >
               <button
-                  @click.stop="handleShareClick"
+                  @click="handleShareClick"
                   type="button"
                   class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium text-gray-800"
               >
@@ -108,7 +108,7 @@
                 اشتراک‌گذاری
               </button>
               <button
-                  @click.stop="handleReportClick"
+                  @click="handleReportClick"
                   type="button"
                   class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-all duration-200 font-medium text-gray-800"
               >
@@ -466,10 +466,9 @@
 
       <!-- Share Modal - Bottom Sheet -->
       <UiBottomSheet
-          :visible="showShareModal"
+          v-model="showShareModal"
           title="اشتراک‌گذاری پروفایل"
-          :close-on-overlay="true"
-          @close="showShareModal = false"
+          :close-on-backdrop="true"
       >
         <!-- محتوای اشتراک‌گذاری -->
         <div class="space-y-4">
@@ -572,10 +571,10 @@
 
       <!-- Report Modal - Bottom Sheet -->
       <UiBottomSheet
-          :visible="showReportModal"
+          v-model="showReportModal"
           title="گزارش محتوا"
-          :close-on-overlay="true"
-          @close="showReportModal = false"
+          :close-on-backdrop="true"
+          @update:modelValue="showReportModal = $event"
       >
         <!-- محتوای فرم گزارش -->
         <div class="space-y-6">

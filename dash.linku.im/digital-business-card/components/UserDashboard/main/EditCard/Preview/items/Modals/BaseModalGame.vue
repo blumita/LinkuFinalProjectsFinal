@@ -1,18 +1,6 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 
-const setBodyOverflow = (hidden) => {
-  if (typeof document === 'undefined') return
-  
-  if (hidden) {
-    document.body.style.overflow = 'hidden'
-    document.body.style.touchAction = 'none'
-  } else {
-    document.body.style.overflow = ''
-    document.body.style.touchAction = ''
-  }
-}
-
 const props = defineProps({
   modelValue: Boolean, // v-model:visible
   mobileSlide: { type: Boolean, default: true },
@@ -27,7 +15,6 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'close'])
 
 const isMobile = ref(false)
-const inited = ref(false)
 const modalRef = ref(null)
 
 // تشخیص باز و بسته شدن کیبورد
@@ -42,13 +29,11 @@ const detectKeyboard = () => {
       
       // اگر ارتفاع بیش از 150 پیکسل کم شده، کیبورد باز است
       if (heightDiff > 150) {
-        keyboardOpen = true
         if (modalRef.value) {
           modalRef.value.style.height = `${currentHeight}px`
           modalRef.value.style.maxHeight = `${currentHeight}px`
         }
       } else {
-        keyboardOpen = false
         if (modalRef.value) {
           modalRef.value.style.height = props.maxHeight
           modalRef.value.style.maxHeight = props.maxHeight
@@ -67,8 +52,6 @@ const handleResize = () => {
   }
 }
 
-
-
 onMounted(() => {
   handleResize()
   window.addEventListener('resize', handleResize)
@@ -76,27 +59,14 @@ onMounted(() => {
   // تشخیص کیبورد
   const cleanupKeyboard = detectKeyboard()
   
-  requestAnimationFrame(() => {
-    inited.value = true
-    // فقط زمانی که مدال واقعاً باز است و inited فعال شد، overflow را مخفی کن
-    if (props.modelValue) setBodyOverflow(true)
-  })
-  
   // cleanup keyboard detection
   onBeforeUnmount(() => {
     if (cleanupKeyboard) cleanupKeyboard()
   })
 })
 
-watch(() => props.modelValue, (val) => {
-  // فقط زمانی که inited فعال است، overflow را تغییر بده
-  if (inited.value) setBodyOverflow(val)
-})
-
-
 onBeforeUnmount(() => {
   window.removeEventListener('resize', handleResize)
-  setBodyOverflow(false)
 })
 
 function closeModal() {
@@ -109,9 +79,10 @@ function closeModal() {
   <!-- بک‌دراپ -->
   <transition name="fade">
     <div
-      v-if="props.modelValue && inited"
+      v-if="props.modelValue"
       @click="closeModal"
       class="fixed inset-0 bg-stone-900/20 z-[99998]"
+      style="touch-action: none;"
     />
   </transition>
 
@@ -129,10 +100,9 @@ function closeModal() {
       v-if="props.modelValue"
       ref="modalRef"
       :class="[
-        'fixed bottom-0 flex flex-col text-sm text-gray-800 w-full bg-white overflow-hidden',
+        'fixed bottom-0 left-0 right-0 flex flex-col text-sm text-gray-800 w-full bg-white',
         zIndex,
         rounded,
-        'bottom-0 left-0 right-0',
       ]"
       :style="{
         touchAction: 'none',
@@ -142,7 +112,7 @@ function closeModal() {
         maxHeight: props.maxHeight
       }"
       @click.stop
-      @touchmove.stop
+      @touchmove.stop.prevent
     >
       <div class="flex-shrink-0">
         <slot name="header" />
@@ -154,6 +124,7 @@ function closeModal() {
           WebkitOverflowScrolling: 'touch',
           overscrollBehavior: 'contain'
         }"
+        @touchmove.stop
       >
         <slot />
       </div>

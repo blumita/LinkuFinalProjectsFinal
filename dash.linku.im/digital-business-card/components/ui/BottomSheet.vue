@@ -56,6 +56,7 @@
         v-show="modelValue"
         :class="['fixed inset-0 bg-black/50', zIndex]"
         @click="handleBackdropClick"
+        style="touch-action: none; overscroll-behavior: none;"
       >
         <Transition
           enter-active-class="transition-all duration-300 ease-out"
@@ -76,7 +77,9 @@
               zIndex
             ]"
             :style="bottomSheetStyle"
+            style="touch-action: none; overscroll-behavior: none;"
             @click.stop
+            @touchmove.stop.prevent
           >
             <div v-if="!closable" class="flex justify-center pt-2 pb-1 lg:hidden">
               <div class="w-10 h-1 bg-muted-foreground/30 rounded-full"></div>
@@ -92,9 +95,10 @@
             </div>
 
             <div 
-              class="overflow-y-auto flex-1 scrollbar-hidden overscroll-contain" 
+              class="overflow-y-auto flex-1 scrollbar-hidden" 
               :style="contentStyle"
-              style="-webkit-overflow-scrolling: touch; touch-action: pan-y;"
+              style="-webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain;"
+              @touchmove.stop
             >
               <slot />
             </div>
@@ -146,15 +150,21 @@ const emit = defineEmits<{
 
 const bottomSheetRef = ref<HTMLElement | null>(null)
 
+// فیکس برای جلوگیری از اسکرول background بدون lock کردن کل صفحه
+let scrollY = 0
 const setBodyLock = (hidden: boolean) => {
-  if (typeof document === 'undefined') return
+  if (typeof document === 'undefined' || typeof window === 'undefined') return
   
   if (hidden) {
+    // ذخیره موقعیت اسکرول فعلی
+    scrollY = window.scrollY
+    // فقط overflow hidden بدون position fixed
     document.body.style.overflow = 'hidden'
-    document.body.style.touchAction = 'none'
+    document.body.style.position = 'relative'
   } else {
+    // بازگردانی حالت عادی
     document.body.style.overflow = ''
-    document.body.style.touchAction = ''
+    document.body.style.position = ''
   }
 }
 
