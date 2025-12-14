@@ -1115,12 +1115,13 @@ const filteredCards = computed(() => {
                             licenseId.toLowerCase().includes(profileIdSearch.value.toLowerCase())
 
     // General search
-    const matchesSearch = !searchQuery.value ||
-                         card.ownerName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                         card.description?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                         card.id.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                         card.qrLink.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                         licenseId.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const query = searchQuery.value?.toLowerCase() || ''
+    const matchesSearch = !query ||
+                         (card.ownerName ? String(card.ownerName).toLowerCase().includes(query) : false) ||
+                         (card.description ? String(card.description).toLowerCase().includes(query) : false) ||
+                         (card.id != null ? String(card.id).toLowerCase().includes(query) : false) ||
+                         (card.qrLink ? String(card.qrLink).toLowerCase().includes(query) : false) ||
+                         licenseId.toLowerCase().includes(query)
 
     const matchesStatus = !statusFilter.value || card.status === statusFilter.value
 
