@@ -590,15 +590,27 @@ import QRCode from 'qrcode'
 import { copyToClipboard as copyText } from '@/utils/clipboard'
 import { useCardsStore } from '@/stores/cards'
 
-// Types
+// Types - matching store Card interface
 interface Card {
   id: string
+  identifier: string
   ownerName: string
-  description: string
+  mobile?: string
+  description?: string
+  cardType?: string
+  license: string
   qrLink: string
-  image: string | null
+  image?: string | null
   status: 'active' | 'inactive'
+  isUsed: boolean
   createdAt: string
+  activatedBy?: {
+    id: number
+    name: string
+    email: string
+    mobile?: string | null
+    cardSlug: string
+  } | null
 }
 
 defineOptions({
@@ -635,109 +647,6 @@ const selectedCards = ref<string[]>([])
 // Get cards from store
 const cards = computed(() => cardsStore.cards)
 const loading = computed(() => cardsStore.loading)
-
-// Sample data - REMOVED, using store instead
-const mockCards = ref<Card[]>([
-  {
-    id: 'VZT001',
-    ownerName: 'محمد حسین زاده',
-    description: 'کارت ویزیت دیجیتال برای نمایش اطلاعات شرکت و خدمات ارائه شده',
-    qrLink: 'https://linku.im/04E1F322E81490/pqqr',
-    image: null,
-    status: 'active',
-    createdAt: '1403/04/15'
-  },
-  {
-    id: 'VZT002',
-    ownerName: 'فاطمه احمدی',
-    description: 'کارت شخصی برای معرفی مدیر فروش و راه‌های ارتباطی',
-    qrLink: 'https://linku.im/A7B3C9D2F4E8127/xyzw',
-    image: null,
-    status: 'active',
-    createdAt: '1403/04/10'
-  },
-  {
-    id: 'VZT003',
-    ownerName: 'علی رضایی',
-    description: 'کارت ویژه برای نمایش محصولات در نمایشگاه‌ها و رویدادها',
-    qrLink: 'https://linku.im/B2F8A1C7E4D9350/mnop',
-    image: null,
-    status: 'inactive',
-    createdAt: '1403/04/05'
-  },
-  {
-    id: 'VZT004',
-    ownerName: 'زهرا کریمی',
-    description: 'کارت ویزیت مخصوص ارائه خدمات مشاوره',
-    qrLink: 'https://linku.im/C9E2D7F1A8B4063/defg',
-    image: null,
-    status: 'active',
-    createdAt: '1403/04/01'
-  },
-  {
-    id: 'VZT005',
-    ownerName: 'حسن موسوی',
-    description: 'کارت ویزیت برای معرفی خدمات طراحی گرافیک',
-    qrLink: 'https://linku.im/D4A8B2C9F7E3156/jklm',
-    image: null,
-    status: 'inactive',
-    createdAt: '1403/03/28'
-  },
-  {
-    id: 'VZT006',
-    ownerName: 'رضا علیزاده',
-    description: 'کارت ویزیت مدیریت فروش',
-    qrLink: 'https://linku.im/E7C1F4A9B8D2503/abcd',
-    image: null,
-    status: 'active',
-    createdAt: '1403/03/25'
-  },
-  {
-    id: 'VZT007',
-    ownerName: 'مریم حسینی',
-    description: 'کارت ویزیت مشاوره کسب و کار',
-    qrLink: 'https://linku.im/F2B7E4C8A1D9046/uvwx',
-    image: null,
-    status: 'active',
-    createdAt: '1403/03/22'
-  },
-  {
-    id: 'VZT008',
-    ownerName: 'امیر محمدی',
-    description: 'کارت ویزیت طراحی وب',
-    qrLink: 'https://linku.im/A8D3F7B2C4E9150/stuv',
-    image: null,
-    status: 'inactive',
-    createdAt: '1403/03/20'
-  },
-  {
-    id: 'VZT009',
-    ownerName: 'ساره صادقی',
-    description: 'کارت ویزیت مارکتینگ دیجیتال',
-    qrLink: 'https://linku.im/B1C9E4F8A7D2063/qrst',
-    image: null,
-    status: 'active',
-    createdAt: '1403/03/18'
-  },
-  {
-    id: 'VZT010',
-    ownerName: 'محسن قاسمی',
-    description: 'کارت ویزیت مدیر پروژه',
-    qrLink: 'https://linku.im/C7F2A8D4B9E1506/nopq',
-    image: null,
-    status: 'active',
-    createdAt: '1403/03/15'
-  },
-  {
-    id: 'VZT011',
-    ownerName: 'نسیم رحیمی',
-    description: 'کارت ویزیت مشاوره حقوقی',
-    qrLink: 'https://linku.im/D8B4F1C7A2E9053/hijk',
-    image: null,
-    status: 'inactive',
-    createdAt: '1403/03/12'
-  }
-])
 
 // Computed Properties
 const totalCards = computed(() => cards.value.length)
