@@ -92,19 +92,42 @@ export const useUserStore = defineStore('userStore', () => {
         userCards.value=cards.slice(0,max)
     }
 
-    const fetchProfiles = async (page: number = 1, perPage: number = 100) => {
+    const fetchProfiles = async () => {
         try {
-            const { data } = await axios.get('/user/admin/profiles', {
-                params: { page, per_page: perPage }
+            // اول یه درخواست برای گرفتن اطلاعات pagination
+            const { data: firstPage } = await axios.get('/user/admin/profiles', {
+                params: { page: 1, per_page: 100 }
             })
 
+            const pagination = firstPage.data.pagination
+            const totalPages = pagination?.last_page || 1
+            
+            // گرفتن همه صفحات
+            let allProfiles = firstPage.data.data || []
+            
+            // اگه بیشتر از یه صفحه داریم، بقیه رو هم بگیر
+            if (totalPages > 1) {
+                const promises = []
+                for (let page = 2; page <= totalPages; page++) {
+                    promises.push(
+                        axios.get('/user/admin/profiles', {
+                            params: { page, per_page: 100 }
+                        })
+                    )
+                }
+                const responses = await Promise.all(promises)
+                for (const res of responses) {
+                    allProfiles = [...allProfiles, ...(res.data.data.data || [])]
+                }
+            }
+
             // اضافه کردن cardCount به هر پروفایل
-            profiles.value = data.data.data.map((profile: any) => ({
+            profiles.value = allProfiles.map((profile: any) => ({
                 ...profile,
                 cardCount: profile.cards ? profile.cards.length : 0,
             }))
 
-            console.log('cc',profiles)
+            console.log('cc', profiles.value.length, 'profiles loaded')
 
             fetched.value = true
         } catch (error) {
