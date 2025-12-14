@@ -663,10 +663,11 @@ const filteredCards = computed(() => {
   if (loading.value) return []
   
   return cards.value.filter(card => {
-    const matchesSearch = card.ownerName?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                         card.description?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                         String(card.id).toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                         card.qrLink?.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const searchLower = searchQuery.value.toLowerCase()
+    const matchesSearch = card.ownerName?.toLowerCase().includes(searchLower) ||
+                         card.description?.toLowerCase().includes(searchLower) ||
+                         String(card.id).toLowerCase().includes(searchLower) ||
+                         card.qrLink?.toLowerCase().includes(searchLower)
 
     const matchesStatus = !statusFilter.value || card.status === statusFilter.value
 
