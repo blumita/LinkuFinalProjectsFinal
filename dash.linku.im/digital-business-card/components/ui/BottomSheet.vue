@@ -56,7 +56,6 @@
         v-show="modelValue"
         :class="['fixed inset-0 bg-black/50', zIndex]"
         @click="handleBackdropClick"
-        style="touch-action: none;"
       >
         <Transition
           enter-active-class="transition-all duration-300 ease-out"
@@ -92,7 +91,11 @@
               </button>
             </div>
 
-            <div class="overflow-y-auto flex-1 scrollbar-hidden overscroll-contain" :style="contentStyle">
+            <div 
+              class="overflow-y-auto flex-1 scrollbar-hidden overscroll-contain" 
+              :style="contentStyle"
+              style="-webkit-overflow-scrolling: touch; touch-action: pan-y;"
+            >
               <slot />
             </div>
           </div>
@@ -143,8 +146,23 @@ const emit = defineEmits<{
 
 const bottomSheetRef = ref<HTMLElement | null>(null)
 
+let scrollY = 0
 const setBodyLock = (hidden: boolean) => {
-  document.body.style.overflow = hidden ? 'hidden' : ''
+  if (typeof document === 'undefined') return
+  
+  if (hidden) {
+    scrollY = window.scrollY || 0
+    document.body.style.position = 'fixed'
+    document.body.style.width = '100%'
+    document.body.style.top = `-${scrollY}px`
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.position = ''
+    document.body.style.width = ''
+    document.body.style.top = ''
+    document.body.style.overflow = ''
+    window.scrollTo(0, scrollY)
+  }
 }
 
 watch(() => props.modelValue, (val) => {

@@ -1,38 +1,22 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 
-let lastBodyOverflow = ''
-let lastBodyPosition = ''
-let lastBodyWidth = ''
-let lastBodyHeight = ''
-let lastBodyTop = ''
-let lastBodyLeft = ''
 let scrollY = 0
 const setBodyOverflow = (hidden) => {
-  if (typeof document !== 'undefined') {
-    if (hidden) {
-      lastBodyOverflow = document.body.style.overflow
-      lastBodyPosition = document.body.style.position
-      lastBodyWidth = document.body.style.width
-      lastBodyHeight = document.body.style.height
-      lastBodyTop = document.body.style.top
-      lastBodyLeft = document.body.style.left
-      scrollY = window.scrollY
-      document.body.style.overflow = 'hidden'
-      document.body.style.position = 'fixed'
-      document.body.style.width = '100vw'
-      document.body.style.height = '100vh'
-      document.body.style.top = `-${scrollY}px`
-      document.body.style.left = '0'
-    } else {
-      document.body.style.overflow = lastBodyOverflow || ''
-      document.body.style.position = lastBodyPosition || ''
-      document.body.style.width = lastBodyWidth || ''
-      document.body.style.height = lastBodyHeight || ''
-      document.body.style.top = lastBodyTop || ''
-      document.body.style.left = lastBodyLeft || ''
-      window.scrollTo(0, scrollY)
-    }
+  if (typeof document === 'undefined' || typeof window === 'undefined') return
+  
+  if (hidden) {
+    scrollY = window.scrollY || 0
+    document.body.style.position = 'fixed'
+    document.body.style.width = '100%'
+    document.body.style.top = `-${scrollY}px`
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.position = ''
+    document.body.style.width = ''
+    document.body.style.top = ''
+    document.body.style.overflow = ''
+    window.scrollTo(0, scrollY)
   }
 }
 
@@ -119,7 +103,10 @@ function closeModal() {
       @click.stop
     >
       <slot name="header" />
-      <div class="flex-1 overflow-y-auto">
+      <div 
+        class="flex-1 overflow-y-auto"
+        style="-webkit-overflow-scrolling: touch; touch-action: pan-y; overscroll-behavior: contain;"
+      >
         <slot />
       </div>
       <slot name="footer" />

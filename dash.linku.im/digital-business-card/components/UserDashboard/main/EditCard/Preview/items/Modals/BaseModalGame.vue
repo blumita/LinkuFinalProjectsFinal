@@ -1,36 +1,24 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 
-let lastBodyOverflow = ''
-let lastBodyPosition = ''
 let scrollY = 0
 
 const setBodyOverflow = (hidden) => {
-  if (typeof document !== 'undefined' && typeof window !== 'undefined') {
-    if (hidden) {
-      // ذخیره تنظیمات فعلی
-      lastBodyOverflow = document.body.style.overflow || ''
-      lastBodyPosition = document.body.style.position || ''
-      scrollY = window.scrollY || 0
-      
-      // قفل ساده‌تر برای compatibility بهتر با اندروید
-      document.body.style.overflow = 'hidden'
-      document.body.style.position = 'fixed'
-      document.body.style.width = '100vw'
-      document.body.style.top = `-${scrollY}px`
-      document.body.style.left = '0'
-    } else {
-      // بازگردانی تنظیمات اصلی
-      document.body.style.overflow = lastBodyOverflow
-      document.body.style.position = lastBodyPosition
-      document.body.style.width = ''
-      document.body.style.top = ''
-      document.body.style.left = ''
-      
-      // بازگردانی موقعیت اسکرول
-      if (window.scrollTo) {
-        window.scrollTo(0, scrollY)
-      }
+  if (typeof document === 'undefined' || typeof window === 'undefined') return
+  
+  if (hidden) {
+    scrollY = window.scrollY || 0
+    document.body.style.position = 'fixed'
+    document.body.style.width = '100%'
+    document.body.style.top = `-${scrollY}px`
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.position = ''
+    document.body.style.width = ''
+    document.body.style.top = ''
+    document.body.style.overflow = ''
+    if (window.scrollTo) {
+      window.scrollTo(0, scrollY)
     }
   }
 }
