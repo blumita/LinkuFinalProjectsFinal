@@ -96,63 +96,65 @@ function closeModal() {
 </script>
 
 <template>
-  <!-- بک‌دراپ -->
-  <transition name="fade">
-    <div
-      v-if="props.modelValue"
-      @click="closeModal"
-      class="fixed inset-0 bg-stone-900/20 z-[99998]"
-      style="touch-action: none;"
-    />
-  </transition>
+  <Teleport to="body">
+    <!-- بک‌دراپ -->
+    <transition name="fade">
+      <div
+        v-if="props.modelValue"
+        @click="closeModal"
+        class="fixed inset-0 bg-stone-900/20 z-[99998]"
+        style="touch-action: none;"
+      />
+    </transition>
 
-  <!-- مودال -->
-  <transition
-    appear
-    enter-active-class="transform transition-transform duration-300 ease-out"
-    leave-active-class="transform transition-transform duration-300 ease-in"
-    enter-from-class="translate-y-full"
-    enter-to-class="translate-y-0"
-    leave-from-class="translate-y-0"
-    leave-to-class="translate-y-full"
-  >
-    <div
-      v-if="props.modelValue"
-      ref="modalRef"
-      :class="[
-        'fixed bottom-0 left-0 right-0 flex flex-col text-sm text-gray-800 w-full bg-white',
-        zIndex,
-        rounded,
-      ]"
-      :style="{
-        touchAction: 'none',
-        WebkitOverflowScrolling: 'touch',
-        overscrollBehavior: 'none',
-        height: props.maxHeight,
-        maxHeight: props.maxHeight
-      }"
-      @click.stop
-      @touchmove.stop.prevent
+    <!-- مودال -->
+    <transition
+      appear
+      enter-active-class="transform transition-transform duration-300 ease-out"
+      leave-active-class="transform transition-transform duration-300 ease-in"
+      enter-from-class="translate-y-full"
+      enter-to-class="translate-y-0"
+      leave-from-class="translate-y-0"
+      leave-to-class="translate-y-full"
     >
-      <div class="flex-shrink-0">
-        <slot name="header" />
-      </div>
-      <div 
-        class="flex-1 overflow-y-auto"
+      <div
+        v-if="props.modelValue"
+        ref="modalRef"
+        :class="[
+          'fixed bottom-0 left-0 right-0 flex flex-col text-sm text-gray-800 w-full bg-white',
+          zIndex,
+          rounded,
+        ]"
         :style="{
-          touchAction: 'pan-y',
+          touchAction: 'none',
           WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'contain'
+          overscrollBehavior: 'none',
+          height: props.maxHeight,
+          maxHeight: props.maxHeight
         }"
-        @touchmove.stop
+        @click.stop
+        @touchmove.stop.prevent
       >
-        <slot />
+        <div class="flex-shrink-0">
+          <slot name="header" />
+        </div>
+        <div 
+          class="flex-1 overflow-y-auto"
+          :style="{
+            touchAction: 'pan-y',
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain'
+          }"
+          @touchmove.stop
+        >
+          <slot />
+        </div>
+        <div class="flex-shrink-0">
+          <slot name="footer" />
+        </div>
       </div>
-      <div class="flex-shrink-0">
-        <slot name="footer" />
-      </div>
-    </div>
-  </transition>
+    </transition>
+  </Teleport>
 </template>
 
 <style scoped>
