@@ -661,18 +661,25 @@ const inactiveCardsCount = computed(() => {
 
 const filteredCards = computed(() => {
   if (loading.value) return []
+
+  const query = searchQuery.value?.toLowerCase() || ''
   
-  const query = searchQuery.value.toLowerCase()
-  
+  // اگر جستجو خالی باشه، فقط فیلتر وضعیت رو اعمال کن
+  if (!query) {
+    return cards.value.filter(card => {
+      return !statusFilter.value || card.status === statusFilter.value
+    })
+  }
+
   return cards.value.filter(card => {
-    // Check search match
-    const ownerMatch = card.ownerName?.toLowerCase().includes(query)
-    const descMatch = card.description?.toLowerCase().includes(query)
-    const idMatch = card.id ? String(card.id).toLowerCase().includes(query) : false
-    const qrMatch = card.qrLink?.toLowerCase().includes(query)
-    
+    // Check search match - تبدیل همه مقادیر به رشته قبل از toLowerCase
+    const ownerMatch = card.ownerName ? String(card.ownerName).toLowerCase().includes(query) : false
+    const descMatch = card.description ? String(card.description).toLowerCase().includes(query) : false
+    const idMatch = card.id != null ? String(card.id).toLowerCase().includes(query) : false
+    const qrMatch = card.qrLink ? String(card.qrLink).toLowerCase().includes(query) : false
+
     const searchMatch = ownerMatch || descMatch || idMatch || qrMatch
-    
+
     // Check status match
     const statusMatch = !statusFilter.value || card.status === statusFilter.value
 

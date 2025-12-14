@@ -90,14 +90,14 @@ class CardController extends Controller
     public function checkSlug(Request $request): JsonResponse
     {
         $slug = $request->query('slug');
-        
+
         if (!$slug) {
             return $this->ok('', ['available' => false]);
         }
-        
+
         // چک کنیم که slug قبلاً استفاده نشده
         $exists = Card::where('slug', $slug)->exists();
-        
+
         // همچنین چک می‌کنیم که با license_code یا user_name تداخل نداشته باشه
         if (!$exists) {
             $exists = License::where('license_code', $slug)->exists();
@@ -105,7 +105,7 @@ class CardController extends Controller
         if (!$exists) {
             $exists = User::where('user_name', $slug)->exists();
         }
-        
+
         return $this->ok('', ['available' => !$exists]);
     }
 
@@ -143,18 +143,18 @@ class CardController extends Controller
     public function setActiveProfile(Request $request, Card $card): JsonResponse
     {
         $user = $request->user();
-        
+
         // Check if the card belongs to the user
         if ($card->user_id !== $user->id) {
             return $this->fail('این کارت متعلق به شما نیست.', 403);
         }
-        
+
         // Set all user's cards to not default
         $user->cards()->update(['is_default' => false]);
-        
+
         // Set selected card as default
         $card->update(['is_default' => true]);
-        
+
         return $this->ok('پروفایل فعال با موفقیت تغییر کرد.', [
             'activeCardId' => $card->id
         ]);

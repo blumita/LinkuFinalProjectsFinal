@@ -68,10 +68,10 @@ class ZarinPal implements GatewayInterface
             Log::error('Zarinpal Invalid Response', ['response' => $data]);
             throw new Exception('Zarinpal Invalid Response: ' . json_encode($data));
         }
-        
+
         $code = $data['data']['code'] ?? null;
         $authority = $data['data']['authority'] ?? null;
-        
+
         if ($code != 100 || empty($authority)) {
             $errorMessage = $data['errors']['message'] ?? ($data['data']['message'] ?? 'Unknown error');
             Log::error('Zarinpal Payment Error', ['code' => $code, 'message' => $errorMessage]);

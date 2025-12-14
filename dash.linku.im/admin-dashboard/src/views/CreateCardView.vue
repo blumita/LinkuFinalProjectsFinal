@@ -225,9 +225,9 @@
             </div>
 
             <div class="flex gap-3 pt-5 border-t border-gray-200 dark:border-slate-700">
-              <button 
-                type="submit" 
-                :disabled="isCreating || bulkProgress.isCreating || (!cardForm.isBulkMode && !cardForm.isAutoGenerate && licenseCheckStatus === 'exists') || (cardForm.isBulkMode && bulkCardCount <= 0)" 
+              <button
+                type="submit"
+                :disabled="isCreating || bulkProgress.isCreating || (!cardForm.isBulkMode && !cardForm.isAutoGenerate && licenseCheckStatus === 'exists') || (cardForm.isBulkMode && bulkCardCount <= 0)"
                 class="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500 text-white py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-2"
               >
                 <i v-if="!isCreating && !bulkProgress.isCreating" class="ti ti-plus"></i>
@@ -437,7 +437,7 @@ const createBulkCards = async () => {
         slug: slug,
         product_unit_id: cardForm.value.productUnitId
       })
-      
+
       if (response.success) {
         bulkProgress.value.successCount++
       } else {

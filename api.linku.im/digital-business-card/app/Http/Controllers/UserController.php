@@ -345,10 +345,10 @@ class UserController
         $user->is_pro = true;
         $user->subscription_type = 'premium';
         $user->subscription_months = $months;
-        
+
         // Calculate subscription end date from now
         $user->subscription_end_date = now()->addMonths($months);
-        
+
         $user->save();
 
         return $this->ok('اشتراک با موفقیت ارتقا یافت', [
