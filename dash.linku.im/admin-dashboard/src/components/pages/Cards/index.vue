@@ -659,17 +659,23 @@ const inactiveCardsCount = computed(() => {
   return cards.value.filter(card => card.status === 'inactive').length
 })
 
+// فیلتر کردن کارت‌ها بر اساس جستجو و وضعیت
 const filteredCards = computed(() => {
   if (loading.value) return []
   
+  const searchLower = searchQuery.value.toLowerCase()
+  const statusVal = statusFilter.value
+  
   return cards.value.filter(card => {
-    const searchLower = searchQuery.value.toLowerCase()
-    const matchesSearch = card.ownerName?.toLowerCase().includes(searchLower) ||
-                         card.description?.toLowerCase().includes(searchLower) ||
-                         String(card.id).toLowerCase().includes(searchLower) ||
-                         card.qrLink?.toLowerCase().includes(searchLower)
+    // جستجو در فیلدهای مختلف
+    const matchesSearch = 
+      card.ownerName?.toLowerCase().includes(searchLower) ||
+      card.description?.toLowerCase().includes(searchLower) ||
+      String(card.id).toLowerCase().includes(searchLower) ||
+      card.qrLink?.toLowerCase().includes(searchLower)
 
-    const matchesStatus = !statusFilter.value || card.status === statusFilter.value
+    // فیلتر وضعیت
+    const matchesStatus = !statusVal || card.status === statusVal
 
     return matchesSearch && matchesStatus
   })
