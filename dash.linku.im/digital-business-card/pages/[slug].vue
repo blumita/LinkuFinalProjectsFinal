@@ -53,7 +53,7 @@
   </div>
 
   <!-- صفحه پروفایل عادی -->
-  <div v-else-if="!isLoading" class="min-h-screen bg-gray-50 lg:flex lg:items-center lg:justify-center">
+  <div v-else class="min-h-screen bg-gray-50 lg:flex lg:items-center lg:justify-center">
     <InfoToast :visible="showToast" :message="toastMessage" :icon="toastIcon"/>
 
     <!-- نمایش Layout عادی -->
@@ -688,10 +688,6 @@
       <!-- Toast container is handled by useToast composable -->
     </div>
   </div>
-  <!-- 🟢 Loading State - Skeleton -->
-  <template v-else>
-    <SkeletonProfile />
-  </template>
 </template>
 <script setup>
 import {computed, markRaw, onMounted, onUnmounted, ref} from 'vue'
@@ -884,7 +880,7 @@ const isLightColor = (color) => {
 }
 
 // SEO and Meta Configuration
-const isLoading = ref(true)
+const isLoading = ref(false) // شروع با false برای سرعت بیشتر
 const isCardActivated = ref(true) // پیش‌فرض فعال است
 const formData = useFormStore();
 const route = useRoute();

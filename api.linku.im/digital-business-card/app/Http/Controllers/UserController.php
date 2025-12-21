@@ -76,9 +76,9 @@ class UserController
 
     public function profiles(Request $request): JsonResponse
     {
-        // گرفتن همه پروفایل‌ها با eager loading برای بهینه‌سازی
+        // گرفتن همه پروفایل‌ها با eager loading و count برای بهینه‌سازی
         // حداکثر 1000 تا برای جلوگیری از timeout
-        $profiles = User::with(['cards'])->limit(1000)->get();
+        $profiles = User::withCount('cards')->limit(1000)->get();
 
         return $this->ok('', ProfileResource::collection($profiles));
     }

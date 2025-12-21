@@ -96,8 +96,11 @@ export const useUserStore = defineStore('userStore', () => {
         try {
             const { data } = await axios.get('/user/admin/profiles')
 
-            // data.data مستقیم استفاده میشه چون API همه چیز رو آماده برمیگردونه
-            profiles.value = data.data || []
+            // اضافه کردن cardCount به هر پروفایل
+            profiles.value = (data.data || []).map((profile: any) => ({
+                ...profile,
+                cardCount: profile.cards ? profile.cards.length : 0,
+            }))
 
             console.log('✅ Loaded', profiles.value.length, 'profiles')
 

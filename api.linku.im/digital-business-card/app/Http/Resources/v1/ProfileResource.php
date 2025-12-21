@@ -22,7 +22,7 @@ class ProfileResource extends JsonResource
             'email' => $this->email,
             'subscriptionType' => $this->is_pro ? 'premium' : 'free',
             'profileUrl' => env('CARD_URL') . '/' . $this->user_name,
-            'cardCount' => $this->cards->count(),
+            'cardCount' => $this->cards_count ?? 0,
             'linkCount' => 0,
             'status' => $this->status,
             'createdAt' => $this->created_at ? $this->created_at->format('Y-m-d') : null,
