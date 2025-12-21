@@ -690,6 +690,11 @@
   </div>
 </template>
 <script setup>
+// غیرفعال کردن SSR برای سرعت بیشتر
+definePageMeta({
+  ssr: false
+})
+
 import {computed, markRaw, onMounted, onUnmounted, ref} from 'vue'
 import {useFormStore} from '~/stores/form';
 import {useToast} from '~/composables/useToast';
@@ -880,7 +885,6 @@ const isLightColor = (color) => {
 }
 
 // SEO and Meta Configuration
-const isLoading = ref(false) // شروع با false برای سرعت بیشتر
 const isCardActivated = ref(true) // پیش‌فرض فعال است
 const formData = useFormStore();
 const route = useRoute();
@@ -899,8 +903,8 @@ const runtimeConfig = useRuntimeConfig()
 const apiBase = runtimeConfig.public.apiBase || 'https://api.linku.im'
 const urlPrefix = `${apiBase}/api/cards`
 
-// ✅ واکشی اطلاعات کارت
-const { data: card } = await useAsyncData('card', async () => {
+// ✅ واکشی اطلاعات کارت (lazy - بدون بلاک کردن صفحه)
+const { data: card, pending } = useLazyAsyncData('card', async () => {
   return await $fetch(`${urlPrefix}/${slug}/preview`, {method: 'GET'})
 })
 
@@ -910,9 +914,13 @@ watch(card, (val) => {
     // اگر فیلد isActivated وجود داشته باشد و false باشد
     if (val.data.isActivated === false) {
       isCardActivated.value = false
-      isLoading.value = false
     } else {
       isCardActivated.value = true
+      // بارگذاری اطلاعات پروفایل
+      if (!formData.cards?.length) {
+        formData.cards = [val.data]
+      }
+      formData.setAboutFrom(val.data.id)
     }
   }
 }, { immediate: true })
@@ -1268,19 +1276,13 @@ onMounted(async () => {
         await $axios.post(`cards/${slug}/recordViews`)
         console.log('✅ View recorded successfully')
       } catch (error) {
+        console.error('Failed to record view:', error)
       }
     }
 
-    // Load additional data only if not already loaded via asyncData
-    if (card.value?.data && !formData.cards?.length) {
+    // Load blue tick status
+    if (card.value?.data) {
       try {
-        formData.cards = [card.value.data]
-        isLoading.value = false
-        
-        // همیشه اطلاعات پروفایل رو ست کن
-        formData.setAboutFrom(card.value.data.id)
-
-        // Load blue tick status
         const res = await $axios.get(`cards/${slug}/hasBlueTick`)
         if (res.data?.success) {
           enableBlueTick.value = res.data.data
@@ -1288,13 +1290,9 @@ onMounted(async () => {
           enableBlueTick.value = false
         }
       } catch (error) {
+        console.error('Failed to load blue tick:', error)
+        enableBlueTick.value = false
       }
-    } else if (card.value?.data) {
-      // Use the already loaded card data but still set profile info
-      formData.setAboutFrom(card.value.data.id)
-      isLoading.value = false
-    } else {
-      isLoading.value = false
     }
   }
 })
