@@ -690,11 +690,6 @@
   </div>
 </template>
 <script setup>
-// غیرفعال کردن SSR برای سرعت بیشتر
-definePageMeta({
-  ssr: false
-})
-
 import {computed, markRaw, onMounted, onUnmounted, ref} from 'vue'
 import {useFormStore} from '~/stores/form';
 import {useToast} from '~/composables/useToast';
@@ -906,6 +901,8 @@ const urlPrefix = `${apiBase}/api/cards`
 // ✅ واکشی اطلاعات کارت (lazy - بدون بلاک کردن صفحه)
 const { data: card, pending } = useLazyAsyncData('card', async () => {
   return await $fetch(`${urlPrefix}/${slug}/preview`, {method: 'GET'})
+}, {
+  server: false // فقط client-side اجرا میشه برای سرعت بیشتر
 })
 
 // بررسی فعال بودن کارت
