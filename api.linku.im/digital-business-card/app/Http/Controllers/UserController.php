@@ -76,14 +76,9 @@ class UserController
 
     public function profiles(Request $request): JsonResponse
     {
-        // فقط فیلدهای ضروری برای سرعت بالا
-        $profiles = User::select([
-            'id', 'name', 'user_name', 'phone', 'email', 'is_pro', 
-            'status', 'created_at', 'updated_at'
-        ])
-        ->withCount('cards') // تعداد کارت‌ها به صورت بهینه
-        ->limit(1000)
-        ->get();
+        // گرفتن همه پروفایل‌ها با eager loading برای بهینه‌سازی
+        // حداکثر 1000 تا برای جلوگیری از timeout
+        $profiles = User::with(['cards'])->limit(1000)->get();
 
         return $this->ok('', ProfileResource::collection($profiles));
     }

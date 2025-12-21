@@ -129,14 +129,17 @@
 
       <!-- Modern Users List -->
       <div class="p-2">
-        <!-- Minimal Skeleton Loader - فقط header و عکس پروفایل -->
-        <div v-if="loading" class="space-y-3">
-          <div v-for="i in 3" :key="i" class="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-            <div class="flex items-center gap-4">
-              <!-- عکس پروفایل -->
-              <div class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
-              <!-- فقط نام -->
-              <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
+        <!-- Skeleton Loader -->
+        <div v-if="loading" class="space-y-4">
+          <div v-for="i in 5" :key="i" class="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 animate-pulse">
+            <div class="flex items-start gap-4">
+              <div class="w-14 h-14 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+              </div>
+              <div class="w-20 h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
             </div>
           </div>
         </div>
@@ -808,8 +811,7 @@ const upgradeDurations = [
 
 const userStore = useUserStore()
 const users = computed(() => userStore.profiles)
-// فقط اگه data نداریم loading نشون بده
-const loading = ref(userStore.profiles.length === 0)
+const loading = ref(true)
 
 // Computed properties
 const filteredUsers = computed(() => {
@@ -1126,16 +1128,10 @@ const confirmUpgrade = async () => {
 }
 
 onMounted(async () => {
-  // اگه data داریم، اول نشون بده بعد refresh کن
-  if (userStore.profiles.length > 0) {
+  try {
+    await userStore.fetchProfiles()
+  } finally {
     loading.value = false
-    userStore.fetchProfiles() // در پس‌زمینه refresh
-  } else {
-    try {
-      await userStore.fetchProfiles()
-    } finally {
-      loading.value = false
-    }
   }
 })
 
