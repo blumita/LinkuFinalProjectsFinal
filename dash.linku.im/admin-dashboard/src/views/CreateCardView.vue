@@ -92,7 +92,7 @@
                 <span class="text-lg font-bold text-green-600 dark:text-green-400">{{ bulkCardCount }}</span>
               </div>
               <p class="text-xs text-gray-600 dark:text-gray-400">
-                کارت‌ها با slug هایی مثل <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-slate-600 rounded font-mono">c-1</code>, <code class="px-1.5 py-0.5 bg-gray-100 dark:bg-slate-600 rounded font-mono">c-2</code>, ... ایجاد خواهند شد
+                هر کارت با یک username منحصر به فرد ایجاد می‌شود (مشابه ایجاد تک کارت خودکار)
               </p>
             </div>
 
@@ -432,9 +432,8 @@ const createBulkCards = async () => {
     bulkProgress.value.percentage = Math.round((bulkProgress.value.current / totalCards) * 100)
 
     try {
-      const slug = `c-${i}`
-      const response = await cardStore.createManualCard({
-        slug: slug,
+      // استفاده از createAutoCard برای تولید username منحصر به فرد (مثل کارت‌های عادی)
+      const response = await cardStore.createAutoCard({
         product_unit_id: cardForm.value.productUnitId
       })
 
