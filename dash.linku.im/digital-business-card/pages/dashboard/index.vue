@@ -286,5 +286,16 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+// رفرش کردن user data وقتی صفحه فوکوس میشه (برای دریافت آپدیت‌های اشتراک)
+if (process.client) {
+  window.addEventListener('focus', async () => {
+    if (authStore.isAuthenticated) {
+      console.log('🔄 Window focused - Refreshing user data...')
+      await userStore.fetchUser()
+      console.log('✅ User data refreshed. isPro:', userStore.user?.isPro)
+    }
+  })
+}
 </script>
 

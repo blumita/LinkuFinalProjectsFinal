@@ -1099,6 +1099,13 @@ const confirmUpgrade = async () => {
   try {
     const token = sessionStorage.getItem('adminToken') || ''
     const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.linku.im/api'
+
+    console.log('🔄 Sending upgrade request:', {
+      url: `${baseUrl}/user/admin/upgrade-subscription`,
+      userId: selectedUpgradeUser.value.id,
+      months: parseInt(selectedDuration.value)
+    })
+
     const response = await fetch(`${baseUrl}/user/admin/upgrade-subscription`, {
       method: 'POST',
       headers: {
@@ -1111,7 +1118,13 @@ const confirmUpgrade = async () => {
       })
     })
 
-    if (!response.ok) throw new Error('Upgrade failed')
+    const responseData = await response.json()
+    console.log('📥 Upgrade response:', responseData)
+
+    if (!response.ok) {
+      console.error('❌ Upgrade failed with status:', response.status, responseData)
+      throw new Error(responseData.message || 'Upgrade failed')
+    }
 
     await showSuccess('ارتقا موفق', `اشتراک ${selectedUpgradeUser.value.name} برای ${selectedDuration.value} ماه فعال شد`)
 
@@ -1120,7 +1133,7 @@ const confirmUpgrade = async () => {
 
     closeUpgradeModal()
   } catch (error) {
-    console.error('Upgrade error:', error)
+    console.error('💥 Upgrade error:', error)
     await showSuccess('خطا', 'ارتقا ناموفق بود. لطفا دوباره تلاش کنید')
   } finally {
     isUpgrading.value = false
