@@ -227,11 +227,10 @@ class OtpCodeController
             return ['user' => $user, 'isNew' => true];
         }
 
-        // Check if user has an active paid subscription and update pro status
+        // Check if user has an active subscription (paid or admin-activated) and update pro status
         $activeOrder = Order::where('user_id', $user->id)
-            ->where('start_date', '<=', now())
+            ->where('status', 'paid')
             ->where('end_date', '>', now())
-            ->whereHas('transaction', fn($q) => $q->where('is_success', true))
             ->first();
 
         if (!$activeOrder) {
@@ -541,11 +540,10 @@ class OtpCodeController
             return ['user' => $user, 'isNew' => true];
         }
 
-        // Check if user has an active paid subscription and update pro status
+        // Check if user has an active subscription (paid or admin-activated) and update pro status
         $activeOrder = Order::where('user_id', $user->id)
-            ->where('start_date', '<=', now())
+            ->where('status', 'paid')
             ->where('end_date', '>', now())
-            ->whereHas('transaction', fn($q) => $q->where('is_success', true))
             ->first();
 
         if (!$activeOrder) {

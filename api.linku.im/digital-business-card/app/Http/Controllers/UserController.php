@@ -338,9 +338,24 @@ class UserController
         $user->subscription_months = $months;
 
         // Calculate subscription end date from now
-        $user->subscription_end_date = now()->addMonths($months);
+        $startDate = now();
+        $endDate = now()->addMonths($months);
+        $user->subscription_end_date = $endDate;
 
         $user->save();
+
+        // ایجاد یک order برای این اشتراک (برای ثبت در سیستم و جلوگیری از expire شدن توسط cron)
+        \App\Models\Order::create([
+            'user_id' => $user->id,
+            'plan_id' => 1, // فرض میکنیم plan_id=1 برای manual upgrade
+            'title' => "اشتراک {$months} ماهه - فعال‌سازی دستی توسط ادمین",
+            'amount' => 0, // رایگان چون ادمین فعال کرده
+            'status' => 'paid',
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'currency' => 'IRR',
+            'description' => 'فعال‌سازی دستی اشتراک توسط مدیر سیستم'
+        ]);
 
         return $this->ok('اشتراک با موفقیت ارتقا یافت', [
             'user' => new UserResource($user),
