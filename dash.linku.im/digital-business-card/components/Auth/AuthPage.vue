@@ -1182,17 +1182,15 @@ async function handleOtpKey(index: number, event: KeyboardEvent) {
             // اجرای موازی fetchUser - بدون await برای سرعت بیشتر
             // redirect سریع و بارگذاری داده در پس‌زمینه
             try {
-              const fetchPromise = userStore.fetchUser()
+              await userStore.fetchUser()
               
-              // همزمان بررسی کارت پیش‌فرض
-              await fetchPromise
-              const defaultCard = formStore.defaultCard
-              
-              // ایجاد کارت پیش‌فرض اگر وجود ندارد
-              if (!defaultCard) {
+              // چک کردن تعداد کارت‌ها - اگر هیچ کارتی نداره، یکی بساز
+              if (userStore.cards.length === 0) {
                 await $axios.post('v1/cards/createDefaultCard', {
                   defaultContactType: authMethod.value === 'email' ? 'email' : 'phone'
                 })
+                // بعد از ساخت کارت، دوباره user رو fetch کن
+                await userStore.fetchUser()
               }
               // همیشه به داشبورد ریدایرکت کن
               router.push('/dashboard')
@@ -1391,13 +1389,14 @@ async function handleEmailProfileSubmit() {
     // Fetch user and redirect
     try {
       await userStore.fetchUser()
-      const defaultCard = formStore.defaultCard
       
-      // ایجاد کارت پیش‌فرض اگر وجود ندارد
-      if (!defaultCard) {
+      // چک کردن تعداد کارت‌ها - اگر هیچ کارتی نداره، یکی بساز
+      if (userStore.cards.length === 0) {
         await $axios.post('v1/cards/createDefaultCard', {
           defaultContactType: 'email'
         })
+        // بعد از ساخت کارت، دوباره user رو fetch کن
+        await userStore.fetchUser()
       }
     } catch (fetchError) {
       console.error('❌ Error fetching user after profile submission:', fetchError)
@@ -1473,13 +1472,14 @@ async function handleRegister() {
       
       try {
         await userStore.fetchUser()
-        const defaultCard = computed(() => formStore.defaultCard)
 
-        // ایجاد کارت پیش‌فرض اگر وجود ندارد
-        if (!defaultCard?.value) {
+        // چک کردن تعداد کارت‌ها - اگر هیچ کارتی نداره، یکی بساز
+        if (userStore.cards.length === 0) {
           await $axios.post('v1/cards/createDefaultCard', {
             defaultContactType: 'phone'
           })
+          // بعد از ساخت کارت، دوباره user رو fetch کن
+          await userStore.fetchUser()
         }
       } catch (fetchError) {
         console.error('❌ Error fetching user after phone profile:', fetchError)
@@ -1499,13 +1499,14 @@ async function handleRegister() {
 
     showInfoToast(`ثبت‌نام موفق! خوش آمدید ${firstName}`, 'ti-check')
     await userStore.fetchUser()
-    const defaultCard = computed(() => formStore.defaultCard)
 
-    // ایجاد کارت پیش‌فرض اگر وجود ندارد
-    if (!defaultCard?.value) {
+    // چک کردن تعداد کارت‌ها - اگر هیچ کارتی نداره، یکی بساز
+    if (userStore.cards.length === 0) {
       await $axios.post('v1/cards/createDefaultCard', {
         defaultContactType: authMethod.value === 'email' ? 'email' : 'phone'
       })
+      // بعد از ساخت کارت، دوباره user رو fetch کن
+      await userStore.fetchUser()
     }
     // همیشه به داشبورد ریدایرکت کن
     await router.push('/dashboard')
@@ -1620,12 +1621,14 @@ onMounted(async () => {
                     // بهینه‌سازی: fetch سریع‌تر
                     try {
                       await userStore.fetchUser()
-                      const defaultCard = formStore.defaultCard
-                      // ایجاد کارت پیش‌فرض اگر وجود ندارد
-                      if (!defaultCard) {
+                      
+                      // چک کردن تعداد کارت‌ها - اگر هیچ کارتی نداره، یکی بساز
+                      if (userStore.cards.length === 0) {
                         await $axios.post('v1/cards/createDefaultCard', {
                           defaultContactType: authMethod.value === 'email' ? 'email' : 'phone'
                         })
+                        // بعد از ساخت کارت، دوباره user رو fetch کن
+                        await userStore.fetchUser()
                       }
                     } catch (fetchError) {
                       console.error('❌ Error fetching user after OTP verification:', fetchError)
