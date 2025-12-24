@@ -65,9 +65,10 @@
 
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import TabLeadCapture from '~/components/UserDashboard/main/EditCard/tabs/TabLeadCapture.vue'
 import { useFormStore } from '~/stores/form'
+import { useUserStore } from '~/stores/user'
 import { useSafeNavigation } from '~/composables/useSafeNavigation'
 const { goBack } = useSafeNavigation()
 
@@ -79,6 +80,14 @@ definePageMeta({
 const route = useRoute()
 const router = useRouter()
 const formStore = useFormStore()
+const userStore = useUserStore()
+
+// Fetch user data on mount
+onMounted(async () => {
+  if (!userStore.fetched) {
+    await userStore.fetchUser()
+  }
+})
 
 // گرفتن cardId از query یا از formStore
 const cardId = computed(() => {
