@@ -97,10 +97,16 @@ export interface ColorOption {
     border?: boolean
 }
 
+// فیلدهای پیش‌فرض برای کاربران رایگان (فقط شماره موبایل)
+export const defaultFieldsFree: FormField[] = [
+    {id: '3', label: 'شماره تماس',name:'phoneNumber', required: true, type: 'text'}
+]
+
+// فیلدهای پیش‌فرض برای کاربران پرو
 export const defaultFields: FormField[] = [
     {id: '1', label: 'نام کامل',name:'fullName', required: false, type: 'text'},
     {id: '2', label: 'ایمیل',name:'email', required: false, type: 'text'},
-    {id: '3', label: 'شماره تماس',name:'phoneNumber', required: false, type: 'text'},
+    {id: '3', label: 'شماره تماس',name:'phoneNumber', required: true, type: 'text'},
     {id: '4', label: 'عنوان شغلی',name:'jobTitle', required: false, type: 'text'},
     {id: '5', label: 'شرکت',name:'company', required: false, type: 'text'},
     {id: '6', label: 'یادداشت',name:'note', required: false, type: 'text'}

@@ -319,7 +319,7 @@
 <script setup>
 import {ref, onMounted, onUnmounted, computed} from 'vue'
 import draggable from 'vuedraggable'
-import {useFormStore, defaultFields} from '~/stores/form'
+import {useFormStore, defaultFields, defaultFieldsFree} from '~/stores/form'
 import {useUserStore} from "~/stores/user.js";
 import InfoToast from "~/components/UserDashboard/modals/InfoToast.vue";
 
@@ -404,7 +404,9 @@ onMounted(() => {
   }
 
   if (form.fields.length === 0) {
-    form.fields = JSON.parse(JSON.stringify(defaultFields))
+    // برای کاربران رایگان فقط شماره موبایل، برای پرو همه فیلدها
+    const fieldsToUse = isPro.value ? defaultFields : defaultFieldsFree
+    form.fields = JSON.parse(JSON.stringify(fieldsToUse))
   }
 
   form.fields.forEach(field => {
