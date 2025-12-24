@@ -328,7 +328,7 @@ const form = useFormStore()
 const userStore = useUserStore()
 const user = computed(() => userStore.user)
 const showBanner = ref(false)
-const isPro = ref(user.value?.isPro)
+const isPro = computed(() => user.value?.isPro || false)
 const props = defineProps({
   cardId: String,
   isMobile: {

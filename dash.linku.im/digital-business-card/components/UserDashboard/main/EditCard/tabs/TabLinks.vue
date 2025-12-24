@@ -115,7 +115,7 @@ const categories = ref([])
 const userStore = useUserStore()
 const {$axios} = useNuxtApp();
 const user = computed(() => userStore.user)
-const isPro = ref(user.value?.isPro)
+const isPro = computed(() => user.value?.isPro || false)
 const props = defineProps({cardId: String})
 ////Setting Toast
 const showToast = ref(false)
