@@ -12,12 +12,20 @@ import {useUserStore} from "~/stores/user";
 import {useAuthStore} from "~/stores/auth";
 import {useFormStore} from "~/stores/form";
 import {navigateTo, useNuxtApp} from "#app";
+import {usePhoneFormatter} from "~/composables/usePhoneFormatter";
 
 const userStore = useUserStore()
 const authStore = useAuthStore()
 const formStore = useFormStore()
 const {$axios} = useNuxtApp()
 const route = useRoute()
+const { formatPhone } = usePhoneFormatter()
+
+// تابع فرمت نمایش شماره - همیشه 09XXXXXXXXX
+const formatPhoneDisplay = (phone: string) => {
+  if (!phone) return ''
+  return formatPhone(phone)
+}
 
 // چک امنیتی - اگه token نیست رندر نکن
 const hasValidAuth = computed(() => {
@@ -368,7 +376,7 @@ provide('topbarConfig', topbarConfig)
           v-bind="topbarConfig"
           v-model:search="searchQuery"
           :userLogo="userStore.user?.avatar||''"
-          :userPhone="userStore.user.phone||''"
+          :userPhone="formatPhoneDisplay(userStore.user.phone||'')"
           :cardSlug="formStore.defaultCard?.slug"
           :qrBgColor="formStore.defaultCard?.qrBgColor"
           :qrColor="formStore.defaultCard?.qrColor"

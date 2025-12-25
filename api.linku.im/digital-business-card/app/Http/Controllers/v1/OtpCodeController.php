@@ -73,11 +73,11 @@ class OtpCodeController
         // بررسی اینکه کاربر جدید است و اطلاعات پروفایل ندارد
         $phone = $this->otpService->normalizePhone($validatedData['phone']);
         $existingUser = User::where('phone', $phone)->first();
-        
+
         // تصمیم‌گیری قبل از verify: آیا کاربر جدید بدون پروفایل است؟
         // فقط name کافی است (family اختیاری است)
         $isNewUserWithoutProfile = !$existingUser && (empty($validatedData['name']) || trim($validatedData['name']) === '');
-        
+
         // اگر کاربر جدید است و نام ارسال نشده، فرم ثبت‌نام نمایش داده شود
         // این چک را قبل از verify انجام می‌دهیم تا OTP حذف نشود
         if ($isNewUserWithoutProfile) {
@@ -85,7 +85,7 @@ class OtpCodeController
             if (!$this->otpService->verifyOtp($validatedData, false)) {
                 throw new CustomException(__('sms.sms_expired'), 429);
             }
-            
+
             return $this->fail(
                 'لطفاً نام و نام خانوادگی خود را وارد کنید.',
                 null,
@@ -154,7 +154,10 @@ class OtpCodeController
 
         $user = $request->user();
 
-        $exists = User::where('phone', $validatedData['phone'])
+        // Normalize شماره قبل از ذخیره
+        $normalizedPhone = $this->otpService->normalizePhone($validatedData['phone']);
+
+        $exists = User::where('phone', $normalizedPhone)
             ->where('id', '!=', $user->id)
             ->exists();
 
@@ -162,7 +165,7 @@ class OtpCodeController
             throw new CustomException(__('sms.phone_already_taken'), 409);
         }
 
-        $user->phone = $validatedData['phone'];
+        $user->phone = $normalizedPhone;
 
         $user->save();
 
@@ -176,7 +179,7 @@ class OtpCodeController
     {
         // Default country code if not provided
         $countryCode = $request['countryCode'] ?? '+98';
-        
+
         $result = $this->checkExistOrCreateUser(
             $this->otpService->normalizePhone($request['phone']),
             $this->otpService->validateCountryCode($countryCode),
@@ -211,7 +214,7 @@ class OtpCodeController
             // اگر نام ارسال شده، استفاده کن، وگرنه یک username پیش‌فرض بساز
             $userName = $name ?? ('user' . substr($phone, -4));
             $username = 'user' . substr($phone, -4); // username یکتا
-            
+
             $user = User::create([
                 'name' => $userName,
                 'user_name' => $username,
@@ -331,7 +334,7 @@ class OtpCodeController
             if (!$this->emailOtpService->verifyOtp($email, $validatedData['code'], false)) {
                 throw new CustomException(__('sms.sms_expired'), 429);
             }
-            
+
             return $this->fail(
                 'لطفاً نام و نام خانوادگی خود را وارد کنید.',
                 null,
@@ -359,7 +362,17 @@ class OtpCodeController
         if (!$existingUser) {
             // بررسی شماره (ممنوعیت اسرائیل) - فقط اگر شماره ارسال شده باشد
             $phoneRaw = $validatedData['phone'] ?? null;
-            $digits = $phoneRaw ? preg_replace('/\D/', '', $phoneRaw) : null;
+            $digits = null;
+
+            if ($phoneRaw) {
+                try {
+                    // normalize کردن شماره به فرمت استاندارد 9XXXXXXXXX
+                    $digits = $this->otpService->normalizePhone($phoneRaw);
+                } catch (\Exception $e) {
+                    // اگر شماره نامعتبر بود، null بذار
+                    $digits = null;
+                }
+            }
 
             if ($digits && preg_match('/^(?:972)/', $digits)) {
                 return $this->fail(
@@ -370,7 +383,7 @@ class OtpCodeController
                 );
             }
 
-            // بررسی اینکه شماره قبلاً استفاده نشده باشد
+            // بررسی اینکه شماره قبلاً استفاده نشده باشد (با normalized phone)
             if (!empty($digits) && User::where('phone', $digits)->exists()) {
                 return $this->fail(
                     'شماره تلفن قبلاً ثبت شده است.',
@@ -389,7 +402,7 @@ class OtpCodeController
             if (empty($fullName)) {
                 $fullName = explode('@', $email)[0];
             }
-            
+
             $user = User::create([
                 'name' => $fullName,
                 'email' => $email,
@@ -481,7 +494,7 @@ class OtpCodeController
 
         // بررسی اینکه ادمین وجود داشته باشد
         $admin = Admin::where('email', $email)->first();
-        
+
         if (!$admin) {
             return $this->fail('ادمین با این ایمیل یافت نشد.');
         }
@@ -526,7 +539,7 @@ class OtpCodeController
         if (!$user) {
             // استخراج نام از ایمیل
             $emailName = explode('@', $email)[0];
-            
+
             $user = User::create([
                 'name' => $emailName,
                 'email' => $email,
@@ -667,7 +680,7 @@ class OtpCodeController
                 'ip' => $request->ip(),
                 'user_agent' => $request->userAgent(),
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'نام کاربری یا رمز عبور اشتباه است.'
@@ -683,7 +696,7 @@ class OtpCodeController
                 'ip' => $request->ip(),
                 'user_agent' => $request->userAgent(),
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'نام کاربری یا رمز عبور اشتباه است.'
@@ -697,7 +710,7 @@ class OtpCodeController
                 'status' => $admin->status,
                 'ip' => $request->ip(),
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'حساب کاربری شما غیرفعال شده است.'
@@ -706,7 +719,7 @@ class OtpCodeController
 
         // لاگین مستقیم بدون OTP
         Auth::guard('admin')->login($admin);
-        
+
         // ثبت log ورود موفق
         Log::info('Successful admin login', [
             'admin_id' => $admin->id,
@@ -737,7 +750,7 @@ class OtpCodeController
 
         // بررسی اینکه کاربر ادمین باشد
         $admin = Admin::where('phone', $phone)->first();
-        
+
         if (!$admin) {
             return response()->json([
                 'success' => false,
@@ -813,10 +826,10 @@ class OtpCodeController
         try {
             $loginTime = now()->setTimezone('Asia/Tehran')->format('Y-m-d H:i:s');
             $ipAddress = request()->ip() ?? 'Unknown';
-            
+
             // Get user agent and parse it for better display
             $userAgent = request()->userAgent() ?? 'Unknown';
-            
+
             // Send email
             Mail::to($user->email)->send(
                 new LoginSecurityNotification(

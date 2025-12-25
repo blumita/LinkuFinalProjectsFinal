@@ -43,7 +43,7 @@ class OtpService
             if ($this->otpCodeExist($phone, 30)) {
                 // دریافت زمان باقیمانده برای اطلاع فرونت
                 $remainingSeconds = $this->getRemainingSeconds($phone);
-                
+
                 throw new CustomException(
                     __('sms.sms_recent_code'),
                     429,
@@ -93,7 +93,7 @@ class OtpService
     {
         // تبدیل کد OTP هم به انگلیسی
         $code = $this->convertPersianToEnglish($requestData['code']);
-        
+
         Log::info('🔐 OTP Verification Started', [
             'phone_raw' => $requestData['phone'],
             'code_raw' => $requestData['code'],
@@ -107,7 +107,7 @@ class OtpService
         }
 
         $normalizedPhone = $this->normalizePhone($requestData['phone']);
-        
+
         Log::info('📱 Normalized phone', [
             'original' => $requestData['phone'],
             'normalized' => $normalizedPhone,
@@ -165,29 +165,32 @@ class OtpService
     }
 
     /**
+     * نرمال کردن شماره تلفن به فرمت استاندارد ایران: 09XXXXXXXXX
      * @throws CustomException
      */
     public function normalizePhone(string $phone): string
     {
         // تبدیل ارقام فارسی و عربی به انگلیسی
         $phone = $this->convertPersianToEnglish($phone);
-        
+
         $digits = preg_replace('/\D/', '', $phone);
 
+        // حذف صفر اول (اگر وجود داشت)
         if (str_starts_with($digits, '0')) {
             $digits = substr($digits, 1);
         }
-        
+
         // حذف کد کشور ایران اگر وجود داشت
         if (str_starts_with($digits, '98') && strlen($digits) > 10) {
             $digits = substr($digits, 2);
         }
-        
-        // حذف + از ابتدا اگر وجود داشت
+
+        // حذف + از ابتدا اگر وجود داشت (98 بعد از حذف +)
         if (str_starts_with($digits, '989') && strlen($digits) > 10) {
             $digits = substr($digits, 2);
         }
 
+        // چک کردن فرمت نهایی (باید 9XXXXXXXXX باشه)
         if (!preg_match('/^9\d{9}$/', $digits)) {
             Log::warning('❌ Invalid phone format', [
                 'original' => $phone,
@@ -196,9 +199,10 @@ class OtpService
             throw new CustomException(__('sms.custom.phone.invalid'));
         }
 
-        return $digits;
+        // اضافه کردن صفر به ابتدا برای فرمت استاندارد ایران
+        return '0' . $digits;
     }
-    
+
     /**
      * تبدیل ارقام فارسی و عربی به انگلیسی
      */
@@ -207,10 +211,10 @@ class OtpService
         $persian = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
         $arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
         $english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-        
+
         $string = str_replace($persian, $english, $string);
         $string = str_replace($arabic, $english, $string);
-        
+
         return $string;
     }
 
@@ -220,14 +224,14 @@ class OtpService
     public function otpCodeExist(string $phone, int $gracePeriodSeconds = 0): bool
     {
         $query = OtpCode::where('phone', $phone);
-        
+
         if ($gracePeriodSeconds > 0) {
             // فقط اگر بیشتر از gracePeriod به انقضا مانده جلوگیری کن
             $query->where('expires_at', '>', now()->addSeconds($gracePeriodSeconds));
         } else {
             $query->where('expires_at', '>', now());
         }
-        
+
         return $query->exists();
     }
 

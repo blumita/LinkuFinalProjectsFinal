@@ -599,13 +599,14 @@ const formStore = useFormStore()
 // User data from store (matching dashboard)
 const userName = computed(() => userStore.user?.name || 'کاربر')
 const userUserName = computed(() => userStore.user?.userName || userStore.user?.username || '')
+
+const { formatPhone } = usePhoneFormatter()
 const userPhone = computed(() => {
   const user = userStore.user
-  const countryCode = user?.countryCode || ''
   const phone = user?.phone || ''
-  // اگر شماره داره، شماره رو نشون بده، وگرنه ایمیل
+  // اگر شماره داره، به فرمت 09XXXXXXXXX نمایش بده
   if (phone) {
-    return `${countryCode}${phone}`
+    return formatPhone(phone)
   }
   return user?.email || ''
 })

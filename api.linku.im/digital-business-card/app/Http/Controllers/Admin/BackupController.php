@@ -34,7 +34,7 @@ class BackupController extends Controller
         $to = $request->input('to');
 
         $query = Card::with(['user', 'cardUser'])->orderBy('id');
-        
+
         if ($to) {
             $cards = $query->skip($from - 1)->take($to - $from + 1)->get();
         } else {
@@ -146,7 +146,7 @@ class BackupController extends Controller
         $to = $request->input('to');
 
         $query = User::orderBy('id');
-        
+
         if ($to) {
             $users = $query->skip($from - 1)->take($to - $from + 1)->get();
         } else {
@@ -254,7 +254,7 @@ class BackupController extends Controller
         try {
             // Create SQL dump
             $sqlContent = $this->createSqlDump();
-            
+
             // Save based on destination
             switch ($destination) {
                 case 'local':
@@ -419,7 +419,7 @@ class BackupController extends Controller
     public function runBackupNow(Request $request)
     {
         $settings = BackupSetting::first();
-        
+
         if (!$settings) {
             return response()->json([
                 'success' => false,
@@ -454,7 +454,7 @@ class BackupController extends Controller
                             );
                             break;
                     }
-                    
+
                     $this->logBackup($destination, $path, strlen($sqlContent));
                     $results[$destination] = ['success' => true, 'path' => $path];
                 } catch (Exception $e) {
@@ -581,7 +581,7 @@ class BackupController extends Controller
 
         foreach ($tables as $table) {
             $tableName = $table->$tableKey;
-            
+
             // Get create table statement
             $createTable = DB::select("SHOW CREATE TABLE `{$tableName}`");
             $sql .= "DROP TABLE IF EXISTS `{$tableName}`;\n";
@@ -598,7 +598,7 @@ class BackupController extends Controller
                         if (is_null($value)) return 'NULL';
                         return "'" . addslashes($value) . "'";
                     }, (array)$row);
-                    
+
                     $sql .= "INSERT INTO `{$tableName}` (`{$columnNames}`) VALUES (" . implode(', ', $values) . ");\n";
                 }
                 $sql .= "\n";
@@ -613,11 +613,11 @@ class BackupController extends Controller
     {
         $path = storage_path("app/backups/{$filename}");
         $dir = dirname($path);
-        
+
         if (!File::exists($dir)) {
             File::makeDirectory($dir, 0755, true);
         }
-        
+
         File::put($path, $content);
         return $path;
     }
@@ -625,7 +625,7 @@ class BackupController extends Controller
     private function saveSftpBackup(string $content, string $filename, string $remotePath): string
     {
         $settings = BackupSetting::first();
-        
+
         $host = $settings->sftp_host ?? config('filesystems.disks.sftp.host') ?? env('STORE_FILE_SERVER_HOST');
         $username = $settings->sftp_username ?? config('filesystems.disks.sftp.username') ?? env('STORE_FILE_SERVER_USERNAME');
         $password = $settings->sftp_password ?? config('filesystems.disks.sftp.password') ?? env('STORE_FILE_SERVER_PASSWORD');
@@ -651,7 +651,7 @@ class BackupController extends Controller
     {
         $client = new \GuzzleHttp\Client();
         $path = "backups/{$filename}";
-        
+
         // Check if file exists (to get SHA for update)
         $sha = null;
         try {
@@ -673,7 +673,7 @@ class BackupController extends Controller
             'content' => base64_encode($content),
             'branch' => $branch,
         ];
-        
+
         if ($sha) {
             $payload['sha'] = $sha;
         }
@@ -764,10 +764,22 @@ class BackupController extends Controller
 
     private function createOrUpdateUser(array $data, string $mode): void
     {
+        // Normalize phone if provided
+        $phone = null;
+        if (!empty($data['phone'])) {
+            try {
+                $otpService = app(\App\Services\OtpService::class);
+                $phone = $otpService->normalizePhone($data['phone']);
+            } catch (\Exception $e) {
+                // If phone is invalid, keep it null
+                $phone = null;
+            }
+        }
+
         $userData = [
             'name' => $data['name'] ?? 'Imported User',
             'email' => $data['email'] ?? null,
-            'phone' => $data['phone'] ?? null,
+            'phone' => $phone,
             'role' => $data['role'] ?? 'user',
             'status' => $data['status'] ?? 'active',
             'password' => bcrypt(Str::random(12)),
