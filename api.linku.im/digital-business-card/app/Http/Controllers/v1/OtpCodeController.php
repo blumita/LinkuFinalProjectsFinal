@@ -230,16 +230,36 @@ class OtpCodeController
             return ['user' => $user, 'isNew' => true];
         }
 
-        // Check if user has an active subscription (paid or admin-activated) and update pro status
-        $activeOrder = Order::where('user_id', $user->id)
-            ->where('status', 'paid')
-            ->where('end_date', '>', now())
-            ->first();
-
-        if (!$activeOrder) {
+        // Check if user has an active subscription and update pro status
+        // بررسی از روی subscription_end_date و orders
+        $hasActiveSubscription = false;
+        
+        // چک کردن subscription_end_date
+        if ($user->subscription_end_date && $user->subscription_end_date >= now()->toDateString()) {
+            $hasActiveSubscription = true;
+        }
+        
+        // چک کردن orders فعال
+        if (!$hasActiveSubscription) {
+            $activeOrder = Order::where('user_id', $user->id)
+                ->where('status', 'paid')
+                ->where('end_date', '>', now())
+                ->first();
+            
+            if ($activeOrder) {
+                $hasActiveSubscription = true;
+            }
+        }
+        
+        // بروزرسانی is_pro بر اساس اشتراک
+        if ($hasActiveSubscription && !$user->is_pro) {
+            $user->is_pro = true;
+            $user->save();
+        } elseif (!$hasActiveSubscription && $user->is_pro) {
             $user->is_pro = false;
             $user->save();
         }
+        
         return ['user' => $user, 'isNew' => false];
     }
 
@@ -553,13 +573,32 @@ class OtpCodeController
             return ['user' => $user, 'isNew' => true];
         }
 
-        // Check if user has an active subscription (paid or admin-activated) and update pro status
-        $activeOrder = Order::where('user_id', $user->id)
-            ->where('status', 'paid')
-            ->where('end_date', '>', now())
-            ->first();
-
-        if (!$activeOrder) {
+        // Check if user has an active subscription and update pro status
+        // بررسی از روی subscription_end_date و orders
+        $hasActiveSubscription = false;
+        
+        // چک کردن subscription_end_date
+        if ($user->subscription_end_date && $user->subscription_end_date >= now()->toDateString()) {
+            $hasActiveSubscription = true;
+        }
+        
+        // چک کردن orders فعال
+        if (!$hasActiveSubscription) {
+            $activeOrder = Order::where('user_id', $user->id)
+                ->where('status', 'paid')
+                ->where('end_date', '>', now())
+                ->first();
+            
+            if ($activeOrder) {
+                $hasActiveSubscription = true;
+            }
+        }
+        
+        // بروزرسانی is_pro بر اساس اشتراک
+        if ($hasActiveSubscription && !$user->is_pro) {
+            $user->is_pro = true;
+            $user->save();
+        } elseif (!$hasActiveSubscription && $user->is_pro) {
             $user->is_pro = false;
             $user->save();
         }
