@@ -309,11 +309,10 @@ class UserController
                     DB::table('forms')->whereIn('card_link_id', $cardLinkIds)->delete();
                 }
 
-                // حذف اطلاعات مرتبط با کارت‌ها
+                // حذف اطلاعات مرتبط با کارت‌ها (فقط جداولی که card_id دارن)
                 DB::table('card_links')->whereIn('card_id', $cardIds)->delete();
                 DB::table('card_qrs')->whereIn('card_id', $cardIds)->delete();
                 DB::table('card_settings')->whereIn('card_id', $cardIds)->delete();
-                DB::table('card_visits')->whereIn('card_id', $cardIds)->delete();
                 DB::table('card_leads')->whereIn('card_id', $cardIds)->delete();
                 DB::table('card_users')->whereIn('card_id', $cardIds)->delete();
 
