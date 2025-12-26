@@ -275,18 +275,32 @@
                   <i class="ti ti-chevron-left text-muted-foreground"></i>
                 </button>
 
-                <!-- خروج از حساب -->
+                <!-- حذف حساب کاربری -->
                 <button
-                  @click="handleLogout"
+                  @click="showDeleteAccountModal = true"
                   class="w-full flex items-center justify-between p-4 hover:bg-red-500/10 transition-colors group"
                 >
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
-                      <i class="ti ti-logout text-red-500 text-lg"></i>
+                      <i class="ti ti-trash text-red-500 text-lg"></i>
                     </div>
-                    <span class="font-medium text-red-500">خروج از حساب</span>
+                    <span class="font-medium text-red-500">حذف حساب کاربری</span>
                   </div>
                   <i class="ti ti-chevron-left text-red-500"></i>
+                </button>
+
+                <!-- خروج از حساب -->
+                <button
+                  @click="handleLogout"
+                  class="w-full flex items-center justify-between p-4 hover:bg-muted transition-colors group"
+                >
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-muted flex items-center justify-center group-hover:bg-border transition-colors">
+                      <i class="ti ti-logout text-foreground text-lg"></i>
+                    </div>
+                    <span class="font-medium text-foreground">خروج از حساب</span>
+                  </div>
+                  <i class="ti ti-chevron-left text-muted-foreground"></i>
                 </button>
               </div>
               <div v-else class="divide-y divide-border">
@@ -559,16 +573,28 @@
             <i class="ti ti-chevron-left text-muted-foreground text-sm"></i>
           </button>
 
-          <!-- خروج از حساب -->
+          <!-- حذف حساب کاربری -->
           <button
-            @click="handleLogout"
+            @click="showDeleteAccountModal = true"
             class="w-full flex items-center justify-between py-4 hover:bg-red-500/10 transition-colors group"
           >
             <div class="flex items-center gap-3">
-              <i class="ti ti-logout text-red-500 text-lg"></i>
-              <span class="font-medium text-red-500 text-base">خروج از حساب</span>
+              <i class="ti ti-trash text-red-500 text-lg"></i>
+              <span class="font-medium text-red-500 text-base">حذف حساب کاربری</span>
             </div>
             <i class="ti ti-chevron-left text-red-500 text-sm"></i>
+          </button>
+
+          <!-- خروج از حساب -->
+          <button
+            @click="handleLogout"
+            class="w-full flex items-center justify-between py-4 hover:bg-muted transition-colors group"
+          >
+            <div class="flex items-center gap-3">
+              <i class="ti ti-logout text-foreground text-lg"></i>
+              <span class="font-medium text-foreground text-base">خروج از حساب</span>
+            </div>
+            <i class="ti ti-chevron-left text-muted-foreground text-sm"></i>
           </button>
         </div>
 
@@ -583,6 +609,68 @@
           </div>
         </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Account Modal -->
+  <div v-if="showDeleteAccountModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" @click.self="showDeleteAccountModal = false">
+    <div class="bg-background rounded-3xl shadow-2xl max-w-md w-full p-6 space-y-4 border border-border">
+      <!-- Header -->
+      <div class="flex items-start gap-4">
+        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center">
+          <i class="ti ti-alert-triangle text-2xl text-red-600 dark:text-red-400"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-lg font-bold text-foreground mb-1">حذف حساب کاربری</h3>
+          <p class="text-sm text-secondary">این عمل غیرقابل برگشت است!</p>
+        </div>
+      </div>
+
+      <!-- Warning -->
+      <div class="bg-red-50 dark:bg-red-500/10 rounded-2xl p-4 border border-red-200 dark:border-red-500/30">
+        <p class="text-sm text-red-800 dark:text-red-300 leading-relaxed">
+          با حذف حساب کاربری، تمامی اطلاعات شما از جمله کارت‌ها، لینک‌ها، تراکنش‌ها و تمام داده‌های مرتبط به طور کامل و <strong>غیرقابل بازیابی</strong> حذف خواهند شد.
+        </p>
+      </div>
+
+      <!-- Confirmation Input -->
+      <div>
+        <label class="block text-sm font-medium text-foreground mb-2">
+          برای تایید، کلمه <span class="font-bold text-red-600">"حذف"</span> را وارد کنید:
+        </label>
+        <input
+            v-model="deleteConfirmText"
+            type="text"
+            placeholder="حذف"
+            class="w-full px-4 py-3 rounded-xl border-2 border-border bg-background text-foreground focus:border-red-500 focus:outline-none transition-colors"
+        />
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-3 pt-2">
+        <button
+            @click="showDeleteAccountModal = false; deleteConfirmText = ''"
+            class="flex-1 px-4 py-3 rounded-xl font-semibold text-foreground bg-secondary hover:bg-border transition-colors"
+        >
+          انصراف
+        </button>
+        <button
+            @click="deleteAccount"
+            :disabled="deleteConfirmText !== 'حذف' || isDeleting"
+            :class="[
+              'flex-1 px-4 py-3 rounded-xl font-semibold text-white transition-all',
+              deleteConfirmText === 'حذف' && !isDeleting
+                ? 'bg-red-600 hover:bg-red-700 cursor-pointer'
+                : 'bg-gray-400 cursor-not-allowed opacity-50'
+            ]"
+        >
+          <span v-if="isDeleting" class="flex items-center justify-center gap-2">
+            <i class="ti ti-loader animate-spin"></i>
+            در حال حذف...
+          </span>
+          <span v-else>حذف نهایی</span>
+        </button>
       </div>
     </div>
   </div>
@@ -615,6 +703,11 @@ const userAvatar = computed(() => {
   return avatar || '/logo.svg'
 })
 const isPro = computed(() => userStore.user?.isPro || false)
+
+// Delete account modal state
+const showDeleteAccountModal = ref(false)
+const deleteConfirmText = ref('')
+const isDeleting = ref(false)
 
 // محاسبه روزهای باقی‌مانده اشتراک
 const subscriptionStatusText = computed(() => {
@@ -722,6 +815,45 @@ const handleLogout = async () => {
       await navigateTo('/auth/login')
     } catch (error) {
       console.error('خطا در خروج از حساب:', error)
+    }
+  }
+}
+
+const deleteAccount = async () => {
+  if (deleteConfirmText.value !== 'حذف') return;
+  
+  isDeleting.value = true;
+  
+  try {
+    const { $axios } = useNuxtApp()
+    const authStore = useAuthStore()
+    
+    const { data } = await $axios.delete('user/delete-account')
+    
+    if (data.success) {
+      // Clear authentication
+      localStorage.removeItem('auth_token')
+      authStore.setToken('')
+      
+      // Clear stores
+      userStore.$reset()
+      formStore.$reset()
+      
+      // Close modal
+      showDeleteAccountModal.value = false
+      
+      // Show success message
+      alert('حساب کاربری شما با موفقیت حذف شد.')
+      
+      // Redirect to login
+      await navigateTo('/auth/login')
+    }
+  } catch (error: any) {
+    isDeleting.value = false
+    if (error.response?.data?.message) {
+      alert(error.response.data.message)
+    } else {
+      alert('خطا در حذف حساب کاربری. لطفاً دوباره تلاش کنید.')
     }
   }
 }
