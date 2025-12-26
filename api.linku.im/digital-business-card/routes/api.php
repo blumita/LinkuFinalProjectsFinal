@@ -365,6 +365,9 @@ Route::middleware(['auth:sanctum','log.activity'])
     Route::get('/logout', [UserController::class, 'logout'])
         ->name('user.logout');
 
+    Route::delete('/delete-account', [UserController::class, 'deleteAccount'])
+        ->name('user.deleteAccount');
+
     // Get user
     Route::get('/', [UserController::class, 'index'])
         ->name('user.index');

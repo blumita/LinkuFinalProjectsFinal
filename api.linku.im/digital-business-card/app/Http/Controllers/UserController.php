@@ -14,6 +14,7 @@ use Illuminate\Auth\Events\Logout;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
@@ -266,6 +267,107 @@ class UserController
             return response()->json([
                 'message' => __('errors.unexpected_error'),
                 'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * حذف کامل حساب کاربری و تمام اطلاعات مرتبط
+     */
+    public function deleteAccount(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'کاربر یافت نشد.'
+                ], 401);
+            }
+
+            $userId = $user->id;
+            
+            Log::info('🗑️ Starting account deletion', ['user_id' => $userId, 'phone' => $user->phone]);
+
+            // حذف تمام کارت‌ها و اطلاعات مرتبط
+            $cards = $user->cards;
+            foreach ($cards as $card) {
+                // حذف card_links
+                $card->links()->delete();
+                
+                // حذف card_products
+                $card->products()->delete();
+                
+                // حذف card_qrs
+                $card->qrs()->delete();
+                
+                // حذف card_settings
+                $card->settings()->delete();
+                
+                // حذف card_visits
+                $card->visits()->delete();
+                
+                // حذف card_leads
+                $card->leads()->delete();
+                
+                // حذف card_users
+                $card->users()->delete();
+                
+                // حذف forms
+                $card->forms()->delete();
+                
+                // حذف خود کارت
+                $card->delete();
+            }
+
+            // حذف transactions
+            $user->transactions()->delete();
+
+            // حذف orders
+            $user->orders()->delete();
+
+            // حذف files
+            $user->files()->delete();
+
+            // حذف notifications
+            $user->notifications()->delete();
+
+            // حذف supports
+            $user->supports()->delete();
+
+            // حذف OTP codes
+            DB::table('otp_codes')->where('phone', $user->phone)->delete();
+            DB::table('email_otp_codes')->where('email', $user->email)->delete();
+
+            // حذف push subscriptions
+            DB::table('push_subscriptions')->where('user_id', $userId)->delete();
+
+            // حذف backup logs
+            DB::table('backup_logs')->where('user_id', $userId)->delete();
+
+            // حذف views
+            DB::table('views')->where('user_id', $userId)->delete();
+
+            // حذف کاربر
+            $user->delete();
+
+            Log::info('✅ Account deleted successfully', ['user_id' => $userId]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'حساب کاربری شما با موفقیت حذف شد.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('❌ Error deleting account', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در حذف حساب کاربری. لطفاً با پشتیبانی تماس بگیرید.'
             ], 500);
         }
     }

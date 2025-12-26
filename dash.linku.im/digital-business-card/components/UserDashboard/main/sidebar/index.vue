@@ -128,6 +128,17 @@
       </button>
     </div>
 
+    <!-- حذف حساب -->
+    <div class="px-3 pb-2">
+      <button
+          @click="showDeleteAccountModal = true"
+          class="flex items-center justify-center gap-2 w-full py-3 text-red-600 dark:text-red-400 text-sm font-semibold rounded-2xl bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors border border-red-200 dark:border-red-500/30"
+      >
+        <i class="ti ti-trash text-base"></i>
+        حذف حساب کاربری
+      </button>
+    </div>
+
     <!-- ارتقاء -->
     <div class="px-3 pb-3">
       <NuxtLink
@@ -140,6 +151,68 @@
       </NuxtLink>
     </div>
   </aside>
+
+  <!-- Delete Account Modal -->
+  <div v-if="showDeleteAccountModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" @click.self="showDeleteAccountModal = false">
+    <div class="bg-background rounded-3xl shadow-2xl max-w-md w-full p-6 space-y-4 border border-border">
+      <!-- Header -->
+      <div class="flex items-start gap-4">
+        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center">
+          <i class="ti ti-alert-triangle text-2xl text-red-600 dark:text-red-400"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-lg font-bold text-foreground mb-1">حذف حساب کاربری</h3>
+          <p class="text-sm text-secondary">این عمل غیرقابل برگشت است!</p>
+        </div>
+      </div>
+
+      <!-- Warning -->
+      <div class="bg-red-50 dark:bg-red-500/10 rounded-2xl p-4 border border-red-200 dark:border-red-500/30">
+        <p class="text-sm text-red-800 dark:text-red-300 leading-relaxed">
+          با حذف حساب کاربری، تمامی اطلاعات شما از جمله کارت‌ها، لینک‌ها، تراکنش‌ها و تمام داده‌های مرتبط به طور کامل و <strong>غیرقابل بازیابی</strong> حذف خواهند شد.
+        </p>
+      </div>
+
+      <!-- Confirmation Input -->
+      <div>
+        <label class="block text-sm font-medium text-foreground mb-2">
+          برای تایید، کلمه <span class="font-bold text-red-600">"حذف"</span> را وارد کنید:
+        </label>
+        <input
+            v-model="deleteConfirmText"
+            type="text"
+            placeholder="حذف"
+            class="w-full px-4 py-3 rounded-xl border-2 border-border bg-background text-foreground focus:border-red-500 focus:outline-none transition-colors"
+        />
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-3 pt-2">
+        <button
+            @click="showDeleteAccountModal = false; deleteConfirmText = ''"
+            class="flex-1 px-4 py-3 rounded-xl font-semibold text-foreground bg-secondary hover:bg-border transition-colors"
+        >
+          انصراف
+        </button>
+        <button
+            @click="deleteAccount"
+            :disabled="deleteConfirmText !== 'حذف' || isDeleting"
+            :class="[
+              'flex-1 px-4 py-3 rounded-xl font-semibold text-white transition-all',
+              deleteConfirmText === 'حذف' && !isDeleting
+                ? 'bg-red-600 hover:bg-red-700 cursor-pointer'
+                : 'bg-gray-400 cursor-not-allowed opacity-50'
+            ]"
+        >
+          <span v-if="isDeleting" class="flex items-center justify-center gap-2">
+            <i class="ti ti-loader animate-spin"></i>
+            در حال حذف...
+          </span>
+          <span v-else>حذف نهایی</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -166,6 +239,9 @@ const userStore = useUserStore()
 const formStore = useFormStore()
 const inboxBadge = ref(formStore.inboxBadge)
 const isActive = (path) => route?.path?.startsWith(path) || false;
+const showDeleteAccountModal = ref(false)
+const deleteConfirmText = ref('')
+const isDeleting = ref(false)
 watch(() => formStore.inboxBadge, (newVal, oldVal) => {
   if (newVal !== oldVal) {
     inboxBadge.value = newVal
@@ -188,6 +264,41 @@ const logout = async () => {
       alert(error.response.data.message);
     } else {
       alert('مشکلی در برقراری ارتباط با سرور وجود دارد.');
+    }
+  }
+}
+
+const deleteAccount = async () => {
+  if (deleteConfirmText.value !== 'حذف') return;
+  
+  isDeleting.value = true;
+  
+  try {
+    const authStore = useAuthStore()
+    const {$axios} = useNuxtApp()
+    
+    const {data} = await $axios.delete('user/delete-account');
+    
+    if (data.success) {
+      // Clear authentication
+      localStorage.removeItem('auth_token');
+      authStore.setToken('')
+      
+      // Close modal
+      showDeleteAccountModal.value = false;
+      
+      // Show success message
+      alert('حساب کاربری شما با موفقیت حذف شد.');
+      
+      // Redirect to login
+      navigateTo('/auth/login');
+    }
+  } catch (error) {
+    isDeleting.value = false;
+    if (error.response?.data?.message) {
+      alert(error.response.data.message);
+    } else {
+      alert('خطا در حذف حساب کاربری. لطفاً دوباره تلاش کنید.');
     }
   }
 }
