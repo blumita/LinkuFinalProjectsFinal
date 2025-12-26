@@ -289,26 +289,43 @@ class UserController
             $userId = $user->id;
             $userPhone = $user->phone;
             $userEmail = $user->email;
-            
+
             Log::info('🗑️ Starting account deletion', ['user_id' => $userId, 'phone' => $userPhone]);
 
             // دریافت لیست کارت‌های کاربر
             $cardIds = DB::table('cards')->where('user_id', $userId)->pluck('id');
 
             if ($cardIds->isNotEmpty()) {
+                // دریافت لیست لینک‌های کارت
+                $cardLinkIds = DB::table('card_links')->whereIn('card_id', $cardIds)->pluck('id');
+
+                if ($cardLinkIds->isNotEmpty()) {
+                    // حذف نتایج بازی‌ها (مرتبط با card_link_id)
+                    DB::table('lucky_wheel_results')->whereIn('card_link_id', $cardLinkIds)->delete();
+                    DB::table('lucky_dice_results')->whereIn('card_link_id', $cardLinkIds)->delete();
+                    DB::table('lucky_egg_results')->whereIn('card_link_id', $cardLinkIds)->delete();
+                    
+                    // حذف فرم‌ها (مرتبط با card_link_id)
+                    DB::table('forms')->whereIn('card_link_id', $cardLinkIds)->delete();
+                }
+
                 // حذف اطلاعات مرتبط با کارت‌ها
                 DB::table('card_links')->whereIn('card_id', $cardIds)->delete();
-                DB::table('card_products')->whereIn('card_id', $cardIds)->delete();
                 DB::table('card_qrs')->whereIn('card_id', $cardIds)->delete();
                 DB::table('card_settings')->whereIn('card_id', $cardIds)->delete();
                 DB::table('card_visits')->whereIn('card_id', $cardIds)->delete();
                 DB::table('card_leads')->whereIn('card_id', $cardIds)->delete();
                 DB::table('card_users')->whereIn('card_id', $cardIds)->delete();
-                DB::table('forms')->whereIn('card_id', $cardIds)->delete();
-                
+
+                // حذف views مرتبط با کارت‌ها
+                DB::table('views')
+                    ->where('viewable_type', 'App\\Models\\Card')
+                    ->whereIn('viewable_id', $cardIds)
+                    ->delete();
+
                 // حذف خود کارت‌ها
                 DB::table('cards')->where('user_id', $userId)->delete();
-                
+
                 Log::info('✅ Deleted cards and related data', ['card_count' => $cardIds->count()]);
             }
 
@@ -338,16 +355,11 @@ class UserController
             // حذف push subscriptions
             DB::table('push_subscriptions')->where('user_id', $userId)->delete();
 
-            // حذف backup logs
-            DB::table('backup_logs')->where('user_id', $userId)->delete();
-
-            // حذف views
-            DB::table('views')->where('user_id', $userId)->delete();
-
-            // حذف نتایج بازی‌ها
-            DB::table('lucky_wheel_results')->where('user_id', $userId)->delete();
-            DB::table('lucky_dice_results')->where('user_id', $userId)->delete();
-            DB::table('lucky_egg_results')->where('user_id', $userId)->delete();
+            // حذف views مرتبط با یوزر
+            DB::table('views')
+                ->where('viewable_type', 'App\\Models\\User')
+                ->where('viewable_id', $userId)
+                ->delete();
 
             // حذف کاربر
             DB::table('users')->where('id', $userId)->delete();

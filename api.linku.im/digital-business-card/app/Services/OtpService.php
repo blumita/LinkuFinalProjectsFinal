@@ -37,7 +37,7 @@ class OtpService
 
             // چک کردن وجود کاربر با این شماره (هر 3 فرمت)
             $existingUser = User::where('phone', $phone)->first();
-            
+
             // لاگ برای debug
             Log::info('📞 Phone Check', [
                 'input' => $requestData['phone'],
