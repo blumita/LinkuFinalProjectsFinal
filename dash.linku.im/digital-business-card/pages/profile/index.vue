@@ -614,44 +614,39 @@
   </div>
 
   <!-- Delete Account Modal -->
-  <div v-if="showDeleteAccountModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" @click.self="showDeleteAccountModal = false">
-    <div class="bg-background rounded-3xl shadow-2xl max-w-md w-full p-6 space-y-4 border border-border">
+  <div v-if="showDeleteAccountModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="showDeleteAccountModal = false"></div>
+    <div class="relative bg-background border border-border rounded-2xl p-6 max-w-md w-full shadow-2xl">
       <!-- Header -->
-      <div class="flex items-start gap-4">
-        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center">
-          <i class="ti ti-alert-triangle text-2xl text-red-600 dark:text-red-400"></i>
+      <div class="text-center mb-4">
+        <div class="w-16 h-16 mx-auto mb-4 bg-destructive/10 rounded-full flex items-center justify-center">
+          <i class="ti ti-alert-triangle text-destructive text-3xl"></i>
         </div>
-        <div class="flex-1">
-          <h3 class="text-lg font-bold text-foreground mb-1">حذف حساب کاربری</h3>
-          <p class="text-sm text-secondary">این عمل غیرقابل برگشت است!</p>
-        </div>
-      </div>
-
-      <!-- Warning -->
-      <div class="bg-red-50 dark:bg-red-500/10 rounded-2xl p-4 border border-red-200 dark:border-red-500/30">
-        <p class="text-sm text-red-800 dark:text-red-300 leading-relaxed">
-          با حذف حساب کاربری، تمامی اطلاعات شما از جمله کارت‌ها، لینک‌ها، تراکنش‌ها و تمام داده‌های مرتبط به طور کامل و <strong>غیرقابل بازیابی</strong> حذف خواهند شد.
+        <h3 class="text-lg font-bold text-foreground mb-2">حذف حساب کاربری</h3>
+        <p class="text-sm text-muted-foreground mb-3">این عمل غیرقابل برگشت است!</p>
+        <p class="text-xs text-muted-foreground leading-relaxed">
+          با حذف حساب، تمامی اطلاعات شما از جمله کارت‌ها، لینک‌ها، تراکنش‌ها و تمام داده‌های مرتبط به طور کامل و <strong class="text-destructive">غیرقابل بازیابی</strong> حذف خواهند شد.
         </p>
       </div>
 
       <!-- Confirmation Input -->
-      <div>
+      <div class="mb-4">
         <label class="block text-sm font-medium text-foreground mb-2">
-          برای تایید، کلمه <span class="font-bold text-red-600">"حذف"</span> را وارد کنید:
+          برای تایید، کلمه <span class="font-bold text-destructive">"حذف"</span> را وارد کنید:
         </label>
         <input
             v-model="deleteConfirmText"
             type="text"
             placeholder="حذف"
-            class="w-full px-4 py-3 rounded-xl border-2 border-border bg-background text-foreground focus:border-red-500 focus:outline-none transition-colors"
+            class="w-full px-4 py-3 rounded-xl border-2 border-border bg-background text-foreground focus:border-destructive focus:outline-none transition-colors"
         />
       </div>
 
       <!-- Actions -->
-      <div class="flex gap-3 pt-2">
+      <div class="flex gap-2">
         <button
             @click="showDeleteAccountModal = false; deleteConfirmText = ''"
-            class="flex-1 px-4 py-3 rounded-xl font-semibold text-foreground bg-secondary hover:bg-border transition-colors"
+            class="flex-1 py-3 rounded-xl border-2 border-border text-foreground font-medium hover:bg-muted transition-colors"
         >
           انصراف
         </button>
@@ -659,10 +654,10 @@
             @click="deleteAccount"
             :disabled="deleteConfirmText !== 'حذف' || isDeleting"
             :class="[
-              'flex-1 px-4 py-3 rounded-xl font-semibold text-white transition-all',
+              'flex-1 py-3 rounded-xl font-medium transition-colors',
               deleteConfirmText === 'حذف' && !isDeleting
-                ? 'bg-red-600 hover:bg-red-700 cursor-pointer'
-                : 'bg-gray-400 cursor-not-allowed opacity-50'
+                ? 'bg-destructive text-white hover:bg-destructive/90 cursor-pointer'
+                : 'bg-muted text-muted-foreground cursor-not-allowed opacity-50'
             ]"
         >
           <span v-if="isDeleting" class="flex items-center justify-center gap-2">

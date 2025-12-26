@@ -287,58 +287,53 @@ class UserController
             }
 
             $userId = $user->id;
+            $userPhone = $user->phone;
+            $userEmail = $user->email;
             
-            Log::info('🗑️ Starting account deletion', ['user_id' => $userId, 'phone' => $user->phone]);
+            Log::info('🗑️ Starting account deletion', ['user_id' => $userId, 'phone' => $userPhone]);
 
-            // حذف تمام کارت‌ها و اطلاعات مرتبط
-            $cards = $user->cards;
-            foreach ($cards as $card) {
-                // حذف card_links
-                $card->links()->delete();
+            // دریافت لیست کارت‌های کاربر
+            $cardIds = DB::table('cards')->where('user_id', $userId)->pluck('id');
+
+            if ($cardIds->isNotEmpty()) {
+                // حذف اطلاعات مرتبط با کارت‌ها
+                DB::table('card_links')->whereIn('card_id', $cardIds)->delete();
+                DB::table('card_products')->whereIn('card_id', $cardIds)->delete();
+                DB::table('card_qrs')->whereIn('card_id', $cardIds)->delete();
+                DB::table('card_settings')->whereIn('card_id', $cardIds)->delete();
+                DB::table('card_visits')->whereIn('card_id', $cardIds)->delete();
+                DB::table('card_leads')->whereIn('card_id', $cardIds)->delete();
+                DB::table('card_users')->whereIn('card_id', $cardIds)->delete();
+                DB::table('forms')->whereIn('card_id', $cardIds)->delete();
                 
-                // حذف card_products
-                $card->products()->delete();
+                // حذف خود کارت‌ها
+                DB::table('cards')->where('user_id', $userId)->delete();
                 
-                // حذف card_qrs
-                $card->qrs()->delete();
-                
-                // حذف card_settings
-                $card->settings()->delete();
-                
-                // حذف card_visits
-                $card->visits()->delete();
-                
-                // حذف card_leads
-                $card->leads()->delete();
-                
-                // حذف card_users
-                $card->users()->delete();
-                
-                // حذف forms
-                $card->forms()->delete();
-                
-                // حذف خود کارت
-                $card->delete();
+                Log::info('✅ Deleted cards and related data', ['card_count' => $cardIds->count()]);
             }
 
-            // حذف transactions
-            $user->transactions()->delete();
+            // حذف تراکنش‌ها
+            DB::table('transactions')->where('user_id', $userId)->delete();
 
-            // حذف orders
-            $user->orders()->delete();
+            // حذف سفارشات
+            DB::table('orders')->where('user_id', $userId)->delete();
 
-            // حذف files
-            $user->files()->delete();
+            // حذف فایل‌ها
+            DB::table('files')->where('user_id', $userId)->delete();
 
-            // حذف notifications
-            $user->notifications()->delete();
+            // حذف نوتیفیکیشن‌ها
+            DB::table('notifications')->where('notifiable_id', $userId)->where('notifiable_type', 'App\\Models\\User')->delete();
 
-            // حذف supports
-            $user->supports()->delete();
+            // حذف پشتیبانی
+            DB::table('supports')->where('user_id', $userId)->delete();
 
             // حذف OTP codes
-            DB::table('otp_codes')->where('phone', $user->phone)->delete();
-            DB::table('email_otp_codes')->where('email', $user->email)->delete();
+            if ($userPhone) {
+                DB::table('otp_codes')->where('phone', $userPhone)->delete();
+            }
+            if ($userEmail) {
+                DB::table('email_otp_codes')->where('email', $userEmail)->delete();
+            }
 
             // حذف push subscriptions
             DB::table('push_subscriptions')->where('user_id', $userId)->delete();
@@ -349,8 +344,13 @@ class UserController
             // حذف views
             DB::table('views')->where('user_id', $userId)->delete();
 
+            // حذف نتایج بازی‌ها
+            DB::table('lucky_wheel_results')->where('user_id', $userId)->delete();
+            DB::table('lucky_dice_results')->where('user_id', $userId)->delete();
+            DB::table('lucky_egg_results')->where('user_id', $userId)->delete();
+
             // حذف کاربر
-            $user->delete();
+            DB::table('users')->where('id', $userId)->delete();
 
             Log::info('✅ Account deleted successfully', ['user_id' => $userId]);
 
@@ -367,7 +367,7 @@ class UserController
 
             return response()->json([
                 'success' => false,
-                'message' => 'خطا در حذف حساب کاربری. لطفاً با پشتیبانی تماس بگیرید.'
+                'message' => 'خطا در حذف حساب کاربری. لطفاً دوباره تلاش کنید.'
             ], 500);
         }
     }
