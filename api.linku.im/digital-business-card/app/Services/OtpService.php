@@ -202,6 +202,7 @@ class OtpService
 
         // برگرداندن بدون صفر (9XXXXXXXXX)
         return $digits;
+    }
 
     /**
      * تبدیل ارقام فارسی و عربی به انگلیسی
