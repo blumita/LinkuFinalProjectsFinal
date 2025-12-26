@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Contracts\OtpSenderInterface;
 use App\Exceptions\CustomException;
 use App\Models\OtpCode;
+use App\Models\User;
 use Exception;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\Log;
@@ -33,6 +34,17 @@ class OtpService
     {
         try {
             $phone = $this->normalizePhone($requestData['phone']);
+
+            // چک کردن وجود کاربر با این شماره (هر 3 فرمت)
+            $existingUser = User::where('phone', $phone)->first();
+            
+            // لاگ برای debug
+            Log::info('📞 Phone Check', [
+                'input' => $requestData['phone'],
+                'normalized' => $phone,
+                'user_exists' => $existingUser ? 'YES' : 'NO',
+                'user_id' => $existingUser?->id
+            ]);
 
             // پاک کردن کدهای منقضی شده قبلی
             OtpCode::where('phone', $phone)
@@ -173,19 +185,19 @@ class OtpService
     {
         // تبدیل ارقام فارسی و عربی به انگلیسی
         $phone = $this->convertPersianToEnglish($phone);
-        
+
         $digits = preg_replace('/\D/', '', $phone);
 
         // حذف صفر اول (اگر وجود داشت)
         if (str_starts_with($digits, '0')) {
             $digits = substr($digits, 1);
         }
-        
+
         // حذف کد کشور ایران اگر وجود داشت
         if (str_starts_with($digits, '98') && strlen($digits) > 10) {
             $digits = substr($digits, 2);
         }
-        
+
         // حذف + از ابتدا اگر وجود داشت (98 بعد از حذف +)
         if (str_starts_with($digits, '989') && strlen($digits) > 10) {
             $digits = substr($digits, 2);

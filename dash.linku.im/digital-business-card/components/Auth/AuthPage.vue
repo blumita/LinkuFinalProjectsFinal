@@ -1063,13 +1063,17 @@ async function sendOtpCode(normalized: string): Promise<boolean> {
     // Format 2: {success: false, message: 'کد قبلی هنوز معتبر است...'}
     if (
       (errorData?.code === 'code_already_valid' && errorData?.remaining_seconds) ||
+      (errorData?.data?.code === 'code_already_valid' && errorData?.data?.remaining_seconds) ||
       (errorData?.message && errorData.message.includes('کد قبلی هنوز معتبر است'))
     ) {
-      // نمایش پیام به کاربر
-      const remaining = errorData?.remaining_seconds ? parseInt(errorData.remaining_seconds) : 120
+      // دریافت زمان باقیمانده
+      const remaining = errorData?.remaining_seconds || errorData?.data?.remaining_seconds || 120
       const minutes = Math.floor(remaining / 60)
       const seconds = remaining % 60
-      showInfoToast(`کد قبلی هنوز معتبر است. ${minutes}:${seconds.toString().padStart(2, '0')} دقیقه باقی‌مانده`, 'ti-clock')
+      
+      // نمایش پیام با زمان باقیمانده
+      const message = errorData?.message || errorData?.data?.message || `کد قبلی هنوز معتبر است. ${minutes}:${seconds.toString().padStart(2, '0')} دقیقه باقی‌مانده`
+      showInfoToast(message, 'ti-clock')
       
       // مستقیم به صفحه OTP برو
       step.value = 'otp'
@@ -1079,11 +1083,9 @@ async function sendOtpCode(normalized: string): Promise<boolean> {
       return true;
     }
     
-    if (errorData?.message) {
-      showInfoToast(errorData.message);
-    } else {
-      showInfoToast('مشکلی در ارتباط با سرور وجود دارد.', 'ti-alert-triangle');
-    }
+    // نمایش پیام خطا (از backend یا پیام کاربرپسند)
+    const errorMessage = errorData?.message || errorData?.data?.message || 'لطفاً دوباره امتحان کنید'
+    showInfoToast(errorMessage, 'ti-alert-triangle')
 
     return false;
   }
