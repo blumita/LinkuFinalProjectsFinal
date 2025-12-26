@@ -334,14 +334,25 @@ class UserController
             // حذف سفارشات
             DB::table('orders')->where('user_id', $userId)->delete();
 
-            // حذف فایل‌ها
-            DB::table('files')->where('user_id', $userId)->delete();
+            // حذف فایل‌ها (polymorphic relation)
+            DB::table('files')
+                ->where('fileable_type', 'App\\Models\\User')
+                ->where('fileable_id', $userId)
+                ->delete();
 
-            // حذف نوتیفیکیشن‌ها
-            DB::table('notifications')->where('notifiable_id', $userId)->where('notifiable_type', 'App\\Models\\User')->delete();
+            // حذف نوتیفیکیشن‌ها (polymorphic relation)
+            DB::table('notifications')
+                ->where('notifiable_type', 'App\\Models\\User')
+                ->where('notifiable_id', $userId)
+                ->delete();
 
-            // حذف پشتیبانی
-            DB::table('supports')->where('user_id', $userId)->delete();
+            // حذف supports (با phone/email)
+            if ($userPhone) {
+                DB::table('supports')->where('phone', $userPhone)->delete();
+            }
+            if ($userEmail) {
+                DB::table('supports')->where('email', $userEmail)->delete();
+            }
 
             // حذف OTP codes
             if ($userPhone) {
