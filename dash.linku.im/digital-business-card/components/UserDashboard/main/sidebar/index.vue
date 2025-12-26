@@ -155,20 +155,17 @@
   <!-- Delete Account Modal -->
   <div v-if="showDeleteAccountModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="showDeleteAccountModal = false"></div>
-    <div class="relative bg-background border border-border rounded-2xl p-6 max-w-md w-full shadow-2xl">
-      <!-- Header -->
+    <div class="relative bg-background border border-border rounded-2xl p-6 max-w-sm w-full shadow-2xl">
       <div class="text-center mb-4">
         <div class="w-16 h-16 mx-auto mb-4 bg-destructive/10 rounded-full flex items-center justify-center">
           <i class="ti ti-alert-triangle text-destructive text-3xl"></i>
         </div>
         <h3 class="text-lg font-bold text-foreground mb-2">حذف حساب کاربری</h3>
-        <p class="text-sm text-muted-foreground mb-3">این عمل غیرقابل برگشت است!</p>
-        <p class="text-xs text-muted-foreground leading-relaxed">
-          با حذف حساب، تمامی اطلاعات شما از جمله کارت‌ها، لینک‌ها، تراکنش‌ها و تمام داده‌های مرتبط به طور کامل و <strong class="text-destructive">غیرقابل بازیابی</strong> حذف خواهند شد.
+        <p class="text-sm text-muted-foreground mb-1">این عمل غیرقابل برگشت است!</p>
+        <p class="text-xs text-muted-foreground mt-2">
+          با حذف حساب، تمامی کارت‌ها، لینک‌ها و داده‌های مرتبط غیرقابل بازیابی حذف می‌شوند.
         </p>
       </div>
-
-      <!-- Confirmation Input -->
       <div class="mb-4">
         <label class="block text-sm font-medium text-foreground mb-2">
           برای تایید، کلمه <span class="font-bold text-destructive">"حذف"</span> را وارد کنید:
@@ -180,8 +177,6 @@
             class="w-full px-4 py-3 rounded-xl border-2 border-border bg-background text-foreground focus:border-destructive focus:outline-none transition-colors"
         />
       </div>
-
-      <!-- Actions -->
       <div class="flex gap-2">
         <button
             @click="showDeleteAccountModal = false; deleteConfirmText = ''"
@@ -195,7 +190,7 @@
             :class="[
               'flex-1 py-3 rounded-xl font-medium transition-colors',
               deleteConfirmText === 'حذف' && !isDeleting
-                ? 'bg-destructive text-white hover:bg-destructive/90 cursor-pointer'
+                ? 'bg-destructive text-white hover:bg-destructive/90'
                 : 'bg-muted text-muted-foreground cursor-not-allowed opacity-50'
             ]"
         >
