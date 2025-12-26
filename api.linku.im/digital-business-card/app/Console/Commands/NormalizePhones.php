@@ -18,7 +18,7 @@ class NormalizePhones extends Command
 
     public function handle()
     {
-        $this->info('Starting phone normalization to 09XXXXXXXXX format...');
+        $this->info('Starting phone normalization to 9XXXXXXXXX format (without leading zero)...');
 
         $users = User::all();
         $updated = 0;
@@ -36,8 +36,8 @@ class NormalizePhones extends Command
 
                 $originalPhone = $user->phone;
 
-                // اگر قبلاً با فرمت 09XXXXXXXXX ذخیره شده، skip کن
-                if (preg_match('/^09\d{9}$/', $originalPhone)) {
+                // اگر قبلاً با فرمت 9XXXXXXXXX ذخیره شده (بدون صفر)، skip کن
+                if (preg_match('/^9\d{9}$/', $originalPhone)) {
                     $alreadyNormalized++;
                     continue;
                 }
@@ -58,7 +58,7 @@ class NormalizePhones extends Command
 
         $this->info("\nNormalization complete!");
         $this->info("Updated: {$updated}");
-        $this->info("Already normalized (09...): {$alreadyNormalized}");
+        $this->info("Already normalized (9...): {$alreadyNormalized}");
         $this->info("Skipped (null/empty): {$skipped}");
         $this->info("Errors: {$errors}");
 

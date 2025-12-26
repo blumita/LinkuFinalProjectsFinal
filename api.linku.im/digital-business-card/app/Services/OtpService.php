@@ -165,32 +165,33 @@ class OtpService
     }
 
     /**
-     * نرمال کردن شماره تلفن به فرمت استاندارد ایران: 09XXXXXXXXX
+     * نرمال کردن شماره تلفن به فرمت استاندارد بین‌المللی: 9XXXXXXXXX (بدون صفر)
+     * کد کشور (+98) جداگانه ذخیره می‌شود
      * @throws CustomException
      */
     public function normalizePhone(string $phone): string
     {
         // تبدیل ارقام فارسی و عربی به انگلیسی
         $phone = $this->convertPersianToEnglish($phone);
-
+        
         $digits = preg_replace('/\D/', '', $phone);
 
         // حذف صفر اول (اگر وجود داشت)
         if (str_starts_with($digits, '0')) {
             $digits = substr($digits, 1);
         }
-
+        
         // حذف کد کشور ایران اگر وجود داشت
         if (str_starts_with($digits, '98') && strlen($digits) > 10) {
             $digits = substr($digits, 2);
         }
-
+        
         // حذف + از ابتدا اگر وجود داشت (98 بعد از حذف +)
         if (str_starts_with($digits, '989') && strlen($digits) > 10) {
             $digits = substr($digits, 2);
         }
 
-        // چک کردن فرمت نهایی (باید 9XXXXXXXXX باشه)
+        // چک کردن فرمت نهایی (باید 9XXXXXXXXX باشه - بدون صفر)
         if (!preg_match('/^9\d{9}$/', $digits)) {
             Log::warning('❌ Invalid phone format', [
                 'original' => $phone,
@@ -199,9 +200,8 @@ class OtpService
             throw new CustomException(__('sms.custom.phone.invalid'));
         }
 
-        // اضافه کردن صفر به ابتدا برای فرمت استاندارد ایران
-        return '0' . $digits;
-    }
+        // برگرداندن بدون صفر (9XXXXXXXXX)
+        return $digits;
 
     /**
      * تبدیل ارقام فارسی و عربی به انگلیسی

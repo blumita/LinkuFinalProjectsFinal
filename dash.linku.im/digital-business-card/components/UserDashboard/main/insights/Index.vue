@@ -117,7 +117,7 @@ const iconColor = computed(() => {
 </script>
 
 <template>
-  <div v-if="store && statsCards && getLinks" class="px-4 pb-24 pt-4">
+  <div v-if="store && statsCards && getLinks" class="px-4 pb-4 lg:pb-24 pt-4">
     <!-- فیلتر بازه زمانی -->
     <Filter v-model="selectedRange" :username="userStore.user?.name"/>
 
@@ -240,7 +240,7 @@ const iconColor = computed(() => {
       </template>
     </div>
   </div>
-  <div v-else class="px-4 pb-24 pt-4">
+  <div v-else class="px-4 pb-4 lg:pb-24 pt-4">
     <!-- لودینگ شیک با اسکلت‌های متحرک -->
     
     <!-- اسکلتون فیلتر -->

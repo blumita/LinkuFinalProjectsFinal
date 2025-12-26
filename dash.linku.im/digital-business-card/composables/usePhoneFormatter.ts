@@ -1,12 +1,13 @@
 /**
  * Composable برای فرمت کردن شماره تلفن
- * شماره‌ها در دیتابیس به صورت 09XXXXXXXXX ذخیره می‌شوند
+ * شماره‌ها در دیتابیس به صورت 9XXXXXXXXX (بدون صفر) ذخیره می‌شوند
+ * کد کشور (+98) جداگانه ذخیره می‌شود
  */
 export const usePhoneFormatter = () => {
   /**
-   * فرمت کردن شماره تلفن - در صورت نیاز به 09XXXXXXXXX تبدیل می‌کند
-   * @param phone شماره تلفن
-   * @returns شماره فرمت شده (09XXXXXXXXX)
+   * فرمت کردن شماره تلفن برای نمایش - با اضافه کردن صفر
+   * @param phone شماره تلفن از دیتابیس (9XXXXXXXXX)
+   * @returns شماره فرمت شده برای نمایش (09XXXXXXXXX)
    */
   const formatPhone = (phone: string | null | undefined): string => {
     if (!phone) return ''
@@ -14,7 +15,7 @@ export const usePhoneFormatter = () => {
     // حذف فاصله‌ها و کاراکترهای غیرعددی
     const cleaned = phone.replace(/\D/g, '')
     
-    // اگر قبلاً با 09 شروع میشه، برگردون
+    // اگر با 09 شروع میشه، برگردون
     if (cleaned.startsWith('09') && cleaned.length === 11) {
       return cleaned
     }
@@ -24,7 +25,7 @@ export const usePhoneFormatter = () => {
       return `0${cleaned.substring(2)}`
     }
     
-    // اگر با 9 شروع میشه و 10 رقمه، یه صفر اضافه کن
+    // اگر با 9 شروع میشه و 10 رقمه (فرمت database)، یه صفر اضافه کن
     if (cleaned.startsWith('9') && cleaned.length === 10) {
       return `0${cleaned}`
     }
