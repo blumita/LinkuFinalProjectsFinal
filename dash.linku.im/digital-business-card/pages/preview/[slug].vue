@@ -22,11 +22,7 @@
             <button
                 @click.prevent.stop="showOptionsMenu = !showOptionsMenu"
                 type="button"
-                class="w-10 h-10 rounded-full flex items-center justify-center text-white transition-all duration-300 shadow-lg"
-                :style="{
-                  backgroundColor: formData?.themeColor?.background || '#000000',
-                  opacity: 0.95
-                }"
+                class="w-10 h-10 bg-white backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-gray-50 transition-all duration-300 shadow-lg border border-gray-200/50 text-gray-800"
             >
               <i class="ti ti-dots-vertical text-lg"></i>
             </button>
@@ -523,10 +519,10 @@
           @close="showReportModal = false"
       >
         <!-- محتوای فرم گزارش -->
-        <div class="space-y-6">
+        <div class="px-6 pb-6 space-y-4">
           <!-- انتخاب نوع گزارش -->
           <div class="space-y-3">
-            <h4 class="font-semibold text-gray-700">نوع گزارش:</h4>
+            <h4 class="font-semibold text-gray-800 text-sm">نوع گزارش:</h4>
             <div class="space-y-2">
               <label
                   class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors">
@@ -588,7 +584,7 @@
 
           <!-- توضیحات -->
           <div class="space-y-3">
-            <h4 class="font-semibold text-gray-700">توضیحات (اختیاری):</h4>
+            <h4 class="font-semibold text-gray-800 text-sm">توضیحات (اختیاری):</h4>
             <textarea
                 v-model="reportDescription"
                 placeholder="لطفاً توضیحات بیشتری در مورد گزارش خود ارائه دهید..."
@@ -598,10 +594,10 @@
           </div>
 
           <!-- دکمه‌های عملیات -->
-          <div class="flex gap-3 pt-4 border-t border-gray-200">
+          <div class="flex gap-3 pt-2">
             <button
                 @click="showReportModal = false"
-                class="flex-1 py-3 px-4 bg-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-300 transition-colors"
+                class="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
             >
               انصراف
             </button>
@@ -616,7 +612,7 @@
             </button>
           </div>
 
-          <p class="text-xs text-gray-500 text-center">
+          <p class="text-xs text-gray-400 text-center">
             گزارش شما محرمانه بررسی و اقدام لازم انجام خواهد شد
           </p>
         </div>
