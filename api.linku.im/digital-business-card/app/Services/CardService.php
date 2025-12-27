@@ -145,6 +145,8 @@ class CardService
                     'company' => $data['company'] ?? $card->user->company,
                     'bio' => $data['bio'] ?? $card->user->bio,
                 ]);
+                // بعد از آپدیت، relation رو دوباره load کن تا اطلاعات جدید رو بگیره
+                $card->load('user');
             }
 
             // Handle QR Code settings
