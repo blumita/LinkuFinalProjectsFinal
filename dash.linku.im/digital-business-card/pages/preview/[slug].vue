@@ -518,10 +518,10 @@
           :close-on-overlay="true"
           @close="showReportModal = false"
       >
-        <!-- محتوای فرم گزارش -->
-        <div class="px-6 pb-6 space-y-4">
+        <!-- محتوای اسکرول‌شونده -->
+        <div class="overflow-y-auto max-h-[60vh] px-6 pt-4 pb-4">
           <!-- انتخاب نوع گزارش -->
-          <div class="space-y-3">
+          <div class="space-y-3 mb-4">
             <h4 class="font-semibold text-gray-800 text-sm">نوع گزارش:</h4>
             <div class="space-y-2">
               <label
@@ -592,9 +592,11 @@
                 rows="4"
             ></textarea>
           </div>
+        </div>
 
-          <!-- دکمه‌های عملیات -->
-          <div class="flex gap-3 pt-2">
+        <!-- دکمه‌های ثابت پایین -->
+        <div class="sticky bottom-0 bg-white border-t border-gray-100 px-6 py-4 -mx-6">
+          <div class="flex gap-3">
             <button
                 @click="showReportModal = false"
                 class="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
@@ -611,8 +613,7 @@
               ارسال گزارش
             </button>
           </div>
-
-          <p class="text-xs text-gray-400 text-center">
+          <p class="text-xs text-gray-400 text-center mt-3">
             گزارش شما محرمانه بررسی و اقدام لازم انجام خواهد شد
           </p>
         </div>
