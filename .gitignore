@@ -47,3 +47,7 @@ public/hot
 # Composer
 composer.lock
 composer.phar
+
+# Media & Logs
+linku/media/
+linku/logs/
