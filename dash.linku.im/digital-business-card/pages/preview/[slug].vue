@@ -1072,7 +1072,8 @@ const iconText = computed(() => {
     return '#ffffff'
   }
   // برای تم‌های روشن (سفید، زرد، نارنجی روشن) متن مشکی باشه
-  if (isWhiteTheme.value || isLightColor(iconColor.value)) {
+  // استفاده از backgroundWithOpacity چون پس‌زمینه واقعی که کاربر می‌بینه روشن شده است
+  if (isWhiteTheme.value || isLightColor(backgroundWithOpacity.value)) {
     return '#000000'
   }
   // برای بقیه تم‌ها (رنگی متوسط) سفید باشه

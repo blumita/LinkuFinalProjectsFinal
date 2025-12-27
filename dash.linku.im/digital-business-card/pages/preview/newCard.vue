@@ -153,7 +153,7 @@
                   {{ formData?.name }}
                   <span :class="formData?.layout === 'left' ? 'ml-2' : 'mr-2'">
 
-                  <i v-if="enableBlueTick" class="ti ti-rosette-discount-check text-blue-500"/>
+                  <i v-if="enableBlueTick" class="ti ti-rosette-discount-check-filled" :style="{ color: iconText }"/>
                 </span>
                 </div>
               </div>

@@ -304,7 +304,7 @@ class UserController
                     DB::table('lucky_wheel_results')->whereIn('card_link_id', $cardLinkIds)->delete();
                     DB::table('lucky_dice_results')->whereIn('card_link_id', $cardLinkIds)->delete();
                     DB::table('lucky_egg_results')->whereIn('card_link_id', $cardLinkIds)->delete();
-                    
+
                     // حذف فرم‌ها (مرتبط با card_link_id)
                     DB::table('forms')->whereIn('card_link_id', $cardLinkIds)->delete();
                 }

@@ -233,24 +233,24 @@ class OtpCodeController
         // Check if user has an active subscription and update pro status
         // بررسی از روی subscription_end_date و orders
         $hasActiveSubscription = false;
-        
+
         // چک کردن subscription_end_date
         if ($user->subscription_end_date && $user->subscription_end_date >= now()->toDateString()) {
             $hasActiveSubscription = true;
         }
-        
+
         // چک کردن orders فعال
         if (!$hasActiveSubscription) {
             $activeOrder = Order::where('user_id', $user->id)
                 ->where('status', 'paid')
                 ->where('end_date', '>', now())
                 ->first();
-            
+
             if ($activeOrder) {
                 $hasActiveSubscription = true;
             }
         }
-        
+
         // بروزرسانی is_pro بر اساس اشتراک
         if ($hasActiveSubscription && !$user->is_pro) {
             $user->is_pro = true;
@@ -259,7 +259,7 @@ class OtpCodeController
             $user->is_pro = false;
             $user->save();
         }
-        
+
         return ['user' => $user, 'isNew' => false];
     }
 
@@ -576,24 +576,24 @@ class OtpCodeController
         // Check if user has an active subscription and update pro status
         // بررسی از روی subscription_end_date و orders
         $hasActiveSubscription = false;
-        
+
         // چک کردن subscription_end_date
         if ($user->subscription_end_date && $user->subscription_end_date >= now()->toDateString()) {
             $hasActiveSubscription = true;
         }
-        
+
         // چک کردن orders فعال
         if (!$hasActiveSubscription) {
             $activeOrder = Order::where('user_id', $user->id)
                 ->where('status', 'paid')
                 ->where('end_date', '>', now())
                 ->first();
-            
+
             if ($activeOrder) {
                 $hasActiveSubscription = true;
             }
         }
-        
+
         // بروزرسانی is_pro بر اساس اشتراک
         if ($hasActiveSubscription && !$user->is_pro) {
             $user->is_pro = true;

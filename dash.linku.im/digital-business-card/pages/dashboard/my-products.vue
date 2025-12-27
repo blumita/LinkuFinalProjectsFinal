@@ -50,10 +50,11 @@
             <p class="text-xs text-muted-foreground">فعال شده در: {{ card.activatedAt }}</p>
           </div>
           <button
-            @click="deactivateDevice(card.card_id)"
-            class="text-xs lg:text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg hover:bg-destructive/20 transition-colors"
+            @click="deactivateDevice(card)"
+            class="text-xs lg:text-sm text-green-600 bg-green-500/10 px-3 py-2 rounded-lg hover:bg-green-500/20 transition-colors flex items-center gap-1"
           >
-            غیرفعال
+            <i class="ti ti-circle-check text-sm"></i>
+            <span>فعال شده</span>
           </button>
         </div>
       </div>
@@ -176,7 +177,7 @@ async function activatedDevice() {
   }
 }
 
-function confirmDeactivate(card) {
+function deactivateDevice(card) {
   selectedCard.value = card
   showConfirmModal.value = true
 }

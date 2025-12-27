@@ -206,7 +206,7 @@
                   {{ formData?.name }}
                   <span :class="formData?.layout === 'left' ? 'ml-2' : 'mr-2'">
 
-                  <i v-if="enableBlueTick" class="ti ti-rosette-discount-check-filled" :style="{ color: isDarkTheme ? '#ffffff' : isWhiteTheme ? '#000000' : iconColor }"/>
+                  <i v-if="enableBlueTick" class="ti ti-rosette-discount-check-filled" :style="{ color: iconText }"/>
                 </span>
                 </div>
               </div>
@@ -812,7 +812,8 @@ const iconText = computed(() => {
   }
   
   // برای تم‌های روشن (زرد، نارنجی روشن) متن مشکی باشه
-  if (isLightColor(iconColor.value)) {
+  // استفاده از backgroundWithOpacity چون پس‌زمینه واقعی که کاربر می‌بینه روشن شده است
+  if (isLightColor(backgroundWithOpacity.value)) {
     return '#000000'
   }
   
