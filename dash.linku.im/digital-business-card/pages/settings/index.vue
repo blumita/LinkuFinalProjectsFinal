@@ -596,17 +596,6 @@
               <div class="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
-
-          <!-- Test Notification Button -->
-          <button
-            @click="sendTestNotification"
-            :disabled="isSendingTest"
-            class="w-full h-12 rounded-xl border-2 border-primary text-primary font-medium hover:bg-primary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            <i v-if="isSendingTest" class="ti ti-loader animate-spin text-xl"></i>
-            <i v-else class="ti ti-send text-xl"></i>
-            <span>{{ isSendingTest ? 'در حال ارسال...' : 'ارسال اعلان تستی' }}</span>
-          </button>
         </div>
 
         <!-- Help Text -->
@@ -726,7 +715,6 @@ const isNotificationSheetOpen = ref(false)
 // Notification management
 const notificationPermission = ref<NotificationPermission>('default')
 const isEnablingNotifications = ref(false)
-const isSendingTest = ref(false)
 const notificationSettings = ref({
   system: true,
   subscription: true,
@@ -929,49 +917,6 @@ const handleEnableNotifications = async () => {
 const saveNotificationSettings = () => {
   if (process.client) {
     localStorage.setItem('notification-settings', JSON.stringify(notificationSettings.value))
-  }
-}
-
-const sendTestNotification = async () => {
-  if (notificationPermission.value !== 'granted') {
-    alert('ابتدا باید دسترسی اعلان را فعال کنید')
-    return
-  }
-
-  isSendingTest.value = true
-
-  try {
-    // اول یه نوتیفیکیشن محلی نشون بده
-    if ('Notification' in window) {
-      new Notification('تست اعلان لینکو', {
-        body: 'این یک اعلان تستی است ✨',
-        icon: '/AppImages/android/android-launchericon-192-192.png',
-        badge: '/AppImages/android/android-launchericon-96-96.png',
-        tag: 'test-notification',
-        requireInteraction: false,
-        vibrate: [200, 100, 200],
-        timestamp: Date.now()
-      })
-    }
-
-    // بعد درخواست به سرور بفرست (اگه بکند API داره)
-    const { $axios } = useNuxtApp()
-    try {
-      await $axios.post('/user/push-subscription/test')
-      alert('✅ اعلان تستی ارسال شد')
-    } catch (error: any) {
-      // اگه API خطا داد، بررسی کن چه خطایی بوده
-      if (error.response?.data?.message) {
-        alert('⚠️ ' + error.response.data.message)
-      } else {
-        console.log('Test notification API error:', error)
-      }
-    }
-  } catch (error) {
-    console.error('Error sending test notification:', error)
-    alert('خطا در ارسال اعلان تستی')
-  } finally {
-    isSendingTest.value = false
   }
 }
 
