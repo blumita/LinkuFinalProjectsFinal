@@ -18,6 +18,23 @@ function linku_customize_register($wp_customize) {
         'priority' => 30,
     ));
     
+    // سایز لوگو
+    $wp_customize->add_setting('linku_logo_size', array(
+        'default'           => 120,
+        'sanitize_callback' => 'absint',
+        'transport'         => 'postMessage',
+    ));
+    $wp_customize->add_control('linku_logo_size', array(
+        'label'       => __('سایز لوگو (پیکسل)', 'linku-landing'),
+        'section'     => 'linku_general',
+        'type'        => 'range',
+        'input_attrs' => array(
+            'min'  => 40,
+            'max'  => 300,
+            'step' => 5,
+        ),
+    ));
+    
     // رنگ اصلی
     $wp_customize->add_setting('linku_primary_color', array(
         'default'           => '#000000',
@@ -198,6 +215,29 @@ function linku_customize_register($wp_customize) {
         'type'     => 'textarea',
     ));
     
+    // متن دکمه CTA
+    $wp_customize->add_setting('linku_cta_button_text', array(
+        'default'           => 'ساخت پروفایل رایگان',
+        'sanitize_callback' => 'sanitize_text_field',
+        'transport'         => 'postMessage',
+    ));
+    $wp_customize->add_control('linku_cta_button_text', array(
+        'label'    => __('متن دکمه CTA', 'linku-landing'),
+        'section'  => 'linku_cta',
+        'type'     => 'text',
+    ));
+    
+    // لینک دکمه CTA
+    $wp_customize->add_setting('linku_cta_button_url', array(
+        'default'           => 'https://dash.linku.im/auth/login',
+        'sanitize_callback' => 'esc_url_raw',
+    ));
+    $wp_customize->add_control('linku_cta_button_url', array(
+        'label'    => __('لینک دکمه CTA', 'linku-landing'),
+        'section'  => 'linku_cta',
+        'type'     => 'url',
+    ));
+    
     // رنگ پس‌زمینه CTA
     $wp_customize->add_setting('linku_cta_bg_color', array(
         'default'           => '#000000',
@@ -251,6 +291,7 @@ function linku_customizer_css() {
     $gray_color = get_theme_mod('linku_gray_color', '#f5f5f5');
     $cta_bg_color = get_theme_mod('linku_cta_bg_color', '#000000');
     $footer_bg_color = get_theme_mod('linku_footer_bg_color', '#f5f5f5');
+    $logo_size = get_theme_mod('linku_logo_size', 120);
     
     ?>
     <style type="text/css">
@@ -258,6 +299,12 @@ function linku_customizer_css() {
             --color-primary: <?php echo esc_attr($primary_color); ?>;
             --color-secondary: <?php echo esc_attr($secondary_color); ?>;
             --color-gray: <?php echo esc_attr($gray_color); ?>;
+        }
+        
+        .logo img,
+        .custom-logo {
+            max-width: <?php echo esc_attr($logo_size); ?>px !important;
+            height: auto !important;
         }
         
         .btn-primary,
