@@ -10,7 +10,7 @@ vendor/
 # Build cache only (not the final build outputs)
 .nuxt/
 .output/
-dist/
+dash.linku.im/admin-dashboard/dist/
 # Logs
 *.log
 npm-debug.log*
