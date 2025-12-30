@@ -4,14 +4,16 @@ Theme URI: https://landing.linku.im
 Author: Linku Team
 Author URI: https://linku.im
 Description: قالب وردپرس حرفه‌ای لندینگ پیج لینکو با امکانات پیشرفته درگ و دراپ، ریپیتر و ویرایش آنلاین
-Version: 1.0.0
+Version: 1.0.1
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Text Domain: linku-landing
+Text Domain: linkulanding
 Tags: rtl-language-support, custom-background, custom-colors, custom-menu, featured-images, theme-options, translation-ready
 Requires at least: 6.0
 Tested up to: 6.4
 Requires PHP: 7.4
 */
+
+/* فونت‌ها از فایل جداگانه لود می‌شوند */
 
 /* فایل CSS اصلی در assets/css/style.css */
