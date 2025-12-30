@@ -278,10 +278,21 @@ h6 { font-size: 1rem; }
     .hero-content {
         grid-template-columns: 1fr;
         gap: 2rem;
+        text-align: center;
     }
     
     .hero-title {
         font-size: 2.5rem;
+    }
+    
+    .hero-subtitle,
+    .hero-description {
+        text-align: center;
+    }
+    
+    .hero-buttons {
+        justify-content: center;
+        flex-wrap: wrap;
     }
     
     .hero-image {
