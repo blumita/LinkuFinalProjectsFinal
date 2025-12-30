@@ -1,34 +1,5 @@
 <footer class="site-footer" style="background-color: <?php echo esc_attr(get_theme_mod('linku_footer_bg_color', '#f5f5f5')); ?>;">
     <div class="container">
-        <?php if (is_active_sidebar('footer-1') || is_active_sidebar('footer-2') || is_active_sidebar('footer-3') || is_active_sidebar('footer-4')) : ?>
-        <div class="footer-widgets">
-            <div class="footer-row">
-                <?php if (is_active_sidebar('footer-1')) : ?>
-                    <div class="footer-column">
-                        <?php dynamic_sidebar('footer-1'); ?>
-                    </div>
-                <?php endif; ?>
-                
-                <?php if (is_active_sidebar('footer-2')) : ?>
-                    <div class="footer-column">
-                        <?php dynamic_sidebar('footer-2'); ?>
-                    </div>
-                <?php endif; ?>
-                
-                <?php if (is_active_sidebar('footer-3')) : ?>
-                    <div class="footer-column">
-                        <?php dynamic_sidebar('footer-3'); ?>
-                    </div>
-                <?php endif; ?>
-                
-                <?php if (is_active_sidebar('footer-4')) : ?>
-                    <div class="footer-column">
-                        <?php dynamic_sidebar('footer-4'); ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-        <?php endif; ?>
         
         <?php if (get_theme_mod('linku_show_social', true)) : ?>
             <div class="social-links">
