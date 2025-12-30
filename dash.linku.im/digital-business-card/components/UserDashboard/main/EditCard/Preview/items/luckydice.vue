@@ -8,7 +8,7 @@
           : 'rounded-xl text-center p-2 flex flex-col items-center justify-center transition hover:shadow-md backdrop-blur cursor-pointer',
         isDarkTheme ? 'bg-white/[0.02]' : isLightTheme ? 'bg-black/[0.02]' : 'bg-gradient-to-br from-white/60 via-white/30 to-white/10 border border-white/20'
       ]"
-      @click.prevent="showGame = true"
+      @click.prevent="openGame"
       tabindex="0"
       role="button"
     >
@@ -335,6 +335,23 @@ const startCountdown = () => {
     countdown.value--
     if (countdown.value <= 0) clearInterval(timer)
   }, 1000)
+}
+
+// ✅ تابع باز کردن بازی - تنظیم صحیح authStep
+const openGame = () => {
+  showGame.value = true
+  
+  // اگر authStep هنوز none هست، باید تنظیمش کنیم
+  if (authStep.value === 'none') {
+    // اگر شماره موبایل غیرفعال باشه، مستقیم authenticated کن
+    if (props.link?.phoneRequired === false) {
+      authStep.value = 'authenticated'
+      phoneNumber.value = 'guest_' + Date.now()
+    } else {
+      // شروع فرم شماره موبایل
+      authStep.value = 'phone'
+    }
+  }
 }
 
 const cancelAuth = () => {
