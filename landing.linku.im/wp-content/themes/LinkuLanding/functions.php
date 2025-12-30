@@ -95,63 +95,6 @@ function linku_enqueue_scripts() {
 add_action('wp_enqueue_scripts', 'linku_enqueue_scripts');
 
 /**
- * ثبت ناحیه‌های ویجت
- */
-function linku_widgets_init() {
-    register_sidebar(array(
-        'name'          => __('نوار کناری', 'linkulanding'),
-        'id'            => 'sidebar-1',
-        'description'   => __('ناحیه ویجت نوار کناری', 'linkulanding'),
-        'before_widget' => '<section id="%1$s" class="widget %2$s">',
-        'after_widget'  => '</section>',
-        'before_title'  => '<h3 class="widget-title">',
-        'after_title'   => '</h3>',
-    ));
-    
-    // فوتر ویجت‌ها
-    register_sidebar(array(
-        'name'          => __('ستون فوتر 1', 'linkulanding'),
-        'id'            => 'footer-1',
-        'description'   => __('ناحیه ویجت ستون اول فوتر', 'linkulanding'),
-        'before_widget' => '<div id="%1$s" class="footer-widget %2$s">',
-        'after_widget'  => '</div>',
-        'before_title'  => '<h4 class="widget-title">',
-        'after_title'   => '</h4>',
-    ));
-    
-    register_sidebar(array(
-        'name'          => __('ستون فوتر 2', 'linkulanding'),
-        'id'            => 'footer-2',
-        'description'   => __('ناحیه ویجت ستون دوم فوتر', 'linkulanding'),
-        'before_widget' => '<div id="%1$s" class="footer-widget %2$s">',
-        'after_widget'  => '</div>',
-        'before_title'  => '<h4 class="widget-title">',
-        'after_title'   => '</h4>',
-    ));
-    
-    register_sidebar(array(
-        'name'          => __('ستون فوتر 3', 'linkulanding'),
-        'id'            => 'footer-3',
-        'description'   => __('ناحیه ویجت ستون سوم فوتر', 'linkulanding'),
-        'before_widget' => '<div id="%1$s" class="footer-widget %2$s">',
-        'after_widget'  => '</div>',
-        'before_title'  => '<h4 class="widget-title">',
-        'after_title'   => '</h4>',
-    ));
-    
-    register_sidebar(array(
-        'name'          => __('ستون فوتر 4', 'linkulanding'),
-        'id'            => 'footer-4',
-        'description'   => __('ناحیه ویجت ستون چهارم فوتر', 'linkulanding'),
-        'before_widget' => '<div id="%1$s" class="footer-widget %2$s">',
-        'after_widget'  => '</div>',
-        'before_title'  => '<h4 class="widget-title">',
-        'after_title'   => '</h4>',
-    ));
-}
-add_action('widgets_init', 'linku_widgets_init');
-
-/**
  * فایل‌های اضافی
  */
 require_once LINKU_THEME_DIR . '/inc/customizer.php';
