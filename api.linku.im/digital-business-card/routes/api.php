@@ -505,6 +505,9 @@ Route::middleware(['auth:sanctum','log.activity'])
         Route::get('/premiumMembers', [UserController::class, 'premiumMembersCount'])
             ->name('user.admin.premiumMembersCount');
 
+        Route::post('/upgrade-subscription', [UserController::class, 'upgradeSubscription'])
+            ->name('user.admin.upgrade-subscription');
+
         Route::get('/monthlyRevenue', [OrderController::class, 'monthlyRevenue'])
             ->name('user.admin.monthlyRevenue');
 
