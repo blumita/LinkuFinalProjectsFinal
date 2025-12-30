@@ -175,7 +175,7 @@ if (!empty($faqs)) :
             <h2><?php echo esc_html(get_theme_mod('linku_cta_title', 'همین الان شروع کنید')); ?></h2>
             <p><?php echo esc_html(get_theme_mod('linku_cta_description', 'در کمتر از ۲ دقیقه صفحه لینک خود را بسازید')); ?></p>
             <div class="cta-buttons">
-                <a href="<?php echo esc_url(get_theme_mod('linku_cta_button_url', 'https://dash.linku.im/auth/login')); ?>" class="btn btn-secondary btn-lg" target="_blank">
+                <a href="<?php echo esc_url(get_theme_mod('linku_cta_button_url', 'https://dash.linku.im/auth/login')); ?>" class="btn btn-secondary btn-lg" target="_blank" rel="noopener noreferrer">
                     <?php echo esc_html(get_theme_mod('linku_cta_button_text', 'ساخت پروفایل رایگان')); ?>
                 </a>
             </div>
