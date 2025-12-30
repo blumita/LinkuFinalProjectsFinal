@@ -4,6 +4,7 @@
  * ایمپورتر اختصاصی برای قالب LinkuLanding
  * 
  * @package LinkuLanding
+ * @version 2.0.0
  */
 
 if (!defined('ABSPATH')) exit;
@@ -64,8 +65,8 @@ class Linku_Demo_Importer {
                     <ul>
                         <li>✅ حتماً از دیتابیس خود نسخه پشتیبان بگیرید</li>
                         <li>✅ این ایمپورتر محتوای نمونه کامل را وارد می‌کند</li>
-                        <li>✅ شامل: صفحات، تنظیمات، منوها، و ویجت‌ها</li>
-                        <li>⚠️ محتوای موجود حذف نمی‌شود، فقط محتوای جدید اضافه می‌شود</li>
+                        <li>✅ شامل: صفحات، تنظیمات، منوها</li>
+                        <li>⚠️ صفحات تکراری ایجاد نمی‌شوند</li>
                     </ul>
                 </div>
                 
@@ -82,7 +83,7 @@ class Linku_Demo_Importer {
                             <li>
                                 <label>
                                     <input type="checkbox" name="import_pages" checked disabled>
-                                    <span>صفحات (صفحه اصلی + صفحات کمکی)</span>
+                                    <span>صفحات (صفحه اصلی، درباره ما، تماس، قوانین، حریم خصوصی)</span>
                                 </label>
                             </li>
                             <li>
@@ -95,12 +96,6 @@ class Linku_Demo_Importer {
                                 <label>
                                     <input type="checkbox" name="import_menus" checked disabled>
                                     <span>منوها (منوی اصلی + فوتر)</span>
-                                </label>
-                            </li>
-                            <li>
-                                <label>
-                                    <input type="checkbox" name="import_widgets" checked disabled>
-                                    <span>ویجت‌های فوتر</span>
                                 </label>
                             </li>
                             <li>
@@ -171,11 +166,6 @@ class Linku_Demo_Importer {
             $results['menus'] = $this->import_menus($demo_data['menus']);
         }
         
-        // ایمپورت ویجت‌ها
-        if (isset($demo_data['widgets'])) {
-            $results['widgets'] = $this->import_widgets($demo_data['widgets']);
-        }
-        
         wp_send_json_success($results);
     }
     
@@ -186,25 +176,33 @@ class Linku_Demo_Importer {
         $imported = array();
         
         foreach ($pages as $page_data) {
-            // چک کردن وجود صفحه
-            $existing = get_page_by_title($page_data['title'], OBJECT, 'page');
+            // چک کردن وجود صفحه با slug
+            $slug = isset($page_data['slug']) ? $page_data['slug'] : sanitize_title($page_data['title']);
+            $existing = get_page_by_path($slug);
             
             if ($existing) {
                 $page_id = $existing->ID;
+                // آپدیت صفحه موجود
+                wp_update_post(array(
+                    'ID' => $page_id,
+                    'post_content' => isset($page_data['content']) ? $page_data['content'] : '',
+                    'page_template' => isset($page_data['template']) ? $page_data['template'] : '',
+                ));
             } else {
                 // ساخت صفحه جدید
                 $page_id = wp_insert_post(array(
                     'post_title'     => $page_data['title'],
-                    'post_content'   => $page_data['content'],
+                    'post_name'      => $slug,
+                    'post_content'   => isset($page_data['content']) ? $page_data['content'] : '',
                     'post_status'    => 'publish',
                     'post_type'      => 'page',
-                    'page_template'  => $page_data['template'],
+                    'page_template'  => isset($page_data['template']) ? $page_data['template'] : '',
                 ));
             }
             
             if ($page_id && !is_wp_error($page_id)) {
                 // ذخیره متادیتا
-                if (isset($page_data['meta'])) {
+                if (isset($page_data['meta']) && is_array($page_data['meta'])) {
                     foreach ($page_data['meta'] as $key => $value) {
                         update_post_meta($page_id, $key, $value);
                     }
@@ -212,7 +210,8 @@ class Linku_Demo_Importer {
                 
                 $imported[] = array(
                     'id' => $page_id,
-                    'title' => $page_data['title']
+                    'title' => $page_data['title'],
+                    'url' => get_permalink($page_id)
                 );
                 
                 // تنظیم صفحه اصلی
@@ -258,45 +257,28 @@ class Linku_Demo_Importer {
             
             if ($menu_id && !is_wp_error($menu_id)) {
                 // اضافه کردن آیتم‌ها
-                foreach ($menu_data['items'] as $item) {
-                    wp_update_nav_menu_item($menu_id, 0, array(
-                        'menu-item-title'   => $item['title'],
-                        'menu-item-url'     => $item['url'],
-                        'menu-item-status'  => 'publish',
-                        'menu-item-position' => $item['order']
-                    ));
+                if (isset($menu_data['items']) && is_array($menu_data['items'])) {
+                    foreach ($menu_data['items'] as $item) {
+                        wp_update_nav_menu_item($menu_id, 0, array(
+                            'menu-item-title'   => $item['title'],
+                            'menu-item-url'     => $item['url'],
+                            'menu-item-status'  => 'publish',
+                            'menu-item-position' => isset($item['order']) ? $item['order'] : 0
+                        ));
+                    }
                 }
                 
                 // تخصیص به لوکیشن
                 if (isset($menu_data['location'])) {
                     $locations = get_theme_mod('nav_menu_locations');
+                    if (!is_array($locations)) {
+                        $locations = array();
+                    }
                     $locations[$menu_data['location']] = $menu_id;
                     set_theme_mod('nav_menu_locations', $locations);
                 }
                 
                 $imported[] = $menu_data['name'];
-            }
-        }
-        
-        return $imported;
-    }
-    
-    /**
-     * ایمپورت ویجت‌ها
-     */
-    private function import_widgets($widgets) {
-        $imported = 0;
-        
-        foreach ($widgets as $sidebar_id => $sidebar_widgets) {
-            update_option('sidebars_widgets', array($sidebar_id => $sidebar_widgets));
-            
-            foreach ($sidebar_widgets as $widget_data) {
-                if (isset($widget_data['type']) && isset($widget_data['data'])) {
-                    $widget_options = get_option('widget_' . $widget_data['type'], array());
-                    $widget_options[] = $widget_data['data'];
-                    update_option('widget_' . $widget_data['type'], $widget_options);
-                    $imported++;
-                }
             }
         }
         
