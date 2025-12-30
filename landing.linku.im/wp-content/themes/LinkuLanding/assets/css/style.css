@@ -467,6 +467,11 @@ h6 { font-size: 1rem; }
     padding: 6rem 0;
 }
 
+.faq-section h2,
+.faq-section .section-header h2 {
+    font-family: 'Vazirmatn', 'Tahoma', sans-serif !important;
+}
+
 .faq-accordion {
     max-width: 800px;
     margin: 0 auto;
@@ -494,6 +499,10 @@ h6 { font-size: 1rem; }
     justify-content: space-between;
     align-items: center;
     transition: var(--transition);
+}
+
+.faq-question span {
+    font-family: 'Vazirmatn', 'Tahoma', sans-serif !important;
 }
 
 .faq-question:hover {
