@@ -99,7 +99,7 @@
               @click="rollDice"
             >
               <li v-for="n in 6" :key="n" class="die-item" :data-side="n">
-                <span v-for="d in getDots(n)" :key="d" class="dot" :style="{ backgroundColor: link.iconColor?.background || '#000', boxShadow: 'inset -0.15rem 0.15rem 0.25rem rgba(0,0,0,0.5)' }"></span>
+                <span v-for="d in getDots(n)" :key="d" class="dot" :style="{ backgroundColor: getDotColor(), boxShadow: 'inset -0.15rem 0.15rem 0.25rem rgba(0,0,0,0.5)' }"></span>
               </li>
             </ol>
             <ol
@@ -110,7 +110,7 @@
               @click="rollDice"
             >
               <li v-for="n in 6" :key="n" class="die-item" :data-side="n">
-                <span v-for="d in getDots(n)" :key="d" class="dot" :style="{ backgroundColor: link.iconColor?.background || '#000', boxShadow: 'inset -0.15rem 0.15rem 0.25rem rgba(0,0,0,0.5)' }"></span>
+                <span v-for="d in getDots(n)" :key="d" class="dot" :style="{ backgroundColor: getDotColor(), boxShadow: 'inset -0.15rem 0.15rem 0.25rem rgba(0,0,0,0.5)' }"></span>
               </li>
             </ol>
           </div>
@@ -248,12 +248,52 @@ const rewards = ref([])
 
 const getDots = n => Array.from({ length: n }, (_, i) => i + 1)
 
+// تابع گرفتن رنگ نقطه‌های تاس بر اساس تم پروفایل
+const getDotColor = () => {
+  const color = props.link?.iconColor?.background
+  if (color && color !== 'transparent' && color !== '') {
+    return color
+  }
+  return '#3B82F6' // آبی پیش‌فرض به جای مشکی
+}
+
 const adjustOpacity = (hex, opacity) => {
   if (!hex || !hex.startsWith('#')) return hex
   const r = parseInt(hex.slice(1, 3), 16)
   const g = parseInt(hex.slice(3, 5), 16)
   const b = parseInt(hex.slice(5, 7), 16)
   return `rgba(${r}, ${g}, ${b}, ${opacity})`
+}
+
+// تابع پخش کاغذ رنگی برای برنده
+const launchWinConfetti = () => {
+  const themeColor = getDotColor()
+  const colors = [themeColor, '#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1']
+  
+  // پخش از چپ و راست
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { x: 0.1, y: 0.6 },
+    colors: colors
+  })
+  
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { x: 0.9, y: 0.6 },
+    colors: colors
+  })
+  
+  // پخش از وسط
+  setTimeout(() => {
+    confetti({
+      particleCount: 150,
+      spread: 100,
+      origin: { y: 0.5 },
+      colors: colors
+    })
+  }, 200)
 }
 
 const rollDice = async () => {
@@ -293,7 +333,7 @@ const rollDice = async () => {
 
       result.value = String(result1)
 
-      confetti({particleCount: 100, spread: 70, origin: {y: 0.6}})
+      launchWinConfetti()
 
     } else {
       result.value = 'متاسفانه اینبار برنده نشدی!'

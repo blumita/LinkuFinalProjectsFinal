@@ -93,6 +93,8 @@
                 <EggIcon
                   :variant="eggVariant"
                   :is-shaking="isShaking"
+                  :crack-color="getCrackColor()"
+                  :icon-color="getThemeColor()"
                   class="w-full h-full cursor-pointer transition-all duration-300"
                   @click="handleEggClick"
                 />
@@ -255,6 +257,57 @@ const adjustOpacity = (hex, opacity) => {
   return `rgba(${r}, ${g}, ${b}, ${opacity})`
 }
 
+// تابع گرفتن رنگ ترک‌ها بر اساس تم پروفایل
+const getCrackColor = () => {
+  const color = formStore.iconColor?.background
+  if (color && color !== 'transparent' && color !== '') {
+    return color
+  }
+  return '#FB923C' // نارنجی پیش‌فرض
+}
+
+// تابع گرفتن رنگ تم برای خطوط تخم‌مرغ
+const getThemeColor = () => {
+  const color = formStore.iconColor?.background
+  if (color && color !== 'transparent' && color !== '') {
+    return color
+  }
+  return '#8b5cf6' // بنفش پیش‌فرض
+}
+
+// تابع پخش کاغذ رنگی برای برنده
+const launchConfetti = () => {
+  const themeColor = getCrackColor()
+  
+  // ایجاد چند رنگ مرتبط با تم
+  const colors = [themeColor, '#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1']
+  
+  // پخش از چپ و راست
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { x: 0.1, y: 0.6 },
+    colors: colors
+  })
+  
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { x: 0.9, y: 0.6 },
+    colors: colors
+  })
+  
+  // پخش از وسط
+  setTimeout(() => {
+    confetti({
+      particleCount: 150,
+      spread: 100,
+      origin: { y: 0.5 },
+      colors: colors
+    })
+  }, 200)
+}
+
 // Computed برای variant تخم‌مرغ
 const eggVariant = computed(() => {
   const variant = eggClickCount.value === 0 ? 'normal' : eggClickCount.value === 1 ? 'cracked' : 'final'
@@ -319,12 +372,14 @@ const tryLuck = async () => {
     isShaking.value = false
 
     hasPlayed.value = true
-    result.value = 'true'
+    
+    // اول جایزه رو بگیر بعد result رو ست کن
     await sendResultToBackend()
 
     if (prize.value) {
-      //result.value = prize.value
-      confetti({particleCount: 150, spread: 90, origin: {y: 0.6}})
+      result.value = prize.value
+      // پخش کاغذ رنگی برای برنده
+      launchConfetti()
       playSound('/sounds/win.mp3')
     } else {
       result.value = 'متاسفانه اینبار برنده نشدی!'

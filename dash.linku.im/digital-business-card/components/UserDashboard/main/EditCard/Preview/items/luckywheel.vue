@@ -89,8 +89,8 @@
             @cancel-auth="cancelAuth"
           />
 
-          <!-- پیام محدودیت چرخش اگر قبلاً شرکت کرده -->
-          <div v-else-if="authStep === 'authenticated' && hasSpun && !result" class="flex flex-col items-center justify-center py-8 px-4 h-full">
+          <!-- پیام محدودیت چرخش اگر قبلاً شرکت کرده (فقط وقتی احراز هویت فعال است) -->
+          <div v-else-if="authStep === 'authenticated' && hasSpun && !result && link?.phoneRequired !== false" class="flex flex-col items-center justify-center py-8 px-4 h-full">
             <div class="text-4xl mb-4 text-orange-500">
               <i class="ti ti-clock"></i>
             </div>
@@ -108,62 +108,48 @@
             
             <!-- گردونه - فقط اگر نتیجه نداشته باشیم نمایش داده شود -->
             <div v-if="!result" class="relative w-full max-w-[320px] aspect-square mb-8 mx-auto">
-              <div
+              <!-- گردونه اصلی با SVG -->
+              <svg
                 ref="wheelEl"
-                class="wheel w-full h-full rounded-full relative overflow-hidden transition-transform shadow-2xl"
+                viewBox="0 0 300 300"
+                class="w-full h-full transition-transform"
                 :style="{ 
                   transform: `rotate(${rotation}deg)`,
-                  border: `8px solid ${form.iconColor?.background && form.iconColor?.background !== 'transparent' ? form.iconColor?.background : '#3B82F6'}`,
-                  boxShadow: `0 20px 50px rgba(0, 0, 0, 0.3), inset 0 0 20px ${adjustOpacity((form.iconColor?.background && form.iconColor?.background !== 'transparent' ? form.iconColor?.background : '#3B82F6'), 0.3)}`,
                   transitionDuration: isSpinning ? '4s' : '0s',
                   transitionTimingFunction: 'cubic-bezier(0.17, 0.67, 0.12, 0.99)',
                   willChange: isSpinning ? 'transform' : 'auto',
-                  backfaceVisibility: 'hidden',
-                  perspective: '1000px'
+                  filter: 'drop-shadow(0 10px 25px rgba(0, 0, 0, 0.25))'
                 }"
               >
-                <div
-                  v-for="(prize, index) in wheelItems"
-                  :key="index"
-                  class="wheel-segment absolute w-full h-full"
-                  :style="{
-                    transform: `rotate(${index * segmentAngle}deg)`,
-                    backgroundColor: prize.color,
-                    color: isDark(prize.color) ? '#fff' : '#1F2937',
-                    borderRight: '1px solid rgba(255, 255, 255, 0.2)'
-                  }"
-                >
-                  <div
-                    class="absolute font-bold text-sm text-center flex flex-col items-center justify-center"
-                    :style="{
-                      transform: `rotate(${segmentAngle / 2}deg)`,
-                      left: '60%',
-                      top: '20px',
-                      transformOrigin: '0 70px',
-                      width: '70px',
-                      marginLeft: '-30px',
-                      color: isDark(prize.color) ? '#fff' : '#1F2937',
-                      textShadow: isDark(prize.color) ? '0 1px 3px rgba(0,0,0,0.3)' : '0 1px 2px rgba(255,255,255,0.8)'
-                    }"
+                <!-- دایره پس‌زمینه -->
+                <circle cx="150" cy="150" r="148" :fill="getBaseColor()" stroke="#fff" stroke-width="4" />
+                
+                <!-- قطعات گردونه -->
+                <g v-for="(item, index) in wheelItems" :key="index">
+                  <path
+                    :d="getSegmentPath(Number(index), wheelItems.length)"
+                    :fill="item.color"
+                    stroke="#fff"
+                    stroke-width="2"
+                  />
+                  <!-- متن جایزه -->
+                  <text
+                    :transform="getTextTransform(Number(index), wheelItems.length)"
+                    text-anchor="middle"
+                    dominant-baseline="middle"
+                    :fill="isDark(item.color) ? '#fff' : '#1F2937'"
+                    font-weight="bold"
+                    :font-size="item.name.length > 10 ? '10' : '12'"
+                    style="text-shadow: 0 1px 2px rgba(0,0,0,0.3);"
                   >
-                    <div class="text-base font-extrabold">{{ prize.name.split(' ')[0] }}</div>
-                    <div class="text-xs font-semibold mt-0.5 leading-tight">
-                      {{ prize.name.split(' ').slice(1).join(' ') }}
-                    </div>
-                  </div>
-                </div>
-
+                    {{ truncateText(item.name, 12) }}
+                  </text>
+                </g>
+                
                 <!-- دایره مرکزی -->
-                <div 
-                  class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full z-10 shadow-2xl flex items-center justify-center"
-                  :style="{ 
-                    background: `linear-gradient(135deg, ${form.iconColor?.background && form.iconColor?.background !== 'transparent' ? form.iconColor?.background : '#3B82F6'} 0%, ${adjustOpacity((form.iconColor?.background && form.iconColor?.background !== 'transparent' ? form.iconColor?.background : '#3B82F6'), 0.7)} 100%)`,
-                    border: '4px solid #fff'
-                  }"
-                >
-                  <div class="text-3xl">🎰</div>
-                </div>
-              </div>
+                <circle cx="150" cy="150" r="35" :fill="getBaseColor()" stroke="#fff" stroke-width="4" />
+                <text x="150" y="150" text-anchor="middle" dominant-baseline="middle" font-size="24">🎰</text>
+              </svg>
 
               <!-- پوینتر لوکیشن -->
               <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 z-30">
@@ -194,7 +180,7 @@
             <button
               v-if="!result"
               @click="authStep === 'authenticated' || link?.phoneRequired === false ? spinWheel() : startAuth()"
-              :disabled="isSpinning || hasSpun"
+              :disabled="isSpinning || (hasSpun && link?.phoneRequired !== false)"
               class="px-10 py-4 rounded-2xl font-bold text-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl hover:shadow-3xl transform hover:scale-105 active:scale-95 text-white relative overflow-hidden"
               :style="{ background: `linear-gradient(135deg, ${form.iconColor?.background && form.iconColor?.background !== 'transparent' ? form.iconColor?.background : '#3B82F6'} 0%, ${adjustOpacity((form.iconColor?.background && form.iconColor?.background !== 'transparent' ? form.iconColor?.background : '#3B82F6'), 0.8)} 100%)` }"
             >
@@ -383,12 +369,62 @@ export default defineComponent({
       // استفاده از prizes داینامیک از لینک
       const prizes = props.link?.prizes || ['پوچ', 'جایزه ویژه', 'جایزه طلایی', 'جایزه نقره‌ای', 'جایزه برنزی', 'جایزه ممتاز'];
       
-      // رنگ‌های متناوب با opacity‌های مختلف از baseColor
+      // رنگ‌های متناوب - یکی پررنگ، یکی کمرنگ
       return prizes.map((prize: string, index: number) => ({
         name: prize,
-        color: adjustOpacity(baseColor, 0.3 + (index * 0.1))
+        color: index % 2 === 0 
+          ? adjustOpacity(baseColor, 0.9)  // پررنگ
+          : adjustOpacity(baseColor, 0.5)  // کمرنگ
       }));
     })
+    
+    // تابع گرفتن رنگ پایه
+    const getBaseColor = () => {
+      let baseColor = form.iconColor?.background || '#3B82F6';
+      if (baseColor === 'transparent' || baseColor === '') {
+        baseColor = '#3B82F6';
+      }
+      return baseColor;
+    }
+    
+    // تابع ساخت مسیر قطعه گردونه
+    const getSegmentPath = (index: number, total: number) => {
+      const angle = 360 / total;
+      const startAngle = (index * angle - 90) * (Math.PI / 180);
+      const endAngle = ((index + 1) * angle - 90) * (Math.PI / 180);
+      const radius = 145;
+      const cx = 150;
+      const cy = 150;
+      
+      const x1 = cx + radius * Math.cos(startAngle);
+      const y1 = cy + radius * Math.sin(startAngle);
+      const x2 = cx + radius * Math.cos(endAngle);
+      const y2 = cy + radius * Math.sin(endAngle);
+      
+      const largeArcFlag = angle > 180 ? 1 : 0;
+      
+      return `M ${cx} ${cy} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
+    }
+    
+    // تابع محاسبه transform متن
+    const getTextTransform = (index: number, total: number) => {
+      const angle = 360 / total;
+      const midAngle = index * angle + angle / 2 - 90;
+      const radius = 95; // فاصله از مرکز
+      const cx = 150;
+      const cy = 150;
+      
+      const x = cx + radius * Math.cos(midAngle * Math.PI / 180);
+      const y = cy + radius * Math.sin(midAngle * Math.PI / 180);
+      
+      return `translate(${x}, ${y}) rotate(${midAngle + 90})`;
+    }
+    
+    // تابع کوتاه کردن متن
+    const truncateText = (text: string, maxLength: number) => {
+      if (text.length <= maxLength) return text;
+      return text.substring(0, maxLength - 2) + '..';
+    }
 
     // بررسی وضعیت کاربر از localStorage
     onMounted(() => {
@@ -641,7 +677,9 @@ export default defineComponent({
         }
       }
       
-      if (isSpinning.value || hasSpun.value || authStep.value !== 'authenticated') return
+      // وقتی phoneRequired غیرفعاله، محدودیت hasSpun نداریم
+      const spinLimitActive = props.link?.phoneRequired !== false
+      if (isSpinning.value || (spinLimitActive && hasSpun.value) || authStep.value !== 'authenticated') return
 
       isSpinning.value = true
       result.value = ''
@@ -712,17 +750,41 @@ export default defineComponent({
         // اگر جایزه برد، confetti نمایش داده شود (فقط برای چرخش‌های جدید)
         if (isNewSpin.value && !result.value.includes('پوچ') && !result.value.includes('برنده نشدید')) {
           setTimeout(() => {
-            confetti({
-              particleCount: 200,
-              spread: 90,
-              origin: {y: 0.6},
-              colors: ['#FFD700', '#FFA500', '#FF6347', '#32CD32', '#1E90FF', '#DA70D6', '#FF69B4'],
-              scalar: 1.2,
-              gravity: 0.8
-            })
+            launchWinConfetti()
           }, 200)
         }
       }, 3500)
+    }
+
+    // تابع پخش کاغذ رنگی برای برنده
+    function launchWinConfetti() {
+      const themeColor = getBaseColor()
+      const colors = [themeColor, '#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1']
+      
+      // پخش از چپ و راست
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { x: 0.1, y: 0.6 },
+        colors: colors
+      })
+      
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { x: 0.9, y: 0.6 },
+        colors: colors
+      })
+      
+      // پخش از وسط
+      setTimeout(() => {
+        confetti({
+          particleCount: 150,
+          spread: 100,
+          origin: { y: 0.5 },
+          colors: colors
+        })
+      }, 200)
     }
 
     function hexToRgb(hex: string) {
@@ -834,6 +896,10 @@ export default defineComponent({
       isDark,
       getHueRotation,
       adjustOpacity,
+      getBaseColor,
+      getSegmentPath,
+      getTextTransform,
+      truncateText,
       authStep,
       phoneNumber,
       verificationCode,
@@ -867,13 +933,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.wheel {
-  transform-origin: center;
-}
-.wheel-segment {
-  clip-path: polygon(50% 50%, 50% 0, 140% 0);
-  transform-origin: center;
-}
 .pointer {
   z-index: 20;
 }

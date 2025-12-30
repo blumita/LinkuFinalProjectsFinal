@@ -57,11 +57,23 @@ const setBodyLock = (hidden) => {
   if (typeof document === 'undefined') return
   
   if (hidden) {
+    // ذخیره موقعیت اسکرول فعلی
+    const scrollY = window.scrollY
     document.body.style.overflow = 'hidden'
-    document.body.style.position = 'relative'
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${scrollY}px`
+    document.body.style.left = '0'
+    document.body.style.right = '0'
+    document.body.dataset.scrollY = scrollY.toString()
   } else {
+    // بازگشت به موقعیت قبلی بدون پرش
+    const scrollY = document.body.dataset.scrollY || '0'
     document.body.style.overflow = ''
     document.body.style.position = ''
+    document.body.style.top = ''
+    document.body.style.left = ''
+    document.body.style.right = ''
+    window.scrollTo(0, parseInt(scrollY))
   }
 }
 
