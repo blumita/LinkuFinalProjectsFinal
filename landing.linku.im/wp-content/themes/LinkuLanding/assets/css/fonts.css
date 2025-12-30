@@ -1,7 +1,9 @@
 /* ==========================================================================
    Vazirmatn Font Face
    ========================================================================== */
-
+body{
+      font-family: 'Vazirmatn';
+}
 @font-face {
     font-family: 'Vazirmatn';
     src: url('../fonts/Vazirmatn[wght].woff2') format('woff2-variations');
