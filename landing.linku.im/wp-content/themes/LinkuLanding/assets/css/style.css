@@ -26,6 +26,10 @@
     box-sizing: border-box;
 }
 
+html, body {
+    font-family: 'Vazirmatn', 'Tahoma', sans-serif !important;
+}
+
 body {
     font-family: var(--font-vazir);
     direction: rtl;
