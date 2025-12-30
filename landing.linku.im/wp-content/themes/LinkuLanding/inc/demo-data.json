@@ -1,0 +1,254 @@
+{
+  "pages": [
+    {
+      "title": "صفحه اصلی",
+      "content": "",
+      "template": "page-landing.php",
+      "is_front_page": true,
+      "meta": {
+        "_linku_hero_title": "همه لینک‌های شما در یک صفحه",
+        "_linku_hero_subtitle": "لینکو - پلتفرم حرفه‌ای مدیریت لینک‌ها",
+        "_linku_hero_description": "با لینکو می‌تونید همه لینک‌های مهمتون رو در یک صفحه زیبا و حرفه‌ای جمع کنید و با دنیا به اشتراک بگذارید",
+        "_linku_hero_button_text": "ساخت پروفایل رایگان",
+        "_linku_hero_button_link": "https://dash.linku.im/auth/login",
+        "_linku_stats": [
+          {
+            "number": "750,000+",
+            "label": "کاربر فعال"
+          },
+          {
+            "number": "2M+",
+            "label": "لینک ساخته شده"
+          },
+          {
+            "number": "50M+",
+            "label": "بازدید ماهانه"
+          },
+          {
+            "number": "99.9%",
+            "label": "آپتایم سرور"
+          }
+        ],
+        "_linku_features": [
+          {
+            "icon": "fas fa-link",
+            "title": "لینک نامحدود",
+            "description": "هر تعداد لینک که می‌خواید اضافه کنید، بدون محدودیت"
+          },
+          {
+            "icon": "fas fa-palette",
+            "title": "شخصی‌سازی کامل",
+            "description": "صفحه خودتون رو با رنگ‌ها، فونت‌ها و تم‌های مختلف سفارشی کنید"
+          },
+          {
+            "icon": "fas fa-chart-line",
+            "title": "آمار و تحلیل",
+            "description": "آمار دقیق بازدیدها، کلیک‌ها و رفتار کاربران رو ببینید"
+          },
+          {
+            "icon": "fas fa-qrcode",
+            "title": "کیوآر کد",
+            "description": "کیوآر کد اختصاصی برای اشتراک‌گذاری آسان‌تر"
+          },
+          {
+            "icon": "fas fa-mobile-alt",
+            "title": "واکنش‌گرا",
+            "description": "روی همه دستگاه‌ها و صفحه‌نمایش‌ها عالی نمایش داده میشه"
+          },
+          {
+            "icon": "fas fa-bolt",
+            "title": "سریع و امن",
+            "description": "سرورهای پرسرعت و امنیت بالا برای حفاظت از اطلاعات شما"
+          }
+        ],
+        "_linku_blocks": [
+          {
+            "icon": "fas fa-image",
+            "title": "بلوک تصویر",
+            "description": "تصاویر خود را به صورت حرفه‌ای نمایش دهید"
+          },
+          {
+            "icon": "fas fa-video",
+            "title": "بلوک ویدیو",
+            "description": "ویدیوهای یوتیوب، آپارات و... را به راحتی اضافه کنید"
+          },
+          {
+            "icon": "fas fa-file-alt",
+            "title": "بلوک متن",
+            "description": "متن‌های خود را با فرمت‌بندی کامل نمایش دهید"
+          },
+          {
+            "icon": "fas fa-share-alt",
+            "title": "شبکه‌های اجتماعی",
+            "description": "لینک شبکه‌های اجتماعی خود را با آیکون زیبا نمایش دهید"
+          },
+          {
+            "icon": "fas fa-envelope",
+            "title": "فرم تماس",
+            "description": "فرم تماس برای ارتباط مستقیم با مخاطبان"
+          },
+          {
+            "icon": "fas fa-shopping-cart",
+            "title": "فروشگاه",
+            "description": "محصولات خود را به صورت حرفه‌ای نمایش و فروش کنید"
+          }
+        ],
+        "_linku_faqs": [
+          {
+            "question": "لینکو چیست؟",
+            "answer": "لینکو یک پلتفرم حرفه‌ای برای مدیریت و اشتراک‌گذاری لینک‌های شماست. با لینکو می‌تونید همه لینک‌های مهمتون رو در یک صفحه زیبا جمع کنید."
+          },
+          {
+            "question": "آیا استفاده از لینکو رایگان است؟",
+            "answer": "بله! لینکو یک پلن رایگان با امکانات کامل داره که برای همیشه رایگانه. البته پلن‌های پریمیوم با امکانات بیشتر هم وجود دارن."
+          },
+          {
+            "question": "چطور میتونم صفحه لینکو خودم رو بسازم؟",
+            "answer": "خیلی ساده! کافیه ثبت نام کنید، نام کاربری انتخاب کنید و شروع به اضافه کردن لینک‌ها کنید. کل فرایند کمتر از 2 دقیقه طول میکشه."
+          },
+          {
+            "question": "آیا میتونم آمار بازدید و کلیک رو ببینم؟",
+            "answer": "بله! لینکو یک پنل آماری کامل داره که نشون میده چند نفر صفحه شما رو بازدید کردن، روی کدوم لینک کلیک کردن و از کجا اومدن."
+          },
+          {
+            "question": "آیا میتونم ظاهر صفحه‌ام رو شخصی‌سازی کنم؟",
+            "answer": "قطعاً! شما می‌تونید رنگ‌ها، فونت‌ها، پس‌زمینه و حتی قالب کلی صفحه خودتون رو تغییر بدید و یه صفحه کاملاً منحصربفرد داشته باشید."
+          },
+          {
+            "question": "چه کسانی از لینکو استفاده می‌کنند؟",
+            "answer": "اینفلوئنسرها، کسب‌وکارها، هنرمندان، فریلنسرها و هر کسی که می‌خواد همه لینک‌های مهمش رو در یک جا جمع کنه از لینکو استفاده می‌کنن."
+          }
+        ]
+      }
+    },
+    {
+      "title": "درباره ما",
+      "content": "<h2>درباره لینکو</h2><p>لینکو یک پلتفرm حرفه‌ای برای مدیریت و اشتراک‌گذاری لینک‌هاست که به شما کمک می‌کند تا همه لینک‌های مهم خود را در یک صفحه زیبا و کاربرپسند جمع‌آوری کنید.</p>",
+      "template": "",
+      "meta": {}
+    },
+    {
+      "title": "تماس با ما",
+      "content": "<h2>تماس با ما</h2><p>برای ارتباط با تیم لینکو می‌توانید از راه‌های زیر استفاده کنید:</p><ul><li>ایمیل: support@linku.im</li><li>تلگرام: @linkuim</li></ul>",
+      "template": "",
+      "meta": {}
+    }
+  ],
+  "customizer": {
+    "linku_logo_text": "لینکو",
+    "linku_transparent_header": true,
+    "linku_sticky_header": true,
+    "linku_header_cta_text": "ساخت پروفایل رایگان",
+    "linku_header_cta_link": "https://dash.linku.im/auth/login",
+    "linku_primary_color": "#000000",
+    "linku_secondary_color": "#ffffff",
+    "linku_accent_color": "#4f46e5",
+    "linku_cta_bg_color": "#000000",
+    "linku_cta_title": "همین الان شروع کنید",
+    "linku_cta_description": "در کمتر از 2 دقیقه صفحه لینک خود را بسازید",
+    "linku_cta_button_text": "ساخت پروفایل رایگان",
+    "linku_show_social": true,
+    "linku_social_instagram": "https://instagram.com/linku.im",
+    "linku_social_telegram": "https://t.me/linkuim",
+    "linku_social_twitter": "https://twitter.com/linkuim",
+    "linku_footer_bg_color": "#f5f5f5",
+    "linku_copyright_text": "© 2025 Linku. تمامی حقوق محفوظ است."
+  },
+  "menus": [
+    {
+      "name": "منوی اصلی",
+      "location": "primary",
+      "items": [
+        {
+          "title": "صفحه اصلی",
+          "url": "/",
+          "order": 1
+        },
+        {
+          "title": "ویژگی‌ها",
+          "url": "#features",
+          "order": 2
+        },
+        {
+          "title": "بلوک‌ها",
+          "url": "#blocks",
+          "order": 3
+        },
+        {
+          "title": "سوالات متداول",
+          "url": "#faq",
+          "order": 4
+        },
+        {
+          "title": "تماس با ما",
+          "url": "/contact",
+          "order": 5
+        }
+      ]
+    },
+    {
+      "name": "منوی فوتر",
+      "location": "footer",
+      "items": [
+        {
+          "title": "درباره ما",
+          "url": "/about",
+          "order": 1
+        },
+        {
+          "title": "قوانین و مقررات",
+          "url": "/terms",
+          "order": 2
+        },
+        {
+          "title": "حریم خصوصی",
+          "url": "/privacy",
+          "order": 3
+        },
+        {
+          "title": "تماس با ما",
+          "url": "/contact",
+          "order": 4
+        }
+      ]
+    }
+  ],
+  "widgets": {
+    "footer-1": [
+      {
+        "type": "text",
+        "data": {
+          "title": "درباره لینکو",
+          "text": "لینکو یک پلتفرم حرفه‌ای برای مدیریت و اشتراک‌گذاری لینک‌هاست."
+        }
+      }
+    ],
+    "footer-2": [
+      {
+        "type": "nav_menu",
+        "data": {
+          "title": "لینک‌های مفید",
+          "nav_menu": 2
+        }
+      }
+    ],
+    "footer-3": [
+      {
+        "type": "text",
+        "data": {
+          "title": "تماس با ما",
+          "text": "ایمیل: support@linku.im<br>تلگرام: @linkuim"
+        }
+      }
+    ],
+    "footer-4": [
+      {
+        "type": "text",
+        "data": {
+          "title": "عضویت در خبرنامه",
+          "text": "برای دریافت آخرین اخبار و به‌روزرسانی‌ها عضو خبرنامه ما شوید."
+        }
+      }
+    ]
+  }
+}

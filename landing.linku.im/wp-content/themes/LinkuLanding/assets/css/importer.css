@@ -1,0 +1,230 @@
+/* Linku Demo Importer Styles */
+
+.linku-importer-wrap {
+    max-width: 1200px;
+    margin: 20px auto;
+}
+
+.linku-importer-content {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+
+.importer-notice {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 4px;
+    padding: 20px;
+    margin: 20px;
+}
+
+.importer-notice h3 {
+    margin: 0 0 15px;
+    color: #856404;
+}
+
+.importer-notice ul {
+    margin: 0;
+    padding-right: 20px;
+}
+
+.importer-notice li {
+    margin: 8px 0;
+    color: #856404;
+}
+
+.importer-box {
+    padding: 30px;
+}
+
+.importer-preview {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.importer-preview img {
+    max-width: 600px;
+    width: 100%;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.importer-preview h2 {
+    font-size: 28px;
+    margin: 15px 0;
+}
+
+.importer-preview p {
+    color: #666;
+    font-size: 16px;
+}
+
+.importer-items {
+    background: #f9f9f9;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.importer-items h3 {
+    margin: 0 0 20px;
+    font-size: 20px;
+}
+
+.import-checklist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.import-checklist li {
+    margin: 12px 0;
+}
+
+.import-checklist label {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.import-checklist input[type="checkbox"] {
+    margin-left: 12px;
+    width: 20px;
+    height: 20px;
+}
+
+.import-checklist input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.import-checklist span {
+    color: #333;
+}
+
+.importer-actions {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.importer-actions .button-hero {
+    padding: 15px 40px;
+    height: auto;
+    font-size: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.importer-actions .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+}
+
+.importer-progress {
+    margin: 30px 0;
+}
+
+.progress-bar {
+    background: #e0e0e0;
+    border-radius: 10px;
+    height: 20px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, #4f46e5 0%, #6366f1 100%);
+    height: 100%;
+    width: 0;
+    transition: width 0.3s ease;
+    border-radius: 10px;
+}
+
+.progress-text {
+    text-align: center;
+    color: #666;
+    font-size: 15px;
+}
+
+.importer-result {
+    margin-top: 30px;
+}
+
+.result-success,
+.result-error {
+    padding: 20px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.result-success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.result-error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.result-success h3,
+.result-error h3 {
+    margin: 0 0 15px;
+    font-size: 18px;
+}
+
+.result-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.result-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.result-list li:last-child {
+    border-bottom: none;
+}
+
+.result-list .dashicons {
+    margin-left: 8px;
+    color: #28a745;
+}
+
+/* Loading Animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.importer-progress .dashicons-update {
+    animation: spin 1s linear infinite;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .importer-box {
+        padding: 20px 15px;
+    }
+    
+    .importer-preview img {
+        max-width: 100%;
+    }
+    
+    .importer-actions .button-hero {
+        padding: 12px 30px;
+        font-size: 16px;
+    }
+}
