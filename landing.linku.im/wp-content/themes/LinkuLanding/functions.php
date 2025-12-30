@@ -67,12 +67,12 @@ add_action('after_setup_theme', 'linku_theme_setup');
  * ثبت و بارگذاری اسکریپت‌ها و استایل‌ها
  */
 function linku_enqueue_scripts() {
-    // فونت وزیر
-    wp_enqueue_style('vazirmatn-font', 'https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css', array(), LINKU_THEME_VERSION);
+    // فونت وزیر - لوکال
+    wp_enqueue_style('vazirmatn-font', LINKU_THEME_URI . '/assets/css/fonts.css', array(), LINKU_THEME_VERSION);
     
     // استایل اصلی
-    wp_enqueue_style('linku-style', get_stylesheet_uri(), array(), LINKU_THEME_VERSION);
-    wp_enqueue_style('linku-main', LINKU_THEME_URI . '/assets/css/style.css', array(), LINKU_THEME_VERSION);
+    wp_enqueue_style('linku-style', get_stylesheet_uri(), array('vazirmatn-font'), LINKU_THEME_VERSION);
+    wp_enqueue_style('linku-main', LINKU_THEME_URI . '/assets/css/style.css', array('vazirmatn-font'), LINKU_THEME_VERSION);
     
     // اسکریپت‌ها
     wp_enqueue_script('linku-main', LINKU_THEME_URI . '/assets/js/main.js', array('jquery'), LINKU_THEME_VERSION, true);

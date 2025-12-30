@@ -1,16 +1,20 @@
 <footer class="site-footer" style="background-color: <?php echo esc_attr(get_theme_mod('linku_footer_bg_color', '#f5f5f5')); ?>;">
     <div class="container">
+        <?php if (is_active_sidebar('footer-1') || is_active_sidebar('footer-2') || is_active_sidebar('footer-3') || is_active_sidebar('footer-4')) : ?>
         <div class="footer-widgets">
             <div class="footer-row">
                 <?php for ($i = 1; $i <= 4; $i++) : ?>
-                    <?php if (is_active_sidebar('footer-' . $i)) : ?>
-                        <div class="footer-column">
-                            <?php dynamic_sidebar('footer-' . $i); ?>
-                        </div>
-                    <?php endif; ?>
+                    <div class="footer-column">
+                        <?php 
+                        if (is_active_sidebar('footer-' . $i)) {
+                            dynamic_sidebar('footer-' . $i); 
+                        }
+                        ?>
+                    </div>
                 <?php endfor; ?>
             </div>
         </div>
+        <?php endif; ?>
         
         <?php if (get_theme_mod('linku_show_social', true)) : ?>
             <div class="social-links">
