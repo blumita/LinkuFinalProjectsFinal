@@ -595,6 +595,11 @@ function getEditComponent(link) {
 }
 
 async function saveChanges() {
+  // ✅ Guard: جلوگیری از کلیک تکراری
+  if (isSaving.value) {
+    console.log("Already saving, ignoring duplicate click")
+    return
+  }
   isSaving.value = true
   
   try {

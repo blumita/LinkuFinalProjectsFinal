@@ -135,13 +135,24 @@
                     class="ti ti-rosette-discount-check-filled text-primary text-lg"
                   />
                 </div>
-                <span 
-                  v-if="profile.id === activeCard?.id"
-                  class="text-xs bg-secondary text-primary border border-border px-2 py-0.5 rounded-full font-medium flex items-center gap-1"
-                >
-                  <i class="ti ti-check text-xs"></i>
-                  فعال
-                </span>
+                <div class="flex items-center gap-2">
+                  <!-- دکمه حذف - فقط اگر بیش از یک کارت داشته باشیم -->
+                  <button
+                    v-if="availableProfiles.length > 1"
+                    @click.stop="confirmDeleteProfile(profile)"
+                    class="w-7 h-7 rounded-full bg-destructive/10 flex items-center justify-center text-destructive hover:bg-destructive/20 transition-colors"
+                    title="حذف پروفایل"
+                  >
+                    <i class="ti ti-trash text-sm"></i>
+                  </button>
+                  <span 
+                    v-if="profile.id === activeCard?.id"
+                    class="text-xs bg-secondary text-primary border border-border px-2 py-0.5 rounded-full font-medium flex items-center gap-1"
+                  >
+                    <i class="ti ti-check text-xs"></i>
+                    فعال
+                  </span>
+                </div>
               </div>
               
               <!-- Additional Info -->
@@ -185,6 +196,46 @@
         </div>
       </div>
     </BottomSheet>
+
+    <!-- ✅ مودال تایید حذف پروفایل -->
+    <div 
+      v-if="showDeleteConfirm"
+      class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      @click.self="cancelDelete"
+    >
+      <div class="bg-card rounded-2xl p-6 mx-4 max-w-sm w-full shadow-xl border border-border">
+        <div class="text-center">
+          <div class="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+            <i class="ti ti-trash text-destructive text-3xl"></i>
+          </div>
+          <h3 class="text-lg font-bold text-foreground mb-2">حذف پروفایل</h3>
+          <p class="text-sm text-muted-foreground mb-6">
+            آیا از حذف پروفایل «{{ profileToDelete?.userName || profileToDelete?.name || 'بدون نام' }}» اطمینان دارید؟
+            <br/>
+            <span class="text-destructive font-medium">این عمل غیرقابل بازگشت است.</span>
+          </p>
+          <div class="flex gap-3">
+            <button
+              @click="cancelDelete"
+              class="flex-1 h-12 rounded-xl bg-muted text-foreground font-medium hover:bg-muted/80 transition-colors"
+            >
+              انصراف
+            </button>
+            <button
+              @click="deleteProfile"
+              :disabled="isDeleting"
+              class="flex-1 h-12 rounded-xl bg-destructive text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              <svg v-if="isDeleting" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {{ isDeleting ? 'در حال حذف...' : 'حذف' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Support Bottom Sheet -->
     <BottomSheet
@@ -362,6 +413,54 @@ const addNewProfile = () => {
 const handlePremiumClick = () => {
   showProfileSelector.value = false
   navigateTo('/dashboard/checkout')
+}
+
+// ✅ حذف پروفایل
+const profileToDelete = ref(null)
+const showDeleteConfirm = ref(false)
+const isDeleting = ref(false)
+
+const confirmDeleteProfile = (profile) => {
+  profileToDelete.value = profile
+  showDeleteConfirm.value = true
+}
+
+const cancelDelete = () => {
+  profileToDelete.value = null
+  showDeleteConfirm.value = false
+}
+
+const deleteProfile = async () => {
+  if (!profileToDelete.value || isDeleting.value) return
+  
+  isDeleting.value = true
+  try {
+    const nuxtApp = useNuxtApp()
+    const response = await nuxtApp.$axios.put(`/v1/cards/${profileToDelete.value.id}/delete`)
+    
+    if (response.data.success) {
+      // به‌روزرسانی لیست کارت‌ها
+      await formStore.fetchCards()
+      
+      // اگر کارت حذف شده، کارت فعال بود، کارت دیگه‌ای رو انتخاب کن
+      if (profileToDelete.value.id === activeCard.value?.id) {
+        const remainingCards = formStore.cards || []
+        if (remainingCards.length > 0) {
+          formStore.setDefaultCard(remainingCards[0].id)
+          formStore.setAboutFrom(remainingCards[0].id)
+        }
+      }
+      
+      showDeleteConfirm.value = false
+      showProfileSelector.value = false
+      profileToDelete.value = null
+    }
+  } catch (error) {
+    console.error('Error deleting profile:', error)
+    alert(error.response?.data?.message || 'خطا در حذف پروفایل')
+  } finally {
+    isDeleting.value = false
+  }
 }
 
 // Support handlers

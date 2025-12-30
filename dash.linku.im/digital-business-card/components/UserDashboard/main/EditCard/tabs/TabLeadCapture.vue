@@ -70,14 +70,17 @@
                 متن
               </button>
             </li>
-            <li class="relative group">
-              <div class="w-full px-4 py-2.5 hover:bg-accent flex items-center gap-3 cursor-pointer text-right transition-colors">
+            <li class="relative">
+              <div 
+                  @click.stop="dropdownSubmenuOpen = !dropdownSubmenuOpen"
+                  class="w-full px-4 py-2.5 hover:bg-accent flex items-center gap-3 cursor-pointer text-right transition-colors">
                 <i class="ti ti-selector text-muted-foreground"></i>
                 <span>کشویی</span>
-                <span class="rtl:mr-auto ltr:ml-auto"><i class="ti ti-chevron-left ltr:rotate-180 text-muted-foreground"></i></span>
+                <span class="rtl:mr-auto ltr:ml-auto"><i class="ti ti-chevron-left ltr:rotate-180 text-muted-foreground transition-transform" :class="{'rotate-[-90deg]': dropdownSubmenuOpen}"></i></span>
               </div>
               <div
-                  class="absolute top-0 ltr:left-full rtl:right-full mt-0 w-56 bg-card border border-border rounded-xl shadow-xl z-20 hidden group-hover:block overflow-hidden">
+                  v-show="dropdownSubmenuOpen"
+                  class="absolute top-0 ltr:left-full rtl:right-full mt-0 w-56 bg-card border border-border rounded-xl shadow-xl z-[60] overflow-hidden">
                 <ul class="text-sm text-foreground">
                   <li>
                     <button @click="addField('dropdown', 'custom')"
@@ -337,6 +340,7 @@ const props = defineProps({
   }
 })
 const dropdownOpen = ref(false)
+const dropdownSubmenuOpen = ref(false)
 const expandedFields = ref({})
 const {$axios} = useNuxtApp();
 let bannerTimeout = null
@@ -453,6 +457,10 @@ const getFieldIcon = (type) => {
 const toggleDropdown = () => {
   if (!checkProBeforeAction({target: {disabled: !isPro.value}})) return
   dropdownOpen.value = !dropdownOpen.value
+  // بستن ساب‌منو وقتی منوی اصلی بسته میشه
+  if (!dropdownOpen.value) {
+    dropdownSubmenuOpen.value = false
+  }
 }
 
 const toggleFieldExpansion = (fieldId) => {
@@ -502,6 +510,7 @@ const addField = (type, preset = '') => {
 
   form.fields.push(field)
   dropdownOpen.value = false
+  dropdownSubmenuOpen.value = false
 }
 
 const addOption = (fieldIndex) => {

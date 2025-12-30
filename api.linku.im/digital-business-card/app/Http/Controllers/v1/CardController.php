@@ -167,6 +167,19 @@ class CardController extends Controller
     public function store(CardRequest $request): JsonResponse
     {
         $user = $request->user();
+        
+        // ✅ Idempotency: جلوگیری از ایجاد تکراری
+        $idempotencyKey = "card_creation_" . $user->id . "_" . md5(json_encode($request->only(["cardName", "name"])));
+        $cache = \Illuminate\Support\Facades\Cache::store("file");
+        
+        // اگر در ۱۰ ثانیه گذشته درخواست مشابه اومده، ریجکت کن
+        if ($cache->has($idempotencyKey)) {
+            Log::warning("Duplicate card creation blocked", ["user_id" => $user->id, "cardName" => $request->input("cardName")]);
+            return $this->fail("لطفاً چند ثانیه صبر کنید و دوباره تلاش کنید.", 429);
+        }
+        
+        // ست کردن قفل برای ۱۰ ثانیه
+        $cache->put($idempotencyKey, true, 10);
 
         // Count how many cards the user already has
         $cardCount = $user->cards()->count();
@@ -175,11 +188,13 @@ class CardController extends Controller
         if ($user->is_pro) {
             // Pro users can create up to 5 cards
             if ($cardCount >= 5) {
+                $cache->forget($idempotencyKey);
                 return $this->fail(__('messages.not-allowed_pro'), 403);
             }
         } else {
             // Free users can only create 1 card
             if ($cardCount > 0) {
+                $cache->forget($idempotencyKey);
                 return $this->fail(__('messages.not-allowed_free'), 403);
             }
         }
@@ -241,9 +256,42 @@ class CardController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Card $card)
+    public function destroy(Card $card): JsonResponse
     {
-        //
+        $user = request()->user();
+        
+        // بررسی مالکیت کارت
+        if ($card->user_id !== $user->id) {
+            return $this->fail('شما اجازه حذف این کارت را ندارید.', 403);
+        }
+        
+        // بررسی اینکه آخرین کارت نباشه
+        $cardCount = $user->cards()->count();
+        if ($cardCount <= 1) {
+            return $this->fail('شما نمی‌توانید تنها کارت خود را حذف کنید.', 403);
+        }
+        
+        // اگر کارت پیش‌فرض بود، کارت دیگری را پیش‌فرض کن
+        if ($card->is_default) {
+            $otherCard = $user->cards()->where('id', '!=', $card->id)->first();
+            if ($otherCard) {
+                $otherCard->update(['is_default' => true]);
+            }
+        }
+        
+        // حذف داده‌های مرتبط
+        $card->links()->delete();
+        $card->leads()->delete();
+        $card->leadSetting()->delete();
+        $card->qr()->delete();
+        $card->cardUsers()->delete();
+        
+        // حذف کارت
+        $card->delete();
+        
+        Log::info('Card deleted', ['card_id' => $card->id, 'user_id' => $user->id]);
+        
+        return $this->ok('کارت با موفقیت حذف شد.', null, 200);
     }
 
     /**
