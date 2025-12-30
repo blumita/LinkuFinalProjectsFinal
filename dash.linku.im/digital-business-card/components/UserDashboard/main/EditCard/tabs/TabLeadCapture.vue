@@ -76,26 +76,26 @@
                   class="w-full px-4 py-2.5 hover:bg-accent flex items-center gap-3 cursor-pointer text-right transition-colors">
                 <i class="ti ti-selector text-muted-foreground"></i>
                 <span>کشویی</span>
-                <span class="rtl:mr-auto ltr:ml-auto"><i class="ti ti-chevron-left ltr:rotate-180 text-muted-foreground transition-transform" :class="{'rotate-[-90deg]': dropdownSubmenuOpen}"></i></span>
+                <span class="rtl:mr-auto ltr:ml-auto"><i class="ti ti-chevron-down text-muted-foreground transition-transform" :class="{'rotate-180': dropdownSubmenuOpen}"></i></span>
               </div>
+              <!-- ساب‌منوی کشویی - نمایش زیر آیتم -->
               <div
                   v-show="dropdownSubmenuOpen"
-                  class="absolute top-0 ltr:left-full rtl:right-full mt-0 w-56 bg-card border border-border rounded-xl shadow-xl z-[60] overflow-hidden">
-                <ul class="text-sm text-foreground">
+                  class="w-full bg-accent/50 overflow-hidden">
+                <ul class="text-sm text-foreground py-1">
                   <li>
-                    <button @click="addField('dropdown', 'custom')"
-                            class="w-full px-4 py-2.5 hover:bg-accent text-right transition-colors">کشویی سفارشی
-                    </button>
-                  </li>
-                  <li class="px-4 py-2 text-muted-foreground text-xs text-right border-t border-border">پیش‌فرض</li>
-                  <li>
-                    <button @click="addField('dropdown', 'countries')"
-                            class="w-full px-4 py-2.5 hover:bg-accent text-right transition-colors">لیست کشورها
+                    <button @click.stop="addField('dropdown', 'custom')"
+                            class="w-full px-6 py-2 hover:bg-accent text-right transition-colors">کشویی سفارشی
                     </button>
                   </li>
                   <li>
-                    <button @click="addField('dropdown', 'states')"
-                            class="w-full px-4 py-2.5 hover:bg-accent text-right transition-colors">لیست استان‌ها
+                    <button @click.stop="addField('dropdown', 'countries')"
+                            class="w-full px-6 py-2 hover:bg-accent text-right transition-colors">لیست کشورها
+                    </button>
+                  </li>
+                  <li>
+                    <button @click.stop="addField('dropdown', 'states')"
+                            class="w-full px-6 py-2 hover:bg-accent text-right transition-colors">لیست استان‌ها
                     </button>
                   </li>
                 </ul>
