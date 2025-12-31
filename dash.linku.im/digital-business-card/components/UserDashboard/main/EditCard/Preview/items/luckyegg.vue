@@ -419,26 +419,28 @@ const startAuth = () => {
 }
 
 const submitPhone = async () => {
-  authStep.value = 'code'
-
   /////send otp
   // phoneNumber.value از v-model پر میشه
-  await sendOtpCode(phoneNumber.value)
-
-  startCountdown()
+  const result = await sendOtpCode(phoneNumber.value)
+  
+  if (result.success) {
+    authStep.value = 'code'
+    startCountdown()
+  } else {
+    alert(result.message)
+  }
 }
 
 const submitCode = async () => {
-
   ////verify otp
   // codeInputs یه آرایه ۴ رقمیه ['1','2','3','4']
   const fullCode = codeInputs.value.join('')
 
-  const response = await verifyOtpCode(phoneNumber.value, fullCode)
-  if (response) {
+  const result = await verifyOtpCode(phoneNumber.value, fullCode)
+  if (result.success) {
     authStep.value = 'authenticated'
   } else {
-    alert('کد اشتباهه یا منقضی شده!')
+    alert(result.message)
   }
 }
 

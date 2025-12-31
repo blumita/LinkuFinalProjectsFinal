@@ -70,7 +70,7 @@ export default defineNuxtPlugin((nuxtApp) => {
             
             // Handle 500 Server Error
             if (error.response?.status === 500) {
-                const errorMessage = error.response?.data?.message || 'خطای سرور رخ داده است'
+                const errorMessage = error.response?.data?.message || 'لطفاً چند دقیقه دیگر تلاش کنید'
                 console.error('❌ Server Error 500:', {
                     endpoint: error.config?.url,
                     message: errorMessage,
@@ -80,7 +80,16 @@ export default defineNuxtPlugin((nuxtApp) => {
                 // Show user-friendly message
                 if (process.client) {
                     // You can show a toast notification here if you have one
-                    console.error('🔴 خطای سرور: ' + errorMessage)
+                    console.error('🔴 خطا: ' + errorMessage)
+                }
+            }
+            
+            // Handle 429 Too Many Requests (Rate Limit)
+            if (error.response?.status === 429) {
+                console.error('Rate limit exceeded:', error.response?.data)
+                
+                if (process.client) {
+                    console.error('تعداد درخواست‌ها بیش از حد مجاز است. لطفاً چند دقیقه دیگر تلاش کنید.')
                 }
             }
             

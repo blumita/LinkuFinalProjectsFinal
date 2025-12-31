@@ -9,30 +9,46 @@ export function useOtpService() {
     const sendOtpCode = async (phone: string,
                                countryCode = '+98',
                                type='authenticate') => {
-
-        const response = await $axios.post('auth/sendOtpCode', {
-            phone: phone,
-            countryCode: countryCode,
-            type:type
-        })
-        if (response.data && response.data.success === true) {
-            return true;
-
-
+        try {
+            const response = await $axios.post('auth/sendOtpCode', {
+                phone: phone,
+                countryCode: countryCode,
+                type:type
+            })
+            if (response.data && response.data.success === true) {
+                return { success: true, message: 'کد تأیید ارسال شد' };
+            }
+            return { success: false, message: response.data?.message || 'خطا در ارسال کد' };
+        } catch (error: any) {
+            // بررسی نوع خطا
+            if (error.response?.status === 429) {
+                return { success: false, message: 'تعداد درخواست‌ها زیاد است. لطفاً چند دقیقه دیگر تلاش کنید.' };
+            }
+            if (error.response?.status === 500) {
+                return { success: false, message: 'لطفاً چند دقیقه دیگر تلاش کنید.' };
+            }
+            return { success: false, message: error.response?.data?.message || 'لطفاً چند دقیقه دیگر تلاش کنید.' };
         }
     }
     const verifyOtpCode = async (phone: string, code: string,
                                  countryCode = '+98',
                                  type='authenticate') => {
-
-        const response = await $axios.post('/auth/verifyOtpCode', {
-            code: code,
-            phone: phone,
-            countryCode: countryCode,
-            type:type
-        })
-        if (response.data && response.data.success === true) {
-            return true;
+        try {
+            const response = await $axios.post('/auth/verifyOtpCode', {
+                code: code,
+                phone: phone,
+                countryCode: countryCode,
+                type:type
+            })
+            if (response.data && response.data.success === true) {
+                return { success: true, message: 'کد تأیید صحیح است' };
+            }
+            return { success: false, message: response.data?.message || 'کد تأیید نامعتبر است' };
+        } catch (error: any) {
+            if (error.response?.status === 429) {
+                return { success: false, message: 'تعداد درخواست‌ها زیاد است. لطفاً چند دقیقه دیگر تلاش کنید.' };
+            }
+            return { success: false, message: error.response?.data?.message || 'کد تأیید نامعتبر است' };
         }
     }
 

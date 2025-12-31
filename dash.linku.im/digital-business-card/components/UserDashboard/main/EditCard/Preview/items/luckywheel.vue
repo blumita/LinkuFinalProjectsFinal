@@ -121,8 +121,8 @@
                   filter: 'drop-shadow(0 10px 25px rgba(0, 0, 0, 0.25))'
                 }"
               >
-                <!-- دایره پس‌زمینه -->
-                <circle cx="150" cy="150" r="148" :fill="getBaseColor()" stroke="#fff" stroke-width="4" />
+                <!-- حاشیه گردونه -->
+                <circle cx="150" cy="150" r="148" fill="none" :stroke="getBaseColor()" stroke-width="6" />
                 
                 <!-- قطعات گردونه -->
                 <g v-for="(item, index) in wheelItems" :key="index">
@@ -137,18 +137,17 @@
                     :transform="getTextTransform(Number(index), wheelItems.length)"
                     text-anchor="middle"
                     dominant-baseline="middle"
-                    :fill="isDark(item.color) ? '#fff' : '#1F2937'"
+                    fill="#fff"
                     font-weight="bold"
-                    :font-size="item.name.length > 10 ? '10' : '12'"
-                    style="text-shadow: 0 1px 2px rgba(0,0,0,0.3);"
+                    font-size="11"
+                    style="text-shadow: 1px 1px 2px rgba(0,0,0,0.5);"
                   >
-                    {{ truncateText(item.name, 12) }}
+                    {{ truncateText(item.name, 10) }}
                   </text>
                 </g>
                 
                 <!-- دایره مرکزی -->
-                <circle cx="150" cy="150" r="35" :fill="getBaseColor()" stroke="#fff" stroke-width="4" />
-                <text x="150" y="150" text-anchor="middle" dominant-baseline="middle" font-size="24">🎰</text>
+                <circle cx="150" cy="150" r="30" fill="#fff" :stroke="getBaseColor()" stroke-width="4" />
               </svg>
 
               <!-- پوینتر لوکیشن -->
@@ -369,13 +368,17 @@ export default defineComponent({
       // استفاده از prizes داینامیک از لینک
       const prizes = props.link?.prizes || ['پوچ', 'جایزه ویژه', 'جایزه طلایی', 'جایزه نقره‌ای', 'جایزه برنزی', 'جایزه ممتاز'];
       
-      // رنگ‌های متناوب - یکی پررنگ، یکی کمرنگ
-      return prizes.map((prize: string, index: number) => ({
-        name: prize,
-        color: index % 2 === 0 
-          ? adjustOpacity(baseColor, 0.9)  // پررنگ
-          : adjustOpacity(baseColor, 0.5)  // کمرنگ
-      }));
+      const total = prizes.length;
+      
+      // رنگبندی گرادیانت از پررنگ به کمرنگ
+      return prizes.map((prize: string, index: number) => {
+        // محاسبه opacity از 1 (پررنگ) تا 0.4 (کمرنگ)
+        const opacity = 1 - (index * 0.6 / total);
+        return {
+          name: prize,
+          color: adjustOpacity(baseColor, Math.max(0.4, opacity))
+        };
+      });
     })
     
     // تابع گرفتن رنگ پایه
@@ -410,7 +413,7 @@ export default defineComponent({
     const getTextTransform = (index: number, total: number) => {
       const angle = 360 / total;
       const midAngle = index * angle + angle / 2 - 90;
-      const radius = 95; // فاصله از مرکز
+      const radius = 100; // فاصله از مرکز - بیشتر برای خوانایی بهتر
       const cx = 150;
       const cy = 150;
       
@@ -484,16 +487,15 @@ export default defineComponent({
     const openGame = () => {
       showGame.value = true
       
-      // اگر authStep هنوز none هست، باید تنظیمش کنیم
-      if (authStep.value === 'none') {
-        // اگر شماره موبایل غیرفعال باشه، مستقیم authenticated کن
-        if (props.link?.phoneRequired === false) {
-          authStep.value = 'authenticated'
+      // اگر شماره موبایل غیرفعال باشه، مستقیم authenticated کن
+      if (props.link?.phoneRequired === false) {
+        authStep.value = 'authenticated'
+        if (!phoneNumber.value) {
           phoneNumber.value = 'guest_' + Date.now()
-        } else {
-          // شروع فرم شماره موبایل
-          authStep.value = 'phone'
         }
+      } else if (authStep.value === 'none') {
+        // شروع فرم شماره موبایل
+        authStep.value = 'phone'
       }
     }
 
@@ -506,13 +508,17 @@ export default defineComponent({
 
     // تابع ارسال شماره موبایل
     const submitPhone = async () => {
-      authStep.value = 'code'
-
       /////send otp
       // phoneNumber.value از v-model پر میشه
-      await sendOtpCode(phoneNumber.value)
-
-      startCountdown()
+      const result = await sendOtpCode(phoneNumber.value)
+      
+      if (result.success) {
+        authStep.value = 'code'
+        startCountdown()
+      } else {
+        // نمایش پیام خطا
+        alert(result.message)
+      }
     }
 
     // شروع شمارشگر
@@ -528,12 +534,16 @@ export default defineComponent({
     }
 
     // ارسال مجدد کد
-    const resendCode = () => {
+    const resendCode = async () => {
       if (canResendCode.value) {
         canResendCode.value = false
-        startCountdown()
-        // اینجا می‌توانید API ارسال مجدد کد را فراخوانی کنید
-        alert('کد تایید مجدد ارسال شد')
+        const result = await sendOtpCode(phoneNumber.value)
+        if (result.success) {
+          startCountdown()
+        } else {
+          alert(result.message)
+          canResendCode.value = true
+        }
       }
     }
 
@@ -619,21 +629,16 @@ export default defineComponent({
       // codeInputs یه آرایه ۴ رقمیه ['1','2','3','4']
       const fullCode = codeInputs.value.join('')
 
-      try{
-
-      const res = await verifyOtpCode(phoneNumber.value, fullCode)
-        if (res) {
-          authStep.value = 'authenticated'
-          localStorage.setItem('luckywheel_user_data', JSON.stringify({
-            phoneNumber: phoneNumber.value,
-            hasSpun: false,
-            authenticatedAt: new Date().toISOString()
-          }))
-        } else {
-          alert('کد تأیید اشتباه است')
-        }
-      } catch (e) {
-        alert('مشکل در تأیید کد')
+      const result = await verifyOtpCode(phoneNumber.value, fullCode)
+      if (result.success) {
+        authStep.value = 'authenticated'
+        localStorage.setItem('luckywheel_user_data', JSON.stringify({
+          phoneNumber: phoneNumber.value,
+          hasSpun: false,
+          authenticatedAt: new Date().toISOString()
+        }))
+      } else {
+        alert(result.message)
       }
     }
     // برگشت به مرحله قبل
@@ -679,7 +684,9 @@ export default defineComponent({
       
       // وقتی phoneRequired غیرفعاله، محدودیت hasSpun نداریم
       const spinLimitActive = props.link?.phoneRequired !== false
-      if (isSpinning.value || (spinLimitActive && hasSpun.value) || authStep.value !== 'authenticated') return
+      const isAuthenticated = authStep.value === 'authenticated' || props.link?.phoneRequired === false
+      
+      if (isSpinning.value || (spinLimitActive && hasSpun.value) || !isAuthenticated) return
 
       isSpinning.value = true
       result.value = ''
@@ -849,9 +856,13 @@ export default defineComponent({
         if (response.data?.data?.reward?.value) {
           prize.value = response.data.data.reward.value
         }
-        result.value=response.data.data.result.result
+        if (response.data?.data?.result?.result) {
+          result.value = response.data.data.result.result
+        }
 
       } catch (error) {
+        // در صورت خطا، نتیجه محلی رو نگه دار
+        console.error('Error sending result to backend:', error)
       }
     }
     const checkForPlay = async () => {

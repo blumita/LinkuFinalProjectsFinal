@@ -248,13 +248,13 @@ const rewards = ref([])
 
 const getDots = n => Array.from({ length: n }, (_, i) => i + 1)
 
-// تابع گرفتن رنگ نقطه‌های تاس بر اساس تم پروفایل
+// تابع گرفتن رنگ نقطه‌های تاس بر اساس تم پروفایل (از color picker)
 const getDotColor = () => {
-  const color = props.link?.iconColor?.background
+  const color = formStore.iconColor?.background
   if (color && color !== 'transparent' && color !== '') {
     return color
   }
-  return '#3B82F6' // آبی پیش‌فرض به جای مشکی
+  return '#8B5CF6' // بنفش پیش‌فرض
 }
 
 const adjustOpacity = (hex, opacity) => {
@@ -347,13 +347,16 @@ const rollDice = async () => {
 }
 // احراز هویت ساده (شماره موبایل و کد تستی)
 const submitPhone = async () => {
-  authStep.value = 'code'
-
   /////send otp
   // phoneNumber.value از v-model پر میشه
-  await sendOtpCode(phoneNumber.value)
-
-  startCountdown()
+  const result = await sendOtpCode(phoneNumber.value)
+  
+  if (result.success) {
+    authStep.value = 'code'
+    startCountdown()
+  } else {
+    alert(result.message)
+  }
 }
 
 const submitCode = async () => {
@@ -361,11 +364,11 @@ const submitCode = async () => {
   // codeInputs یه آرایه ۴ رقمیه ['1','2','3','4']
   const fullCode = codeInputs.value.join('')
 
-  const response = await verifyOtpCode(phoneNumber.value, fullCode)
-  if (response) {
+  const result = await verifyOtpCode(phoneNumber.value, fullCode)
+  if (result.success) {
     authStep.value = 'authenticated'
   } else {
-    alert('کد اشتباهه یا منقضی شده!')
+    alert(result.message)
   }
 }
 
