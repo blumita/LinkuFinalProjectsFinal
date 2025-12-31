@@ -127,6 +127,10 @@ class Card extends Model
     {
         return $this->hasMany(QuestionBox::class);
     }
+    public function cardUsers(): HasMany
+    {
+        return $this->hasMany(CardUser::class);
+    }
     public function licenses(): HasMany
     {
         return $this->hasMany(License::class);
