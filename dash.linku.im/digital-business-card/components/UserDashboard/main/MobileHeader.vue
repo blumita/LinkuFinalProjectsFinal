@@ -198,44 +198,67 @@
     </BottomSheet>
 
     <!-- ✅ مودال تایید حذف پروفایل -->
-    <div 
-      v-if="showDeleteConfirm"
-      class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
-      @click.self="cancelDelete"
-    >
-      <div class="bg-card rounded-2xl p-6 mx-4 max-w-sm w-full shadow-xl border border-border">
-        <div class="text-center">
-          <div class="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
-            <i class="ti ti-trash text-destructive text-3xl"></i>
-          </div>
-          <h3 class="text-lg font-bold text-foreground mb-2">حذف پروفایل</h3>
-          <p class="text-sm text-muted-foreground mb-6">
-            آیا از حذف پروفایل «{{ profileToDelete?.userName || profileToDelete?.name || 'بدون نام' }}» اطمینان دارید؟
-            <br/>
-            <span class="text-destructive font-medium">این عمل غیرقابل بازگشت است.</span>
-          </p>
-          <div class="flex gap-3">
-            <button
-              @click="cancelDelete"
-              class="flex-1 h-12 rounded-xl bg-muted text-foreground font-medium hover:bg-muted/80 transition-colors"
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-all duration-200 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-all duration-150 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div 
+          v-if="showDeleteConfirm"
+          class="fixed inset-0 z-[999999] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          @click.self="cancelDelete"
+        >
+          <Transition
+            enter-active-class="transition-all duration-200 ease-out"
+            enter-from-class="opacity-0 scale-95"
+            enter-to-class="opacity-100 scale-100"
+            leave-active-class="transition-all duration-150 ease-in"
+            leave-from-class="opacity-100 scale-100"
+            leave-to-class="opacity-0 scale-95"
+          >
+            <div 
+              v-if="showDeleteConfirm"
+              class="bg-card rounded-2xl p-6 mx-4 max-w-sm w-full shadow-2xl border border-border"
             >
-              انصراف
-            </button>
-            <button
-              @click="deleteProfile"
-              :disabled="isDeleting"
-              class="flex-1 h-12 rounded-xl bg-destructive text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              <svg v-if="isDeleting" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              {{ isDeleting ? 'در حال حذف...' : 'حذف' }}
-            </button>
-          </div>
+              <div class="text-center">
+                <div class="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+                  <i class="ti ti-trash text-destructive text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-foreground mb-2">حذف پروفایل</h3>
+                <p class="text-sm text-muted-foreground mb-6">
+                  آیا از حذف پروفایل «{{ profileToDelete?.userName || profileToDelete?.name || 'بدون نام' }}» اطمینان دارید؟
+                  <br/>
+                  <span class="text-destructive font-medium">این عمل غیرقابل بازگشت است.</span>
+                </p>
+                <div class="flex gap-3">
+                  <button
+                    @click="cancelDelete"
+                    class="flex-1 h-12 rounded-xl bg-muted text-foreground font-medium hover:bg-muted/80 transition-colors"
+                  >
+                    انصراف
+                  </button>
+                  <button
+                    @click="deleteProfile"
+                    :disabled="isDeleting"
+                    class="flex-1 h-12 rounded-xl bg-destructive text-destructive-foreground font-medium hover:bg-destructive/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    <svg v-if="isDeleting" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {{ isDeleting ? 'در حال حذف...' : 'حذف' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Transition>
         </div>
-      </div>
-    </div>
+      </Transition>
+    </Teleport>
 
     <!-- Support Bottom Sheet -->
     <BottomSheet
