@@ -50,19 +50,26 @@ export default defineNuxtPlugin((nuxtApp) => {
             if (error.response?.status === 401) {
                 const authStore = useAuthStore()
                 
-                // فقط اگر واقعاً unauthenticated باشه لاگ‌اوت کن
-                // برای PWA و حالت offline این مهم هست
-                if (error.response?.data?.message === 'Unauthenticated.' || 
+                // لیست endpoint‌های عمومی که نیاز به توکن ندارن
+                const publicEndpoints = ['club/', 'otp/', 'v1/cards/show/', 'public/']
+                const isPublicEndpoint = publicEndpoints.some(ep => error.config?.url?.includes(ep))
+                
+                // فقط اگر واقعاً unauthenticated باشه و endpoint عمومی نباشه لاگ‌اوت کن
+                if (!isPublicEndpoint && (
+                    error.response?.data?.message === 'Unauthenticated.' || 
                     error.response?.data?.code === 'unauthenticated' ||
-                    error.response?.data?.message?.includes('Unauthenticated')) {
+                    error.response?.data?.message?.includes('Unauthenticated'))) {
                     
                     console.warn('Token expired or invalid, logging out...')
                     
                     // پاک کردن token
                     authStore.logout()
                     
-                    // Redirect to login only if not already on login/register page
-                    if (process.client && !window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
+                    // Redirect to login only if not already on login/register page and not on public profile page
+                    if (process.client && 
+                        !window.location.pathname.includes('/login') && 
+                        !window.location.pathname.includes('/register') &&
+                        window.location.pathname.startsWith('/dashboard')) {
                         navigateTo('/login')
                     }
                 }

@@ -366,17 +366,25 @@ export default defineComponent({
       }
       
       // استفاده از prizes داینامیک از لینک
-      const prizes = props.link?.prizes || ['پوچ', 'جایزه ویژه', 'جایزه طلایی', 'جایزه نقره‌ای', 'جایزه برنزی', 'جایزه ممتاز'];
+      let prizes = props.link?.prizes || [];
+      
+      // اگر جایزه‌ای نبود، جایزه‌های پیش‌فرض
+      if (!prizes || prizes.length === 0) {
+        prizes = ['جایزه ویژه', 'پوچ', 'جایزه طلایی', 'پوچ', 'جایزه نقره‌ای', 'پوچ'];
+      }
+      
+      // محدود کردن به حداکثر 8 قطعه
+      prizes = prizes.slice(0, 8);
       
       const total = prizes.length;
       
       // رنگبندی گرادیانت از پررنگ به کمرنگ
       return prizes.map((prize: string, index: number) => {
-        // محاسبه opacity از 1 (پررنگ) تا 0.4 (کمرنگ)
-        const opacity = 1 - (index * 0.6 / total);
+        // محاسبه opacity از 1 (پررنگ) تا 0.5 (کمرنگ)
+        const opacity = 1 - (index * 0.5 / (total - 1 || 1));
         return {
           name: prize,
-          color: adjustOpacity(baseColor, Math.max(0.4, opacity))
+          color: adjustOpacity(baseColor, Math.max(0.5, opacity))
         };
       });
     })
