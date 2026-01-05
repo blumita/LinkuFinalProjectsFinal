@@ -69,11 +69,23 @@ export const useUserStore = defineStore('userStore', {
                 // دیباگ: بعد از ست کردن هم چک کنیم
                 console.log('✅ User store updated. isPro:', this.user?.isPro)
                 console.log('✅ isUserPro getter:', this.isUserPro)
-            } catch (error) {
+            } catch (error: any) {
                 console.error('❌ Error fetching user:', error)
-                const router = useRouter()
                 this.fetched = true
-                await router.push('/auth/login')
+                
+                // فقط اگه واقعاً 401 Unauthenticated باشه logout کن
+                // خطاهای شبکه یا timeout نباید باعث logout بشن
+                const status = error?.response?.status
+                const message = error?.response?.data?.message
+                
+                if (status === 401 && (message === 'Unauthenticated.' || message?.includes('Unauthenticated'))) {
+                    console.warn('🔒 User is unauthenticated, redirecting to login...')
+                    const router = useRouter()
+                    await router.push('/auth/login')
+                } else {
+                    // برای خطاهای شبکه، فقط لاگ کن و اجازه بده کاربر ادامه بده
+                    console.warn('⚠️ Network error fetching user, but not logging out:', error?.message || 'Unknown error')
+                }
             }
         },
 
