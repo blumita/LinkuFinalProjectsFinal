@@ -1,11 +1,6 @@
 // API Base URL utility for server-side
 export const getApiBaseUrl = () => {
-  // Server-side: Use internal connection for faster response
-  // Production: http://127.0.0.1 (internal nginx)
-  // Development: http://127.0.0.1:8000
-  if (process.server) {
-    return 'http://127.0.0.1'
-  }
+  // Always use HTTPS for API calls (nginx redirects HTTP to HTTPS)
   return process.env.NUXT_PUBLIC_API_BASE || 'https://api.linku.im'
 }
 
