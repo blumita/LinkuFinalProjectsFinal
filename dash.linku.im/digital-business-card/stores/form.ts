@@ -2,6 +2,7 @@ import {defineStore} from 'pinia'
 import {nextTick} from 'vue'
 import {safeStorage} from '~/utils/safeStorage'
 import {useNuxtApp} from 'nuxt/app'
+import {useUserStore} from '~/stores/user'
 
 // Helper function برای تبدیل URL media در محیط توسعه
 // در صفحات HTTPS، URLهای HTTP را به HTTPS proxy تبدیل می‌کند
@@ -286,6 +287,12 @@ export const useFormStore = defineStore('form', {
         },
         removeCard(id: any) {
             this.cards = this.cards.filter(c => c.id !== id)
+        },
+        async fetchCards() {
+            // کارت‌ها را از طریق userStore دریافت کن
+            const userStore = useUserStore()
+            await userStore.fetchUser()
+            this.cards = userStore.cards || []
         },
         async setDefaultCard(id: any) {
             this.cards = this.cards.map(c => ({...c, isDefault: String(c.id) === String(id)}))
