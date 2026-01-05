@@ -611,8 +611,9 @@
       <!-- Lead Capture Modal -->
       <div
           v-if="formData?.isLeadCaptureEnabled"
-          class="fixed inset-0 bg-white/70 bg-opacity-50 z-50 w-full p-4 backdrop-blur-[1px]"
+          class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 w-full p-4"
           style="display: grid; place-items: center;"
+          @click.self="closeLeadCapture"
       >
         <LayoutLeadForm class="w-full" @close="closeLeadCapture" :cardId="null" :slug="'newCard'" :isDefault="true"/>
       </div>
