@@ -131,8 +131,24 @@ const emit = defineEmits(['update:phoneNumber', 'update:codeInputs', 'submit-pho
 
 const codeInputRefs = ref([])
 
+// تبدیل اعداد فارسی و عربی به انگلیسی
+const toEnglishDigits = (str) => {
+  if (!str) return str
+  const persianDigits = '۰۱۲۳۴۵۶۷۸۹'
+  const arabicDigits = '٠١٢٣٤٥٦٧٨٩'
+  let result = str
+  for (let i = 0; i < 10; i++) {
+    result = result.replace(new RegExp(persianDigits[i], 'g'), String(i))
+    result = result.replace(new RegExp(arabicDigits[i], 'g'), String(i))
+  }
+  return result
+}
+
 const handlePhoneKeypress = (e) => {
-  if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
+  // قبول اعداد انگلیسی، فارسی و عربی
+  const persianDigits = '۰۱۲۳۴۵۶۷۸۹'
+  const arabicDigits = '٠١٢٣٤٥٦٧٨٩'
+  if (!/[0-9]/.test(e.key) && !persianDigits.includes(e.key) && !arabicDigits.includes(e.key) && e.key !== 'Backspace' && e.key !== 'Delete') {
     e.preventDefault()
   }
 }
@@ -166,7 +182,10 @@ const clearPhone = () => {
 }
 
 const handleCodeInput = (index, e) => {
-  const input = e.target.value
+  let input = e.target.value
+  
+  // تبدیل به انگلیسی
+  input = toEnglishDigits(input)
   
   // فقط اعداد را قبول کن
   if (!/^[0-9]?$/.test(input)) {
@@ -203,7 +222,7 @@ const handleKeyDown = (index, e) => {
 
 const handlePaste = (e) => {
   e.preventDefault()
-  const paste = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 4)
+  const paste = toEnglishDigits(e.clipboardData.getData('text')).replace(/\D/g, '').slice(0, 4)
   const newCodeInputs = [...props.codeInputs]
   
   // پاک کردن همه اینپوت‌ها
