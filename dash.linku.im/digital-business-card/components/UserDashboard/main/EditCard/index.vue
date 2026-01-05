@@ -1700,9 +1700,13 @@ watch(() => form.$state, () => {
 
 // Watch card changes only when cardId actually changes
 let lastLoadedCardId = null
+// فلگ برای جلوگیری از نمایش toast هنگام لود اولیه
+let isLeadCaptureInitialized = false
+
 watch(() => cardId.value, (newCardId, oldCardId) => {
   if (process.client && newCardId && newCardId !== oldCardId && newCardId !== lastLoadedCardId) {
     lastLoadedCardId = newCardId
+    isLeadCaptureInitialized = false // ریست فلگ برای کارت جدید
     form.setAboutFrom(String(newCardId))
   }
 }, {immediate: false})
@@ -1716,7 +1720,14 @@ watch(() => form.links, (newLinks) => {
 
 // ذخیره تغییرات سوئیچ فرم لید
 watch(() => form.isLeadCaptureEnabled, async (newValue, oldValue) => {
-  console.log('Lead capture watch triggered:', { newValue, oldValue, cardId: cardId.value })
+  console.log('Lead capture watch triggered:', { newValue, oldValue, cardId: cardId.value, initialized: isLeadCaptureInitialized })
+  
+  // در لود اولیه فقط فلگ رو تنظیم کن و return کن
+  if (!isLeadCaptureInitialized) {
+    isLeadCaptureInitialized = true
+    console.log('Lead capture initialized, skipping API call')
+    return
+  }
   
   // اطمینان از اینکه تغییر واقعی رخ داده
   if (newValue === oldValue) {
