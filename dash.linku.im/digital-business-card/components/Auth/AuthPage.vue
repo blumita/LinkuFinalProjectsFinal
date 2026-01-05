@@ -1181,26 +1181,15 @@ async function handleOtpKey(index: number, event: KeyboardEvent) {
         const {success, userExists} = await verifyOtpCode(fullCode)
         if (success) {
           if (userExists) {
-            // اجرای موازی fetchUser - بدون await برای سرعت بیشتر
-            // redirect سریع و بارگذاری داده در پس‌زمینه
+            // کاربر قدیمی - فقط fetch کن و به داشبورد برو
+            // هیچوقت کارت جدید نساز برای کاربران قدیمی
             try {
               await userStore.fetchUser()
-              
-              // چک کردن تعداد کارت‌ها - اگر هیچ کارتی نداره، یکی بساز
-              if (userStore.cards.length === 0) {
-                await $axios.post('v1/cards/createDefaultCard', {
-                  defaultContactType: authMethod.value === 'email' ? 'email' : 'phone'
-                })
-                // بعد از ساخت کارت، دوباره user رو fetch کن
-                await userStore.fetchUser()
-              }
-              // همیشه به داشبورد ریدایرکت کن
-              router.push('/dashboard')
             } catch (fetchError: any) {
               console.error('❌ Error fetching user after login:', fetchError)
-              // حتی اگر fetch user خطا داد، بازم به داشبورد برو (token ذخیره شده)
-              router.push('/dashboard')
             }
+            // همیشه به داشبورد ریدایرکت کن
+            router.push('/dashboard')
           } else {
             // اگر step قبلاً به email_profile تغییر کرده، دست نزن
             if (step.value !== 'email_profile') {
@@ -1620,18 +1609,10 @@ onMounted(async () => {
                 const {success, userExists} = await verifyOtpCode(fullCode);
                 if (success) {
                   if (userExists) {
-                    // بهینه‌سازی: fetch سریع‌تر
+                    // کاربر قدیمی - فقط fetch کن و به داشبورد برو
+                    // هیچوقت کارت جدید نساز برای کاربران قدیمی
                     try {
                       await userStore.fetchUser()
-                      
-                      // چک کردن تعداد کارت‌ها - اگر هیچ کارتی نداره، یکی بساز
-                      if (userStore.cards.length === 0) {
-                        await $axios.post('v1/cards/createDefaultCard', {
-                          defaultContactType: authMethod.value === 'email' ? 'email' : 'phone'
-                        })
-                        // بعد از ساخت کارت، دوباره user رو fetch کن
-                        await userStore.fetchUser()
-                      }
                     } catch (fetchError) {
                       console.error('❌ Error fetching user after OTP verification:', fetchError)
                     }
