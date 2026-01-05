@@ -50,14 +50,14 @@ class RouteServiceProvider extends ServiceProvider
         });
 
 
-        // Rate limiter برای OTP - 5 درخواست در 2 دقیقه به ازای هر شماره
+        // Rate limiter برای OTP - 10 درخواست در دقیقه به ازای هر شماره
         RateLimiter::for('otp', function ($request) {
             $phone = $request->input('phone') ?? $request->ip();
-            return Limit::perMinutes(2, 5)->by($phone)
+            return Limit::perMinute(10)->by($phone)
                 ->response(function () {
                     return response()->json([
                         'success' => false,
-                        'message' => 'لطفاً 2 دقیقه صبر کنید و دوباره تلاش کنید.',
+                        'message' => 'تعداد درخواست‌های شما زیاد است. لطفاً 1 دقیقه صبر کنید.',
                         'code' => 'rate_limit_exceeded'
                     ], 429);
                 });
