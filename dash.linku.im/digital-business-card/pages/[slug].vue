@@ -453,12 +453,14 @@
         <!-- Made with Linku Footer - بهتر شده -->
         <div v-if="!formData.removeBranding" class="flex items-center justify-center py-6 px-6">
              <div v-if="!formData.removeBranding" class="flex items-center justify-center py-6 px-6">
+              <a href="https://linkutag.com/" target="_blank"> 
           <div
               class="flex items-center gap-2 text-xs text-gray-500 bg-gray-100 px-4 py-2 rounded-full border border-gray-200">
             <img src="/logo.svg" alt="Linku Logo" class="w-4 h-4" />
             <span class="font-medium">ساخته شده با</span>
             <span class="font-bold text-gray-700">لینکو</span>
           </div>
+        </a>
         </div>
         </div>
       </div> <!-- پایان div اصلی -->
@@ -663,7 +665,7 @@
             <button
                 @click="submitReport"
                 :disabled="!reportType"
-                class="flex-1 py-3 px-4 rounded-xl font-medium transition-colors text-white hover:opacity-90"
+                class="flex-1 py-3 px-4 rounded-xl font-medium transition-colors bg-black text-white hover:opacity-90"
                 :class="{ 'bg-gray-300 !text-gray-500 cursor-not-allowed': !reportType }"
                 :style="reportType ? { backgroundColor: iconBg } : { backgroundColor: '#d1d5db' }"
             >
