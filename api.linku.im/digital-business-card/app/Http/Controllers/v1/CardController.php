@@ -633,4 +633,38 @@ class CardController extends Controller
             'message' => $exists ? 'این لایسنس قبلاً ثبت شده است' : 'این لایسنس قابل استفاده است'
         ]);
     }
+
+    /**
+     * جستجوی کارت بر اساس slug (برای ادمین)
+     */
+    public function searchBySlug(string $slug): JsonResponse
+    {
+        $card = Card::where('slug', $slug)
+            ->with(['user', 'creator'])
+            ->first();
+
+        if (!$card) {
+            return $this->fail('کارت یافت نشد.', 404);
+        }
+
+        return $this->ok('کارت با موفقیت یافت شد.', new CardResource($card));
+    }
+
+    /**
+     * آپدیت footer سفارشی کارت (برای ادمین)
+     */
+    public function updateFooter(Request $request, Card $card): JsonResponse
+    {
+        $validated = $request->validate([
+            'customFooterText' => 'nullable|string|max:100',
+            'customFooterUrl' => 'nullable|url|max:500',
+        ]);
+
+        $card->update([
+            'custom_footer_text' => $validated['customFooterText'] ?? null,
+            'custom_footer_url' => $validated['customFooterUrl'] ?? null,
+        ]);
+
+        return $this->ok('Footer با موفقیت آپدیت شد.', new CardResource($card->fresh()));
+    }
 }

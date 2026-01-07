@@ -135,6 +135,9 @@ class CardService
                 'icon_color' => $data['iconColor'] ?? $card->icon_color,
                 'match_theme_color' => $data['matchThemeColor'] ?? $card->match_theme_color,
                 'lead_capture_mode' => isset($data['leadCaptureMode']) ? (bool)$data['leadCaptureMode'] : $card->lead_capture_mode,
+                'custom_footer_text' => $data['customFooterText'] ?? $card->custom_footer_text,
+                'custom_footer_url' => $data['customFooterUrl'] ?? $card->custom_footer_url,
+                'show_save_contact' => isset($data['showSaveContact']) ? (bool)$data['showSaveContact'] : ($card->show_save_contact ?? true),
             ]);
 
             if ($card->user) {

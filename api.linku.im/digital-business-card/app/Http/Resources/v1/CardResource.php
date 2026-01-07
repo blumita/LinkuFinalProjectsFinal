@@ -26,6 +26,7 @@ class CardResource extends JsonResource
             'logo' => media_path($this->logo->path??''),
             'avatar' => media_path($this->avatar->path??''),
             'saveContact'=>$this->save_contact,
+            'showSaveContact'=>$this->show_save_contact ?? true,
             'themeColor'=>$this->theme_color,
             'iconColor'=>$this->icon_color,
             'matchThemeColor'=>$this->match_theme_color,
@@ -69,7 +70,9 @@ class CardResource extends JsonResource
             'qrMargin'=>$this->qr?->qr_margin,
             'qrLogo'=>$this->getQrLogoUrl(),
 
-
+            //Custom footer
+            'customFooterText'=>$this->custom_footer_text,
+            'customFooterUrl'=>$this->custom_footer_url,
 
             //timestamp
             'createdAt'=>$this->created_at->format('Y-m-d'),

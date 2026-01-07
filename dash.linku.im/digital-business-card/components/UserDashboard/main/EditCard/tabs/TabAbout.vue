@@ -40,10 +40,22 @@
                    :rows="10"
                    :error="form.bio && form.bio.length > 500 ? 'حداکثر 500 کاراکتر مجاز است' : ''"
     />
-    <TextInput label="عنوان دکمه ذخیره مخاطب" v-model="form.saveContact" placeholder="دکمه ذخیره مخاطب"
-               :maxlength="20"
-               :error="form.saveContact && form.saveContact.length > 20 ? 'حداکثر ۲۰ کاراکتر مجاز است' : ''"
-    />
+    <div class="space-y-3">
+      <TextInput label="عنوان دکمه ذخیره مخاطب" v-model="form.saveContact" placeholder="دکمه ذخیره مخاطب"
+                 :maxlength="20"
+                 :error="form.saveContact && form.saveContact.length > 20 ? 'حداکثر ۲۰ کاراکتر مجاز است' : ''"
+      />
+      <div class="flex items-center justify-between p-4 bg-card border border-border rounded-xl">
+        <div>
+          <label class="text-sm font-medium text-foreground">نمایش دکمه ذخیره مخاطب</label>
+          <p class="text-xs text-muted-foreground mt-1">نمایش یا مخفی کردن دکمه ذخیره مخاطب در پروفایل</p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" v-model="form.showSaveContact" class="sr-only peer">
+          <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+        </label>
+      </div>
+    </div>
     <!-- بخش رنگ‌بندی -->
     <div>
       <h3 class="text-base font-medium text-foreground mb-3">رنگبندی پروفایل</h3>
@@ -69,7 +81,7 @@
 </template>
 
 <script setup>
-import {ref, computed, onMounted, onUnmounted} from 'vue'
+import {ref, computed, onMounted, onUnmounted, nextTick} from 'vue'
 import {defaultFields, useFormStore} from '~/stores/form'
 import TextInput from './about/TextInput.vue'
 import TextAreaInput from './about/TextAreaInput.vue'
@@ -126,6 +138,7 @@ async function saveForm() {
   formData.append('company', form.company || '')
   formData.append('bio', form.bio || '')
   formData.append('saveContact', form.saveContact || '')
+  formData.append('showSaveContact', form.showSaveContact ? 1 : 0)
   formData.append('themeColor', JSON.stringify(form.themeColor || {}))
   formData.append('iconColor', JSON.stringify(form.iconColor || {}))
   formData.append('matchThemeColor', form.matchThemeColor ? 1 : 0)
@@ -144,15 +157,37 @@ async function saveForm() {
 
       await uploadImages(cardId.value)
 
-      // بروزرسانی userStore برای نمایش real-time در داشبورد
+      // بروزرسانی formStore با داده‌های جدید از response (قبل از fetchUser)
+      const formStore = useFormStore()
+      if (response.data.data) {
+        const cardData = response.data.data
+        // آپدیت مستقیم form از response (جلوگیری از overwrite با داده‌های قدیمی)
+        if (cardData.job !== undefined) form.job = cardData.job || ''
+        if (cardData.company !== undefined) form.company = cardData.company || ''
+        if (cardData.location !== undefined) form.location = cardData.location || ''
+        if (cardData.bio !== undefined) form.bio = cardData.bio || ''
+        if (cardData.userName !== undefined) form.name = cardData.userName || ''
+        if (cardData.name !== undefined) form.cardName = cardData.name || ''
+        if (cardData.saveContact !== undefined) form.saveContact = cardData.saveContact || ''
+        if (cardData.showSaveContact !== undefined) {
+          form.showSaveContact = cardData.showSaveContact !== false
+        }
+        if (cardData.themeColor !== undefined) {
+          form.themeColor = typeof cardData.themeColor === 'string' 
+            ? JSON.parse(cardData.themeColor) 
+            : cardData.themeColor
+        }
+        if (cardData.iconColor !== undefined) {
+          form.iconColor = typeof cardData.iconColor === 'string'
+            ? JSON.parse(cardData.iconColor)
+            : cardData.iconColor
+        }
+        if (cardData.matchThemeColor !== undefined) form.matchThemeColor = cardData.matchThemeColor || false
+      }
+
+      // بروزرسانی userStore برای نمایش real-time در داشبورد (بعد از آپدیت form)
       const userStore = useUserStore()
       await userStore.fetchUser()
-
-      // بروزرسانی formStore با داده‌های جدید
-      const formStore = useFormStore()
-      if (formStore && cardId.value) {
-        formStore.setAboutFrom(cardId.value)
-      }
 
       showInfoToast(response.data.message, 'ti-check')
 

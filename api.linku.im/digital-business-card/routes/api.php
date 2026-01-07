@@ -572,6 +572,14 @@ Route::middleware(['auth:sanctum','log.activity'])
 
         });
 
+        //Card Footer Customization (Admin only)
+        Route::prefix('cards')->group(function () {
+            Route::get('/search/{slug}', [CardController::class, 'searchBySlug'])
+                ->name('admin.cards.search');
+            Route::put('/{card}/updateFooter', [CardController::class, 'updateFooter'])
+                ->name('admin.cards.updateFooter');
+        });
+
         //Plans
         Route::prefix('plan')->group(function () {
 

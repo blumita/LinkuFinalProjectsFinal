@@ -345,6 +345,7 @@
 
           <!-- دکمه ذخیره مخاطب -->
           <div
+              v-if="formData.showSaveContact !== false && formData.saveContact"
               :class="[
             'mt-5 w-full',
             formData.layout === 'center' ? 'px-0' :
@@ -352,31 +353,17 @@
             'px-6'
           ]"
           >
-            <template v-if="formData.saveContact">
-              <button
-                  class="w-full py-3 rounded-full font-semibold text-center flex items-center justify-center gap-2 transition-all hover:opacity-90"
-                  :style="{
+            <button
+                class="w-full py-3 rounded-full font-semibold text-center flex items-center justify-center gap-2 transition-all hover:opacity-90"
+                :style="{
                 backgroundColor: !formData?.themeColor?.background || formData?.themeColor?.background === 'transparent' ? '#000000' : iconBg,
                 color: !formData?.themeColor?.background || formData?.themeColor?.background === 'transparent' ? '#ffffff' : (isLightColor(iconBg) ? '#000000' : '#ffffff'),
                 boxShadow: `0 2px 6px ${iconShadow}`
               }"
-                  @click="downloadVCard"
-              >
-
-                <i class="ti ti-download"/>
-                {{ formData.saveContact }}
-              </button>
-            </template>
-            <button
-                v-else
-                disabled
-                class="w-full py-3 rounded-full text-center font-bold text-gray-400 bg-gray-200 flex items-center justify-center gap-2 cursor-not-allowed"
+                @click="downloadVCard"
             >
-              <!-- آیکون placeholder -->
-              <div class="w-5 h-5 bg-gray-300 rounded-full animate-pulse"></div>
-
-              <!-- متن placeholder -->
-              <div class="h-4 w-32 bg-gray-300 rounded animate-pulse"></div>
+              <i class="ti ti-download"/>
+              {{ formData.saveContact }}
             </button>
           </div>
 
@@ -450,18 +437,26 @@
           </template>
         </div>
 
-        <!-- Made with Linku Footer - بهتر شده -->
+        <!-- Made with Linku Footer - سفارشی یا پیش‌فرض -->
         <div v-if="!formData.removeBranding" class="flex items-center justify-center py-6 px-6">
-             <div v-if="!formData.removeBranding" class="flex items-center justify-center py-6 px-6">
-              <a href="https://linkutag.com/" target="_blank"> 
-          <div
-              class="flex items-center gap-2 text-xs text-gray-500 bg-gray-100 px-4 py-2 rounded-full border border-gray-200">
-            <img src="/logo.svg" alt="Linku Logo" class="w-4 h-4" />
-            <span class="font-medium">ساخته شده با</span>
-            <span class="font-bold text-gray-700">لینکو</span>
-          </div>
-        </a>
-        </div>
+          <template v-if="card?.data?.customFooterText && card?.data?.customFooterUrl">
+            <!-- Footer سفارشی -->
+            <a :href="card.data.customFooterUrl" target="_blank" rel="noopener noreferrer">
+              <div class="flex items-center gap-2 text-xs text-gray-500 bg-gray-100 px-4 py-2 rounded-full border border-gray-200">
+                <span class="font-medium">{{ card.data.customFooterText }}</span>
+              </div>
+            </a>
+          </template>
+          <template v-else>
+            <!-- Footer پیش‌فرض -->
+            <a href="https://linkutag.com/" target="_blank" rel="noopener noreferrer">
+              <div class="flex items-center gap-2 text-xs text-gray-500 bg-gray-100 px-4 py-2 rounded-full border border-gray-200">
+                <img src="/logo.svg" alt="Linku Logo" class="w-4 h-4" />
+                <span class="font-medium">ساخته شده با</span>
+                <span class="font-bold text-gray-700">لینکو</span>
+              </div>
+            </a>
+          </template>
         </div>
       </div> <!-- پایان div اصلی -->
 
@@ -1354,6 +1349,7 @@ const handleMessage = (event) => {
     if (newData.singleLink !== undefined) formData.singleLink = newData.singleLink
     if (newData.isLeadCaptureEnabled !== undefined) formData.isLeadCaptureEnabled = newData.isLeadCaptureEnabled
     if (newData.saveContact !== undefined) formData.saveContact = newData.saveContact
+    if (newData.showSaveContact !== undefined) formData.showSaveContact = newData.showSaveContact !== false
 
   }
 }
@@ -1574,8 +1570,49 @@ function downloadVCard() {
         }
       }
 
-      if (isMobile) {
-        // برای موبایل: استفاده از data URI
+      if (isAndroid) {
+        // برای Android: استفاده از blob با روش بهتر
+        try {
+          const blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8' })
+          const url = URL.createObjectURL(blob)
+          
+          // ایجاد لینک با download attribute
+          const link = document.createElement('a')
+          link.href = url
+          link.download = fileName
+          link.style.display = 'none'
+          
+          // اضافه کردن به DOM
+          document.body.appendChild(link)
+          
+          // استفاده از requestAnimationFrame برای اطمینان از render شدن
+          requestAnimationFrame(() => {
+            // کلیک با event
+            const clickEvent = new MouseEvent('click', {
+              view: window,
+              bubbles: true,
+              cancelable: true,
+              buttons: 1
+            })
+            
+            link.dispatchEvent(clickEvent)
+            
+            // پاک کردن بعد از 500ms
+            setTimeout(() => {
+              if (link.parentNode) {
+                document.body.removeChild(link)
+              }
+              URL.revokeObjectURL(url)
+            }, 500)
+          })
+          
+        } catch (error) {
+          console.error('Android download error:', error)
+          // روش جایگزین: استفاده از blob method
+          useBlobMethod()
+        }
+      } else if (isIOS) {
+        // برای iOS: استفاده از data URI
         try {
           const dataUri = `data:text/vcard;charset=utf-8,${encodeURIComponent(vCardData)}`
           const link = document.createElement('a')
@@ -1588,16 +1625,6 @@ function downloadVCard() {
           document.body.appendChild(link)
           link.click()
           document.body.removeChild(link)
-
-          // پیام راهنما
-          setTimeout(() => {
-            if (isIOS) {
-              //alert('فایل مخاطب آماده است.\nاز اپ Files یا Safari Downloads فایل را باز کنید.')
-            } else {
-              //alert('فایل مخاطب دانلود شد.\nاز Downloads فایل .vcf را باز کنید.')
-            }
-          }, 500)
-
         } catch {
           useBlobMethod()
         }

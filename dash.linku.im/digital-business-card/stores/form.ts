@@ -53,6 +53,7 @@ export interface CardItem {
     connectButtonText?: string
     leadCaptureForm?: ''
     saveContact?: string
+    showSaveContact?: boolean
     themeColor?: ColorOption
     iconColor?: ColorOption
     matchThemeColor?: boolean
@@ -133,6 +134,7 @@ export const useFormStore = defineStore('form', {
         company: '',
         bio: '',
         saveContact: '',
+        showSaveContact: true,
         profileImage: null as string | null,
         coverImage: null as string | null,
         logoImage: null as string | null,
@@ -232,6 +234,7 @@ export const useFormStore = defineStore('form', {
             this.location = ''
             this.bio = ''
             this.saveContact = ''
+            this.showSaveContact = true
             this.profileImage = null
             this.coverImage = null
             this.logoImage = null
@@ -364,6 +367,7 @@ export const useFormStore = defineStore('form', {
 
             this.matchThemeColor = card.matchThemeColor || false;
             this.saveContact = card.saveContact || '';
+            this.showSaveContact = card.showSaveContact !== undefined ? card.showSaveContact : true;
             this.layout = (card.layoutMode as LayoutType) || 'right';
             this.formTitle = card.formTitle || '';
             this.connectButtonText = card.connectButtonText || 'ارسال';

@@ -28,6 +28,9 @@ class Card extends Model
         'lead_capture_mode',
         'match_theme_color',
         'creator_id',
+        'custom_footer_text',
+        'custom_footer_url',
+        'show_save_contact',
     ];
 
     protected $casts = [
@@ -35,7 +38,8 @@ class Card extends Model
         'lead_capture_mode' => 'boolean',
         'match_theme_color' => 'boolean',
         'is_default'=>'boolean',
-        'is_active'=>'boolean'
+        'is_active'=>'boolean',
+        'show_save_contact' => 'boolean',
     ];
     //
     protected static function boot(): void
