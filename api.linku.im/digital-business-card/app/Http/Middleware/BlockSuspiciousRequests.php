@@ -64,6 +64,7 @@ class BlockSuspiciousRequests
     protected array $whitelistedIPs = [
         '127.0.0.1',
         '::1',
+        '95.215.59.92', // IP سرور اصلی
         // می‌توانید IP های معتبر (مثل دفتر، خانه) را اینجا اضافه کنید
     ];
     
