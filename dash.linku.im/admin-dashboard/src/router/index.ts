@@ -27,6 +27,7 @@ import SendNotificationView from "@/views/notifications/SendNotificationView.vue
 import FAQView from "@/views/faqs/FAQView.vue";
 import RolesView from "@/pages/roles/index.vue";
 import SecurityDashboardView from "@/views/SecurityDashboard.vue";
+import FooterCustomizationView from "@/views/footer/FooterCustomizationView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -223,6 +224,12 @@ const router = createRouter({
       component: SecurityDashboardView,
       meta: { requiresAuth: true }
     },
+    {
+      path: '/footer-customization',
+      name: 'footer-customization',
+      component: FooterCustomizationView,
+      meta: { requiresAuth: true }
+    },
     // 404 - آدرس نامعتبر
     {
       path: '/:pathMatch(.*)*',
@@ -249,7 +256,7 @@ router.beforeEach(async (to, from, next) => {
       authStore.logout()
       return next({ name: 'login', replace: true })
     }
-    
+
     // فقط اگه هنوز verify نشده باشه، با سرور چک کن
     if (!authStore.isVerified) {
       try {

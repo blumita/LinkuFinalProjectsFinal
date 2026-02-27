@@ -106,6 +106,7 @@ watch(() => route.path, (newPath) => {
       <SidebarItem icon="ti ti-user-circle" text="مدیریت پروفایل‌ها" :collapsed="itemCollapsed" to="/users" @itemClicked="handleItemClick" />
       <SidebarItem icon="ti ti-credit-card" text="مدیریت کارت‌ها" :collapsed="itemCollapsed" to="/cards" @itemClicked="handleItemClick" />
       <SidebarItem icon="ti ti-settings" text="مدیریت محصولات" :collapsed="itemCollapsed" to="/cards/management" @itemClicked="handleItemClick" />
+      <SidebarItem icon="ti ti-brand-html5" text="سفارشی‌سازی Footer" :collapsed="itemCollapsed" to="/footer-customization" @itemClicked="handleItemClick" />
       <SidebarItem icon="ti ti-users" text="مدیریت مدیران" :collapsed="itemCollapsed" to="/admins" @itemClicked="handleItemClick" />
       <SidebarItem icon="ti ti-shield-lock" text="مدیریت نقش‌ها" :collapsed="itemCollapsed" to="/roles" @itemClicked="handleItemClick" />
       <SidebarItem icon="ti ti-shield-check" text="داشبورد امنیتی" :collapsed="itemCollapsed" to="/security" @itemClicked="handleItemClick" />
