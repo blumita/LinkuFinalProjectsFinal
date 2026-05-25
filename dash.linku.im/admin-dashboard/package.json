@@ -5,10 +5,10 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "NODE_OPTIONS='--max-old-space-size=4096' run-p type-check \"build-only {@}\" --",
-        "build:full": "NODE_OPTIONS='--max-old-space-size=6144' vite build",
+        "build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 nuxt build",
+        "build:full": "cross-env NODE_OPTIONS=--max-old-space-size=4096 nuxt build",
+        "generate": "cross-env NODE_OPTIONS=--max-old-space-size=4096 nuxt generate",
         "preview": "vite preview",
-        "build-only": "NODE_OPTIONS='--max-old-space-size=4096' vite build",
         "type-check": "vue-tsc --build",
         "lint": "eslint . --fix",
         "format": "prettier --write src/"
@@ -21,6 +21,7 @@
         "jalaali-js": "^1.2.8",
         "jspdf": "^3.0.3",
         "jszip": "^3.10.1",
+        "nuxt": "^4.4.6",
         "pinia": "^3.0.3",
         "qrcode": "^1.5.4",
         "tinymce": "^7.9.1",
@@ -41,6 +42,7 @@
         "@vue/eslint-config-typescript": "^14.5.1",
         "@vue/tsconfig": "^0.7.0",
         "autoprefixer": "^10.4.21",
+        "cross-env": "^10.1.0",
         "eslint": "^9.29.0",
         "eslint-plugin-vue": "~10.2.0",
         "jiti": "^2.4.2",
@@ -53,5 +55,6 @@
         "vite": "^7.0.0",
         "vite-plugin-vue-devtools": "^7.7.7",
         "vue-tsc": "^2.2.10"
-    }
+    },
+    "packageManager": "pnpm@10.18.3+sha512.bbd16e6d7286fd7e01f6b3c0b3c932cda2965c06a908328f74663f10a9aea51f1129eea615134bf992831b009eabe167ecb7008b597f40ff9bc75946aadfb08d"
 }

@@ -3,10 +3,10 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "NODE_OPTIONS='--max-old-space-size=4096' nuxt build",
-        "build:full": "NODE_OPTIONS='--max-old-space-size=4096' nuxt build",
+        "build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 nuxt build",
+        "build:full": "cross-env NODE_OPTIONS=--max-old-space-size=4096 nuxt build",
+        "generate": "cross-env NODE_OPTIONS=--max-old-space-size=4096 nuxt generate",
         "dev": "nuxt dev",
-        "generate": "NODE_OPTIONS='--max-old-space-size=4096' nuxt generate",
         "preview": "nuxt preview",
         "start": "nuxt start",
         "postinstall": "nuxt prepare"
@@ -80,6 +80,7 @@
         "autoprefixer": "^10.4.21",
         "baseline-browser-mapping": "^2.8.31",
         "cordova-android": "^14.0.1",
+        "cross-env": "^10.1.0",
         "postcss": "^8.5.3",
         "tailwindcss": "^4.1.5",
         "typescript": "^5.8.3",
